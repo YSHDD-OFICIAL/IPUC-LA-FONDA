@@ -1,4 +1,4 @@
-## Hi there 👋
+## Hi👋 esto es una página web oficial de una iglesia pentecostal unida de Colombia.
 
 <!--
 **IPUC-LA-FONDA/IPUC-LA-FONDA** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
