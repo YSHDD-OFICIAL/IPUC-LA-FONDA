@@ -1,231 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" translate="no">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
-    <meta property="og:locale" content="es_CO">
+    <meta name="description" content="Iglesia Pentecostal Unida de Colombia - IPUC LA FONDA, una comunidad de fe en Cali, Valle del Cauca">
+    <meta property="og:title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
+    <meta property="og:description" content="Una iglesia que cree en Jesús, una iglesia que enseña la Biblia">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1513326738677-b964603b136d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
-    <meta property="og:title" content="IPUC LA FONDA">
-    <meta preload="https://ipuclafonda.netlify.app/">
-    <title>IPUC LA FONDA</title>
-    <link rel="icon" href="https://tse3.mm.bing.net/th?id=OIP.0Nf3mVypwepPnYpjaJ5NcwHaHa&pid=Api&P=0&h=180">
-    <link rel="stylesheet" href="Estilos.css">
-    <link rel="stylesheet" href="Javascript.js">
-    <link rel="stylesheet" href="D-H-PreG.html">
-    <link rel="stylesheet" href="CambiaPalabras.js">
-    <link rel="stylesheet" href="Tiempo-Cronometro.js">
+    <meta property="og:type" content="website">
+    <title>IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia</title>
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMxYTRmOGIiLz48cGF0aCBkPSJNMjUgMjVINTBWNjVIMjVWNjVINDBWNDBIMjVWMjVaIiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik01MCAyNUg3NVY0MEg2MFY2NUg1MFYyNVoiIGZpbGw9IndoaXRlIi8+PHBhdGggZD0iTTI1IDY1Vjc1SDM3LjVWODcuNUg1MFY3NUg3NVY2NUg1MFY1MEgyNVY2NVoiIGZpbGw9IiNkNGFmMzciLz48L3N2Zz4=">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Loader -->
-<article id="splash-screen" class="splash-screen" style="display: none;">
-    <div>
-        <img src="LA FONDA IPUC.png" alt="IPUC LA FONDA">
+    <div id="splash-screen" class="splash-screen">
+        <div class="loader"></div>
+        <h2>IPUC LA FONDA</h2>
+        <p>Cargando...</p>
     </div>
-    <div class="loader"></div>
-    <h1 style="margin-top: 75px;">Cargando...</h1>
-</article>
 
-<!-- Encabezado -->
-<header class="header">
-    <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="logo" style="display: none;">
-    <h3>IPUC LA FONDA</h3>
-    <!--Buscador-->
-    <div class="search-container" style="display: none;">
-        <form id="search-form" onsubmit="searchContent(event)">
-            <input type="search" name="search" id="search" autocapitalize="" placeholder="Buscar">
-            <button type="submit" id="search-button">
-                <i class="bx bx-search"></i>
-            </button>
-        </form>
-    </div>
-    <div class="menu-icon" id="menuToggle" style="color: #2980b9; font-size: 25px;">=</div>
-</header>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMxYTRmOGIiLz48cGF0aCBkPSJNMjUgMjVINTBWNjVIMjVWNjVINDBWNDBIMjVWMjVaIiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik01MCAyNUg3NVY0MEg2MFY2NUg1MFYyNVoiIGZpbGw9IndoaXRlIi8+PHBhdGggZD0iTTI1IDY1Vjc1SDM3LjVWODcuNUg1MFY3NUg3NVY2NUg1MFY1MEgyNVY2NVoiIGZpbGw9IiNkNGFmMzciLz48L3N2Zz4=" alt="IPUC Logo">
+                    <div class="logo-text">IPUC LA FONDA</div>
+                </div>
+                <button class="menu-icon" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav id="mainNav">
+                    <ul class="main-menu">
+                        <li><a href="#">Inicio</a></li>
+                        <li><a href="#">Nosotros</a></li>
+                        <li><a href="#">Ministerios</a></li>
+                        <li><a href="#">Eventos</a></li>
+                        <li><a href="#">Sermones</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
 
-<p id="search-result" style="margin: 10px 10px; padding: 10px 10px; font-weight: bold; color: #2980b9;"></p>
-
-<!-- Menú desplegable -->
-<nav class="menu" id="menu" style="display: none;">
-    <ul>
-        <li><a href="Index.html">Inicio</a></li>
-        <li><a href="Eventos.html">Eventos</a></li>
-        <li><a href="Videos Nuevos.html" style="display: none;">Video Nuevo</a></li>
-        <li><a href=""></a>
-            <article class="Descarga-EXTRA">
-            <h1 style="padding-bottom: 20px;">DESCARGA LOS DATOS LEGALES DE LA IPUC</h1> 
-            <p class="extra" style="display: none;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis fugiat fuga maxime magnam sunt, vitae quibusdam non rem aliquid tenetur nisi expedita deserunt accusantium, error voluptatem veritatis explicabo. Dolore, voluptates.</p>
-            <a href="https://drive.google.com/file/d/1Yst60spvuGq0uFyJRLVnOX8ugOVgCUNE/view" download style="color: aliceblue;">
-                <button class="Descarga">Descargar PDF</button>
-            </a>                
-        </article>
-    </li>
-    </ul>
-</nav>
-
-<!-- Sección Álbum -->
-    <section class="album-section" id="album" style="display: none;">
-        <div class="video-background">
-            <video autoplay loop muted playsinline>
-                <source src="INTRO IPUC 2025 UNÁNIMES(360P).mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Iglesia Pentecostal Unida de Colombia</h1>
+            <p>Una iglesia que cree en Jesús, una iglesia que enseña la Biblia</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">Próximos Eventos</a>
+                <a href="#" class="btn btn-secondary">Ver Sermones</a>
+            </div>
         </div>
     </section>
 
-
-    <!--Anuncios-->
+    <!-- Text Animation Section -->
     <section class="text-section">
-        <p>Esta iglesia que <br>permanece en <br>
-           <span id="changing-word">Amor</span>
-       </p>
+        <div class="container">
+            <p>Esta iglesia que permanece en <span id="changing-word">Amor</span></p>
+        </div>
     </section>
-        
 
-    <section class="Anuncios">
-        <div>
-            <div class="Alerta">
-                "Porque así como el cuerpo es uno, y tiene muchos miembros, pero todos los miembros del cuerpo, siendo muchos, son un solo cuerpo, así también Cristo. Porque por un solo Espíritu fuimos todos bautizados en un cuerpo, sean judíos o griegos, sean esclavos o libres; ya todos se nos dio a beber de un mismo Espíritu."
-                <p class="versículo">1 Corintios 12:12-13</p>
+    <!-- Bible Verse Section -->
+    <section class="bible-verse">
+        <div class="container">
+            <p class="verse-text">"Porque así como el cuerpo es uno, y tiene muchos miembros, pero todos los miembros del cuerpo, siendo muchos, son un solo cuerpo, así también Cristo. Porque por un solo Espíritu fuimos todos bautizados en un cuerpo, sean judíos o griegos, sean esclavos o libres; y a todos se nos dio a beber de un mismo Espíritu."</p>
+            <p class="verse-reference">1 Corintios 12:12-13</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title">Próximos Cultos</h2>
+            
+            <div class="service-messages">
+                <div class="message culto-en-curso">Culto en curso: ¡Únete a nosotros ahora!</div>
+                <div class="message recta-final">¡Quedan menos de 10 minutos para el final del culto!</div>
+                <div class="message fin-del-culto">El culto ha finalizado. ¡Gracias por acompañarnos!</div>
+            </div>
+            
+            <div class="countdown">
+                <div class="time">
+                    <span id="days">00</span>
+                    <p>Días</p>
+                </div>
+                <div class="time">
+                    <span id="hours">00</span>
+                    <p>Horas</p>
+                </div>
+                <div class="time">
+                    <span id="minutes">00</span>
+                    <p>Minutos</p>
+                </div>
+                <div class="time">
+                    <span id="seconds">00</span>
+                    <p>Segundos</p>
+                </div>
             </div>
         </div>
     </section>
 
-  <!-- Sección Cultos -->
-  <section class="cultos" id="cultos">
-    <h2>Próximos Cultos</h2>
-    <!-- Mensajes Dinámicos -->
-  <section class="dynamic-messages">
-    <div class="message culto-en-curso">Culto en curso: ¡Únete a nosotros ahora!</div>
-    <div class="message recta-final">¡Quedan menos de 10 minutos para el final del culto!</div>
-    <div class="message fin-del-culto">El culto ha finalizado. ¡Gracias por acompañarnos!</div>
-  </section>
-    <div class="countdown">
-      <div class="time">
-        <span id="days">00</span>
-        <p>Días</p>
-      </div>
-      <div class="time">
-        <span id="hours">00</span>
-        <p>Horas</p>
-      </div>
-      <div class="time">
-        <span id="minutes">00</span>
-        <p>Minutos</p>
-      </div>
-      <div class="time">
-        <span id="seconds">00</span>
-        <p>Segundos</p>
-      </div>
-    </div>
-  </section>
-</main>
-
-<main class="main-section" style="display: none;">
-    <!-- Sección Video Nuevo -->
-    <section class="video-section" id="video">
-        <div class="video-container">
-            <h2 id="TEXT-VIDEO-NUEVO">VIDEO NUEVO</h2>
-            <div class="detalles-video">
-                <video controls autoplay loop muted preload="auto" >
-                    <source src="INFORME-MISIONERO.mp4" type="video/mp4">
-                    Tu navegador no soporta videos.
-                </video>
-                <p class="title" id="title">
-                    INFORME MISIONERO
-                </p>
-                <br>
-                <p class="text">
-                    <strong class="detalles" style="display: none;">Descripción:</strong>
-                    <p id="date-descrip" style="display: none;">El informe misionero de la Iglesia Pentecostal Unida de Colombia (IPUC) ofrece un panorama detallado de las actividades y logros alcanzados en la obra evangelística y social de la iglesia en Colombia. A través de la predicación del evangelio y el servicio a las comunidades, la IPUC ha logrado expandir el mensaje cristiano en diversas regiones, especialmente en áreas rurales y de difícil acceso.
-
-                        El informe abarca las principales actividades realizadas, como cultos evangelísticos, proyectos de discipulado, programas de ayuda social, y testimonios de transformación. También se destacan los esfuerzos de plantación de nuevas iglesias y el trabajo de capacitación de líderes locales. Además, se presentan los retos y desafíos enfrentados durante el año, así como las necesidades y proyecciones para el futuro, incluyendo el apoyo financiero y logístico requerido para continuar con la misión.
-                        
-                        Este informe refleja la fidelidad de Dios en el cumplimiento del mandato de llevar el evangelio a todas las naciones y es un llamado a la oración y al apoyo continuo de la iglesia para seguir extendiendo el Reino de Dios en Colombia.</p>
-                </p>
-                <p class="text">
-                    <strong class="detalles">Año</strong>
-                    <p id="date-año">&copy; 2024</p>
-                </p>
-                <p class="text">
-                    <strong class="detalles">Publicado en tiktok:</strong>
-                    <p id="date-user"><col>@ipuclafonda</col></p>
-                </p>
-                <p class="text">
-                    <strong class="detalles">Visibilidad:</strong>
-                    <p id="date-visi">Apto para todo <search>Publico</search></p>
-                </p>
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Testimonios</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <p>"La IPUC LA FONDA ha sido una bendición en mi vida. He encontrado una comunidad amorosa y un lugar donde puedo crecer espiritualmente."</p>
+                    <p class="author">- Alma Paredes</p>
+                </div>
+                <div class="testimonial">
+                    <p>"Gracias a la IPUC LA FONDA, mi familia y yo hemos encontrado un hogar espiritual. Estamos muy agradecidos por todo el apoyo y las enseñanzas."</p>
+                    <p class="author">- Nodier</p>
+                </div>
             </div>
-
         </div>
     </section>
-</main>
 
-<section class="Red-content">
-    <nav>
-        <div class="Redes">
-            <div>
-                <h2 class="N-R">Nuestras Redes Sociales</h2>
+    <!-- Social Media Section -->
+    <section class="social-media">
+        <div class="container">
+            <h2 class="section-title">Nuestras Redes Sociales</h2>
+            <div class="social-grid">
+                <div class="social-card">
+                    <div class="social-icon">
+                        <i class='bx bxl-tiktok'></i>
+                    </div>
+                    <h3>TikTok</h3>
+                    <p>Síguenos para contenido inspirador</p>
+                    <a href="https://www.tiktok.com/@ipuclafonda" class="btn btn-primary">Seguir</a>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">
+                        <i class='bx bxl-instagram-alt'></i>
+                    </div>
+                    <h3>Instagram</h3>
+                    <p>Mira nuestras fotos y eventos</p>
+                    <a href="https://www.Instagram.com/ipuclafonda" class="btn btn-primary">Seguir</a>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">
+                        <i class='bx bxl-facebook-circle'></i>
+                    </div>
+                    <h3>Facebook</h3>
+                    <p>Conéctate con nuestra comunidad</p>
+                    <a href="https://www.facebook.com/profile.php?id=61565888996000" class="btn btn-primary">Seguir</a>
+                </div>
             </div>
-            <ul class="list-redes">
-                <a href="https://www.tiktok.com/@ipuclafonda">
-                    <i class='bx bxl-tiktok'></i><h5>Tiktok</h5></a>
-            <a href="https://www.Instagram.com/ipuclafonda">
-                <i class='bx bxl-instagram-alt'></i><h5>Instagram</h5></a>
-            <a href="https://www.facebook.com/profile.php?id=61565888996000">
-                <i class='bx bxl-facebook-circle'></i><h5>Facebook</h5></a>
-        </ul>
         </div>
-    </nav>
-</section>
+    </section>
 
-<article class="map-section div-2" id="content">
-    <h2 style="color: rgba(118, 175, 355, 100%);">Nuestra Ubicación</h2>
-    <p style="color: #000; padding-bottom: 15px;">Visítanos En Nuestra IPUC LA FONDA. Estamos felices de recibirte.</p>
-    <div>
-        <p style="color: rgba(118, 175, 355, 500%); padding-bottom: 30px;"><i class='bx bxs-map' style="padding-right: 10px;"></i>IPUC LA FONDA, Cali, Valle Del Cauca</p>
-        <picture style="margin-top: 15px; color: #d63637;"><p style="color: rgba(118, 175, 355, 500%);">Llamenos al</p>+57 3188641238</picture>
-    </div>
-  </article>
+    <!-- Location Section -->
+    <section class="location">
+        <div class="container">
+            <h2 class="section-title">Nuestra Ubicación</h2>
+            <div class="location-info">
+                <p><i class="fas fa-map-marker-alt"></i> IPUC LA FONDA, Cali, Valle Del Cauca</p>
+                <p><i class="fas fa-phone"></i> +57 3188641238</p>
+            </div>
+            <p>Visítanos en nuestra iglesia. Estamos felices de recibirte.</p>
+        </div>
+    </section>
 
+    <!-- Radio Section -->
+    <section class="radio-section">
+        <div class="container">
+            <div class="radio-container">
+                <div class="radio-title">Radio IPUC</div>
+                <audio controls id="audioPlayer">
+                    <source src="https://audio.livecastnet.com:1250/stream" type="audio/mpeg">
+                    Tu navegador no soporta el elemento de audio.
+                </audio>
+                <div class="live-indicator">
+                    <span class="pulse"></span>
+                    Live
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- Sección de Testimonios -->
-<section class="testimonio-section" id="testimonios">
-    <h2>Testimonios</h2>
-    <div class="testimonio">
-        <p>"La IPUC LA FONDA ha sido una bendición en mi vida. He encontrado una comunidad amorosa y un lugar donde puedo crecer espiritualmente."</p>
-        <p class="autor">- Alma Paredes</p>
-    </div>
-    <div class="testimonio">
-        <p>"Gracias a la IPUC LA FONDA, mi familia y yo hemos encontrado un hogar espiritual. Estamos muy agradecidos por todo el apoyo y las enseñanzas."</p>
-        <p class="autor">- Nodier </p>
-    </div>
-</section>
-  
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">IPUC LA FONDA</div>
+                <div class="footer-info">
+                    <p>Iglesia Pentecostal Unida de Colombia</p>
+                    <p><i class="fas fa-phone"></i> +57 3188641238</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Cali, Valle Del Cauca</p>
+                </div>
+                <div class="social-links">
+                    <a href="https://www.tiktok.com/@ipuclafonda"><i class='bx bxl-tiktok'></i></a>
+                    <a href="https://www.Instagram.com/ipuclafonda"><i class='bx bxl-instagram-alt'></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61565888996000"><i class='bx bxl-facebook-circle'></i></a>
+                </div>
+                <div class="copyright">
+                    <p>&copy; 2024 IPUC LA FONDA. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-  <div class="radio-container">
-    <div class="caja">Radio IPUC</div>
-    <audio controls autoplay id="audioPlayer">
-        <source src="https://audio.livecastnet.com:1250/stream" type="audio/mpeg">
-        Tu navegador no soporta el elemento de audio.
-    </audio>
-    <div class="container">
-        <div id="live-indicator">Live</div>
-        <span class="pulse"></span>
-    </div>
-</div>
-<!-- Pie de página -->
-<footer class="footer">
-    <p class="Creditos" style="font-size: small;">&copy; 2024 IPUC LA FONDA. Todos los derechos reservados.</p>
-    <div>-</div>
-    <p style="margin-top: 15px; color: #d63637;">
-        <span style="color: rgba(118, 175, 355, 500%);">Llámenos al:</span> +57 3188641238
-    </p>
-</footer>
-    
-    <!--Scripts JS-->
-    <script src="Javascript.js"></script>
-    <script src="CambiaPalabras.js"></script>
-    <script src="Tiempo-Cronometro.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
