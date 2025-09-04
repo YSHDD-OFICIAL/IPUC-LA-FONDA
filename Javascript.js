@@ -1,172 +1,139 @@
 // Toggle para el menú
 const menuToggle = document.getElementById('menuToggle');
-const menu = document.getElementById('menu');
+const mainNav = document.getElementById('mainNav');
 
 menuToggle.addEventListener('click', () => {
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    mainNav.style.display = mainNav.style.display === 'flex' ? 'none' : 'flex';
 });
-
-// Función para botón del álbum
-function playAlbum() {
-    alert('¡Reproduciendo el álbum!');
-}
-
-// Función para abrir la tienda
-function openStore() {
-    alert('Redirigiendo a la tienda...');
-}
 
 // Ocultar el splash screen después de cargar
 window.addEventListener('load', () => {
     const splashScreen = document.getElementById('splash-screen');
-    const mainContent = document.getElementById('main-content');
-
-    // Retrasar la desaparición para efectos visuales
     setTimeout(() => {
-        splashScreen.style.display = 'none'; // Ocultar splash screen
-        mainContent.style.display = 'block'; // Mostrar contenido principal
-    }, 7000); // 7 segundos
+        splashScreen.style.display = 'none';
+    }, 2000);
 });
 
-// Botones de control de la radio
-const playButton = document.getElementById('play-button');
-const volumeButton = document.getElementById('volume-button');
+// Palabras que se van a mostrar en la animación
+const words = ["Amor", "Justicia", "Unidad", "Santidad", "Gratitud", "Humildad", "Esperanza", "Fe", "Paz"];
+let currentWordIndex = 0;
+const changingWordElement = document.getElementById("changing-word");
 
-// Estado de reproducción y volumen
-let isPlaying = false;
-let isMuted = false;
+// Función para cambiar la palabra
+function changeWord() {
+    currentWordIndex = (currentWordIndex + 1) % words.length;
+    changingWordElement.textContent = words[currentWordIndex];
+}
 
-// Función para reproducir/pausar la radio
-playButton.addEventListener('click', () => {
-    isPlaying = !isPlaying;
-    playButton.textContent = isPlaying ? '⏸️' : '▶️';
-    alert(isPlaying ? 'Radio IPUC está reproduciendo' : 'Radio IPUC en pausa');
-});
+// Cambiar la palabra cada 2 segundos
+setInterval(changeWord, 2000);
 
-// Función para controlar el volumen
-volumeButton.addEventListener('click', () => {
-    isMuted = !isMuted;
-    volumeButton.textContent = isMuted ? '🔇' : '🔊';
-    alert(isMuted ? 'Radio silenciada' : 'Volumen activado');
-});
+// Definición de los cultos y horarios
+const cultos = [
+    { day: 0, start: "10:00", end: "12:30", name: "domingo" }, // Domingo
+    { day: 2, start: "18:00", end: "20:00", name: "martes" }, // Martes
+    { day: 5, start: "18:00", end: "20:00", name: "viernes" } // Viernes
+];
 
-document.addEventListener("DOMContentLoaded", function () {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+// Elementos DOM
+const cultoEnCursoElement = document.querySelector('.message.culto-en-curso');
+const rectaFinalElement = document.querySelector('.message.recta-final');
+const finDelCultoElement = document.querySelector('.message.fin-del-culto');
+const countdownElements = {
+    days: document.getElementById("days"),
+    hours: document.getElementById("hours"),
+    minutes: document.getElementById("minutes"),
+    seconds: document.getElementById("seconds")
+};
 
-    // Detectar dispositivos Android y iOS
-    if (!/android|iphone|ipad|ipod/i.test(userAgent)) {
-        // Redirigir si no es Android o iPhone
-        alert("Acceso permitido solo desde dispositivos móviles.");
-        window.location.href = "https://ipuclafonda.netlify.app/";
-    }
-});
+/**
+ * Obtener el próximo culto y calcular la fecha y hora exactas
+ */
+function getNextCulto() {
+    const now = new Date();
+    const today = now.getDay();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-document.addEventListener("DOMContentLoaded", function () {
-    const audioPlayer = document.getElementById("audioPlayer");
-    const progressBar = document.getElementById("progressBar");
+    for (const culto of cultos) {
+        const startMinutes = parseInt(culto.start.split(":")[0]) * 60 + parseInt(culto.start.split(":")[1]);
+        const endMinutes = parseInt(culto.end.split(":")[0]) * 60 + parseInt(culto.end.split(":")[1]);
 
-    if (audioPlayer && progressBar) {
-        // Actualiza la barra de progreso en función del tiempo actual del audio
-        audioPlayer.addEventListener("timeupdate", function () {
-            const percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-            progressBar.value = percentage || 0; // Maneja el caso de "NaN" para streams en vivo
-        });
-
-        // Permite al usuario adelantar o retroceder el audio
-        progressBar.addEventListener("input", function () {
-            if (!isNaN(audioPlayer.duration)) {
-                const seekTime = (progressBar.value / 100) * audioPlayer.duration;
-                audioPlayer.currentTime = seekTime;
+        if (today === culto.day) {
+            if (currentMinutes < startMinutes) {
+                // Si el culto es hoy pero aún no empieza
+                const cultoDate = new Date(now);
+                cultoDate.setHours(parseInt(culto.start.split(":")[0]));
+                cultoDate.setMinutes(parseInt(culto.start.split(":")[1]));
+                cultoDate.setSeconds(0);
+                return { ...culto, date: cultoDate };
+            } else if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                // Si el culto está en curso
+                return { ...culto, inProgress: true };
             }
-        });
-    } else {
-        console.error("No se encontró el reproductor de audio o la barra de progreso.");
-    }
-});
-
-// Coloca directamente el valor 2024 en el elemento con id "publication-date"
-document.getElementById("date-title").textContent = "INFORME MISIONERO";
-// Coloca directamente el valor 2024 en el elemento con id "publication-date"
-document.getElementById("date-descrip").textContent = "El informe misionero de la Iglesia Pentecostal Unida de Colombia (IPUC) ofrece un panorama detallado de las actividades y logros alcanzados en la obra evangelística y social de la iglesia en Colombia. A través de la predicación del evangelio y el servicio a las comunidades, la IPUC ha logrado expandir el mensaje cristiano en diversas regiones, especialmente en áreas rurales y de difícil acceso. El informe abarca las principales actividades realizadas, como cultos evangelísticos, proyectos de discipulado, programas de ayuda social, y testimonios de transformación. También se destacan los esfuerzos de plantación de nuevas iglesias y el trabajo de capacitación de líderes locales. Además, se presentan los retos y desafíos enfrentados durante el año, así como las necesidades y proyecciones para el futuro, incluyendo el apoyo financiero y logístico requerido para continuar con la misión. Este informe refleja la fidelidad de Dios en el cumplimiento del mandato de llevar el evangelio a todas las naciones y es un llamado a la oración y al apoyo continuo de la iglesia para seguir extendiendo el Reino de Dios en Colombia";
-// Coloca directamente el valor 2024 en el elemento con id "publication-date"
-document.getElementById("date-año").textContent = "2024";
-// Coloca directamente el valor 2024 en el elemento con id "publication-date"
-document.getElementById("date-user").textContent = "@ipuclafonda";
-// Coloca directamente el valor 2024 en el elemento con id "publication-date"
-document.getElementById("date-visi").textContent = "Publico";
-
-// function to change the text of the button
-function changeText() {
-    document.getElementById("btn").innerHTML = "¡Gracias por tu apoyo!"
-};
-
-
-
-// Formulario de busqueda
-function searchContent(event) {
-    event.preventDefault(); // Evita que el formulario recargue la página
-
-    const searchQuery = document.getElementById("search").value.toLowerCase().trim();
-    const contentText = document.body.textContent.toLowerCase();
-
-    if (searchQuery) {
-        if (contentText.includes(searchQuery)) {
-            document.getElementById("search-result").textContent = 
-                `Resultados encontrados para: "${searchQuery}"`;
-        } else {
-            document.getElementById("search-result").textContent = 
-                `No se encontraron resultados para: "${searchQuery}"`;
         }
+
+        if (today < culto.day) {
+            // Si el culto es después de hoy
+            const cultoDate = new Date(now);
+            cultoDate.setDate(now.getDate() + (culto.day - today));
+            cultoDate.setHours(parseInt(culto.start.split(":")[0]));
+            cultoDate.setMinutes(parseInt(culto.start.split(":")[1]));
+            cultoDate.setSeconds(0);
+            return { ...culto, date: cultoDate };
+        }
+    }
+
+    // Si no hay más cultos esta semana, calcular el primero de la próxima semana
+    const firstCulto = cultos[0];
+    const nextDate = new Date(now);
+    nextDate.setDate(now.getDate() + (7 - today + firstCulto.day));
+    nextDate.setHours(parseInt(firstCulto.start.split(":")[0]));
+    nextDate.setMinutes(parseInt(firstCulto.start.split(":")[1]));
+    nextDate.setSeconds(0);
+    return { ...firstCulto, date: nextDate };
+}
+
+/**
+ * Actualizar la cuenta regresiva y los mensajes
+ */
+function updateCountdown() {
+    const now = new Date();
+    const nextEvent = getNextCulto();
+
+    // Ocultar todos los mensajes primero
+    cultoEnCursoElement.style.display = 'none';
+    rectaFinalElement.style.display = 'none';
+    finDelCultoElement.style.display = 'none';
+
+    if (nextEvent.inProgress) {
+        // Mostrar mensaje "Culto en curso"
+        cultoEnCursoElement.style.display = 'block';
     } else {
-        document.getElementById("search-result").textContent = "Ingresa un término de búsqueda.";
+        // Si el culto está próximo, mostrar la cuenta regresiva
+        const timeLeft = nextEvent.date.getTime() - now.getTime();
+
+        if (timeLeft <= 0) {
+            finDelCultoElement.style.display = 'block';
+            return;
+        }
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        countdownElements.days.textContent = String(days).padStart(2, "0");
+        countdownElements.hours.textContent = String(hours).padStart(2, "0");
+        countdownElements.minutes.textContent = String(minutes).padStart(2, "0");
+        countdownElements.seconds.textContent = String(seconds).padStart(2, "0");
+
+        // Mostrar mensaje de la recta final si faltan menos de 10 minutos
+        if (minutes < 10 && days === 0 && hours === 0) {
+            rectaFinalElement.style.display = 'block';
+        }
     }
-};
+}
 
-// Formulario de contacto
-function sumitForm(event) {
-    event.preventDefault(); // Evita que el Formulario regarge la pagina
-
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const messaje = document.getElementById("messaje").value;
-
-    if (name && email && messaje) {
-        alert('¡Gracias por tu mensaje!');
-    }
-    else {
-        alert('Por favor, completa todos los campos del formulario.');
-    }
-
-    document.getElementById("contact-form").reset();
-};
-
-// Agregar el input de búsqueda al DOM
-document.addEventListener("DOMContentLoaded", function () {
-    const searchForm = document.createElement("form");
-    searchForm.setAttribute("onsubmit", "searchContent(event)");
-
-    const searchInput = document.createElement("input");
-    searchInput.setAttribute("type", "text");
-    searchInput.setAttribute("id", "search");
-    searchInput.setAttribute("placeholder", "Buscar...");
-
-    const searchButton = document.createElement("button");
-    searchButton.setAttribute("type", "submit");
-    searchButton.textContent = "Buscar";
-
-    searchForm.appendChild(searchInput);
-    searchForm.appendChild(searchButton);
-
-    document.body.insertBefore(searchForm, document.body.firstChild);
-});
-
-// Agregar sonido de fondo
-document.addEventListener("DOMContentLoaded", function () {
-    const backgroundAudio = document.createElement("audio");
-    backgroundAudio.setAttribute("src", "músicacristiana.mp3"); // Reemplaza con la ruta de tu archivo de audio
-    backgroundAudio.setAttribute("loop", "true");
-    backgroundAudio.setAttribute("autoplay", "true");
-    backgroundAudio.setAttribute("id", "background-audio");
-
-    document.body.appendChild(backgroundAudio);
-});
+// Llamar a la función de actualización y luego cada segundo
+updateCountdown();
+setInterval(updateCountdown, 1000);
