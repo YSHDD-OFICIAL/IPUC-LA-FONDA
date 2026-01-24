@@ -1,939 +1,948 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="no-js">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Iglesia Pentecostal Unida de Colombia - IPUC LA FONDA, una comunidad de fe en Cali, Valle del Cauca">
+    <meta name="keywords" content="IPUC, Iglesia Pentecostal, Cali, Colombia, Cristianismo, Fe">
     <meta property="og:title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
     <meta property="og:description" content="Una iglesia que cree en Jesús, una iglesia que enseña la Biblia">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1513326738677-b964603b136d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80">
+    <meta property="og:image" content="assets/images/og-image.jpg">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
     <meta property="og:type" content="website">
+    
+    <!-- Preconexión y precarga para mejor rendimiento -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="css/styles.css">
+    <link rel="preload" as="script" href="js/main.js">
+    
+    <!-- Icono favicon moderno -->
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    
     <title>IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia</title>
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMxYTRmOGIiLz48cGF0aCBkPSJNMjUgMjVINTBWNjVIMjVWNjVINDBWNDBIMjVWMjVaIiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ=">
+    
+    <!-- Font Awesome optimizado -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #1a4f8b;
-            --secondary: #d4af37;
-            --accent: #e31837;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --text: #333;
-            --gray: #6c757d;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            color: var(--text);
-            line-height: 1.6;
-            background-color: #f5f5f5;
-            overflow-x: hidden;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        /* Loader */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Header */
-        header {
-            background-color: var(--primary);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo img {
-            height: 50px;
-        }
-        
-        .logo-text {
-            color: white;
-            margin-left: 15px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .menu-icon {
-            color: white;
-            font-size: 24px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: none;
-        }
-        
-        /* Navigation */
-        nav {
-            display: flex;
-            justify-content: center;
-        }
-        
-        .main-menu {
-            display: flex;
-            list-style: none;
-            gap: 25px;
-        }
-        
-        .main-menu li {
-            margin: 0;
-        }
-        
-        .main-menu a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 16px;
-            transition: color 0.3s;
-            position: relative;
-            padding: 5px 0;
-        }
-        
-        .main-menu a:hover {
-            color: var(--secondary);
-        }
-        
-        .main-menu a:after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            background: var(--secondary);
-            left: 0;
-            bottom: 0;
-            transition: width 0.3s;
-        }
-        
-        .main-menu a:hover:after {
-            width: 100%;
-        }
-        
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1513326738677-b964603b136d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 100px 0;
-            text-align: center;
-        }
-        
-        .hero h1 {
-            font-size: 42px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
-        .hero p {
-            font-size: 18px;
-            max-width: 700px;
-            margin: 0 auto 30px;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-        
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #c01028;
-            transform: translateY(-3px);
-        }
-        
-        .btn-secondary {
-            background-color: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: white;
-            color: var(--primary);
-            transform: translateY(-3px);
-        }
-        
-        /* Text Animation Section */
-        .text-section {
-            background-color: white;
-            padding: 60px 0;
-            text-align: center;
-        }
-        
-        .text-section p {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 0;
-        }
-        
-        #changing-word {
-            display: inline-block;
-            animation: changeWord 8s infinite;
-            color: var(--secondary);
-        }
-        
-        @keyframes changeWord {
-            0% { opacity: 0; transform: translateY(20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            30% { opacity: 1; transform: translateY(0); }
-            40% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 0; }
-        }
-        
-        /* Bible Verse Section */
-        .bible-verse {
-            background-color: var(--light);
-            padding: 50px 0;
-            text-align: center;
-        }
-        
-        .verse-text {
-            font-size: 18px;
-            font-style: italic;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.8;
-        }
-        
-        .verse-reference {
-            font-weight: bold;
-            color: var(--primary);
-            margin-top: 15px;
-        }
-        
-        /* Services Section */
-        .services {
-            padding: 80px 0;
-            background-color: white;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-            color: var(--primary);
-            position: relative;
-        }
-        
-        .section-title:after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 3px;
-            background: var(--secondary);
-            margin: 15px auto;
-        }
-        
-        .countdown {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .time {
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            background-color: white;
-            min-width: 80px;
-        }
-        
-        .time span {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--primary);
-            display: block;
-        }
-        
-        .time p {
-            font-size: 14px;
-            color: var(--gray);
-            margin-top: 5px;
-        }
-        
-        .service-messages {
-            margin: 30px 0;
-        }
-        
-        .message {
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: none;
-        }
-        
-        .message.culto-en-curso {
-            background-color: #27ae60;
-            color: white;
-        }
-        
-        .message.recta-final {
-            background-color: #f39c12;
-            color: white;
-        }
-        
-        .message.fin-del-culto {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        /* Testimonials Section */
-        .testimonials {
-            padding: 80px 0;
-            background-color: var(--light);
-        }
-        
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-        
-        .testimonial {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .testimonial p {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-        
-        .testimonial .author {
-            font-weight: bold;
-            color: var(--primary);
-            text-align: right;
-        }
-        
-        /* Social Media Section */
-        .social-media {
-            padding: 80px 0;
-            background-color: white;
-        }
-        
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        
-        .social-card {
-            text-align: center;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s;
-        }
-        
-        .social-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .social-icon {
-            font-size: 40px;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-        
-        .social-card h3 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        /* Location Section */
-        .location {
-            padding: 80px 0;
-            background-color: var(--light);
-            text-align: center;
-        }
-        
-        .location-info {
-            margin-bottom: 30px;
-        }
-        
-        .location-info p {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        
-        .location-info i {
-            color: var(--primary);
-            margin-right: 10px;
-        }
-        
-        /* Radio Section */
-        .radio-section {
-            padding: 50px 0;
-            background-color: white;
-            text-align: center;
-        }
-        
-        .radio-container {
-            display: inline-flex;
-            align-items: center;
-            background: var(--light);
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            gap: 15px;
-        }
-        
-        .radio-title {
-            font-weight: bold;
-            color: var(--primary);
-            margin-right: 15px;
-        }
-        
-        .live-indicator {
-            background-color: #ff0000;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .pulse {
-            width: 10px;
-            height: 10px;
-            background-color: #ff0000;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 60px 0 30px;
-        }
-        
-        .footer-content {
-            text-align: center;
-        }
-        
-        .footer-logo {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--secondary);
-        }
-        
-        .footer-info {
-            margin-bottom: 30px;
-        }
-        
-        .footer-info p {
-            margin-bottom: 10px;
-        }
-        
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            transition: all 0.3s;
-        }
-        
-        .social-links a:hover {
-            background: var(--secondary);
-            transform: translateY(-3px);
-        }
-        
-        .copyright {
-            font-size: 14px;
-            color: #aaa;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .testimonials-grid,
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .main-menu {
-                gap: 15px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .menu-icon {
-                display: block;
-            }
-            
-            nav {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--primary);
-                padding: 20px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            
-            .main-menu {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .hero h1 {
-                font-size: 32px;
-            }
-            
-            .hero p {
-                font-size: 16px;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .text-section p {
-                font-size: 24px;
-            }
-            
-            .countdown {
-                flex-wrap: wrap;
-            }
-            
-            .time {
-                min-width: 70px;
-            }
-        }
-    </style>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Hojas de estilo -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Scripts asíncronos -->
+    <script defer src="js/main.js"></script>
+    <script defer src="js/countdown.js"></script>
+    <script defer src="js/animations.js"></script>
 </head>
 <body>
-    <!-- Loader -->
-    <div id="splash-screen" class="splash-screen">
-        <div class="loader"></div>
-        <h2>IPUC LA FONDA</h2>
-        <p>Cargando...</p>
+    <!-- Preloader mejorado -->
+    <div id="preloader" class="preloader">
+        <div class="preloader-container">
+            <div class="preloader-logo">
+                <div class="logo-shape shape-1"></div>
+                <div class="logo-shape shape-2"></div>
+                <div class="logo-shape shape-3"></div>
+            </div>
+            <div class="preloader-text">
+                <span class="loading-text">Cargando bendiciones</span>
+                <div class="loading-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Header -->
-    <header>
+    <!-- Header mejorado con mega menú -->
+    <header class="header">
         <div class="container">
             <div class="header-content">
+                <!-- Logo con animación -->
                 <div class="logo">
-                    <div class="logo-text">IPUC LA FONDA</div>
+                    <a href="#" class="logo-link">
+                        <div class="logo-icon">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1 class="logo-title">IPUC LA FONDA</h1>
+                            <span class="logo-subtitle">Pentecostal Unida de Colombia</span>
+                        </div>
+                    </a>
                 </div>
-                <button class="menu-icon" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <nav id="mainNav">
-                    <ul class="main-menu">
-                        <li><a href="#">Inicio</a></li>
-                        <li><a href="#">Nosotros</a></li>
-                        <li><a href="#">Ministerios</a></li>
-                        <li><a href="#">Eventos</a></li>
-                        <li><a href="#">Sermones</a></li>
-                        <li><a href="#">Contacto</a></li>
+
+                <!-- Navegación principal -->
+                <nav class="main-nav" role="navigation">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#inicio" class="nav-link active" data-nav="inicio">
+                                <i class="fas fa-home"></i>
+                                <span>Inicio</span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#nosotros" class="nav-link" data-nav="nosotros">
+                                <i class="fas fa-users"></i>
+                                <span>Nosotros</span>
+                                <i class="fas fa-chevron-down dropdown-icon"></i>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a href="#historia">Nuestra Historia</a>
+                                <a href="#pastores">Nuestros Pastores</a>
+                                <a href="#vision">Visión y Misión</a>
+                                <a href="#creemos">Lo que Creemos</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#ministerios" class="nav-link" data-nav="ministerios">
+                                <i class="fas fa-hands-praying"></i>
+                                <span>Ministerios</span>
+                                <i class="fas fa-chevron-down dropdown-icon"></i>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a href="#jovenes">Jóvenes</a>
+                                <a href="#niños">Niños</a>
+                                <a href="#mujeres">Mujeres</a>
+                                <a href="#hombres">Hombres</a>
+                                <a href="#alabanza">Alabanza</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#eventos" class="nav-link" data-nav="eventos">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Eventos</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#sermones" class="nav-link" data-nav="sermones">
+                                <i class="fas fa-video"></i>
+                                <span>Sermones</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#contacto" class="nav-link" data-nav="contacto">
+                                <i class="fas fa-envelope"></i>
+                                <span>Contacto</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
+
+                <!-- Botones de acción -->
+                <div class="header-actions">
+                    <button class="btn btn-outline btn-sm" id="give-btn">
+                        <i class="fas fa-heart"></i>
+                        <span>Ofrendar</span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="prayer-btn">
+                        <i class="fas fa-pray"></i>
+                        <span>Petición de Oración</span>
+                    </button>
+                </div>
+
+                <!-- Botón menú móvil -->
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
+    <!-- Botón flotante para volver arriba -->
+    <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Sección Hero mejorada -->
+    <section id="hero" class="hero-section">
+        <div class="hero-background">
+            <!-- Video de fondo opcional -->
+            <div class="video-overlay"></div>
+            <!-- Imagen de fondo con efecto parallax -->
+            <div class="parallax-bg" data-speed="0.5"></div>
+        </div>
+        
         <div class="container">
-            <h1>Iglesia Pentecostal Unida de Colombia</h1>
-            <p>Una iglesia que cree en Jesús, una iglesia que enseña la Biblia</p>
-            <div class="hero-buttons">
-                <a href="#" class="btn btn-primary">Próximos Eventos</a>
-                <a href="#" class="btn btn-secondary">Ver Sermones</a>
+            <div class="hero-content">
+                <div class="hero-text" data-aos="fade-up" data-aos-delay="100">
+                    <h1 class="hero-title">
+                        <span class="title-line">Bienvenidos a</span>
+                        <span class="title-highlight">IPUC LA FONDA</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Una iglesia que <span class="typewriter-text" id="typewriter"></span>
+                    </p>
+                    <p class="hero-description">
+                        Somos una comunidad de fe que cree en el poder transformador de Jesucristo. 
+                        Nuestro propósito es glorificar a Dios, edificar a los santos y alcanzar al mundo.
+                    </p>
+                    
+                    <div class="hero-actions">
+                        <a href="#eventos" class="btn btn-primary btn-lg btn-animate">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Próximos Eventos</span>
+                        </a>
+                        <a href="#sermones" class="btn btn-secondary btn-lg btn-animate">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Ver Sermones</span>
+                        </a>
+                        <a href="#ubicacion" class="btn btn-outline btn-lg btn-animate">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Visítanos</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Widget de próximo evento -->
+                <div class="hero-widget" data-aos="fade-left" data-aos-delay="300">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-church"></i> Próximo Culto</h3>
+                        <div class="live-badge">
+                            <span class="pulse"></span>
+                            En Vivo Pronto
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="next-service">
+                            <div class="service-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="service-info">
+                                <h4>Culto de Adoración</h4>
+                                <p class="service-time">
+                                    <i class="fas fa-clock"></i>
+                                    Domingo 10:00 AM
+                                </p>
+                                <p class="service-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    IPUC LA FONDA
+                                </p>
+                            </div>
+                        </div>
+                        <div class="countdown-mini" id="countdownMini">
+                            <div class="countdown-item">
+                                <span class="number">00</span>
+                                <span class="label">Días</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="number">00</span>
+                                <span class="label">Horas</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="number">00</span>
+                                <span class="label">Min</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="number">00</span>
+                                <span class="label">Seg</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-block btn-notify" id="notifyMe">
+                            <i class="fas fa-bell"></i>
+                            Recordarme
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- Flecha para scroll -->
+        <a href="#features" class="scroll-down" aria-label="Scroll down">
+            <i class="fas fa-chevron-down"></i>
+        </a>
     </section>
 
-    <!-- Text Animation Section -->
-    <section class="text-section">
+    <!-- Sección de características -->
+    <section id="features" class="features-section">
         <div class="container">
-            <p>Esta iglesia que permanece en <span id="changing-word">Amor</span></p>
-        </div>
-    </section>
-
-    <!-- Bible Verse Section -->
-    <section class="bible-verse">
-        <div class="container">
-            <p class="verse-text">"Porque así como el cuerpo es uno, y tiene muchos miembros, pero todos los miembros del cuerpo, siendo muchos, son un solo cuerpo, así también Cristo. Porque por un solo Espíritu fuimos todos bautizados en un cuerpo, sean judíos o griegos, sean esclavos o libres; y a todos se nos dio a beber de un mismo Espíritu."</p>
-            <p class="verse-reference">1 Corintios 12:12-13</p>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section class="services">
-        <div class="container">
-            <h2 class="section-title">Próximos Cultos</h2>
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Nuestra Comunidad</h2>
+                <p class="section-subtitle">Un lugar donde puedes crecer en fe, esperanza y amor</p>
+                <div class="section-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-icon"><i class="fas fa-cross"></i></div>
+                    <div class="divider-line"></div>
+                </div>
+            </div>
             
-            <div class="service-messages">
-                <div class="message culto-en-curso">Culto en curso: ¡Únete a nosotros ahora!</div>
-                <div class="message recta-final">¡Quedan menos de 10 minutos para el final del culto!</div>
-                <div class="message fin-del-culto">El culto ha finalizado. ¡Gracias por acompañarnos!</div>
+            <div class="features-grid">
+                <!-- Característica 1 -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <div class="icon-circle">
+                            <i class="fas fa-book-bible"></i>
+                        </div>
+                    </div>
+                    <h3 class="feature-title">Enseñanza Bíblica</h3>
+                    <p class="feature-description">
+                        Estudiamos la Palabra de Dios con profundidad y aplicación práctica para la vida diaria.
+                    </p>
+                    <a href="#" class="feature-link">Más información <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Característica 2 -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <div class="icon-circle">
+                            <i class="fas fa-hands-praying"></i>
+                        </div>
+                    </div>
+                    <h3 class="feature-title">Comunidad de Fe</h3>
+                    <p class="feature-description">
+                        Caminamos juntos en el discipulado, apoyándonos mutuamente en el crecimiento espiritual.
+                    </p>
+                    <a href="#" class="feature-link">Conoce más <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Característica 3 -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <div class="icon-circle">
+                            <i class="fas fa-heart-circle-plus"></i>
+                        </div>
+                    </div>
+                    <h3 class="feature-title">Servicio Comunitario</h3>
+                    <p class="feature-description">
+                        Extendemos el amor de Cristo a través de programas sociales y ayuda a la comunidad.
+                    </p>
+                    <a href="#" class="feature-link">Involúcrate <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Característica 4 -->
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <div class="icon-circle">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    </div>
+                    <h3 class="feature-title">Adoración Vibrante</h3>
+                    <p class="feature-description">
+                        Celebramos la presencia de Dios con alabanza y adoración que toca el corazón.
+                    </p>
+                    <a href="#" class="feature-link">Escucha ahora <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de versículo animado -->
+    <section class="bible-verse-section">
+        <div class="container">
+            <div class="verse-container" data-aos="zoom-in">
+                <div class="verse-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <blockquote class="verse-text">
+                    "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, 
+                    para que todo aquel que en él cree, no se pierda, mas tenga vida eterna."
+                </blockquote>
+                <cite class="verse-reference">Juan 3:16</cite>
+                <div class="verse-actions">
+                    <button class="btn-verse" id="prevVerse">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn-verse" id="nextVerse">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de cultos con cuenta regresiva mejorada -->
+    <section id="cultos" class="services-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Horarios de Culto</h2>
+                <p class="section-subtitle">Únete a nosotros en estos momentos especiales de adoración</p>
             </div>
             
-            <div class="countdown">
-                <div class="time">
-                    <span id="days">00</span>
-                    <p>Días</p>
+            <div class="services-container">
+                <!-- Mensajes dinámicos -->
+                <div class="service-messages">
+                    <div class="message-alert success" id="messageNow">
+                        <i class="fas fa-bell"></i>
+                        <span>Culto en curso: ¡Únete a nosotros ahora!</span>
+                        <button class="message-close">&times;</button>
+                    </div>
+                    <div class="message-alert warning" id="messageSoon">
+                        <i class="fas fa-clock"></i>
+                        <span>¡Quedan menos de 10 minutos para el culto!</span>
+                        <button class="message-close">&times;</button>
+                    </div>
+                    <div class="message-alert info" id="messageEnded">
+                        <i class="fas fa-check-circle"></i>
+                        <span>El culto ha finalizado. ¡Gracias por acompañarnos!</span>
+                        <button class="message-close">&times;</button>
+                    </div>
                 </div>
-                <div class="time">
-                    <span id="hours">00</span>
-                    <p>Horas</p>
+                
+                <!-- Contador principal -->
+                <div class="countdown-main" data-aos="fade-up" data-aos-delay="200">
+                    <div class="countdown-title">
+                        <h3>Próximo Culto en:</h3>
+                        <div class="service-type">
+                            <span class="service-badge" id="serviceType">Culto Dominical</span>
+                        </div>
+                    </div>
+                    
+                    <div class="countdown-display">
+                        <div class="countdown-item large">
+                            <div class="countdown-number" id="countDays">00</div>
+                            <div class="countdown-label">Días</div>
+                        </div>
+                        <div class="countdown-separator">:</div>
+                        <div class="countdown-item large">
+                            <div class="countdown-number" id="countHours">00</div>
+                            <div class="countdown-label">Horas</div>
+                        </div>
+                        <div class="countdown-separator">:</div>
+                        <div class="countdown-item large">
+                            <div class="countdown-number" id="countMinutes">00</div>
+                            <div class="countdown-label">Minutos</div>
+                        </div>
+                        <div class="countdown-separator">:</div>
+                        <div class="countdown-item large">
+                            <div class="countdown-number" id="countSeconds">00</div>
+                            <div class="countdown-label">Segundos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="countdown-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="countProgress"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="nextServiceTime">Domingo 10:00 AM</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="time">
-                    <span id="minutes">00</span>
-                    <p>Minutos</p>
-                </div>
-                <div class="time">
-                    <span id="seconds">00</span>
-                    <p>Segundos</p>
+                
+                <!-- Horarios de cultos -->
+                <div class="services-grid" data-aos="fade-up" data-aos-delay="300">
+                    <div class="service-card">
+                        <div class="service-card-header">
+                            <div class="service-day">Domingo</div>
+                            <div class="service-time">10:00 AM - 12:30 PM</div>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Culto Dominical</h4>
+                            <p>Culto principal de adoración y predicación</p>
+                            <ul class="service-features">
+                                <li><i class="fas fa-music"></i> Alabanza en vivo</li>
+                                <li><i class="fas fa-child"></i> Escuela Dominical</li>
+                                <li><i class="fas fa-utensils"></i> Refrigerio</li>
+                            </ul>
+                        </div>
+                        <div class="service-card-footer">
+                            <button class="btn btn-outline btn-sm btn-service" data-day="0">
+                                <i class="fas fa-bell"></i>
+                                Recordar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-card-header">
+                            <div class="service-day">Martes</div>
+                            <div class="service-time">6:00 PM - 8:00 PM</div>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Culto de Oración</h4>
+                            <p>Noche de intercesión y búsqueda de Dios</p>
+                            <ul class="service-features">
+                                <li><i class="fas fa-pray"></i> Oración poderosa</li>
+                                <li><i class="fas fa-hands"></i> Ministerio de sanidad</li>
+                                <li><i class="fas fa-star"></i> Testimonios</li>
+                            </ul>
+                        </div>
+                        <div class="service-card-footer">
+                            <button class="btn btn-outline btn-sm btn-service" data-day="2">
+                                <i class="fas fa-bell"></i>
+                                Recordar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-card-header">
+                            <div class="service-day">Viernes</div>
+                            <div class="service-time">6:00 PM - 8:00 PM</div>
+                        </div>
+                        <div class="service-card-body">
+                            <h4>Jóvenes en Acción</h4>
+                            <p>Culto juvenil con música y enseñanza relevante</p>
+                            <ul class="service-features">
+                                <li><i class="fas fa-guitar"></i> Música contemporánea</li>
+                                <li><i class="fas fa-gamepad"></i> Actividades</li>
+                                <li><i class="fas fa-pizza-slice"></i> Refrigerio juvenil</li>
+                            </ul>
+                        </div>
+                        <div class="service-card-footer">
+                            <button class="btn btn-outline btn-sm btn-service" data-day="5">
+                                <i class="fas fa-bell"></i>
+                                Recordar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials">
+    <!-- Sección de testimonios con carrusel -->
+    <section class="testimonials-section">
         <div class="container">
-            <h2 class="section-title">Testimonios</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial">
-                    <p>"La IPUC LA FONDA ha sido una bendición en mi vida. He encontrado una comunidad amorosa y un lugar donde puedo crecer espiritualmente."</p>
-                    <p class="author">- Alma Paredes</p>
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Testimonios Transformados</h2>
+                <p class="section-subtitle">Historias de vida cambiada por el poder de Dios</p>
+            </div>
+            
+            <div class="testimonials-slider">
+                <div class="slider-container" id="testimonialSlider">
+                    <!-- Testimonios se cargarán dinámicamente -->
                 </div>
-                <div class="testimonial">
-                    <p>"Gracias a la IPUC LA FONDA, mi familia y yo hemos encontrado un hogar espiritual. Estamos muy agradecidos por todo el apoyo y las enseñanzas."</p>
-                    <p class="author">- Nodier</p>
+                
+                <div class="slider-controls">
+                    <button class="slider-btn prev" id="prevTestimonial">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="slider-dots" id="testimonialDots"></div>
+                    <button class="slider-btn next" id="nextTestimonial">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Social Media Section -->
-    <section class="social-media">
+    <!-- Sección de redes sociales mejorada -->
+    <section class="social-section">
         <div class="container">
-            <h2 class="section-title">Nuestras Redes Sociales</h2>
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Conéctate Con Nosotros</h2>
+                <p class="section-subtitle">Síguenos en nuestras redes sociales para contenido inspirador</p>
+            </div>
+            
             <div class="social-grid">
-                <div class="social-card">
-                    <div class="social-icon">
-                        <i class='bx bxl-tiktok'></i>
+                <div class="social-card tiktok" data-aos="flip-left">
+                    <div class="social-card-header">
+                        <div class="social-icon">
+                            <i class="fab fa-tiktok"></i>
+                        </div>
+                        <h3>TikTok</h3>
                     </div>
-                    <h3>TikTok</h3>
-                    <p>Síguenos para contenido inspirador</p>
-                    <a href="https://www.tiktok.com/@ipuclafonda" class="btn btn-primary">Seguir</a>
+                    <div class="social-card-body">
+                        <p>Contenido breve e inspirador para tu día a día</p>
+                        <div class="social-stats">
+                            <span><i class="fas fa-users"></i> 2.5K Seguidores</span>
+                            <span><i class="fas fa-video"></i> Videos diarios</span>
+                        </div>
+                    </div>
+                    <div class="social-card-footer">
+                        <a href="https://www.tiktok.com/@ipuclafonda" class="btn btn-social" target="_blank">
+                            <i class="fab fa-tiktok"></i>
+                            Síguenos
+                        </a>
+                    </div>
                 </div>
-                <div class="social-card">
-                    <div class="social-icon">
-                        <i class='bx bxl-instagram-alt'></i>
+                
+                <div class="social-card instagram" data-aos="flip-left" data-aos-delay="100">
+                    <div class="social-card-header">
+                        <div class="social-icon">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <h3>Instagram</h3>
                     </div>
-                    <h3>Instagram</h3>
-                    <p>Mira nuestras fotos y eventos</p>
-                    <a href="https://www.Instagram.com/ipuclafonda" class="btn btn-primary">Seguir</a>
+                    <div class="social-card-body">
+                        <p>Fotos, historias y eventos de nuestra comunidad</p>
+                        <div class="social-stats">
+                            <span><i class="fas fa-users"></i> 1.8K Seguidores</span>
+                            <span><i class="fas fa-image"></i> Galería activa</span>
+                        </div>
+                    </div>
+                    <div class="social-card-footer">
+                        <a href="https://www.instagram.com/ipuclafonda" class="btn btn-social" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                            Síguenos
+                        </a>
+                    </div>
                 </div>
-                <div class="social-card">
-                    <div class="social-icon">
-                        <i class='bx bxl-facebook-circle'></i>
+                
+                <div class="social-card facebook" data-aos="flip-left" data-aos-delay="200">
+                    <div class="social-card-header">
+                        <div class="social-icon">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <h3>Facebook</h3>
                     </div>
-                    <h3>Facebook</h3>
-                    <p>Conéctate con nuestra comunidad</p>
-                    <a href="https://www.facebook.com/profile.php?id=61565888996000" class="btn btn-primary">Seguir</a>
+                    <div class="social-card-body">
+                        <p>Transmisiones en vivo y comunidad interactiva</p>
+                        <div class="social-stats">
+                            <span><i class="fas fa-users"></i> 3.2K Seguidores</span>
+                            <span><i class="fas fa-live"></i> En vivo</span>
+                        </div>
+                    </div>
+                    <div class="social-card-footer">
+                        <a href="https://www.facebook.com/profile.php?id=61565888996000" class="btn btn-social" target="_blank">
+                            <i class="fab fa-facebook-f"></i>
+                            Síguenos
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="social-card youtube" data-aos="flip-left" data-aos-delay="300">
+                    <div class="social-card-header">
+                        <div class="social-icon">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <h3>YouTube</h3>
+                    </div>
+                    <div class="social-card-body">
+                        <p>Sermones completos y contenido de enseñanza</p>
+                        <div class="social-stats">
+                            <span><i class="fas fa-users"></i> 850 Suscriptores</span>
+                            <span><i class="fas fa-play-circle"></i> Sermones</span>
+                        </div>
+                    </div>
+                    <div class="social-card-footer">
+                        <a href="#" class="btn btn-social" target="_blank">
+                            <i class="fab fa-youtube"></i>
+                            Suscríbete
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Location Section -->
-    <section class="location">
-        <div class="container">
-            <h2 class="section-title">Nuestra Ubicación</h2>
-            <div class="location-info">
-                <p><i class="fas fa-map-marker-alt"></i> IPUC LA FONDA, Cali, Valle Del Cauca</p>
-                <p><i class="fas fa-phone"></i> +57 3188641238</p>
-            </div>
-            <p>Visítanos en nuestra iglesia. Estamos felices de recibirte.</p>
-        </div>
-    </section>
-
-    <!-- Radio Section -->
+    <!-- Sección de radio en vivo -->
     <section class="radio-section">
         <div class="container">
-            <div class="radio-container">
-                <div class="radio-title">Radio IPUC</div>
-                <audio controls id="audioPlayer">
-                    <source src="https://audio.livecastnet.com:1250/stream" type="audio/mpeg">
-                    Tu navegador no soporta el elemento de audio.
-                </audio>
-                <div class="live-indicator">
-                    <span class="pulse"></span>
-                    Live
+            <div class="radio-container" data-aos="zoom-in">
+                <div class="radio-header">
+                    <div class="radio-title">
+                        <h3><i class="fas fa-radio"></i> Radio IPUC en Vivo</h3>
+                        <div class="live-indicator">
+                            <span class="pulse"></span>
+                            EN VIVO
+                        </div>
+                    </div>
+                    <div class="radio-actions">
+                        <button class="btn-radio" id="volumeToggle">
+                            <i class="fas fa-volume-up" id="volumeIcon"></i>
+                        </button>
+                        <button class="btn-radio" id="favoriteToggle">
+                            <i class="far fa-heart" id="favoriteIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="radio-body">
+                    <div class="radio-player">
+                        <audio id="radioPlayer" preload="metadata">
+                            <source src="https://audio.livecastnet.com:1250/stream" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                        
+                        <div class="player-controls">
+                            <button class="player-btn" id="playPause">
+                                <i class="fas fa-play" id="playIcon"></i>
+                            </button>
+                            
+                            <div class="player-info">
+                                <div class="player-title">Radio IPUC - Transmisión en Vivo</div>
+                                <div class="player-status" id="playerStatus">Detenido</div>
+                            </div>
+                            
+                            <div class="player-volume">
+                                <input type="range" id="volumeSlider" min="0" max="100" value="80">
+                            </div>
+                        </div>
+                        
+                        <div class="player-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="radioProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="radio-schedule">
+                        <h4>Programación de Hoy</h4>
+                        <ul class="schedule-list">
+                            <li>
+                                <span class="time">7:00 AM</span>
+                                <span class="program">Devocional Matutino</span>
+                            </li>
+                            <li class="active">
+                                <span class="time">10:00 AM</span>
+                                <span class="program">Música Inspiracional</span>
+                            </li>
+                            <li>
+                                <span class="time">6:00 PM</span>
+                                <span class="program">Palabra de Vida</span>
+                            </li>
+                            <li>
+                                <span class="time">8:00 PM</span>
+                                <span class="program">Oración Nocturna</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="radio-footer">
+                    <div class="listeners-count">
+                        <i class="fas fa-headphones"></i>
+                        <span id="listenerCount">125</span> oyentes en vivo
+                    </div>
+                    <button class="btn btn-sm btn-share" id="shareRadio">
+                        <i class="fas fa-share-alt"></i>
+                        Compartir
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
+    <!-- Sección de ubicación con mapa interactivo -->
+    <section id="ubicacion" class="location-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Nuestra Ubicación</h2>
+                <p class="section-subtitle">Visítanos y sé parte de nuestra familia espiritual</p>
+            </div>
+            
+            <div class="location-content">
+                <div class="location-info" data-aos="fade-right">
+                    <div class="info-card">
+                        <h3><i class="fas fa-church"></i> IPUC LA FONDA</h3>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Dirección</h4>
+                                <p>Calle 123 #45-67, Barrio La Fonda</p>
+                                <p>Cali, Valle del Cauca, Colombia</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h4>Teléfono</h4>
+                                <p>+57 318 864 1238</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Correo Electrónico</h4>
+                                <p>info@ipuclafonda.org</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Horario de Oficina</h4>
+                                <p>Lunes a Viernes: 8:00 AM - 5:00 PM</p>
+                                <p>Sábados: 9:00 AM - 12:00 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="location-actions">
+                            <button class="btn btn-primary" id="getDirections">
+                                <i class="fas fa-directions"></i>
+                                Cómo llegar
+                            </button>
+                            <button class="btn btn-outline" id="contactForm">
+                                <i class="fas fa-comment-dots"></i>
+                                Enviar mensaje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="location-map" data-aos="fade-left">
+                    <div id="mapContainer" class="map-placeholder">
+                        <!-- Mapa será insertado por JavaScript -->
+                        <div class="map-overlay">
+                            <p>Haz clic para cargar el mapa interactivo</p>
+                            <button class="btn btn-sm" id="loadMap">
+                                <i class="fas fa-map"></i>
+                                Cargar Mapa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer mejorado -->
+    <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">IPUC LA FONDA</div>
-                <div class="footer-info">
-                    <p>Iglesia Pentecostal Unida de Colombia</p>
-                    <p><i class="fas fa-phone"></i> +57 3188641238</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Cali, Valle Del Cauca</p>
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <div class="logo-footer">
+                            <i class="fas fa-church"></i>
+                            <div class="logo-text">
+                                <h3>IPUC LA FONDA</h3>
+                                <p>Pentecostal Unida de Colombia</p>
+                            </div>
+                        </div>
+                        <p class="footer-motto">
+                            "Una iglesia que cree en Jesús, una iglesia que enseña la Biblia"
+                        </p>
+                        <div class="footer-social">
+                            <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <div class="link-group">
+                            <h4>Enlaces Rápidos</h4>
+                            <ul>
+                                <li><a href="#inicio"><i class="fas fa-chevron-right"></i> Inicio</a></li>
+                                <li><a href="#nosotros"><i class="fas fa-chevron-right"></i> Nosotros</a></li>
+                                <li><a href="#ministerios"><i class="fas fa-chevron-right"></i> Ministerios</a></li>
+                                <li><a href="#eventos"><i class="fas fa-chevron-right"></i> Eventos</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="link-group">
+                            <h4>Recursos</h4>
+                            <ul>
+                                <li><a href="#sermones"><i class="fas fa-chevron-right"></i> Sermones</a></li>
+                                <li><a href="#devocionales"><i class="fas fa-chevron-right"></i> Devocionales</a></li>
+                                <li><a href="#biblioteca"><i class="fas fa-chevron-right"></i> Biblioteca</a></li>
+                                <li><a href="#oracion"><i class="fas fa-chevron-right"></i> Petición de Oración</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="link-group">
+                            <h4>Información</h4>
+                            <ul>
+                                <li><a href="#contacto"><i class="fas fa-chevron-right"></i> Contacto</a></li>
+                                <li><a href="#ubicacion"><i class="fas fa-chevron-right"></i> Ubicación</a></li>
+                                <li><a href="#horarios"><i class="fas fa-chevron-right"></i> Horarios</a></li>
+                                <li><a href="#donaciones"><i class="fas fa-chevron-right"></i> Ofrendas</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-newsletter">
+                        <h4>Boletín Informativo</h4>
+                        <p>Suscríbete para recibir noticias y devocionales</p>
+                        <form id="newsletterForm" class="newsletter-form">
+                            <div class="form-group">
+                                <input type="email" placeholder="Tu correo electrónico" required>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="privacyCheck" required>
+                                <label for="privacyCheck">Acepto la política de privacidad</label>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="social-links">
-                    <a href="https://www.tiktok.com/@ipuclafonda"><i class='bx bxl-tiktok'></i></a>
-                    <a href="https://www.Instagram.com/ipuclafonda"><i class='bx bxl-instagram-alt'></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=61565888996000"><i class='bx bxl-facebook-circle'></i></a>
-                </div>
-                <div class="copyright">
-                    <p>&copy; 2024 IPUC LA FONDA. Todos los derechos reservados.</p>
+                
+                <div class="footer-bottom">
+                    <div class="copyright">
+                        <p>&copy; <span id="currentYear"></span> IPUC LA FONDA. Todos los derechos reservados.</p>
+                        <p class="credits">Desarrollado con <i class="fas fa-heart"></i> para la gloria de Dios</p>
+                    </div>
+                    
+                    <div class="footer-legal">
+                        <a href="#privacidad">Política de Privacidad</a>
+                        <a href="#terminos">Términos de Uso</a>
+                        <a href="#sitemap">Mapa del Sitio</a>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Modal para petición de oración -->
+    <div class="modal" id="prayerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-pray"></i> Petición de Oración</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="prayerForm">
+                    <div class="form-group">
+                        <label for="prayerName">Tu Nombre</label>
+                        <input type="text" id="prayerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prayerEmail">Correo Electrónico</label>
+                        <input type="email" id="prayerEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="prayerRequest">Tu Petición</label>
+                        <textarea id="prayerRequest" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="prayerType">Tipo de Oración</label>
+                        <select id="prayerType">
+                            <option value="sanidad">Sanidad</option>
+                            <option value="familia">Familia</option>
+                            <option value="finanzas">Finanzas</option>
+                            <option value="proposito">Propósito</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="prayerPrivate" required>
+                        <label for="prayerPrivate">Mantener mi petición en privado</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Petición
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Script de inicialización AOS (Animate On Scroll) -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // Toggle para el menú
-        const menuToggle = document.getElementById('menuToggle');
-        const mainNav = document.getElementById('mainNav');
-
-        menuToggle.addEventListener('click', () => {
-            mainNav.style.display = mainNav.style.display === 'flex' ? 'none' : 'flex';
+        // Inicializar AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100,
+            delay: 100,
+            easing: 'ease-in-out'
         });
-
-        // Ocultar el splash screen después de cargar
-        window.addEventListener('load', () => {
-            const splashScreen = document.getElementById('splash-screen');
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-            }, 2000);
-        });
-
-        // Palabras que se van a mostrar en la animación
-        const words = ["Amor", "Justicia", "Unidad", "Santidad", "Gratitud", "Humildad", "Esperanza", "Fe", "Paz"];
-        let currentWordIndex = 0;
-        const changingWordElement = document.getElementById("changing-word");
-
-        // Función para cambiar la palabra
-        function changeWord() {
-            currentWordIndex = (currentWordIndex + 1) % words.length;
-            changingWordElement.textContent = words[currentWordIndex];
-        }
-
-        // Cambiar la palabra cada 2 segundos
-        setInterval(changeWord, 2000);
-
-        // Definición de los cultos y horarios
-        const cultos = [
-            { day: 0, start: "10:00", end: "12:30", name: "domingo" }, // Domingo
-            { day: 2, start: "18:00", end: "20:00", name: "martes" }, // Martes
-            { day: 5, start: "18:00", end: "20:00", name: "viernes" } // Viernes
-        ];
-
-        // Elementos DOM
-        const cultoEnCursoElement = document.querySelector('.message.culto-en-curso');
-        const rectaFinalElement = document.querySelector('.message.recta-final');
-        const finDelCultoElement = document.querySelector('.message.fin-del-culto');
-        const countdownElements = {
-            days: document.getElementById("days"),
-            hours: document.getElementById("hours"),
-            minutes: document.getElementById("minutes"),
-            seconds: document.getElementById("seconds")
-        };
-
-        /**
-         * Obtener el próximo culto y calcular la fecha y hora exactas
-         */
-        function getNextCulto() {
-            const now = new Date();
-            const today = now.getDay();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-            for (const culto of cultos) {
-                const startMinutes = parseInt(culto.start.split(":")[0]) * 60 + parseInt(culto.start.split(":")[1]);
-                const endMinutes = parseInt(culto.end.split(":")[0]) * 60 + parseInt(culto.end.split(":")[1]);
-
-                if (today === culto.day) {
-                    if (currentMinutes < startMinutes) {
-                        // Si el culto es hoy pero aún no empieza
-                        const cultoDate = new Date(now);
-                        cultoDate.setHours(parseInt(culto.start.split(":")[0]));
-                        cultoDate.setMinutes(parseInt(culto.start.split(":")[1]));
-                        cultoDate.setSeconds(0);
-                        return { ...culto, date: cultoDate };
-                    } else if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
-                        // Si el culto está en curso
-                        return { ...culto, inProgress: true };
-                    }
-                }
-
-                if (today < culto.day) {
-                    // Si el culto es después de hoy
-                    const cultoDate = new Date(now);
-                    cultoDate.setDate(now.getDate() + (culto.day - today));
-                    cultoDate.setHours(parseInt(culto.start.split(":")[0]));
-                    cultoDate.setMinutes(parseInt(culto.start.split(":")[1]));
-                    cultoDate.setSeconds(0);
-                    return { ...culto, date: cultoDate };
-                }
-            }
-
-            // Si no hay más cultos esta semana, calcular el primero de la próxima semana
-            const firstCulto = cultos[0];
-            const nextDate = new Date(now);
-            nextDate.setDate(now.getDate() + (7 - today + firstCulto.day));
-            nextDate.setHours(parseInt(firstCulto.start.split(":")[0]));
-            nextDate.setMinutes(parseInt(firstCulto.start.split(":")[1]));
-            nextDate.setSeconds(0);
-            return { ...firstCulto, date: nextDate };
-        }
-
-        /**
-         * Actualizar la cuenta regresiva y los mensajes
-         */
-        function updateCountdown() {
-            const now = new Date();
-            const nextEvent = getNextCulto();
-
-            // Ocultar todos los mensajes primero
-            cultoEnCursoElement.style.display = 'none';
-            rectaFinalElement.style.display = 'none';
-            finDelCultoElement.style.display = 'none';
-
-            if (nextEvent.inProgress) {
-                // Mostrar mensaje "Culto en curso"
-                cultoEnCursoElement.style.display = 'block';
-            } else {
-                // Si el culto está próximo, mostrar la cuenta regresiva
-                const timeLeft = nextEvent.date.getTime() - now.getTime();
-
-                if (timeLeft <= 0) {
-                    finDelCultoElement.style.display = 'block';
-                    return;
-                }
-
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                countdownElements.days.textContent = String(days).padStart(2, "0");
-                countdownElements.hours.textContent = String(hours).padStart(2, "0");
-                countdownElements.minutes.textContent = String(minutes).padStart(2, "0");
-                countdownElements.seconds.textContent = String(seconds).padStart(2, "0");
-
-                // Mostrar mensaje de la recta final si faltan menos de 10 minutos
-                if (minutes < 10 && days === 0 && hours === 0) {
-                    rectaFinalElement.style.display = 'block';
-                }
-            }
-        }
-
-        // Llamar a la función de actualización y luego cada segundo
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
+        
+        // Detectar si JavaScript está activado
+        document.documentElement.classList.remove('no-js');
+        document.documentElement.classList.add('js');
     </script>
 </body>
 </html>
