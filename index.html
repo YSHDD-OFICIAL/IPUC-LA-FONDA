@@ -418,4 +418,239 @@
                 </div>
                 
                 <div class="welcome-image">
-                    <img src="ipuclafonda.png" alt="Templo I
+                    <img src="ipuclafonda.png" alt="Templo IPUC LA FONDA" class="welcome-templo" loading="eager">
+                </div>
+                
+                <div class="welcome-actions">
+                    <button id="btn-login" class="btn-primary btn-lg">
+                        <i class="bx bx-log-in"></i>
+                        Iniciar Sesión
+                    </button>
+                    
+                    <button id="btn-register" class="btn-secondary btn-lg">
+                        <i class="bx bx-user-plus"></i>
+                        Registrarse
+                    </button>
+                    
+                    <button id="btn-continue-guest" class="btn-outline btn-lg">
+                        <i class="bx bx-glasses"></i>
+                        Continuar como Invitado
+                    </button>
+                </div>
+                
+                <div class="welcome-footer">
+                    <div class="welcome-features">
+                        <div class="feature-item">
+                            <i class="bx bx-time-five"></i>
+                            <span>Horarios de Cultos</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-bible"></i>
+                            <span>Versículo Diario</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-group"></i>
+                            <span>Comunidad Activa</span>
+                        </div>
+                    </div>
+                    
+                    <p class="welcome-version">v2.0.0 | © 2026 IPUC LA FONDA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    PANEL DE NOTIFICACIONES
+    ============================================ -->
+    <div id="notification-panel" class="notification-panel hidden">
+        <div class="notification-header">
+            <h3>Notificaciones</h3>
+            <div class="notification-actions">
+                <button class="btn-text" id="mark-all-read">
+                    <i class="bx bx-check-double"></i> Marcar todas leídas
+                </button>
+                <button class="btn-icon" id="close-notifications" aria-label="Cerrar notificaciones">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="notification-filters">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            <button class="filter-btn" data-filter="unread">No leídas</button>
+            <button class="filter-btn" data-filter="mensajes">Mensajes</button>
+            <button class="filter-btn" data-filter="anuncios">Anuncios</button>
+        </div>
+        
+        <div id="notification-list" class="notification-list">
+            <div class="notification-empty">
+                <i class="bx bx-bell-off"></i>
+                <p>No hay notificaciones</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    MODAL PRINCIPAL
+    ============================================ -->
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <button class="modal-close btn-icon" aria-label="Cerrar modal">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido dinámico del modal -->
+            </div>
+            <div class="modal-footer hidden" id="modal-footer">
+                <!-- Acciones del modal -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    MODAL DE CONFIRMACIÓN
+    ============================================ -->
+    <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-sm">
+            <div class="modal-body text-center">
+                <div class="confirm-icon" id="confirm-icon">
+                    <i class="bx bx-question-mark"></i>
+                </div>
+                <h3 id="confirm-title">¿Estás seguro?</h3>
+                <p id="confirm-message">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
+                <button class="btn-primary" id="confirm-accept">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    DRAWER LATERAL (Para acciones rápidas)
+    ============================================ -->
+    <div id="drawer" class="drawer hidden">
+        <div class="drawer-backdrop"></div>
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3 id="drawer-title"></h3>
+                <button class="btn-icon drawer-close" aria-label="Cerrar">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="drawer-body" id="drawer-body">
+                <!-- Contenido dinámico del drawer -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    TOAST NOTIFICATIONS
+    ============================================ -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- ============================================
+    BOTÓN FLOTANTE DE ACCIÓN RÁPIDA (FAB)
+    ============================================ -->
+    <button id="fab-main" class="fab hidden" aria-label="Acciones rápidas" title="Acciones rápidas">
+        <i class="bx bx-plus"></i>
+    </button>
+    
+    <div id="fab-menu" class="fab-menu hidden">
+        <button class="fab-item" data-action="oracion" aria-label="Enviar oración">
+            <i class="bx bx-pray"></i>
+            <span>Oración</span>
+        </button>
+        <button class="fab-item" data-action="asistencia" aria-label="Confirmar asistencia">
+            <i class="bx bx-check-shield"></i>
+            <span>Asistencia</span>
+        </button>
+        <button class="fab-item" data-action="compartir" aria-label="Compartir versículo">
+            <i class="bx bx-share-alt"></i>
+            <span>Compartir</span>
+        </button>
+    </div>
+
+    <!-- ============================================
+    REPRODUCTOR DE MÚSICA DE FONDO (OPCIONAL)
+    ============================================ -->
+    <div id="music-player" class="music-player hidden">
+        <div class="music-controls">
+            <button class="btn-icon music-toggle" aria-label="Reproducir música">
+                <i class="bx bx-play"></i>
+            </button>
+            <div class="music-info">
+                <span class="music-title">Alabanza IPUC</span>
+            </div>
+            <button class="btn-icon music-close" aria-label="Cerrar reproductor">
+                <i class="bx bx-x"></i>
+            </button>
+        </div>
+        <audio id="music-audio" loop>
+            <source src="assets/audio/ambient.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- ============================================
+    SCRIPTS
+    ============================================ -->
+    <script src="script.js" defer></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Registrar Service Worker para funcionalidad PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                        
+                        // Verificar actualizaciones
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            console.log('🔄 Nueva actualización disponible');
+                            
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error al registrar Service Worker:', error);
+                    });
+            });
+            
+            // Manejar mensajes del Service Worker
+            navigator.serviceWorker.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                    showUpdateNotification();
+                }
+            });
+        }
+        
+        function showUpdateNotification() {
+            const toast = document.createElement('div');
+            toast.className = 'toast info update-toast';
+            toast.innerHTML = `
+                <i class="bx bx-refresh"></i>
+                <span>Nueva versión disponible</span>
+                <button onclick="window.location.reload()" class="btn-text">Actualizar</button>
+            `;
+            document.getElementById('toast-container').appendChild(toast);
+            
+            setTimeout(function() {
+                toast.classList.add('toast-hide');
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 10000);
+        }
+    </script>
+</body>
+</html>
