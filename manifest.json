@@ -11,7 +11,19 @@
     "dir": "ltr",
     "scope": "/",
     "id": "ipuc-la-fonda-v2",
+    "categories": ["social", "lifestyle", "utilities"],
+    "prefer_related_applications": false,
     "icons": [
+        {
+            "src": "/assets/icons/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/icons/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
         {
             "src": "/assets/icons/icon-192x192.png",
             "sizes": "192x192",
@@ -23,8 +35,20 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
         }
     ],
-    "categories": ["social", "lifestyle", "utilities"],
-    "prefer_related_applications": false
+    "screenshots": [
+        {
+            "src": "/assets/img/screenshot.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Pantalla principal de IPUC LA FONDA"
+        }
+    ]
 }
