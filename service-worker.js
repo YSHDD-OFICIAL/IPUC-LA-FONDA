@@ -1,127 +1,86 @@
-// service-worker.js - Service Worker para PWA
-const CACHE_NAME = 'ipuc-la-fonda-v2';
+// service-worker.js - IPUC LA FONDA PWA v2.0
+const CACHE_NAME = 'ipuc-la-fonda-v2.0.0';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
     '/styles.css',
     '/script.js',
     '/manifest.json',
-    '/assets/logo/logo.png',
-    '/assets/logo/logo-mini.png',
-    '/assets/logo/icon-192.png',
-    '/assets/logo/icon-512.png',
+    '/ipuclafonda.png',
     '/assets/avatars/default.png',
     '/assets/avatars/admin.png',
-    '/assets/img/templo.jpg'
+    '/assets/icons/favicon-16x16.png',
+    '/assets/icons/favicon-32x32.png',
+    '/assets/icons/icon-192x192.png',
+    '/assets/icons/icon-512x512.png',
+    '/assets/icons/apple-touch-icon.png'
 ];
 
-// Instalación del Service Worker
+// Instalación
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Cache abierto');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-            .then(() => {
-                return self.skipWaiting();
-            })
+        caches.open(CACHE_NAME).then((cache) => {
+            console.log('📦 Cacheando assets...');
+            return cache.addAll(ASSETS_TO_CACHE).catch(err => {
+                console.log('Algunos assets no se pudieron cachear:', err);
+            });
+        }).then(() => self.skipWaiting())
     );
 });
 
-// Activación del Service Worker
+// Activación
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
-                        console.log('Eliminando cache antiguo:', cacheName);
+                        console.log('🗑️ Eliminando cache antiguo:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        }).then(() => {
-            return self.clients.claim();
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
-// Estrategia de cache: Network First, luego cache
+// Fetch - Network First con fallback a cache
 self.addEventListener('fetch', (event) => {
-    // No interceptar llamadas a la API
-    if (event.request.url.includes('/api/')) {
-        return;
-    }
+    if (event.request.url.includes('/api/')) return;
     
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                // Si la respuesta es válida, actualizar cache
                 if (response && response.status === 200) {
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
+                    const clonedResponse = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, clonedResponse);
+                    });
                 }
                 return response;
             })
             .catch(() => {
-                // Si falla la red, buscar en cache
-                return caches.match(event.request)
-                    .then((cachedResponse) => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
-                        // Si no está en cache, mostrar página offline
-                        if (event.request.mode === 'navigate') {
-                            return caches.match('/');
-                        }
-                        return new Response('Sin conexión', {
-                            status: 503,
-                            statusText: 'Service Unavailable'
-                        });
-                    });
+                return caches.match(event.request).then((cached) => {
+                    return cached || caches.match('/');
+                });
             })
     );
 });
 
-// Manejar notificaciones push
+// Push notifications
 self.addEventListener('push', (event) => {
+    const data = event.data ? event.data.json() : {};
     const options = {
-        body: event.data ? event.data.text() : 'Nueva notificación de IPUC LA FONDA',
-        icon: '/assets/logo/icon-192.png',
-        badge: '/assets/logo/icon-192.png',
+        body: data.mensaje || 'Nueva notificación de IPUC LA FONDA',
+        icon: '/assets/icons/icon-192x192.png',
+        badge: '/assets/icons/icon-192x192.png',
         vibrate: [100, 50, 100],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: 1
-        },
-        actions: [
-            {
-                action: 'explore',
-                title: 'Ver detalles',
-                icon: '/assets/logo/icon-192.png'
-            },
-            {
-                action: 'close',
-                title: 'Cerrar',
-                icon: '/assets/logo/icon-192.png'
-            }
-        ]
+        data: { url: data.url || '/' }
     };
-    
-    event.waitUntil(
-        self.registration.showNotification('IPUC LA FONDA', options)
-    );
+    event.waitUntil(self.registration.showNotification(data.titulo || 'IPUC LA FONDA', options));
 });
 
-// Manejar clic en notificaciones
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    
-    event.waitUntil(
-        clients.openWindow('/')
-    );
+    event.waitUntil(clients.openWindow(event.notification.data.url || '/'));
 });
