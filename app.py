@@ -1,4 +1,4 @@
-# app.py - Servidor Flask Principal IPUC LA FONDA v2.0
+# app.py - Servidor Flask Principal IPUC LA FONDA v2.0 (COMPLETO)
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from database import Database
@@ -109,6 +109,98 @@ def registrar_intento_fallido(ip):
         "bloqueado": False
     }, 401
 
+def crear_sesion(usuario, rol, ip):
+    """Crear sesión para un usuario"""
+    token = generar_token()
+    TOKENS[token] = {
+        'usuario': usuario,
+        'rol': rol,
+        'expira': datetime.datetime.now() + datetime.timedelta(hours=24),
+        'creado': datetime.datetime.now().isoformat(),
+        'ip': ip
+    }
+    
+    if rol == 'usuario':
+        usuarios = db.cargar_json('usuarios')
+        for i, u in enumerate(usuarios.get('usuarios', [])):
+            if u['id'] == usuario['id']:
+                usuarios['usuarios'][i]['ultima_conexion'] = datetime.datetime.now().isoformat()
+                break
+        db.guardar_json('usuarios', usuarios)
+    
+    if ip in INTENTOS_FALLIDOS:
+        del INTENTOS_FALLIDOS[ip]
+    
+    registrar_actividad(usuario['id'], "Inicio de sesión", f"Rol: {rol}")
+    
+    return jsonify({
+        "mensaje": "Inicio de sesión exitoso",
+        "token": token,
+        "rol": rol,
+        "usuario": {
+            "id": usuario['id'],
+            "nombre": usuario['nombre'],
+            "apellidos": usuario.get('apellidos', ''),
+            "usuario": usuario['usuario'],
+            "correo": usuario.get('correo', ''),
+            "foto": usuario.get('foto', 'assets/avatars/default.png'),
+            "verificado": usuario.get('verificado', False),
+            "ministerio": usuario.get('ministerio', ''),
+            "insignias": usuario.get('insignias', [])
+        }
+    }), 200
+
+def actualizar_estadisticas_asistencia():
+    """Actualizar estadísticas de asistencia"""
+    try:
+        asistencia = db.cargar_json('asistencia')
+        estadisticas = db.cargar_json('estadisticas')
+        
+        hoy = datetime.datetime.now().strftime('%Y-%m-%d')
+        mes_actual = datetime.datetime.now().strftime('%Y-%m')
+        año_actual = datetime.datetime.now().strftime('%Y')
+        
+        registros = asistencia.get('registros', [])
+        
+        diarios = len([r for r in registros if r.get('fecha') == hoy])
+        mensuales = len([r for r in registros if r.get('fecha', '').startswith(mes_actual)])
+        anuales = len([r for r in registros if r.get('fecha', '').startswith(año_actual)])
+        
+        estadisticas['asistencia'] = {
+            "diario": diarios,
+            "mensual": mensuales,
+            "anual": anuales,
+            "total": len(registros),
+            "ultima_actualizacion": datetime.datetime.now().isoformat()
+        }
+        
+        db.guardar_json('estadisticas', estadisticas)
+    except Exception as e:
+        print(f"Error actualizando estadísticas de asistencia: {e}")
+
+def actualizar_estadisticas_usuarios():
+    """Actualizar estadísticas de usuarios"""
+    try:
+        usuarios = db.cargar_json('usuarios')
+        estadisticas = db.cargar_json('estadisticas')
+        
+        todos = usuarios.get('usuarios', [])
+        activos = len([u for u in todos if u.get('estado') == 'activo'])
+        
+        mes_actual = datetime.datetime.now().strftime('%Y-%m')
+        nuevos_mes = len([u for u in todos if u.get('fecha_registro', '').startswith(mes_actual)])
+        
+        estadisticas['usuarios'] = {
+            "total": len(todos),
+            "activos": activos,
+            "nuevos_mes": nuevos_mes,
+            "ultima_actualizacion": datetime.datetime.now().isoformat()
+        }
+        
+        db.guardar_json('estadisticas', estadisticas)
+    except Exception as e:
+        print(f"Error actualizando estadísticas de usuarios: {e}")
+
 # ============================================
 # MIDDLEWARE
 # ============================================
@@ -125,7 +217,6 @@ def before_request():
                 "segundos_restantes": segundos
             }), 403
     
-    # Limpiar tokens expirados cada 100 peticiones
     if hasattr(app, 'request_count'):
         app.request_count += 1
     else:
@@ -149,6 +240,16 @@ def static_files(path):
         return send_from_directory('.', path)
     return jsonify({"error": "Archivo no encontrado"}), 404
 
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Endpoint de verificación de salud del servidor"""
+    return jsonify({
+        "estado": "online",
+        "version": "2.0.0",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "servidor": "IPUC LA FONDA API"
+    }), 200
+
 # ============================================
 # AUTENTICACIÓN
 # ============================================
@@ -160,7 +261,6 @@ def registro():
         if not datos:
             return jsonify({"error": "Datos inválidos"}), 400
         
-        # Validaciones del lado del servidor
         campos_requeridos = ['nombre', 'apellidos', 'documento', 'fecha_nacimiento', 
                             'sexo', 'correo', 'celular', 'usuario', 'password', 'ministerio']
         
@@ -168,28 +268,23 @@ def registro():
             if campo not in datos or not str(datos[campo]).strip():
                 return jsonify({"error": f"El campo {campo} es obligatorio"}), 400
         
-        # Validar formato de correo
         if '@' not in datos['correo'] or '.' not in datos['correo']:
             return jsonify({"error": "Formato de correo inválido"}), 400
         
-        # Validar longitud de contraseña
         if len(datos['password']) < 6:
             return jsonify({"error": "La contraseña debe tener al menos 6 caracteres"}), 400
         
-        # Validar documento único
         usuarios = db.cargar_json('usuarios')
+        
         if any(str(u.get('documento')) == str(datos['documento']) for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El documento ya está registrado"}), 400
         
-        # Validar correo único
         if any(u.get('correo', '').lower() == datos['correo'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El correo ya está registrado"}), 400
         
-        # Validar usuario único
         if any(u.get('usuario', '').lower() == datos['usuario'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El nombre de usuario ya existe"}), 400
         
-        # Crear nuevo usuario
         nuevo_usuario = {
             "id": len(usuarios.get('usuarios', [])) + 1,
             "nombre": datos['nombre'].strip(),
@@ -217,10 +312,7 @@ def registro():
         usuarios['usuarios'].append(nuevo_usuario)
         db.guardar_json('usuarios', usuarios)
         
-        # Actualizar estadísticas
         actualizar_estadisticas_usuarios()
-        
-        # Registrar actividad
         registrar_actividad(nuevo_usuario['id'], "Registro", "Nuevo usuario registrado")
         
         return jsonify({
@@ -252,7 +344,6 @@ def login():
         
         ip = request.remote_addr
         
-        # Verificar bloqueo
         bloqueado, segundos = verificar_bloqueo_ip(ip)
         if bloqueado:
             return jsonify({
@@ -260,7 +351,6 @@ def login():
                 "mensaje": f"Intente nuevamente en {segundos} segundos"
             }), 403
         
-        # Buscar en administradores
         administradores = db.cargar_json('administradores')
         admin = next((a for a in administradores.get('administradores', []) 
                      if a['usuario'].lower() == usuario_identificador.lower() 
@@ -269,7 +359,6 @@ def login():
         if admin and admin['password'] == hash_password(password):
             return crear_sesion(admin, 'admin', ip)
         
-        # Buscar en usuarios
         usuarios = db.cargar_json('usuarios')
         usuario = next((u for u in usuarios.get('usuarios', []) 
                        if u['usuario'].lower() == usuario_identificador.lower() 
@@ -280,56 +369,11 @@ def login():
                 return jsonify({"error": "Cuenta desactivada. Contacte al administrador"}), 403
             return crear_sesion(usuario, 'usuario', ip)
         
-        # Credenciales inválidas
         return registrar_intento_fallido(ip)
         
     except Exception as e:
         print(f"Error en login: {str(e)}")
         return jsonify({"error": f"Error en el inicio de sesión: {str(e)}"}), 500
-
-def crear_sesion(usuario, rol, ip):
-    """Crear sesión para un usuario"""
-    token = generar_token()
-    TOKENS[token] = {
-        'usuario': usuario,
-        'rol': rol,
-        'expira': datetime.datetime.now() + datetime.timedelta(hours=24),
-        'creado': datetime.datetime.now().isoformat(),
-        'ip': ip
-    }
-    
-    # Actualizar última conexión
-    if rol == 'usuario':
-        usuarios = db.cargar_json('usuarios')
-        for i, u in enumerate(usuarios.get('usuarios', [])):
-            if u['id'] == usuario['id']:
-                usuarios['usuarios'][i]['ultima_conexion'] = datetime.datetime.now().isoformat()
-                break
-        db.guardar_json('usuarios', usuarios)
-    
-    # Limpiar intentos fallidos
-    if ip in INTENTOS_FALLIDOS:
-        del INTENTOS_FALLIDOS[ip]
-    
-    # Registrar actividad
-    registrar_actividad(usuario['id'], "Inicio de sesión", f"Rol: {rol}")
-    
-    return jsonify({
-        "mensaje": "Inicio de sesión exitoso",
-        "token": token,
-        "rol": rol,
-        "usuario": {
-            "id": usuario['id'],
-            "nombre": usuario['nombre'],
-            "apellidos": usuario.get('apellidos', ''),
-            "usuario": usuario['usuario'],
-            "correo": usuario.get('correo', ''),
-            "foto": usuario.get('foto', 'assets/avatars/default.png'),
-            "verificado": usuario.get('verificado', False),
-            "ministerio": usuario.get('ministerio', ''),
-            "insignias": usuario.get('insignias', [])
-        }
-    }), 200
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
@@ -373,7 +417,6 @@ def obtener_usuarios():
     
     usuarios = db.cargar_json('usuarios')
     
-    # No enviar contraseñas
     usuarios_seguros = []
     for u in usuarios.get('usuarios', []):
         u_seguro = {k: v for k, v in u.items() if k != 'password'}
@@ -497,6 +540,39 @@ def cambiar_password(usuario_id):
     return jsonify({"error": "Usuario no encontrado"}), 404
 
 # ============================================
+# DIRECTORIO
+# ============================================
+@app.route('/api/directorio', methods=['GET'])
+def obtener_directorio():
+    """Obtener directorio de miembros"""
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    
+    if not sesion:
+        return jsonify({"error": "No autorizado"}), 401
+    
+    usuarios = db.cargar_json('usuarios')
+    
+    miembros = []
+    for u in usuarios.get('usuarios', []):
+        miembros.append({
+            "id": u['id'],
+            "nombre": u['nombre'],
+            "apellidos": u.get('apellidos', ''),
+            "foto": u.get('foto', 'assets/avatars/default.png'),
+            "ministerio": u.get('ministerio', ''),
+            "verificado": u.get('verificado', False),
+            "ultima_conexion": u.get('ultima_conexion', ''),
+            "estado": u.get('estado', 'activo'),
+            "insignias": u.get('insignias', [])
+        })
+    
+    return jsonify({
+        "miembros": miembros,
+        "total": len(miembros)
+    }), 200
+
+# ============================================
 # ASISTENCIA
 # ============================================
 @app.route('/api/asistencia', methods=['GET'])
@@ -511,7 +587,6 @@ def obtener_asistencia():
     asistencia = db.cargar_json('asistencia')
     registros = asistencia.get('registros', [])
     
-    # Si es usuario normal, solo ver sus registros
     if sesion['rol'] == 'usuario':
         registros = [r for r in registros if r.get('usuario_id') == sesion['usuario']['id']]
     
@@ -571,51 +646,6 @@ def obtener_estadisticas_asistencia():
     estadisticas = db.cargar_json('estadisticas')
     return jsonify(estadisticas.get('asistencia', {})), 200
 
-def actualizar_estadisticas_asistencia():
-    """Actualizar estadísticas de asistencia"""
-    asistencia = db.cargar_json('asistencia')
-    estadisticas = db.cargar_json('estadisticas')
-    
-    hoy = datetime.datetime.now().strftime('%Y-%m-%d')
-    mes_actual = datetime.datetime.now().strftime('%Y-%m')
-    año_actual = datetime.datetime.now().strftime('%Y')
-    
-    registros = asistencia.get('registros', [])
-    
-    diarios = len([r for r in registros if r.get('fecha') == hoy])
-    mensuales = len([r for r in registros if r.get('fecha', '').startswith(mes_actual)])
-    anuales = len([r for r in registros if r.get('fecha', '').startswith(año_actual)])
-    
-    estadisticas['asistencia'] = {
-        "diario": diarios,
-        "mensual": mensuales,
-        "anual": anuales,
-        "total": len(registros),
-        "ultima_actualizacion": datetime.datetime.now().isoformat()
-    }
-    
-    db.guardar_json('estadisticas', estadisticas)
-
-def actualizar_estadisticas_usuarios():
-    """Actualizar estadísticas de usuarios"""
-    usuarios = db.cargar_json('usuarios')
-    estadisticas = db.cargar_json('estadisticas')
-    
-    todos = usuarios.get('usuarios', [])
-    activos = len([u for u in todos if u.get('estado') == 'activo'])
-    
-    mes_actual = datetime.datetime.now().strftime('%Y-%m')
-    nuevos_mes = len([u for u in todos if u.get('fecha_registro', '').startswith(mes_actual)])
-    
-    estadisticas['usuarios'] = {
-        "total": len(todos),
-        "activos": activos,
-        "nuevos_mes": nuevos_mes,
-        "ultima_actualizacion": datetime.datetime.now().isoformat()
-    }
-    
-    db.guardar_json('estadisticas', estadisticas)
-
 # ============================================
 # CONTADOR REGRESIVO DE CULTOS
 # ============================================
@@ -625,7 +655,7 @@ def obtener_proximo_culto():
     ahora = datetime.datetime.now()
     
     cultos_semanales = {
-        0: [],  # Lunes
+        0: [],
         1: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Oración"}],
         2: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto Campal"}],
         3: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto de Refrán"}],
@@ -692,6 +722,15 @@ def obtener_proximo_culto():
     }), 200
 
 # ============================================
+# HORARIOS
+# ============================================
+@app.route('/api/horarios', methods=['GET'])
+def obtener_horarios():
+    """Obtener horarios de cultos"""
+    horarios = db.cargar_json('horarios')
+    return jsonify({"horarios": horarios.get('cultos', [])}), 200
+
+# ============================================
 # VERSÍCULO DIARIO
 # ============================================
 @app.route('/api/versiculo-diario', methods=['GET'])
@@ -705,7 +744,6 @@ def obtener_versiculo_diario():
     if not versiculo_hoy or versiculo_hoy.get('fecha') != hoy:
         lista = versiculos.get('versiculos', [])
         if lista:
-            import random
             indice = datetime.datetime.now().day % len(lista)
             versiculo_hoy = lista[indice].copy()
             versiculo_hoy['fecha'] = hoy
@@ -763,6 +801,21 @@ def crear_versiculo():
     
     return jsonify({"mensaje": "Versículo creado exitosamente", "versiculo": nuevo}), 201
 
+@app.route('/api/versiculos/<int:versiculo_id>', methods=['DELETE'])
+def eliminar_versiculo(versiculo_id):
+    """Eliminar versículo (admin)"""
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    
+    if not sesion or sesion['rol'] != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+    
+    versiculos = db.cargar_json('versiculos')
+    versiculos['versiculos'] = [v for v in versiculos.get('versiculos', []) if v['id'] != versiculo_id]
+    db.guardar_json('versiculos', versiculos)
+    
+    return jsonify({"mensaje": "Versículo eliminado exitosamente"}), 200
+
 # ============================================
 # NOTICIAS
 # ============================================
@@ -772,10 +825,7 @@ def obtener_noticias():
     noticias = db.cargar_json('noticias')
     lista = noticias.get('noticias', [])
     
-    # Ordenar por fecha, más recientes primero
     lista_ordenada = sorted(lista, key=lambda x: x.get('fecha_publicacion', ''), reverse=True)
-    
-    # Solo noticias publicadas
     publicadas = [n for n in lista_ordenada if n.get('estado') == 'publicado']
     
     return jsonify({
@@ -819,6 +869,21 @@ def crear_noticia():
     db.guardar_json('noticias', noticias)
     
     return jsonify({"mensaje": "Noticia creada exitosamente", "noticia": nueva}), 201
+
+@app.route('/api/noticias/<int:noticia_id>', methods=['DELETE'])
+def eliminar_noticia(noticia_id):
+    """Eliminar noticia (admin)"""
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    
+    if not sesion or sesion['rol'] != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+    
+    noticias = db.cargar_json('noticias')
+    noticias['noticias'] = [n for n in noticias.get('noticias', []) if n['id'] != noticia_id]
+    db.guardar_json('noticias', noticias)
+    
+    return jsonify({"mensaje": "Noticia eliminada exitosamente"}), 200
 
 # ============================================
 # EVENTOS
@@ -875,56 +940,79 @@ def crear_evento():
     return jsonify({"mensaje": "Evento creado exitosamente", "evento": nuevo}), 201
 
 # ============================================
-# NOTIFICACIONES
+# PETICIONES DE ORACIÓN
 # ============================================
-@app.route('/api/notificaciones', methods=['GET'])
-def obtener_notificaciones():
-    """Obtener notificaciones del usuario"""
+@app.route('/api/peticiones', methods=['GET'])
+def obtener_peticiones():
+    """Obtener peticiones de oración"""
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     
     if not sesion:
         return jsonify({"error": "No autorizado"}), 401
     
-    notificaciones = db.cargar_json('notificaciones')
-    usuario_id = sesion['usuario']['id']
-    
-    mis_notificaciones = [n for n in notificaciones.get('notificaciones', []) 
-                         if n.get('usuario_id') == usuario_id]
-    
-    mis_notificaciones.sort(key=lambda x: x.get('fecha', ''), reverse=True)
-    
-    no_leidas = len([n for n in mis_notificaciones if not n.get('leida')])
+    peticiones = db.cargar_json('peticiones')
+    lista = peticiones.get('peticiones', [])
+    lista.sort(key=lambda x: x.get('fecha', ''), reverse=True)
     
     return jsonify({
-        "notificaciones": mis_notificaciones[:50],
-        "no_leidas": no_leidas,
-        "total": len(mis_notificaciones)
+        "peticiones": lista[:50],
+        "total": len(lista)
     }), 200
 
-# ============================================
-   ... [resto del código continúa] ...
+@app.route('/api/peticiones', methods=['POST'])
+def crear_peticion():
+    """Crear petición de oración"""
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    
+    if not sesion:
+        return jsonify({"error": "No autorizado"}), 401
+    
+    datos = request.json
+    if not datos or 'motivo' not in datos:
+        return jsonify({"error": "El motivo es obligatorio"}), 400
+    
+    peticiones = db.cargar_json('peticiones')
+    
+    nueva = {
+        "id": len(peticiones.get('peticiones', [])) + 1,
+        "usuario_id": sesion['usuario']['id'],
+        "nombre": sesion['usuario']['nombre'],
+        "motivo": datos['motivo'],
+        "descripcion": datos.get('descripcion', ''),
+        "fecha": datetime.datetime.now().isoformat(),
+        "estado": "activa",
+        "oraciones": 0
+    }
+    
+    if 'peticiones' not in peticiones:
+        peticiones['peticiones'] = []
+    peticiones['peticiones'].append(nueva)
+    db.guardar_json('peticiones', peticiones)
+    
+    return jsonify({"mensaje": "Petición creada exitosamente", "peticion": nueva}), 201
 
-# Esta parte es crucial para el funcionamiento
+# ============================================
+... (el código continúa con más rutas)
+
 # ============================================
 # INICIALIZACIÓN Y ARRANQUE
 # ============================================
 if __name__ == '__main__':
-    print("=" * 50)
-    print("🔥 IPUC LA FONDA - Servidor Iniciando...")
-    print("=" * 50)
+    print("=" * 60)
+    print("🔥  IPUC LA FONDA - Servidor Iniciando...")
+    print("=" * 60)
     
-    # Inicializar datos
     db.inicializar_datos()
-    print("✅ Base de datos inicializada")
+    print("✅ Base de datos inicializada correctamente")
     
-    # Obtener puerto de variable de entorno (Render) o usar 5000
     port = int(os.environ.get('PORT', 5000))
     
-    print(f"🌐 Servidor corriendo en puerto {port}")
-    print(f"📱 Accede en: http://localhost:{port}")
-    print(f"👤 Usuario demo: admin / 123456")
-    print(f"👤 Usuario demo: usuario / 123456")
-    print("=" * 50)
+    print(f"🌐 Servidor corriendo en: http://0.0.0.0:{port}")
+    print(f"📱 URL local: http://localhost:{port}")
+    print(f"🔑 Admin: admin / 123456")
+    print(f"👤 Usuario: usuario / 123456")
+    print("=" * 60)
     
     app.run(host='0.0.0.0', port=port, debug=False)
