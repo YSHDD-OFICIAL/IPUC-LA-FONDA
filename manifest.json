@@ -1,37 +1,30 @@
-// manifest.json - Configuración PWA
 {
     "name": "IPUC LA FONDA",
     "short_name": "IPUC",
-    "description": "Iglesia Pentecostal Unida de Colombia - LA FONDA",
+    "description": "Iglesia Pentecostal Unida de Colombia - LA FONDA. Donde el Espíritu Santo se mueve.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#1a237e",
     "theme_color": "#1a237e",
     "orientation": "portrait-primary",
+    "lang": "es-CO",
+    "dir": "ltr",
+    "scope": "/",
+    "id": "ipuc-la-fonda-v2",
     "icons": [
         {
-            "src": "/assets/logo/icon-192.png",
+            "src": "/assets/icons/icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/assets/logo/icon-512.png",
+            "src": "/assets/icons/icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
     ],
-    "screenshots": [
-        {
-            "src": "/assets/img/screenshot1.png",
-            "sizes": "1080x1920",
-            "type": "image/png",
-            "form_factor": "narrow"
-        }
-    ],
     "categories": ["social", "lifestyle", "utilities"],
-    "lang": "es-CO",
-    "dir": "ltr",
     "prefer_related_applications": false
 }
