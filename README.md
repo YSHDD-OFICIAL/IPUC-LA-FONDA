@@ -1,67 +1,77 @@
-# README.md - Documentación del proyecto
-
-# IPUC LA FONDA - Web App Institucional
+# 🏛️ IPUC LA FONDA - Web App Institucional
 
 ![IPUC LA FONDA](assets/logo/logo.png)
 
-## 🏛️ Descripción
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/tu-repo/ipuc-la-fonda)
+[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/flask-2.0+-red.svg)](https://flask.palletsprojects.com/)
+[![PWA](https://img.shields.io/badge/PWA-Instalable-purple.svg)](https://web.dev/progressive-web-apps/)
+[![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
-Web App institucional de nivel empresarial para IPUC LA FONDA (Iglesia Pentecostal Unida de Colombia). Una plataforma moderna, elegante y completa para la administración de la congregación.
+## 📖 Descripción
+
+Web App institucional de nivel empresarial para **IPUC LA FONDA** (Iglesia Pentecostal Unida de Colombia). Una plataforma moderna, elegante y completamente segura para la administración de la congregación, diseñada para facilitar la comunicación y gestión de la iglesia.
+
+---
 
 ## ✨ Características Principales
 
-- 🔐 **Autenticación completa** con roles de Usuario y Administrador
-- ⏰ **Contador regresivo inteligente** para cultos
-- 💬 **Sistema de chat interno** con mensajería en tiempo real
-- ✅ **Sistema de verificación de cuentas** con distintivo azul propio
-- 📊 **Dashboard de estadísticas** con gráficos de asistencia
-- 📱 **Diseño responsive** compatible con todos los dispositivos
-- 🌙 **Modo oscuro/claro** personalizable
-- 📲 **PWA instalable** en dispositivos móviles
-- 🔒 **Seguridad robusta** con encriptación de contraseñas
-- 📚 **Biblioteca digital** de recursos cristianos
-- 📰 **Sistema de noticias y eventos**
-- 🎨 **Diseño Material con Glassmorphism**
+### 🔐 Seguridad y Autenticación
+- **Autenticación completa** con roles diferenciados (Usuario/Administrador)
+- **Sin credenciales por defecto** - Configuración inicial segura
+- **Bloqueo por IP** tras 5 intentos fallidos
+- **Encriptación de contraseñas** con salt aleatorio
+- **Sesiones con token JWT** (24 horas de duración)
+- **Verificación de cuentas** con distintivo azul propio
+- **Logs de actividad** completa de usuarios
+
+### ⏰ Sistema de Cultos
+- **Contador regresivo inteligente** para cultos en tiempo real
+- **Horarios completos** de todos los cultos (Martes a Domingo)
+- **Estado del culto**: Próximo, En Curso, Finalizado
+- **Notificaciones automáticas** de inicio de culto
+
+### 💬 Comunicación
+- **Sistema de mensajería** interno en tiempo real
+- **Notificaciones push** para eventos importantes
+- **Peticiones de oración** con contador de oraciones
+- **Comentarios y reacciones** en noticias
+- **Sistema de insignias** para miembros destacados
+
+### 📊 Gestión
+- **Dashboard de estadísticas** con gráficos interactivos
+- **Sistema de asistencia** con registro y seguimiento
+- **Biblioteca digital** de recursos cristianos
+- **Galería de eventos** y actividades
+- **Directorio de miembros** con búsqueda
+
+### 🎨 Diseño y Experiencia
+- **Diseño Material Design** con Glassmorphism
+- **Modo oscuro/claro** personalizable
+- **Animaciones fluidas** con interacciones elegantes
+- **Iconografía moderna** con Boxicons
+- **Fuentes tipográficas** profesionales
+
+### 📱 Tecnologías PWA
+- **Instalable** en dispositivos móviles
+- **Funcionamiento offline** con Service Worker
+- **Sincronización en segundo plano**
+- **Notificaciones push** nativas
+- **Responsive** para todos los dispositivos
+
+---
 
 ## 🚀 Instalación
 
-### Requisitos previos
+### Requisitos Previos
 
-- Python 3.8 o superior
-- pip (gestor de paquetes de Python)
+- **Python 3.8** o superior
+- **pip** (gestor de paquetes de Python)
+- Navegador moderno (Chrome, Firefox, Edge, Safari)
 
-### Pasos de instalación
+### Pasos de Instalación
 
 1. **Clonar el repositorio**
 ```bash
-git clone [URL_DEL_REPOSITORIO]
-cd IPUC-LA-FONDA
-
-
-## Resumen del Proyecto Completo
-
-He creado la Web App institucional completa para IPUC LA FONDA con todos los componentes solicitados:
-
-### ✅ Características implementadas:
-
-1. **Arquitectura completa** con Flask + Vanilla JS + JSON
-2. **Sistema de autenticación** con registro, login, roles
-3. **Contador regresivo inteligente** para cultos
-4. **Sistema de mensajería** con chat en tiempo real
-5. **Cuentas verificadas** con distintivo azul propio
-6. **Dashboard de estadísticas** con gráficos
-7. **Notificaciones** administradas por Python
-8. **Diseño responsivo** con Material Design y Glassmorphism
-9. **Modo oscuro/claro** configurable
-10. **PWA** completamente funcional
-11. **Seguridad** con encriptación y protección de sesiones
-12. **Animaciones** elegantes y profesionales
-
-### 🚀 Para ejecutar:
-
-1. Instalar dependencias: `pip install flask flask-cors`
-2. Ejecutar: `python app.py`
-3. Abrir: `http://localhost:5000`
-4. Credenciales: admin/123456 o usuario/123456
-
-El sistema está listo para usar y completamente funcional con todas las características solicitadas.
+git clone https://github.com/tu-usuario/ipuc-la-fonda.git
+cd ipuc-la-fonda
