@@ -634,4 +634,324 @@
                 <!-- SECCIÓN: CREDENCIALES DE ACCESO -->
                 <div class="form-section">
                     <div class="form-section-title">
-          
+                        <i class="bx bx-key"></i> Credenciales de Acceso
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="usuario">Nombre de Usuario <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-at"></i>
+                            <input type="text" class="form-input" id="usuario" name="usuario" 
+                                   placeholder="admin" required autocomplete="off" 
+                                   pattern="[a-zA-Z0-9_]{3,20}" 
+                                   title="Solo letras, números y guiones bajos. Mínimo 3 caracteres.">
+                        </div>
+                        <p class="input-hint">Solo letras, números y guiones bajos. Mínimo 3 caracteres.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Contraseña <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-lock-alt"></i>
+                            <input type="password" class="form-input" id="password" name="password" 
+                                   placeholder="Mínimo 8 caracteres" required 
+                                   minlength="8" autocomplete="new-password">
+                            <i class="bx bx-show" id="togglePassword" 
+                               style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--gris-texto); z-index: 1;"
+                               onclick="togglePasswordVisibility()"></i>
+                        </div>
+                        <p class="input-hint">Mínimo 8 caracteres. Usa mayúsculas, números y símbolos para mayor seguridad.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmarPassword">Confirmar Contraseña <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-lock-alt"></i>
+                            <input type="password" class="form-input" id="confirmarPassword" name="confirmarPassword" 
+                                   placeholder="Repite la contraseña" required 
+                                   minlength="8" autocomplete="new-password">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: URL DE LA API -->
+                <div class="api-url-group">
+                    <label>
+                        <i class="bx bx-link"></i> URL del Endpoint API
+                    </label>
+                    <div class="api-url-display">
+                        <i class="bx bx-server"></i>
+                        <span id="apiUrlDisplay">https://ipuc-api.onrender.com/api/admin/crear-primer-admin</span>
+                    </div>
+                    <p class="input-hint" style="margin-top: 6px;">
+                        Esta es la URL donde se enviará la solicitud. Asegúrate de que el backend esté activo.
+                    </p>
+                </div>
+
+                <!-- BOTÓN DE ENVÍO -->
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <span class="btn-text">
+                        <i class="bx bx-user-plus"></i> Crear Administrador
+                    </span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+
+            <!-- RESULTADO -->
+            <div class="resultado" id="resultado"></div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>IPUC LA FONDA v2.1.0 | 
+               <a href="https://ipuclafonda.netlify.app" target="_blank">Ir a la aplicación</a>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+         SCRIPT PRINCIPAL
+         ============================================ -->
+    <script>
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
+        const API_ENDPOINT = 'https://ipuc-api.onrender.com/api/admin/crear-primer-admin';
+        
+        // Mostrar la URL en el display
+        document.getElementById('apiUrlDisplay').textContent = API_ENDPOINT;
+
+        // ============================================
+        // TOGGLE VISIBILIDAD DE CONTRASEÑA
+        // ============================================
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('togglePassword');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'bx bx-hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'bx bx-show';
+            }
+        }
+
+        // ============================================
+        // VALIDACIÓN DE FORMULARIO
+        // ============================================
+        function validarFormulario(formData) {
+            const errores = [];
+            
+            // Validar nombre
+            if (!formData.nombre || formData.nombre.trim().length < 2) {
+                errores.push('El nombre debe tener al menos 2 caracteres');
+            }
+            
+            // Validar apellidos
+            if (!formData.apellidos || formData.apellidos.trim().length < 2) {
+                errores.push('Los apellidos deben tener al menos 2 caracteres');
+            }
+            
+            // Validar correo
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.correo)) {
+                errores.push('Ingresa un correo electrónico válido');
+            }
+            
+            // Validar usuario
+            const usuarioRegex = /^[a-zA-Z0-9_]{3,20}$/;
+            if (!usuarioRegex.test(formData.usuario)) {
+                errores.push('El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)');
+            }
+            
+            // Validar contraseña
+            if (formData.password.length < 8) {
+                errores.push('La contraseña debe tener al menos 8 caracteres');
+            }
+            
+            // Validar confirmación de contraseña
+            if (formData.password !== formData.confirmarPassword) {
+                errores.push('Las contraseñas no coinciden');
+            }
+            
+            return errores;
+        }
+
+        // ============================================
+        // MOSTRAR RESULTADO
+        // ============================================
+        function mostrarResultado(tipo, titulo, mensaje, credenciales = null) {
+            const resultadoDiv = document.getElementById('resultado');
+            
+            const iconos = {
+                success: 'bx bx-check-circle',
+                error: 'bx bx-error-circle',
+                info: 'bx bx-info-circle'
+            };
+            
+            let html = `
+                <div class="resultado-icon">
+                    <i class="${iconos[tipo] || iconos.info}"></i>
+                </div>
+                <strong>${titulo}</strong>
+                <p>${mensaje}</p>
+            `;
+            
+            if (credenciales) {
+                html += `
+                    <div class="credenciales-box">
+                        <strong>🔑 Credenciales creadas:</strong><br>
+                        Usuario: <strong>${credenciales.usuario}</strong><br>
+                        Contraseña: <strong>${credenciales.password}</strong>
+                    </div>
+                    <p style="margin-top: 8px; font-size: 0.85rem;">
+                        ⚠️ <strong>Guarda estas credenciales en un lugar seguro.</strong> 
+                        No podrás recuperarlas si las pierdes.
+                    </p>
+                `;
+            }
+            
+            resultadoDiv.className = `resultado show ${tipo}`;
+            resultadoDiv.innerHTML = html;
+            
+            // Scroll al resultado
+            resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // ============================================
+        // MANEJAR ENVÍO DEL FORMULARIO
+        // ============================================
+        document.getElementById('formAdmin').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btnSubmit = document.getElementById('btnSubmit');
+            const resultadoDiv = document.getElementById('resultado');
+            
+            // Ocultar resultado anterior
+            resultadoDiv.className = 'resultado';
+            resultadoDiv.innerHTML = '';
+            
+            // Recoger datos del formulario
+            const formData = new FormData(this);
+            const datos = {
+                nombre: formData.get('nombre').trim(),
+                apellidos: formData.get('apellidos').trim(),
+                correo: formData.get('correo').trim().toLowerCase(),
+                celular: formData.get('celular').trim(),
+                usuario: formData.get('usuario').trim().toLowerCase(),
+                password: formData.get('password'),
+                confirmarPassword: formData.get('confirmarPassword')
+            };
+            
+            // Validar formulario
+            const errores = validarFormulario(datos);
+            if (errores.length > 0) {
+                mostrarResultado('error', 'Error de validación', errores.join('<br>'));
+                return;
+            }
+            
+            // Preparar datos para enviar (sin confirmarPassword)
+            const datosEnviar = { ...datos };
+            delete datosEnviar.confirmarPassword;
+            
+            // Mostrar estado de carga
+            btnSubmit.classList.add('loading');
+            btnSubmit.disabled = true;
+            
+            try {
+                console.log('📤 Enviando solicitud a:', API_ENDPOINT);
+                console.log('📦 Datos:', { ...datosEnviar, password: '***' });
+                
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(datosEnviar)
+                });
+                
+                console.log('📥 Respuesta status:', response.status);
+                
+                const result = await response.json();
+                console.log('📥 Respuesta data:', result);
+                
+                if (response.ok) {
+                    mostrarResultado(
+                        'success',
+                        '✅ ¡Administrador creado exitosamente!',
+                        result.mensaje || 'El primer administrador ha sido creado correctamente.',
+                        { usuario: datos.usuario, password: datos.password }
+                    );
+                    
+                    // Limpiar campos de contraseña
+                    document.getElementById('password').value = '';
+                    document.getElementById('confirmarPassword').value = '';
+                    
+                    // Deshabilitar el botón después del éxito
+                    btnSubmit.disabled = true;
+                    btnSubmit.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
+                    btnSubmit.style.background = 'var(--exito)';
+                    
+                } else if (response.status === 403) {
+                    mostrarResultado(
+                        'info',
+                        'ℹ️ Ya existe un administrador',
+                        result.error || 'Ya existe al menos un administrador en el sistema. Esta función está deshabilitada por seguridad.',
+                        null
+                    );
+                    btnSubmit.disabled = true;
+                    btnSubmit.innerHTML = '<span class="btn-text"><i class="bx bx-lock"></i> Función Deshabilitada</span>';
+                    btnSubmit.style.background = 'var(--gris-medio)';
+                    
+                } else {
+                    mostrarResultado(
+                        'error',
+                        '❌ Error del servidor',
+                        result.error || `Error ${response.status}: No se pudo crear el administrador.`,
+                        null
+                    );
+                }
+                
+            } catch (error) {
+                console.error('❌ Error de conexión:', error);
+                
+                mostrarResultado(
+                    'error',
+                    '❌ Error de Conexión',
+                    `
+                        <strong>No se pudo conectar con el servidor.</strong><br><br>
+                        <strong>Posibles causas:</strong><br>
+                        • El backend no está desplegado o no está activo<br>
+                        • La URL de la API es incorrecta<br>
+                        • Hay un problema de red o firewall<br><br>
+                        <strong>Soluciones:</strong><br>
+                        • Verifica que el backend esté corriendo en Render<br>
+                        • Revisa la URL: <code>${API_ENDPOINT}</code><br>
+                        • Intenta acceder a <a href="${API_ENDPOINT.replace('/admin/crear-primer-admin', '/health')}" target="_blank">/api/health</a> para verificar<br>
+                        • Espera unos segundos si el backend está en plan gratuito (puede estar "durmiendo")
+                    `,
+                    null
+                );
+                
+            } finally {
+                // Restaurar botón
+                btnSubmit.classList.remove('loading');
+                if (btnSubmit.disabled && !resultadoDiv.classList.contains('success') && !resultadoDiv.classList.contains('info')) {
+                    btnSubmit.disabled = false;
+                }
+            }
+        });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        console.log('✅ IPUC LA FONDA - Panel de Creación de Administrador cargado');
+        console.log('🔗 Endpoint API:', API_ENDPOINT);
+        console.log('⚠️  Esta página solo funciona si NO existe ningún administrador previo');
+    </script>
+</body>
+</html>
