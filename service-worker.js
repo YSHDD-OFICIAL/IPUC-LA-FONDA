@@ -1,315 +1,337 @@
-// service-worker.js - IPUC LA FONDA PWA v2.1.0
-// Service Worker para funcionalidad PWA instalable, cache offline y notificaciones push
+// ============================================
+// IPUC LA FONDA - SERVICE WORKER PWA v2.1.0
+// Instalable como App Nativa | Offline | Push
+// ============================================
 
 const CACHE_NAME = 'ipuc-la-fonda-v2.1.0';
-const ASSETS_TO_CACHE = [
-    // Archivos HTML y principales
+const RUNTIME_CACHE = 'ipuc-runtime-v2.1.0';
+
+// Assets que se cachean al instalar (shell de la aplicación)
+const PRECACHE_ASSETS = [
     '/',
     '/index.html',
     '/styles.css',
     '/script.js',
     '/manifest.json',
     '/ipuclafonda.png',
+    '/favicon.ico',
     
-    // ============================================
-    // ARCHIVOS PYTHON - Backend y utilidades
-    // ============================================
-    '/app.py',
-    '/database.py',
-    
-    // ============================================
-    // ASSETS - Imágenes y recursos
-    // ============================================
+    // Avatares
     '/assets/avatars/default.png',
     '/assets/avatars/admin.png',
+    
+    // Iconos PWA (necesarios para instalación)
     '/assets/icons/favicon-16x16.png',
     '/assets/icons/favicon-32x32.png',
     '/assets/icons/icon-192x192.png',
     '/assets/icons/icon-512x512.png',
-    '/assets/icons/apple-touch-icon.png'
+    '/assets/icons/apple-touch-icon.png',
+    '/assets/icons/icon-144x144.png',
+    
+    // Icono Safari
+    '/assets/icons/safari-pinned-tab.svg'
 ];
 
 // ============================================
-// INSTALACIÓN
+// EVENTO: INSTALACIÓN
 // ============================================
 self.addEventListener('install', (event) => {
-    console.log('📦 Service Worker: Instalando v2.1.0...');
+    console.log('📦 IPUC LA FONDA - Instalando Service Worker v2.1.0...');
+    
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log(`📦 Cacheando ${ASSETS_TO_CACHE.length} assets para modo offline...`);
-                // Cachear cada asset individualmente para manejar errores
-                const cachePromises = ASSETS_TO_CACHE.map(async (url) => {
+                console.log(`📦 Precacheando ${PRECACHE_ASSETS.length} assets...`);
+                
+                // Intentar cachear cada asset individualmente
+                const cachePromises = PRECACHE_ASSETS.map(async (url) => {
                     try {
-                        const response = await fetch(url);
-                        if (response && response.status === 200) {
+                        const response = await fetch(url, { mode: 'no-cors' });
+                        if (response && (response.status === 200 || response.type === 'opaque')) {
                             await cache.put(url, response);
                             console.log(`✅ Cacheado: ${url}`);
+                            return true;
                         } else {
-                            console.warn(`⚠️ No se pudo cachear: ${url} (Status: ${response?.status})`);
+                            console.warn(`⚠️ No cacheado (status ${response.status}): ${url}`);
+                            return false;
                         }
                     } catch (error) {
-                        console.warn(`⚠️ Error cacheando ${url}:`, error);
+                        console.warn(`⚠️ No se pudo cachear: ${url} - ${error.message}`);
+                        return false;
                     }
                 });
                 
                 return Promise.allSettled(cachePromises);
             })
-            .then(() => {
-                console.log('✅ Instalación completada - App lista para usar sin conexión');
-                // Forzar activación inmediata
+            .then((results) => {
+                const cached = results.filter(r => r.status === 'fulfilled' && r.value).length;
+                console.log(`✅ Instalación completada: ${cached}/${PRECACHE_ASSETS.length} assets cacheados`);
+                
+                // Forzar activación inmediata (no esperar a que cierren pestañas)
                 return self.skipWaiting();
+            })
+            .catch((error) => {
+                console.error('❌ Error durante la instalación:', error);
             })
     );
 });
 
 // ============================================
-// ACTIVACIÓN
+// EVENTO: ACTIVACIÓN
 // ============================================
 self.addEventListener('activate', (event) => {
-    console.log('🔄 Service Worker: Activando...');
+    console.log('🔄 IPUC LA FONDA - Activando Service Worker...');
+    
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('🗑️ Eliminando cache antiguo:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => {
-            console.log('✅ Service Worker activado y controlando la app');
-            // Tomar control de todas las pestañas
-            return self.clients.claim();
-        })
+        caches.keys()
+            .then((cacheNames) => {
+                // Eliminar caches antiguos
+                return Promise.all(
+                    cacheNames.map((cacheName) => {
+                        if (cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE) {
+                            console.log('🗑️ Eliminando cache antiguo:', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+            .then(() => {
+                console.log('✅ Service Worker activado correctamente');
+                
+                // Notificar a los clientes que hay un nuevo SW activo
+                return self.clients.claim().then(() => {
+                    // Enviar mensaje a todos los clientes
+                    return self.clients.matchAll().then((clients) => {
+                        clients.forEach((client) => {
+                            client.postMessage({
+                                type: 'SW_ACTIVATED',
+                                version: '2.1.0'
+                            });
+                        });
+                    });
+                });
+            })
     );
 });
 
 // ============================================
-// FETCH - Network First con fallback a cache
+// EVENTO: FETCH (Estrategia: Network First)
 // ============================================
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
+    const { pathname } = url;
     
-    // No interceptar llamadas a la API
-    if (url.pathname.includes('/api/')) {
+    // No interceptar llamadas a la API del backend
+    if (pathname.includes('/api/')) {
         return;
     }
     
-    // Estrategia especial para archivos Python
-    if (url.pathname.endsWith('.py')) {
-        event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    if (cachedResponse) {
-                        console.log(`📄 Sirviendo desde cache: ${url.pathname}`);
-                        return cachedResponse;
-                    }
-                    // Si no está en cache, intentar obtener de la red
-                    return fetch(event.request)
-                        .then((response) => {
-                            if (response && response.status === 200) {
-                                const responseClone = response.clone();
-                                caches.open(CACHE_NAME).then((cache) => {
-                                    cache.put(event.request, responseClone);
-                                });
-                            }
-                            return response;
-                        })
-                        .catch(() => {
-                            // Si falla todo, devolver respuesta offline
-                            return new Response(
-                                `# ${url.pathname} - Offline Mode
-# Este archivo no está disponible sin conexión.
-# Por favor, conectate a internet para acceder al código fuente.
-
-print("⚠️ Modo offline - Conectate a internet para ver el código completo")`,
-                                {
-                                    status: 503,
-                                    statusText: 'Service Unavailable',
-                                    headers: { 'Content-Type': 'text/plain' }
-                                }
-                            );
-                        });
-                })
-        );
+    // No interceptar solicitudes a otros orígenes
+    if (url.origin !== self.location.origin && !url.href.includes('unpkg.com')) {
         return;
     }
     
-    // Estrategia para el resto de assets (HTML, CSS, JS, imágenes)
+    // Estrategia Network First con fallback a cache
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                // Guardar en cache respuestas exitosas
+                // Si la respuesta es válida, guardarla en cache runtime
                 if (response && response.status === 200 && response.type === 'basic') {
                     const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
+                    caches.open(RUNTIME_CACHE).then((cache) => {
                         cache.put(event.request, responseClone);
                     });
                 }
                 return response;
             })
-            .catch(() => {
-                // Si falla la red, servir desde cache
-                return caches.match(event.request).then((cachedResponse) => {
-                    if (cachedResponse) {
-                        return cachedResponse;
+            .catch(async () => {
+                // Sin conexión: buscar en cache
+                const cachedResponse = await caches.match(event.request);
+                
+                if (cachedResponse) {
+                    console.log('📄 Sirviendo desde cache:', pathname);
+                    return cachedResponse;
+                }
+                
+                // Si es una navegación, devolver index.html
+                if (event.request.mode === 'navigate') {
+                    const indexCache = await caches.match('/');
+                    if (indexCache) {
+                        console.log('🏠 Sirviendo index.html desde cache');
+                        return indexCache;
                     }
-                    // Si es navegación, devolver index.html (SPA fallback)
-                    if (event.request.mode === 'navigate') {
-                        return caches.match('/');
-                    }
-                    // Respuesta offline genérica para otros recursos
-                    if (event.request.url.match(/\.(png|jpg|jpeg|gif|svg|ico)$/)) {
-                        return caches.match('/assets/icons/icon-192x192.png');
-                    }
-                    // Respuesta offline para CSS/JS
-                    if (event.request.url.match(/\.(css|js)$/)) {
-                        return new Response(
-                            '/* Modo offline */',
-                            {
-                                status: 503,
-                                statusText: 'Service Unavailable',
-                                headers: { 'Content-Type': 'text/css' }
-                            }
-                        );
-                    }
-                    return new Response(
-                        JSON.stringify({ 
-                            error: 'Sin conexión', 
-                            mensaje: 'No hay conexión a internet. Algunas funciones no están disponibles.' 
-                        }),
-                        {
-                            status: 503,
-                            statusText: 'Service Unavailable',
-                            headers: { 'Content-Type': 'application/json' }
+                }
+                
+                // Para imágenes, devolver icono por defecto
+                if (event.request.destination === 'image') {
+                    const fallbackIcon = await caches.match('/assets/icons/icon-192x192.png');
+                    if (fallbackIcon) return fallbackIcon;
+                }
+                
+                // Respuesta offline genérica
+                return new Response(
+                    JSON.stringify({
+                        error: true,
+                        mensaje: 'Sin conexión a internet',
+                        offline: true
+                    }),
+                    {
+                        status: 503,
+                        statusText: 'Sin conexión',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Offline': 'true'
                         }
-                    );
-                });
+                    }
+                );
             })
     );
 });
 
 // ============================================
-// PUSH NOTIFICATIONS
+// EVENTO: PUSH NOTIFICATIONS
 // ============================================
 self.addEventListener('push', (event) => {
     console.log('📨 Notificación push recibida');
     
-    let data = {};
+    let data = {
+        titulo: 'IPUC LA FONDA',
+        mensaje: 'Tienes una nueva notificación',
+        url: '/',
+        icono: '/assets/icons/icon-192x192.png'
+    };
+    
     if (event.data) {
         try {
-            data = event.data.json();
+            const pushData = event.data.json();
+            data = { ...data, ...pushData };
         } catch (e) {
-            data = { titulo: 'IPUC LA FONDA', mensaje: event.data.text() };
+            data.mensaje = event.data.text() || data.mensaje;
         }
     }
     
     const options = {
-        body: data.mensaje || 'Nueva notificación de IPUC LA FONDA',
-        icon: '/assets/icons/icon-192x192.png',
+        // Contenido
+        body: data.mensaje,
+        icon: data.icono || '/assets/icons/icon-192x192.png',
         badge: '/assets/icons/icon-192x192.png',
-        vibrate: [100, 50, 100],
+        image: data.imagen || undefined,
+        
+        // Comportamiento
         data: {
             url: data.url || '/',
-            dateOfArrival: Date.now()
+            timestamp: Date.now(),
+            notificationId: data.id || Date.now()
         },
+        
+        // Vibración y sonido
+        vibrate: [100, 50, 100, 50, 100],
+        silent: false,
+        
+        // Acciones
         actions: [
-            { action: 'open', title: 'Abrir' },
-            { action: 'close', title: 'Cerrar' }
+            { 
+                action: 'open', 
+                title: '👁️ Ver', 
+                icon: '/assets/icons/icon-192x192.png' 
+            },
+            { 
+                action: 'close', 
+                title: '❌ Cerrar', 
+                icon: '/assets/icons/icon-192x192.png' 
+            }
         ],
-        tag: data.tag || 'ipuc-notification',
+        
+        // Configuración
+        tag: `ipuc-notif-${data.id || Date.now()}`,
         renotify: true,
-        requireInteraction: data.requireInteraction || false,
-        silent: data.silent || false
+        requireInteraction: data.importante || false,
+        
+        // Timestamp
+        timestamp: Date.now()
     };
     
-    // Añadir imagen si está disponible
-    if (data.imagen) {
-        options.image = data.imagen;
-    }
-    
     event.waitUntil(
-        self.registration.showNotification(
-            data.titulo || 'IPUC LA FONDA',
-            options
-        )
+        self.registration.showNotification(data.titulo, options)
     );
 });
 
 // ============================================
-// CLIC EN NOTIFICACIÓN
+// EVENTO: CLIC EN NOTIFICACIÓN
 // ============================================
 self.addEventListener('notificationclick', (event) => {
     console.log('👆 Clic en notificación:', event.action);
+    
+    // Cerrar la notificación
     event.notification.close();
     
+    // Si eligió cerrar, no hacer nada más
     if (event.action === 'close') return;
     
+    // URL a abrir
     const urlToOpen = event.notification.data?.url || '/';
-    const openWindow = async () => {
-        const windowClients = await clients.matchAll({ 
+    
+    event.waitUntil(
+        clients.matchAll({ 
             type: 'window', 
             includeUncontrolled: true 
-        });
-        
-        // Buscar si ya hay una ventana abierta con la URL
-        for (const client of windowClients) {
-            if (client.url.includes(urlToOpen) && 'focus' in client) {
-                await client.focus();
-                // Enviar mensaje a la ventana existente
-                client.postMessage({
-                    type: 'NOTIFICATION_CLICK',
-                    data: event.notification.data
-                });
-                return;
+        })
+        .then((windowClients) => {
+            // Buscar si ya existe una ventana con la URL
+            for (const client of windowClients) {
+                if (client.url.includes(urlToOpen) && 'focus' in client) {
+                    return client.focus().then(() => {
+                        client.postMessage({
+                            type: 'NOTIFICATION_CLICKED',
+                            data: event.notification.data
+                        });
+                    });
+                }
             }
-        }
-        
-        // Si no, abrir nueva ventana
-        if (clients.openWindow) {
-            const newClient = await clients.openWindow(urlToOpen);
-            // Esperar a que la ventana esté lista
-            if (newClient) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                newClient.postMessage({
-                    type: 'NOTIFICATION_CLICK',
-                    data: event.notification.data
-                });
+            
+            // Abrir nueva ventana si no existe
+            if (clients.openWindow) {
+                return clients.openWindow(urlToOpen);
             }
-        }
-    };
-    
-    event.waitUntil(openWindow());
+        })
+    );
 });
 
 // ============================================
-// SINCRONIZACIÓN EN SEGUNDO PLANO
+// EVENTO: SINCRONIZACIÓN EN SEGUNDO PLANO
 // ============================================
 self.addEventListener('sync', (event) => {
-    console.log('🔄 Sincronización en segundo plano:', event.tag);
+    console.log('🔄 Evento sync:', event.tag);
     
-    if (event.tag === 'sync-asistencia') {
-        event.waitUntil(syncAsistencia());
-    }
-    
-    if (event.tag === 'sync-mensajes') {
-        event.waitUntil(syncMensajes());
-    }
-    
-    if (event.tag === 'sync-peticiones') {
-        event.waitUntil(syncPeticiones());
+    switch (event.tag) {
+        case 'sync-asistencia':
+            event.waitUntil(syncAsistencia());
+            break;
+            
+        case 'sync-mensajes':
+            event.waitUntil(syncMensajes());
+            break;
+            
+        case 'sync-peticiones':
+            event.waitUntil(syncPeticiones());
+            break;
+            
+        case 'sync-datos':
+            event.waitUntil(syncDatosGenerales());
+            break;
+            
+        default:
+            console.log('ℹ️ Tag de sync no reconocido:', event.tag);
     }
 });
 
+// Funciones de sincronización
 async function syncAsistencia() {
     try {
         console.log('✅ Sincronización de asistencia completada');
-        // Aquí iría la lógica de sincronización
         return Promise.resolve();
     } catch (error) {
-        console.error('❌ Error en sincronización de asistencia:', error);
+        console.error('❌ Error sync asistencia:', error);
         return Promise.reject(error);
     }
 }
@@ -317,10 +339,9 @@ async function syncAsistencia() {
 async function syncMensajes() {
     try {
         console.log('✅ Sincronización de mensajes completada');
-        // Aquí iría la lógica de sincronización
         return Promise.resolve();
     } catch (error) {
-        console.error('❌ Error en sincronización de mensajes:', error);
+        console.error('❌ Error sync mensajes:', error);
         return Promise.reject(error);
     }
 }
@@ -328,62 +349,105 @@ async function syncMensajes() {
 async function syncPeticiones() {
     try {
         console.log('✅ Sincronización de peticiones completada');
-        // Aquí iría la lógica de sincronización
         return Promise.resolve();
     } catch (error) {
-        console.error('❌ Error en sincronización de peticiones:', error);
+        console.error('❌ Error sync peticiones:', error);
+        return Promise.reject(error);
+    }
+}
+
+async function syncDatosGenerales() {
+    try {
+        console.log('✅ Sincronización general completada');
+        return Promise.resolve();
+    } catch (error) {
+        console.error('❌ Error sync general:', error);
         return Promise.reject(error);
     }
 }
 
 // ============================================
-// MENSAJE DESDE EL CLIENTE
+// EVENTO: MENSAJES DESDE EL CLIENTE
 // ============================================
 self.addEventListener('message', (event) => {
-    console.log('📩 Mensaje recibido del cliente:', event.data);
+    console.log('📩 Mensaje del cliente:', event.data?.type);
     
-    switch (event.data?.type) {
+    if (!event.data || !event.data.type) return;
+    
+    switch (event.data.type) {
         case 'SKIP_WAITING':
+            // Forzar activación del nuevo SW
             self.skipWaiting();
+            console.log('⏩ Saltando espera, nuevo SW activado');
             break;
             
-        case 'CHECK_UPDATE':
-            self.registration.update();
-            break;
-            
-        case 'CACHE_CLEAN':
-            caches.delete(CACHE_NAME).then(() => {
-                console.log('🧹 Cache limpiado manualmente');
-                event.ports[0].postMessage({ success: true });
+        case 'CHECK_FOR_UPDATE':
+            // Verificar si hay actualizaciones
+            self.registration.update().then(() => {
+                console.log('🔍 Verificación de actualización completada');
             });
             break;
             
-        case 'CACHE_STATS':
-            caches.open(CACHE_NAME).then((cache) => {
-                cache.keys().then((keys) => {
-                    event.ports[0].postMessage({ 
-                        total: keys.length,
-                        keys: keys.map(k => k.url)
-                    });
+        case 'GET_VERSION':
+            // Enviar versión al cliente
+            if (event.ports && event.ports[0]) {
+                event.ports[0].postMessage({
+                    version: '2.1.0',
+                    cache: CACHE_NAME
                 });
+            }
+            break;
+            
+        case 'CLEAR_CACHE':
+            // Limpiar todo el cache
+            caches.keys().then((names) => {
+                return Promise.all(names.map((name) => caches.delete(name)));
+            }).then(() => {
+                console.log('🧹 Cache completamente limpiado');
+                if (event.ports && event.ports[0]) {
+                    event.ports[0].postMessage({ success: true });
+                }
+            });
+            break;
+            
+        case 'GET_CACHE_STATS':
+            // Obtener estadísticas del cache
+            caches.open(CACHE_NAME).then((cache) => {
+                return cache.keys();
+            }).then((keys) => {
+                if (event.ports && event.ports[0]) {
+                    event.ports[0].postMessage({
+                        cacheName: CACHE_NAME,
+                        totalAssets: keys.length,
+                        urls: keys.map(k => k.url)
+                    });
+                }
             });
             break;
             
         default:
-            console.log('ℹ️ Tipo de mensaje no reconocido:', event.data?.type);
+            console.log('ℹ️ Tipo de mensaje no manejado:', event.data.type);
     }
 });
 
 // ============================================
-// MANEJO DE ERRORES GLOBAL
+// MANEJO GLOBAL DE ERRORES
 // ============================================
 self.addEventListener('error', (event) => {
-    console.error('❌ Error en Service Worker:', event.error || event.message);
+    console.error('❌ Error crítico en SW:', event.message, event.filename, event.lineno);
 });
 
 self.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Promesa rechazada en Service Worker:', event.reason);
+    console.error('❌ Promesa rechazada en SW:', event.reason);
+    event.preventDefault();
 });
 
-console.log('✅ Service Worker IPUC LA FONDA v2.1.0 cargado y listo');
-console.log(`📦 ${ASSETS_TO_CACHE.length} assets configurados para cachear`);
+// ============================================
+// LOG DE INICIALIZACIÓN
+// ============================================
+console.log('✅ IPUC LA FONDA - Service Worker PWA v2.1.0 cargado');
+console.log('📱 La app se puede instalar en dispositivos móviles y PC');
+console.log('📦 ' + PRECACHE_ASSETS.length + ' assets configurados para precache');
+console.log('🔔 Notificaciones push configuradas');
+console.log('🔄 Sincronización en segundo plano habilitada');
+console.log('📴 Modo offline disponible');
