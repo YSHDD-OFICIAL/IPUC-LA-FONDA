@@ -53,7 +53,6 @@ class Database:
     
     def cargar_json(self, nombre_archivo, usar_cache=True):
         """Cargar datos de un archivo JSON con sistema de caché"""
-        # Verificar caché
         if usar_cache and nombre_archivo in self.cache:
             if nombre_archivo in self.last_cache_update:
                 tiempo_cache = datetime.now().timestamp() - self.last_cache_update[nombre_archivo]
@@ -71,7 +70,6 @@ class Database:
                 with open(ruta, 'r', encoding='utf-8') as f:
                     datos = json.load(f)
                 
-                # Actualizar caché
                 if usar_cache:
                     self.cache[nombre_archivo] = datos.copy()
                     self.last_cache_update[nombre_archivo] = datetime.now().timestamp()
@@ -98,14 +96,11 @@ class Database:
                 self._crear_backup(nombre_archivo)
             
             with self.lock:
-                # Guardar en archivo temporal primero
                 with open(temp_ruta, 'w', encoding='utf-8') as f:
                     json.dump(datos, f, indent=2, ensure_ascii=False, sort_keys=True)
                 
-                # Mover archivo temporal al definitivo
                 shutil.move(temp_ruta, ruta)
             
-            # Actualizar caché
             if actualizar_cache:
                 self.cache[nombre_archivo] = datos.copy()
                 self.last_cache_update[nombre_archivo] = datetime.now().timestamp()
@@ -131,9 +126,7 @@ class Database:
             backup_ruta = os.path.join(backup_dir, f"{nombre_archivo}_{timestamp}.json")
             
             shutil.copy2(ruta_original, backup_ruta)
-            
             self._limpiar_backups_antiguos(nombre_archivo, max_backups=10)
-            
             logger.info(f"💾 Backup creado: {backup_ruta}")
             
         except Exception as e:
@@ -316,15 +309,15 @@ class Database:
             },
             'insignias': {
                 "insignias": [
-                    {"id": 1, "nombre": "Nuevo Miembro", "icono": "bx-user-plus", "color": "#2196f3", "descripcion": "Recién llegado a la congregación"},
-                    {"id": 2, "nombre": "Miembro Activo", "icono": "bx-star", "color": "#ff9800", "descripcion": "Participa activamente en la iglesia"},
-                    {"id": 3, "nombre": "Líder", "icono": "bx-crown", "color": "#ffd700", "descripcion": "Líder de ministerio"},
-                    {"id": 4, "nombre": "Maestro", "icono": "bx-book", "color": "#4caf50", "descripcion": "Maestro de Escuela Dominical"},
-                    {"id": 5, "nombre": "Músico", "icono": "bx-music", "color": "#9c27b0", "descripcion": "Parte del ministerio de alabanza"},
-                    {"id": 6, "nombre": "Evangelista", "icono": "bx-bible", "color": "#f44336", "descripcion": "Predicador del evangelio"},
-                    {"id": 7, "nombre": "Administrador", "icono": "bx-shield", "color": "#607d8b", "descripcion": "Administrador de la plataforma"},
-                    {"id": 8, "nombre": "Cuenta Verificada", "icono": "bx-badge-check", "color": "#2196f3", "descripcion": "Cuenta verificada por IPUC LA FONDA"},
-                    {"id": 9, "nombre": "Servidor Destacado", "icono": "bx-heart", "color": "#e91e63", "descripcion": "Servidor destacado de la iglesia"}
+                    {"id": 1, "nombre": "Nuevo Miembro", "icono": "bx-user-plus", "color": "#2196f3"},
+                    {"id": 2, "nombre": "Miembro Activo", "icono": "bx-star", "color": "#ff9800"},
+                    {"id": 3, "nombre": "Líder", "icono": "bx-crown", "color": "#ffd700"},
+                    {"id": 4, "nombre": "Maestro", "icono": "bx-book", "color": "#4caf50"},
+                    {"id": 5, "nombre": "Músico", "icono": "bx-music", "color": "#9c27b0"},
+                    {"id": 6, "nombre": "Evangelista", "icono": "bx-bible", "color": "#f44336"},
+                    {"id": 7, "nombre": "Administrador", "icono": "bx-shield", "color": "#607d8b"},
+                    {"id": 8, "nombre": "Cuenta Verificada", "icono": "bx-badge-check", "color": "#2196f3"},
+                    {"id": 9, "nombre": "Servidor Destacado", "icono": "bx-heart", "color": "#e91e63"}
                 ],
                 "ultimo_id": 9
             },
@@ -395,7 +388,6 @@ class Database:
         
         logger.info(f"🎉 Inicialización completada. {archivos_creados} archivos nuevos creados.")
         
-        # Mensaje de seguridad importante
         logger.warning("=" * 60)
         logger.warning("⚠️  IMPORTANTE: No se han creado credenciales por defecto")
         logger.warning("⚠️  El sistema NO tiene usuarios ni administradores predefinidos")
@@ -403,32 +395,26 @@ class Database:
         logger.warning("=" * 60)
     
     def crear_primer_administrador(self, datos_admin):
-        """
-        Crear el primer administrador de la plataforma
+        """Crear el primer administrador de la plataforma
         Args:
-            datos_admin: Diccionario con los datos del administrador
-                Requiere: nombre, apellidos, correo, usuario, password
+            datos_admin: Diccionario con nombre, apellidos, correo, usuario, password
         Returns:
             True si se creó correctamente, False en caso contrario
         """
         try:
-            # Verificar que no exista ningún administrador
             admins = self.cargar_json('administradores')
             if admins.get('administradores', []):
                 logger.warning("⚠️ Ya existe al menos un administrador")
                 return False
             
-            # Validar datos requeridos
             campos_requeridos = ['nombre', 'apellidos', 'correo', 'usuario', 'password']
             for campo in campos_requeridos:
                 if campo not in datos_admin or not datos_admin[campo]:
                     logger.error(f"❌ Campo requerido faltante: {campo}")
                     return False
             
-            # Hashear contraseña
             password_hash = self._hash_contraseña_seguro(datos_admin['password'])
             
-            # Crear administrador
             admin = {
                 "id": 1,
                 "nombre": datos_admin['nombre'].strip(),
@@ -453,19 +439,15 @@ class Database:
                 "bloqueado_hasta": None
             }
             
-            # Guardar administrador
             admins['administradores'].append(admin)
             admins['ultimo_id'] = 1
             
             if self.guardar_json('administradores', admins):
-                # Actualizar configuración
                 config = self.cargar_json('configuracion')
                 config['aplicacion']['primer_administrador_creado'] = True
                 self.guardar_json('configuracion', config)
-                
                 logger.info(f"✅ Primer administrador creado: {admin['usuario']}")
                 return True
-            
             return False
             
         except Exception as e:
@@ -479,7 +461,6 @@ class Database:
         
         try:
             os.makedirs(backup_dir, exist_ok=True)
-            
             archivos_respaldados = 0
             for archivo in os.listdir(self.data_dir):
                 if archivo.endswith('.json'):
@@ -488,19 +469,16 @@ class Database:
                     shutil.copy2(ruta_original, ruta_backup)
                     archivos_respaldados += 1
             
-            # Crear archivo de metadatos
             metadata = {
                 "fecha_backup": datetime.now().isoformat(),
                 "archivos_respaldados": archivos_respaldados,
                 "version": "2.1.0",
-                "tamaño_total": sum(os.path.getsize(os.path.join(self.data_dir, f)) 
+                "tamaño_total": sum(os.path.getsize(os.path.join(self.data_dir, f))
                                    for f in os.listdir(self.data_dir) if f.endswith('.json'))
             }
-            
             with open(os.path.join(backup_dir, 'metadata.json'), 'w', encoding='utf-8') as f:
                 json.dump(metadata, f, indent=2, ensure_ascii=False)
             
-            # Mantener solo últimos 10 backups completos
             backups_dir = os.path.join(self.data_dir, 'backups', 'completos')
             backups = sorted([
                 d for d in os.listdir(backups_dir)
@@ -515,7 +493,6 @@ class Database:
             
             logger.info(f"✅ Backup completo creado: {backup_dir} ({archivos_respaldados} archivos)")
             return backup_dir
-            
         except Exception as e:
             logger.error(f"❌ Error al crear backup completo: {str(e)}")
             return None
@@ -533,12 +510,12 @@ class Database:
             return False
     
     def _limpiar_datos_vacios(self, datos):
-        """Limpiar datos vacíos o nulos recursivamente"""
+        """Limpiar datos vacíos recursivamente"""
         if isinstance(datos, dict):
-            return {k: v for k, v in ((k, self._limpiar_datos_vacios(v)) for k, v in datos.items()) 
+            return {k: v for k, v in ((k, self._limpiar_datos_vacios(v)) for k, v in datos.items())
                     if v is not None and v != [] and v != {} and v != ""}
         elif isinstance(datos, list):
-            return [self._limpiar_datos_vacios(item) for item in datos 
+            return [self._limpiar_datos_vacios(item) for item in datos
                     if item is not None and item != [] and item != {} and item != ""]
         return datos
     
@@ -548,10 +525,7 @@ class Database:
             "total_archivos": 0,
             "tamaño_total_kb": 0,
             "archivos": {},
-            "backups": {
-                "total": 0,
-                "tamaño_total_kb": 0
-            }
+            "backups": {"total": 0, "tamaño_total_kb": 0}
         }
         
         for archivo in os.listdir(self.data_dir):
@@ -565,7 +539,6 @@ class Database:
                     "modificado": datetime.fromtimestamp(os.path.getmtime(ruta)).isoformat()
                 }
         
-        # Contar backups
         backup_dir = os.path.join(self.data_dir, 'backups')
         if os.path.exists(backup_dir):
             for backup in os.listdir(backup_dir):
@@ -576,23 +549,19 @@ class Database:
         
         stats["tamaño_total_kb"] = round(stats["tamaño_total_kb"], 2)
         stats["backups"]["tamaño_total_kb"] = round(stats["backups"]["tamaño_total_kb"], 2)
-        
         return stats
     
     def reparar_json(self, nombre_archivo):
         """Intentar reparar un archivo JSON corrupto"""
         ruta = os.path.join(self.data_dir, f"{nombre_archivo}.json")
-        
         if not os.path.exists(ruta):
             return False, "Archivo no encontrado"
         
         try:
             with open(ruta, 'r', encoding='utf-8') as f:
                 contenido = f.read()
-            
             json.loads(contenido)
             return True, "El archivo parece estar bien"
-            
         except json.JSONDecodeError as e:
             logger.warning(f"⚠️ Reparando JSON: {nombre_archivo}.json - {str(e)}")
             datos_recuperados = self._recuperar_desde_backup(nombre_archivo)
@@ -611,7 +580,6 @@ class Database:
     def get_ultimo_id(self, nombre_archivo, campo_id="id"):
         """Obtener el último ID usado en un archivo"""
         datos = self.cargar_json(nombre_archivo)
-        
         for key, value in datos.items():
             if isinstance(value, list):
                 if value and all(isinstance(item, dict) and campo_id in item for item in value):
@@ -629,7 +597,6 @@ class Database:
         """Agregar un nuevo registro a un archivo"""
         try:
             datos = self.cargar_json(nombre_archivo)
-            
             for key, value in datos.items():
                 if isinstance(value, list):
                     if value and all(isinstance(item, dict) for item in value):
@@ -637,51 +604,27 @@ class Database:
                             registro[campo_id] = self.generar_nuevo_id(nombre_archivo, campo_id)
                         elif registro[campo_id] == 0:
                             registro[campo_id] = self.generar_nuevo_id(nombre_archivo, campo_id)
-                        
                         ids_existentes = [item[campo_id] for item in value if campo_id in item]
                         if registro[campo_id] in ids_existentes:
                             registro[campo_id] = max(ids_existentes) + 1
-                        
                         value.append(registro)
                         return self.guardar_json(nombre_archivo, datos)
-            
             for key in datos.keys():
                 if isinstance(datos[key], list):
                     datos[key].append(registro)
                     return self.guardar_json(nombre_archivo, datos)
-            
             return False
-            
         except Exception as e:
             logger.error(f"❌ Error al agregar registro: {str(e)}")
             return False
 
-# ============================================
-# EJEMPLO DE USO SEGURO
-# ============================================
 if __name__ == "__main__":
-    # Crear instancia de la base de datos
     db = Database()
-    
-    # Inicializar datos (sin credenciales de prueba)
     db.inicializar_datos()
-    
-    print("\n" + "=" * 60)
-    print("📊 Estadísticas de la base de datos:")
+    print("\n📊 Estadísticas de la base de datos:")
     stats = db.obtener_estadisticas_db()
     print(json.dumps(stats, indent=2, ensure_ascii=False))
-    print("=" * 60)
-    
-    print("\n⚠️  IMPORTANTE: No existen credenciales por defecto")
+    print("\n⚠️  IMPORTANTE: No existen credenciales por defecto.")
     print("ℹ️  Para crear el primer administrador, use:")
-    print("    db.crear_primer_administrador({")
-    print("        'nombre': 'Admin',")
-    print("        'apellidos': 'Principal',")
-    print("        'correo': 'admin@ipuclafonda.org',")
-    print("        'usuario': 'admin',")
-    print("        'password': 'ContraseñaSegura123'")
-    print("    })")
-    print("=" * 60)
-    
-    print("\n🎉 Base de datos IPUC LA FONDA inicializada correctamente!")
-    print("✅ SIN CREDENCIALES DE PRUEBA")
+    print("    db.crear_primer_administrador({...})")
+               
