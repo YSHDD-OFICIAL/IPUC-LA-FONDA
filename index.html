@@ -1,15 +1,26 @@
-<!-- index.html - IPUC LA FONDA v2.0 - COMPLETO Y PROFESIONAL -->
+<!-- ============================================
+IPUC LA FONDA v2.1 - Web App Profesional
+Iglesia Pentecostal Unida de Colombia
+"Donde el Espíritu Santo se mueve"
+============================================ -->
 <!DOCTYPE html>
 <html lang="es-CO">
 <head>
+    <!-- ============================================
+    CONFIGURACIÓN BÁSICA
+    ============================================ -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="format-detection" content="telephone=no">
+    <meta name="color-scheme" content="light dark">
 
-    <!-- SEO -->
-    <meta name="description" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia. Donde el Espíritu Santo se mueve. Plataforma oficial de la congregación.">
-    <meta name="keywords" content="IPUC, LA FONDA, Iglesia Pentecostal Unida de Colombia, iglesia cristiana, cultos cristianos, comunidad cristiana">
+    <!-- ============================================
+    SEO - OPTIMIZACIÓN PARA BUSCADORES
+    ============================================ -->
+    <meta name="title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
+    <meta name="description" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia. Donde el Espíritu Santo se mueve. Plataforma oficial de la congregación con cultos, eventos, noticias y comunidad cristiana.">
+    <meta name="keywords" content="IPUC, LA FONDA, Iglesia Pentecostal Unida de Colombia, iglesia cristiana, cultos cristianos, comunidad cristiana, IPUC Colombia, iglesia pentecostal">
     <meta name="author" content="IPUC LA FONDA">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="googlebot" content="index, follow">
@@ -17,25 +28,31 @@
     <meta name="revisit-after" content="7 days">
     <meta name="category" content="religion, church">
 
-    <!-- Open Graph -->
+    <!-- ============================================
+    OPEN GRAPH - FACEBOOK / WHATSAPP
+    ============================================ -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
     <meta property="og:title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
-    <meta property="og:description" content="Donde el Espíritu Santo se mueve. Plataforma oficial de la congregación.">
+    <meta property="og:description" content="Donde el Espíritu Santo se mueve. Plataforma oficial de la congregación IPUC LA FONDA.">
     <meta property="og:image" content="https://ipuclafonda.netlify.app/ipuclafonda.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="es_CO">
     <meta property="og:site_name" content="IPUC LA FONDA">
 
-    <!-- Twitter -->
+    <!-- ============================================
+    TWITTER CARDS
+    ============================================ -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://ipuclafonda.netlify.app/">
     <meta name="twitter:title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
-    <meta name="twitter:description" content="Donde el Espíritu Santo se mueve.">
+    <meta name="twitter:description" content="Donde el Espíritu Santo se mueve. Plataforma oficial.">
     <meta name="twitter:image" content="https://ipuclafonda.netlify.app/ipuclafonda.png">
 
-    <!-- PWA / Mobile -->
+    <!-- ============================================
+    PWA / MOBILE CONFIGURATION
+    ============================================ -->
     <meta name="theme-color" content="#1a237e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -43,243 +60,612 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="IPUC LA FONDA">
     <meta name="msapplication-TileColor" content="#1a237e">
+    <meta name="msapplication-TileImage" content="/assets/icons/icon-144x144.png">
 
-    <!-- Precarga -->
+    <!-- ============================================
+    PRECARGA DE RECURSOS
+    ============================================ -->
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
 
-    <!-- Estilos -->
+    <!-- ============================================
+    HOJAS DE ESTILO
+    ============================================ -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 
-    <!-- PWA Manifest -->
+    <!-- ============================================
+    PWA MANIFEST
+    ============================================ -->
     <link rel="manifest" href="manifest.json">
 
-    <!-- Iconos -->
+    <!-- ============================================
+    ICONOS Y FAVICON
+    ============================================ -->
     <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512x512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="assets/icons/safari-pinned-tab.svg" color="#1a237e">
     <link rel="shortcut icon" href="favicon.ico">
 
+    <!-- ============================================
+    TÍTULO
+    ============================================ -->
     <title>IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia</title>
 
-    <!-- Schema.org -->
+    <!-- ============================================
+    DATOS ESTRUCTURADOS - SCHEMA.ORG
+    ============================================ -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Church",
         "name": "IPUC LA FONDA",
+        "alternateName": "Iglesia Pentecostal Unida de Colombia - LA FONDA",
         "description": "Donde el Espíritu Santo se mueve",
         "url": "https://ipuclafonda.netlify.app",
         "image": "https://ipuclafonda.netlify.app/ipuclafonda.png",
-        "address": { "@type": "PostalAddress", "addressCountry": "CO" }
+        "logo": "https://ipuclafonda.netlify.app/ipuclafonda.png",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "CO",
+            "addressLocality": "Colombia"
+        },
+        "sameAs": [
+            "https://facebook.com/ipuclafonda",
+            "https://instagram.com/ipuclafonda",
+            "https://youtube.com/@ipuclafonda"
+        ]
     }
     </script>
 </head>
 <body>
 
-    <!-- SPLASH SCREEN -->
-    <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive">
+    <!-- ============================================
+    SPLASH SCREEN - PANTALLA DE CARGA
+    ============================================ -->
+    <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive" aria-label="Cargando IPUC LA FONDA">
         <div class="splash-background">
             <div class="splash-particles"></div>
+            <div class="splash-glow"></div>
         </div>
         <div class="splash-content">
             <div class="splash-logo-container">
                 <div class="splash-logo-ring"></div>
-                <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="splash-logo-img" width="120" height="120">
+                <img src="ipuclafonda.png" alt="Logo IPUC LA FONDA" class="splash-logo-img" width="130" height="130" loading="eager" draggable="false">
             </div>
-            <h1 class="splash-title">IPUC LA FONDA</h1>
-            <p class="splash-subtitle">Donde el Espíritu Santo se mueve</p>
-            <div class="splash-loader"><div class="loader-ring"></div></div>
+            <div class="splash-text">
+                <h1 class="splash-title">IPUC LA FONDA</h1>
+                <p class="splash-subtitle">Iglesia Pentecostal Unida de Colombia</p>
+                <p class="splash-motto">"Donde el Espíritu Santo se mueve"</p>
+            </div>
+            <div class="splash-loader">
+                <div class="loader-ring"></div>
+                <p class="loader-text">Preparando tu experiencia...</p>
+            </div>
+            <span class="splash-version">v2.1.0</span>
         </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
-    <div id="app" class="app hidden" role="main">
+    <!-- ============================================
+    APLICACIÓN PRINCIPAL
+    ============================================ -->
+    <div id="app" class="app hidden" role="main" aria-label="Aplicación IPUC LA FONDA">
 
-        <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
+        <!-- OVERLAY PARA SIDEBAR MÓVIL -->
+        <div id="sidebar-overlay" class="sidebar-overlay hidden" aria-hidden="true"></div>
 
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="sidebar" role="navigation">
+        <!-- ============================================
+        SIDEBAR - MENÚ LATERAL DE NAVEGACIÓN
+        ============================================ -->
+        <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menú principal de navegación">
+
+            <!-- ENCABEZADO DEL SIDEBAR -->
             <div class="sidebar-header">
-                <h2>IPUC LA FONDA</h2>
-                <button id="close-sidebar" class="btn-icon" aria-label="Cerrar menú"><i class="bx bx-x"></i></button>
+                <div class="logo-mini">
+                    <img src="ipuclafonda.png" alt="Logo IPUC" width="40" height="40" loading="lazy">
+                </div>
+                <div class="sidebar-brand">
+                    <h2>IPUC LA FONDA</h2>
+                    <span class="sidebar-slogan">Iglesia Pentecostal Unida de Colombia</span>
+                </div>
+                <button id="close-sidebar" class="btn-icon btn-close-sidebar" aria-label="Cerrar menú lateral" title="Cerrar menú">
+                    <i class="bx bx-x"></i>
+                </button>
             </div>
+
+            <!-- BUSCADOR DEL SIDEBAR -->
             <div class="sidebar-search">
-                <i class="bx bx-search"></i>
-                <input type="text" placeholder="Buscar..." aria-label="Buscar">
+                <i class="bx bx-search" aria-hidden="true"></i>
+                <input type="search" id="sidebar-search-input" placeholder="Buscar en IPUC LA FONDA..." aria-label="Buscar en el menú" autocomplete="off">
             </div>
-            <nav class="sidebar-nav">
+
+            <!-- NAVEGACIÓN PRINCIPAL -->
+            <nav class="sidebar-nav" id="sidebar-nav">
+
+                <!-- SECCIÓN: PRINCIPAL -->
                 <div class="nav-section">
                     <span class="nav-section-title">Principal</span>
-                    <a href="#inicio" class="nav-item active" data-page="inicio"><i class="bx bx-home-alt-2"></i><span>Inicio</span></a>
-                    <a href="#horarios" class="nav-item" data-page="horarios"><i class="bx bx-time-five"></i><span>Horarios</span></a>
-                    <a href="#asistencia" class="nav-item" data-page="asistencia"><i class="bx bx-check-shield"></i><span>Asistencia</span></a>
-                    <a href="#noticias" class="nav-item" data-page="noticias"><i class="bx bx-news"></i><span>Noticias</span><span class="badge hidden">0</span></a>
-                    <a href="#eventos" class="nav-item" data-page="eventos"><i class="bx bx-calendar-star"></i><span>Eventos</span></a>
+                    <a href="#inicio" class="nav-item active" data-page="inicio" aria-current="page">
+                        <i class="bx bx-home-alt-2" aria-hidden="true"></i>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="#horarios" class="nav-item" data-page="horarios">
+                        <i class="bx bx-time-five" aria-hidden="true"></i>
+                        <span>Horarios de Cultos</span>
+                    </a>
+                    <a href="#asistencia" class="nav-item" data-page="asistencia">
+                        <i class="bx bx-check-shield" aria-hidden="true"></i>
+                        <span>Confirmar Asistencia</span>
+                    </a>
+                    <a href="#noticias" class="nav-item" data-page="noticias">
+                        <i class="bx bx-news" aria-hidden="true"></i>
+                        <span>Noticias</span>
+                        <span class="badge badge-noticias hidden" aria-label="0 noticias nuevas">0</span>
+                    </a>
+                    <a href="#eventos" class="nav-item" data-page="eventos">
+                        <i class="bx bx-calendar-star" aria-hidden="true"></i>
+                        <span>Eventos</span>
+                    </a>
                 </div>
+
+                <!-- SECCIÓN: COMUNIDAD -->
                 <div class="nav-section">
                     <span class="nav-section-title">Comunidad</span>
-                    <a href="#chat" class="nav-item" data-page="chat"><i class="bx bx-chat"></i><span>Chat</span><span class="badge hidden">0</span></a>
-                    <a href="#directorio" class="nav-item" data-page="directorio"><i class="bx bx-group"></i><span>Directorio</span></a>
-                    <a href="#peticiones" class="nav-item" data-page="peticiones"><i class="bx bx-pray"></i><span>Peticiones</span></a>
-                    <a href="#encuestas" class="nav-item" data-page="encuestas"><i class="bx bx-poll"></i><span>Encuestas</span></a>
+                    <a href="#chat" class="nav-item" data-page="chat">
+                        <i class="bx bx-chat" aria-hidden="true"></i>
+                        <span>Chat Interno</span>
+                        <span class="badge badge-chat hidden" aria-label="0 mensajes nuevos">0</span>
+                    </a>
+                    <a href="#directorio" class="nav-item" data-page="directorio">
+                        <i class="bx bx-group" aria-hidden="true"></i>
+                        <span>Directorio de Miembros</span>
+                    </a>
+                    <a href="#peticiones" class="nav-item" data-page="peticiones">
+                        <i class="bx bx-pray" aria-hidden="true"></i>
+                        <span>Peticiones de Oración</span>
+                    </a>
+                    <a href="#encuestas" class="nav-item" data-page="encuestas">
+                        <i class="bx bx-poll" aria-hidden="true"></i>
+                        <span>Encuestas</span>
+                    </a>
+                    <a href="#cumpleanos" class="nav-item" data-page="cumpleanos">
+                        <i class="bx bx-cake" aria-hidden="true"></i>
+                        <span>Cumpleaños</span>
+                    </a>
                 </div>
+
+                <!-- SECCIÓN: RECURSOS -->
                 <div class="nav-section">
                     <span class="nav-section-title">Recursos</span>
-                    <a href="#biblioteca" class="nav-item" data-page="biblioteca"><i class="bx bx-book-open"></i><span>Biblioteca</span></a>
-                    <a href="#galeria" class="nav-item" data-page="galeria"><i class="bx bx-images"></i><span>Galería</span></a>
-                    <a href="#devocional" class="nav-item" data-page="devocional"><i class="bx bx-bible"></i><span>Devocional</span></a>
+                    <a href="#biblioteca" class="nav-item" data-page="biblioteca">
+                        <i class="bx bx-book-open" aria-hidden="true"></i>
+                        <span>Biblioteca Digital</span>
+                    </a>
+                    <a href="#galeria" class="nav-item" data-page="galeria">
+                        <i class="bx bx-images" aria-hidden="true"></i>
+                        <span>Galería de Fotos</span>
+                    </a>
+                    <a href="#devocional" class="nav-item" data-page="devocional">
+                        <i class="bx bx-bible" aria-hidden="true"></i>
+                        <span>Devocional Diario</span>
+                    </a>
                 </div>
+
+                <!-- SECCIÓN: CUENTA -->
                 <div class="nav-section">
-                    <span class="nav-section-title">Cuenta</span>
-                    <a href="#perfil" class="nav-item" data-page="perfil"><i class="bx bx-user-circle"></i><span>Perfil</span></a>
-                    <a href="#configuracion" class="nav-item" data-page="configuracion"><i class="bx bx-cog"></i><span>Configuración</span></a>
+                    <span class="nav-section-title">Mi Cuenta</span>
+                    <a href="#perfil" class="nav-item" data-page="perfil">
+                        <i class="bx bx-user-circle" aria-hidden="true"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                    <a href="#configuracion" class="nav-item" data-page="configuracion">
+                        <i class="bx bx-cog" aria-hidden="true"></i>
+                        <span>Configuración</span>
+                    </a>
                 </div>
+
+                <!-- SECCIÓN: ADMINISTRACIÓN (SOLO ADMIN) -->
                 <div id="admin-menu" class="nav-section hidden">
-                    <hr>
-                    <span class="nav-section-title admin-label"><i class="bx bx-shield-quarter"></i> Admin</span>
-                    <a href="#dashboard" class="nav-item" data-page="dashboard"><i class="bx bx-line-chart"></i><span>Dashboard</span></a>
-                    <a href="#gestion-usuarios" class="nav-item" data-page="gestion-usuarios"><i class="bx bx-user-voice"></i><span>Usuarios</span></a>
-                    <a href="#gestion-noticias" class="nav-item" data-page="gestion-noticias"><i class="bx bx-edit-alt"></i><span>Noticias</span></a>
-                    <a href="#gestion-eventos" class="nav-item" data-page="gestion-eventos"><i class="bx bx-calendar-edit"></i><span>Eventos</span></a>
-                    <a href="#versiculos" class="nav-item" data-page="versiculos"><i class="bx bx-bookmark-plus"></i><span>Versículos</span></a>
-                    <a href="#sistema" class="nav-item" data-page="sistema"><i class="bx bx-server"></i><span>Sistema</span></a>
+                    <hr class="divider" aria-hidden="true">
+                    <span class="nav-section-title admin-label">
+                        <i class="bx bx-shield-quarter" aria-hidden="true"></i> Panel de Administración
+                    </span>
+                    <a href="#dashboard" class="nav-item" data-page="dashboard">
+                        <i class="bx bx-line-chart" aria-hidden="true"></i>
+                        <span>Dashboard General</span>
+                    </a>
+                    <a href="#gestion-usuarios" class="nav-item" data-page="gestion-usuarios">
+                        <i class="bx bx-user-voice" aria-hidden="true"></i>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                    <a href="#gestion-noticias" class="nav-item" data-page="gestion-noticias">
+                        <i class="bx bx-edit-alt" aria-hidden="true"></i>
+                        <span>Gestión de Noticias</span>
+                    </a>
+                    <a href="#gestion-eventos" class="nav-item" data-page="gestion-eventos">
+                        <i class="bx bx-calendar-edit" aria-hidden="true"></i>
+                        <span>Gestión de Eventos</span>
+                    </a>
+                    <a href="#versiculos" class="nav-item" data-page="versiculos">
+                        <i class="bx bx-bookmark-plus" aria-hidden="true"></i>
+                        <span>Versículos Diarios</span>
+                    </a>
+                    <a href="#insignias" class="nav-item" data-page="insignias">
+                        <i class="bx bx-award" aria-hidden="true"></i>
+                        <span>Gestión de Insignias</span>
+                    </a>
+                    <a href="#gestion-biblioteca" class="nav-item" data-page="gestion-biblioteca">
+                        <i class="bx bx-book-add" aria-hidden="true"></i>
+                        <span>Gestión de Biblioteca</span>
+                    </a>
+                    <a href="#gestion-galeria" class="nav-item" data-page="gestion-galeria">
+                        <i class="bx bx-photo-album" aria-hidden="true"></i>
+                        <span>Gestión de Galería</span>
+                    </a>
+                    <a href="#sistema" class="nav-item" data-page="sistema">
+                        <i class="bx bx-server" aria-hidden="true"></i>
+                        <span>Configuración del Sistema</span>
+                    </a>
                 </div>
             </nav>
+
+            <!-- FOOTER DEL SIDEBAR - INFORMACIÓN DEL USUARIO -->
             <div class="sidebar-footer">
-                <div class="user-mini" id="user-mini">
+                <div class="user-mini" id="user-mini" role="button" tabindex="0" aria-label="Información del usuario" aria-haspopup="true" aria-expanded="false">
                     <div class="user-mini-avatar">
-                        <img src="assets/avatars/default.png" alt="Avatar" width="40" height="40">
-                        <span class="user-status offline"></span>
+                        <img src="assets/avatars/default.png" alt="Foto de perfil" width="42" height="42" loading="lazy">
+                        <span class="user-status offline" aria-label="Desconectado"></span>
                     </div>
                     <div class="user-info">
-                        <span class="user-name">Usuario</span>
-                        <span class="user-role">Miembro</span>
+                        <span class="user-name">Invitado</span>
+                        <span class="user-role">Sin sesión</span>
                     </div>
+                    <i class="bx bx-chevron-up user-mini-arrow" aria-hidden="true"></i>
                 </div>
-                <div id="user-dropdown" class="user-dropdown hidden">
-                    <a href="#perfil"><i class="bx bx-user"></i> Perfil</a>
-                    <a href="#configuracion"><i class="bx bx-cog"></i> Configuración</a>
-                    <hr>
-                    <a href="#" id="btn-logout"><i class="bx bx-log-out"></i> Cerrar sesión</a>
+
+                <!-- MENÚ DESPLEGABLE DEL USUARIO -->
+                <div id="user-dropdown" class="user-dropdown hidden" role="menu" aria-label="Opciones de usuario">
+                    <a href="#perfil" class="dropdown-item" role="menuitem">
+                        <i class="bx bx-user" aria-hidden="true"></i>
+                        <span>Ver mi perfil</span>
+                    </a>
+                    <a href="#configuracion" class="dropdown-item" role="menuitem">
+                        <i class="bx bx-cog" aria-hidden="true"></i>
+                        <span>Configuración</span>
+                    </a>
+                    <a href="#" class="dropdown-item" role="menuitem" onclick="navegarA('ayuda')">
+                        <i class="bx bx-help-circle" aria-hidden="true"></i>
+                        <span>Centro de Ayuda</span>
+                    </a>
+                    <hr aria-hidden="true">
+                    <a href="#" class="dropdown-item" id="btn-logout" role="menuitem">
+                        <i class="bx bx-log-out" aria-hidden="true"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
                 </div>
             </div>
         </aside>
 
-        <!-- MAIN -->
-        <main class="main-content">
-            <header class="header">
-                <button id="menu-toggle" class="btn-icon" aria-label="Menú"><i class="bx bx-menu-alt-left"></i></button>
-                <h1 id="page-title">Inicio</h1>
+        <!-- ============================================
+        CONTENIDO PRINCIPAL
+        ============================================ -->
+        <main class="main-content" id="main-content">
+
+            <!-- HEADER SUPERIOR -->
+            <header class="header" id="main-header">
+                <div class="header-left">
+                    <button id="menu-toggle" class="btn-icon" aria-label="Abrir menú lateral" title="Abrir menú">
+                        <i class="bx bx-menu-alt-left" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- BREADCRUMB -->
+                    <nav class="breadcrumb" aria-label="Ruta de navegación">
+                        <ol>
+                            <li><a href="#inicio" aria-label="Ir al inicio"><i class="bx bx-home" aria-hidden="true"></i></a></li>
+                            <li class="separator" aria-hidden="true"><i class="bx bx-chevron-right"></i></li>
+                            <li class="current" id="breadcrumb-current" aria-current="page">Inicio</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <div class="header-center">
+                    <h1 id="page-title">Inicio</h1>
+                </div>
+
                 <div class="header-right">
-                    <button id="search-toggle" class="btn-icon" aria-label="Buscar"><i class="bx bx-search"></i></button>
-                    <button id="theme-toggle" class="btn-icon" aria-label="Tema"><i class="bx bx-moon"></i></button>
-                    <button id="notifications-toggle" class="btn-icon" aria-label="Notificaciones"><i class="bx bx-bell"></i><span class="badge hidden">0</span></button>
+                    <!-- BUSCADOR GLOBAL -->
+                    <button id="search-toggle" class="btn-icon" aria-label="Abrir buscador" title="Buscar">
+                        <i class="bx bx-search" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- TEMA OSCURO/CLARO -->
+                    <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">
+                        <i class="bx bx-moon" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- NOTIFICACIONES -->
+                    <button id="notifications-toggle" class="btn-icon notification-btn" aria-label="Ver notificaciones" title="Notificaciones">
+                        <i class="bx bx-bell" aria-hidden="true"></i>
+                        <span class="badge badge-notifications hidden" aria-label="0 notificaciones sin leer">0</span>
+                    </button>
+                </div>
+
+                <!-- BARRA DE BÚSQUEDA GLOBAL -->
+                <div id="search-bar" class="search-bar hidden" role="search">
+                    <div class="search-bar-content">
+                        <i class="bx bx-search" aria-hidden="true"></i>
+                        <input type="search" id="global-search-input" placeholder="Buscar en IPUC LA FONDA..." aria-label="Búsqueda global" autocomplete="off">
+                        <button class="btn-icon" id="search-close" aria-label="Cerrar búsqueda">
+                            <i class="bx bx-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div id="search-results" class="search-results hidden" aria-live="polite"></div>
                 </div>
             </header>
+
+            <!-- CONTENIDO DINÁMICO DE PÁGINAS -->
             <div id="page-content" class="page-content">
-                <div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>
+                <div class="page-loader" role="status" aria-label="Cargando contenido">
+                    <div class="spinner"></div>
+                    <p>Cargando contenido...</p>
+                </div>
             </div>
+
         </main>
     </div>
 
-    <!-- WELCOME SCREEN -->
-    <div id="welcome-screen" class="welcome-screen hidden">
-        <div class="welcome-background"><div class="welcome-overlay"></div></div>
+    <!-- ============================================
+    PANTALLA DE BIENVENIDA (USUARIO NO AUTENTICADO)
+    ============================================ -->
+    <div id="welcome-screen" class="welcome-screen" role="main" aria-label="Pantalla de bienvenida">
+        <div class="welcome-background">
+            <div class="welcome-overlay"></div>
+            <div class="welcome-particles"></div>
+        </div>
+
         <div class="welcome-container">
             <div class="welcome-card">
-                <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="welcome-logo" width="100" height="100">
-                <h1 class="welcome-title">IPUC LA FONDA</h1>
-                <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
-                <div class="welcome-actions">
-                    <button id="btn-login" class="btn-primary btn-lg"><i class="bx bx-log-in"></i> Iniciar Sesión</button>
-                    <button id="btn-register" class="btn-secondary btn-lg"><i class="bx bx-user-plus"></i> Registrarse</button>
-                    <button id="btn-continue-guest" class="btn-outline btn-lg"><i class="bx bx-glasses"></i> Invitado</button>
+                <div class="welcome-header">
+                    <img src="ipuclafonda.png" alt="Logo IPUC LA FONDA" class="welcome-logo" width="110" height="110" loading="eager" draggable="false">
+                    <h1 class="welcome-title">IPUC LA FONDA</h1>
+                    <p class="welcome-subtitle">Iglesia Pentecostal Unida de Colombia</p>
+                    <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
                 </div>
-                <p class="welcome-version">v2.0.0 &copy; 2026 IPUC LA FONDA</p>
+
+                <div class="welcome-actions">
+                    <button id="btn-login" class="btn-primary btn-lg">
+                        <i class="bx bx-log-in" aria-hidden="true"></i>
+                        Iniciar Sesión
+                    </button>
+
+                    <button id="btn-register" class="btn-secondary btn-lg">
+                        <i class="bx bx-user-plus" aria-hidden="true"></i>
+                        Crear Cuenta Nueva
+                    </button>
+
+                    <button id="btn-continue-guest" class="btn-outline btn-lg">
+                        <i class="bx bx-glasses" aria-hidden="true"></i>
+                        Explorar como Invitado
+                    </button>
+                </div>
+
+                <div class="welcome-footer">
+                    <div class="welcome-features">
+                        <div class="feature-item">
+                            <i class="bx bx-time-five" aria-hidden="true"></i>
+                            <span>Horarios de Cultos</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-bible" aria-hidden="true"></i>
+                            <span>Devocional Diario</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-group" aria-hidden="true"></i>
+                            <span>Comunidad Activa</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-bell" aria-hidden="true"></i>
+                            <span>Notificaciones</span>
+                        </div>
+                    </div>
+
+                    <p class="welcome-version">v2.1.0 &copy; 2026 IPUC LA FONDA - Todos los derechos reservados</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- NOTIFICACIONES -->
-    <div id="notification-panel" class="notification-panel hidden">
+    <!-- ============================================
+    PANEL DE NOTIFICACIONES
+    ============================================ -->
+    <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-modal="true" aria-label="Panel de notificaciones">
         <div class="notification-header">
-            <h3>Notificaciones</h3>
-            <button class="btn-icon" id="close-notifications"><i class="bx bx-x"></i></button>
+            <h3>Centro de Notificaciones</h3>
+            <div class="notification-actions">
+                <button class="btn-text" id="mark-all-read" aria-label="Marcar todas las notificaciones como leídas">
+                    <i class="bx bx-check-double" aria-hidden="true"></i> Marcar todas leídas
+                </button>
+                <button class="btn-icon" id="close-notifications" aria-label="Cerrar panel de notificaciones">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
         </div>
-        <div id="notification-list"><p>No hay notificaciones</p></div>
+
+        <div class="notification-filters" role="tablist" aria-label="Filtrar notificaciones">
+            <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">Todas</button>
+            <button class="filter-btn" data-filter="unread" role="tab" aria-selected="false">No leídas</button>
+            <button class="filter-btn" data-filter="anuncios" role="tab" aria-selected="false">Anuncios</button>
+        </div>
+
+        <div id="notification-list" class="notification-list" role="tabpanel">
+            <div class="notification-empty">
+                <i class="bx bx-bell-off" aria-hidden="true"></i>
+                <p>No tienes notificaciones nuevas</p>
+                <small>Las notificaciones de cultos, eventos y mensajes aparecerán aquí</small>
+            </div>
+        </div>
     </div>
 
-    <!-- MODAL -->
-    <div id="modal" class="modal hidden">
-        <div class="modal-backdrop"></div>
+    <!-- ============================================
+    MODAL PRINCIPAL
+    ============================================ -->
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-backdrop" aria-hidden="true"></div>
         <div class="modal-container">
             <div class="modal-header">
                 <h2 id="modal-title"></h2>
-                <button class="modal-close btn-icon"><i class="bx bx-x"></i></button>
+                <button class="modal-close btn-icon" aria-label="Cerrar ventana modal">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
             </div>
-            <div class="modal-body" id="modal-body"></div>
-            <div class="modal-footer hidden" id="modal-footer"></div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido dinámico cargado por JavaScript -->
+            </div>
+            <div class="modal-footer hidden" id="modal-footer">
+                <!-- Botones de acción del modal -->
+            </div>
         </div>
     </div>
 
-    <!-- CONFIRM MODAL -->
-    <div id="confirm-modal" class="modal hidden">
-        <div class="modal-backdrop"></div>
+    <!-- ============================================
+    MODAL DE CONFIRMACIÓN
+    ============================================ -->
+    <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="modal-backdrop" aria-hidden="true"></div>
         <div class="modal-container modal-sm">
             <div class="modal-body text-center">
+                <div class="confirm-icon" id="confirm-icon" aria-hidden="true">
+                    <i class="bx bx-question-mark"></i>
+                </div>
                 <h3 id="confirm-title">¿Estás seguro?</h3>
-                <p id="confirm-message"></p>
+                <p id="confirm-message">Esta acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
-                <button class="btn-primary" id="confirm-accept">Aceptar</button>
+                <button class="btn-primary" id="confirm-accept">Confirmar</button>
             </div>
         </div>
     </div>
 
-    <!-- TOAST -->
-    <div id="toast-container" class="toast-container" aria-live="polite"></div>
-
-    <!-- FAB -->
-    <button id="fab-main" class="fab hidden"><i class="bx bx-plus"></i></button>
-    <div id="fab-menu" class="fab-menu hidden">
-        <button class="fab-item" data-action="oracion"><i class="bx bx-pray"></i><span>Oración</span></button>
-        <button class="fab-item" data-action="asistencia"><i class="bx bx-check-shield"></i><span>Asistencia</span></button>
-        <button class="fab-item" data-action="compartir"><i class="bx bx-share-alt"></i><span>Compartir</span></button>
+    <!-- ============================================
+    PANEL LATERAL (DRAWER)
+    ============================================ -->
+    <div id="drawer" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+        <div class="drawer-backdrop" aria-hidden="true"></div>
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3 id="drawer-title"></h3>
+                <button class="btn-icon drawer-close" aria-label="Cerrar panel lateral">
+                    <i class="bx bx-x" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="drawer-body" id="drawer-body">
+                <!-- Contenido dinámico cargado por JavaScript -->
+            </div>
+        </div>
     </div>
 
+    <!-- ============================================
+    CONTENEDOR DE TOASTS (NOTIFICACIONES EMERGENTES)
+    ============================================ -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true" aria-relevant="additions"></div>
+
+    <!-- ============================================
+    BOTÓN FLOTANTE DE ACCIÓN (FAB)
+    ============================================ -->
+    <button id="fab-main" class="fab hidden" aria-label="Abrir menú de acciones rápidas" title="Acciones rápidas" aria-haspopup="true" aria-expanded="false">
+        <i class="bx bx-plus" aria-hidden="true"></i>
+    </button>
+
+    <div id="fab-menu" class="fab-menu hidden" role="menu" aria-label="Acciones rápidas">
+        <button class="fab-item" data-action="oracion" role="menuitem">
+            <i class="bx bx-pray" aria-hidden="true"></i>
+            <span>Enviar Petición de Oración</span>
+        </button>
+        <button class="fab-item" data-action="asistencia" role="menuitem">
+            <i class="bx bx-check-shield" aria-hidden="true"></i>
+            <span>Confirmar Asistencia</span>
+        </button>
+        <button class="fab-item" data-action="compartir" role="menuitem">
+            <i class="bx bx-share-alt" aria-hidden="true"></i>
+            <span>Compartir Versículo</span>
+        </button>
+        <button class="fab-item" data-action="biblia" role="menuitem">
+            <i class="bx bx-bible" aria-hidden="true"></i>
+            <span>Leer la Biblia</span>
+        </button>
+    </div>
+
+    <!-- ============================================
+    SCRIPTS
+    ============================================ -->
     <script src="script.js" defer></script>
+
+    <!-- ============================================
+    REGISTRO DEL SERVICE WORKER (PWA)
+    ============================================ -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => {
-                        console.log('✅ SW registrado');
-                        reg.addEventListener('updatefound', () => {
-                            const newWorker = reg.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    showUpdateNotification();
-                                }
-                            });
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado correctamente');
+
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            if (newWorker) {
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        console.log('🔄 Nueva versión disponible');
+                                        mostrarNotificacionActualizacion();
+                                    }
+                                });
+                            }
                         });
                     })
-                    .catch(err => console.log('SW error:', err));
+                    .catch(error => {
+                        console.warn('⚠️ Error al registrar Service Worker:', error);
+                    });
+            });
+
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
 
-        function showUpdateNotification() {
-            const tc = document.getElementById('toast-container');
-            if (!tc) return;
-            const t = document.createElement('div');
-            t.className = 'toast info';
-            t.innerHTML = '<span>Nueva versión disponible</span> <button onclick="location.reload()">Actualizar</button>';
-            tc.appendChild(t);
-            setTimeout(() => { t.classList.add('toast-hide'); setTimeout(() => t.remove(), 300); }, 8000);
+        function mostrarNotificacionActualizacion() {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast info';
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <i class="bx bx-refresh" aria-hidden="true"></i>
+                <span>Nueva versión disponible</span>
+                <button onclick="window.location.reload()" class="btn-text" style="color: white; text-decoration: underline; margin-left: 8px;">
+                    Actualizar ahora
+                </button>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('toast-hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 15000);
+        }
+
+        // Detectar si la app está instalada como PWA
+        if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+            console.log('📱 Aplicación ejecutándose como PWA instalada');
+            document.body.classList.add('pwa-mode');
         }
     </script>
 </body>
