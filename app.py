@@ -755,3 +755,257 @@ def proximo_culto():
 def horarios():
     """Obtener horarios de cultos"""
     return jsonify(db.cargar_json('horarios')), 200
+
+# ============================================
+# VERSÍCULOS
+# ============================================
+@app.route('/api/versiculo-diario')
+def versiculo_diario():
+    """Obtener versículo del día"""
+    data = db.cargar_json('versiculos')
+    hoy = datetime.datetime.now().strftime('%Y-%m-%d')
+    actual = data.get('versiculo_actual')
+    
+    if not actual or actual.get('fecha') != hoy:
+        lista = data.get('versiculos', [])
+        if lista:
+            actual = lista[datetime.datetime.now().day % len(lista)].copy()
+            actual['fecha'] = hoy
+            data['versiculo_actual'] = actual
+            db.guardar_json('versiculos', data)
+        else:
+            actual = {
+                "texto": "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.",
+                "referencia": "Juan 3:16",
+                "tipo": "promesa",
+                "fecha": hoy
+            }
+    
+    return jsonify({"versiculo": actual}), 200
+
+@app.route('/api/versiculos', methods=['GET', 'POST'])
+@requiere_auth
+def versiculos():
+    """Obtener o crear versículos"""
+    if request.method == 'GET':
+        return jsonify({"versiculos": db.cargar_json('versiculos').get('versiculos', [])}), 200
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    if sesion['rol'] != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+    
+    datos = request.json
+    if not datos or 'texto' not in datos or 'referencia' not in datos:
+        return jsonify({"error": "Datos incompletos"}), 400
+    
+    versiculos_data = db.cargar_json('versiculos')
+    nuevo = {
+        "id": len(versiculos_data.get('versiculos', [])) + 1,
+        "texto": datos['texto'],
+        "referencia": datos['referencia'],
+        "tipo": datos.get('tipo', 'versiculo'),
+        "fecha_creacion": datetime.datetime.now().isoformat()
+    }
+    versiculos_data.setdefault('versiculos', []).append(nuevo)
+    db.guardar_json('versiculos', versiculos_data)
+    return jsonify({"mensaje": "Versículo creado exitosamente", "versiculo": nuevo}), 201
+
+@app.route('/api/versiculos/<int:versiculo_id>', methods=['DELETE'])
+@requiere_admin
+def eliminar_versiculo(versiculo_id):
+    """Eliminar versículo (admin)"""
+    versiculos_data = db.cargar_json('versiculos')
+    versiculos_data['versiculos'] = [v for v in versiculos_data.get('versiculos', []) if v['id'] != versiculo_id]
+    db.guardar_json('versiculos', versiculos_data)
+    return jsonify({"mensaje": "Versículo eliminado exitosamente"}), 200
+
+# ============================================
+# NOTICIAS
+# ============================================
+@app.route('/api/noticias', methods=['GET', 'POST'])
+def noticias():
+    """Obtener o crear noticias"""
+    if request.method == 'GET':
+        noticias_data = db.cargar_json('noticias')
+        lista = noticias_data.get('noticias', [])
+        publicadas = [n for n in lista if n.get('estado') == 'publicado']
+        return jsonify({
+            "noticias": sorted(publicadas, key=lambda x: x.get('fecha_publicacion', ''), reverse=True)[:20],
+            "total": len(publicadas)
+        }), 200
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    if not sesion or sesion['rol'] != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+    
+    datos = request.json
+    if not datos or 'titulo' not in datos or 'contenido' not in datos:
+        return jsonify({"error": "Datos incompletos"}), 400
+    
+    noticias_data = db.cargar_json('noticias')
+    nueva = {
+        "id": len(noticias_data.get('noticias', [])) + 1,
+        "titulo": datos['titulo'],
+        "contenido": datos['contenido'],
+        "imagen": datos.get('imagen', ''),
+        "autor_id": sesion['usuario']['id'],
+        "autor_nombre": sesion['usuario']['nombre'],
+        "fecha_publicacion": datetime.datetime.now().isoformat(),
+        "fecha_actualizacion": datetime.datetime.now().isoformat(),
+        "estado": datos.get('estado', 'publicado'),
+        "categoria": datos.get('categoria', 'General'),
+        "comentarios": [],
+        "reacciones": {"me_gusta": 0, "amen": 0, "bendiciones": 0, "aleluya": 0}
+    }
+    noticias_data.setdefault('noticias', []).append(nueva)
+    db.guardar_json('noticias', noticias_data)
+    return jsonify({"mensaje": "Noticia creada exitosamente", "noticia": nueva}), 201
+
+@app.route('/api/noticias/<int:noticia_id>', methods=['DELETE'])
+@requiere_admin
+def eliminar_noticia(noticia_id):
+    """Eliminar noticia (admin)"""
+    noticias_data = db.cargar_json('noticias')
+    noticias_data['noticias'] = [n for n in noticias_data.get('noticias', []) if n['id'] != noticia_id]
+    db.guardar_json('noticias', noticias_data)
+    return jsonify({"mensaje": "Noticia eliminada exitosamente"}), 200
+
+# ============================================
+# EVENTOS
+# ============================================
+@app.route('/api/eventos', methods=['GET', 'POST'])
+def eventos():
+    """Obtener o crear eventos"""
+    if request.method == 'GET':
+        eventos_data = db.cargar_json('eventos')
+        lista = eventos_data.get('eventos', [])
+        proximos = [e for e in lista if e.get('fecha', '') >= datetime.datetime.now().strftime('%Y-%m-%d')]
+        return jsonify({
+            "eventos": sorted(proximos, key=lambda x: x.get('fecha', ''))[:20],
+            "total": len(proximos)
+        }), 200
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    if not sesion or sesion['rol'] != 'admin':
+        return jsonify({"error": "No autorizado"}), 403
+    
+    datos = request.json
+    if not datos or 'titulo' not in datos or 'fecha' not in datos:
+        return jsonify({"error": "Datos incompletos"}), 400
+    
+    eventos_data = db.cargar_json('eventos')
+    nuevo = {
+        "id": len(eventos_data.get('eventos', [])) + 1,
+        "titulo": datos['titulo'],
+        "descripcion": datos.get('descripcion', ''),
+        "fecha": datos['fecha'],
+        "hora": datos.get('hora', ''),
+        "lugar": datos.get('lugar', 'IPUC LA FONDA'),
+        "imagen": datos.get('imagen', ''),
+        "organizador_id": sesion['usuario']['id'],
+        "fecha_creacion": datetime.datetime.now().isoformat(),
+        "estado": datos.get('estado', 'programado'),
+        "cupos": datos.get('cupos', 0),
+        "reservados": 0
+    }
+    eventos_data.setdefault('eventos', []).append(nuevo)
+    db.guardar_json('eventos', eventos_data)
+    return jsonify({"mensaje": "Evento creado exitosamente", "evento": nuevo}), 201
+
+# ============================================
+# PETICIONES DE ORACIÓN
+# ============================================
+@app.route('/api/peticiones', methods=['GET', 'POST'])
+@requiere_auth
+def peticiones():
+    """Obtener o crear peticiones de oración"""
+    if request.method == 'GET':
+        peticiones_data = db.cargar_json('peticiones')
+        lista = peticiones_data.get('peticiones', [])
+        return jsonify({
+            "peticiones": sorted(lista, key=lambda x: x.get('fecha', ''), reverse=True)[:50],
+            "total": len(lista)
+        }), 200
+    
+    datos = request.json
+    if not datos or 'motivo' not in datos:
+        return jsonify({"error": "El motivo es obligatorio"}), 400
+    
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    sesion = verificar_token(token)
+    
+    peticiones_data = db.cargar_json('peticiones')
+    nueva = {
+        "id": len(peticiones_data.get('peticiones', [])) + 1,
+        "usuario_id": sesion['usuario']['id'],
+        "nombre": sesion['usuario']['nombre'],
+        "motivo": datos['motivo'],
+        "descripcion": datos.get('descripcion', ''),
+        "fecha": datetime.datetime.now().isoformat(),
+        "estado": "activa",
+        "oraciones": 0
+    }
+    peticiones_data.setdefault('peticiones', []).append(nueva)
+    db.guardar_json('peticiones', peticiones_data)
+    return jsonify({"mensaje": "Petición creada exitosamente", "peticion": nueva}), 201
+
+# ============================================
+# INICIALIZACIÓN DEL SERVIDOR
+# ============================================
+if __name__ == '__main__':
+    print("\n")
+    print("╔══════════════════════════════════════════════════════════════╗")
+    print("║                                                              ║")
+    print("║   🔥  IPUC LA FONDA - API REST v2.1.0                       ║")
+    print("║   Iglesia Pentecostal Unida de Colombia                      ║")
+    print("║   'Donde el Espíritu Santo se mueve'                         ║")
+    print("║                                                              ║")
+    print("╚══════════════════════════════════════════════════════════════╝")
+    print("")
+    
+    print("⏳ Inicializando base de datos...")
+    try:
+        db.inicializar_datos()
+        print("✅ Base de datos inicializada correctamente")
+        
+        stats = db.obtener_estadisticas_db()
+        print(f"   📊 Archivos JSON: {stats.get('total_archivos', 0)}")
+        print(f"   💾 Tamaño total: {stats.get('tamaño_total_kb', 0):.2f} KB")
+    except Exception as e:
+        print(f"❌ Error al inicializar la base de datos: {str(e)}")
+    
+    # Verificar administradores
+    administradores = db.cargar_json('administradores')
+    total_admins = len(administradores.get('administradores', []))
+    
+    if total_admins == 0:
+        print("")
+        print("⚠️  ╔══════════════════════════════════════════════════════════╗")
+        print("⚠️  ║  ADVERTENCIA DE SEGURIDAD                               ║")
+        print("⚠️  ║  No existe ningún administrador en el sistema.          ║")
+        print("⚠️  ║  Usa: POST /api/admin/crear-primer-admin               ║")
+        print("⚠️  ╚══════════════════════════════════════════════════════════╝")
+    else:
+        print(f"👑 Administradores registrados: {total_admins}")
+    
+    usuarios = db.cargar_json('usuarios')
+    total_usuarios = len(usuarios.get('usuarios', []))
+    print(f"👥 Usuarios registrados: {total_usuarios}")
+    
+    port = int(os.environ.get('PORT', 5000))
+    entorno = "PRODUCCIÓN" if os.environ.get('RENDER') else "DESARROLLO"
+    
+    print("")
+    print("-" * 60)
+    print(f"⚙️  Entorno: {entorno}")
+    print(f"🌐 Servidor: http://0.0.0.0:{port}")
+    print(f"🔒 Autenticación: SHA-256 + Salt")
+    print(f"⏰ Hora: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("-" * 60)
+    print("🚀 Iniciando servidor Flask...")
+    print("=" * 60)
+    
+    app.run(host='0.0.0.0', port=port, debug=False)
