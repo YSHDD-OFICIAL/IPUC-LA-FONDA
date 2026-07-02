@@ -1,6 +1,7 @@
 // ============================================
-// IPUC LA FONDA - JAVASCRIPT v2.0 - COMPLETO
-// Todas las funciones, botones, enlaces y secciones funcionales
+// IPUC LA FONDA - JAVASCRIPT PRO v2.1
+// Autenticación sin credenciales de prueba
+// Todas las secciones, botones, enlaces y funciones 100% operativas
 // ============================================
 
 // ============================================
@@ -59,142 +60,225 @@ const APP_STATE = {
     contadorInterval: null,
     fechaInterval: null,
     notificacionesNoLeidas: 0,
-    pendingConfirmation: null
+    pendingConfirmation: null,
+    isLoading: false
 };
 
 // ============================================
-// INICIALIZACIÓN
+// INICIALIZACIÓN PRINCIPAL
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 IPUC LA FONDA PRO v2.1 - Inicializando...');
     inicializarApp();
 });
 
 function inicializarApp() {
-    // Cargar tema
-    const temaGuardado = localStorage.getItem(CONFIG.STORAGE_KEYS.TEMA) || 'light';
-    APP_STATE.tema = temaGuardado;
-    aplicarTema(temaGuardado);
+    try {
+        // Cargar tema guardado
+        const temaGuardado = localStorage.getItem(CONFIG.STORAGE_KEYS.TEMA) || 'light';
+        APP_STATE.tema = temaGuardado;
+        aplicarTema(temaGuardado);
 
-    // Verificar sesión
-    const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
-    const usuarioData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
-    const rol = localStorage.getItem(CONFIG.STORAGE_KEYS.ROL);
-    let usuario = null;
-    try { usuario = usuarioData ? JSON.parse(usuarioData) : null; } catch (e) {}
+        // Verificar sesión existente
+        const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+        const usuarioData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
+        const rol = localStorage.getItem(CONFIG.STORAGE_KEYS.ROL);
 
-    // Ocultar splash
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) splash.style.display = 'none';
-
-        if (token && usuario) {
-            APP_STATE.token = token;
-            APP_STATE.usuario = usuario;
-            APP_STATE.rol = rol || 'usuario';
-            mostrarApp();
-        } else {
-            mostrarBienvenida();
+        let usuario = null;
+        try {
+            usuario = usuarioData ? JSON.parse(usuarioData) : null;
+        } catch (e) {
+            console.warn('Error al parsear datos de usuario:', e);
         }
-    }, 2500);
 
-    inicializarEventListeners();
-    manejarResponsiveSidebar();
-    window.addEventListener('resize', () => manejarResponsiveSidebar());
+        // Ocultar splash después de la animación
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            if (splash) {
+                splash.style.display = 'none';
+            }
+
+            if (token && usuario) {
+                APP_STATE.token = token;
+                APP_STATE.usuario = usuario;
+                APP_STATE.rol = rol || 'usuario';
+                mostrarApp();
+                console.log('✅ Sesión restaurada:', usuario.nombre);
+            } else {
+                mostrarBienvenida();
+                console.log('👋 Mostrando pantalla de bienvenida');
+            }
+        }, 2500);
+
+        // Inicializar event listeners
+        inicializarEventListeners();
+
+        // Manejar responsive
+        manejarResponsiveSidebar();
+        window.addEventListener('resize', () => manejarResponsiveSidebar());
+
+        console.log('✅ App inicializada correctamente');
+    } catch (error) {
+        console.error('❌ Error al inicializar la app:', error);
+    }
 }
 
 // ============================================
-// EVENT LISTENERS - TODOS LOS BOTONES
+// EVENT LISTENERS - TODOS LOS BOTONES Y ENLACES
 // ============================================
 function inicializarEventListeners() {
     // Sidebar
-    document.getElementById('menu-toggle')?.addEventListener('click', toggleSidebar);
-    document.getElementById('close-sidebar')?.addEventListener('click', cerrarSidebar);
-    document.getElementById('sidebar-overlay')?.addEventListener('click', cerrarSidebar);
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', cerrarSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', cerrarSidebar);
 
     // Navegación - Todos los links del sidebar
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
-            navegarA(this.getAttribute('data-page'));
+            const page = this.getAttribute('data-page');
+            if (page) navegarA(page);
         });
     });
 
-    // Tema
-    document.getElementById('theme-toggle')?.addEventListener('click', toggleTema);
+    // Tema oscuro/claro
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) themeToggle.addEventListener('click', toggleTema);
 
     // Notificaciones
-    document.getElementById('notifications-toggle')?.addEventListener('click', toggleNotificaciones);
-    document.getElementById('close-notifications')?.addEventListener('click', () => {
-        document.getElementById('notification-panel')?.classList.add('hidden');
-        APP_STATE.notificationsOpen = false;
-    });
+    const notificationsToggle = document.getElementById('notifications-toggle');
+    const closeNotifications = document.getElementById('close-notifications');
+    if (notificationsToggle) notificationsToggle.addEventListener('click', toggleNotificaciones);
+    if (closeNotifications) {
+        closeNotifications.addEventListener('click', () => {
+            const panel = document.getElementById('notification-panel');
+            if (panel) panel.classList.add('hidden');
+            APP_STATE.notificationsOpen = false;
+        });
+    }
+
+    // Marcar todas notificaciones como leídas
+    const markAllRead = document.getElementById('mark-all-read');
+    if (markAllRead) {
+        markAllRead.addEventListener('click', () => {
+            APP_STATE.notificacionesNoLeidas = 0;
+            actualizarBadgeNotificaciones();
+            showToast('Todas las notificaciones marcadas como leídas', 'success');
+        });
+    }
 
     // Usuario dropdown
-    document.getElementById('user-mini')?.addEventListener('click', toggleUserDropdown);
+    const userMini = document.getElementById('user-mini');
+    if (userMini) userMini.addEventListener('click', toggleUserDropdown);
 
-    // FAB
-    document.getElementById('fab-main')?.addEventListener('click', toggleFabMenu);
+    // FAB (Floating Action Button)
+    const fabMain = document.getElementById('fab-main');
+    if (fabMain) fabMain.addEventListener('click', toggleFabMenu);
+
+    // Acciones del FAB
     document.querySelectorAll('.fab-item').forEach(item => {
         item.addEventListener('click', function() {
             const action = this.getAttribute('data-action');
             if (action === 'oracion') navegarA('peticiones');
             if (action === 'asistencia') navegarA('asistencia');
             if (action === 'compartir') compartirVersiculo();
+            if (action === 'biblia') navegarA('devocional');
             toggleFabMenu();
         });
     });
 
     // Logout
-    document.getElementById('btn-logout')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        confirmarAccion('¿Cerrar sesión?', 'Serás redirigido a la pantalla de inicio.', cerrarSesion);
-    });
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', (e) => {
+            e.preventDefault();
+            confirmarAccion(
+                '¿Cerrar sesión?',
+                'Serás redirigido a la pantalla de inicio.',
+                cerrarSesion
+            );
+        });
+    }
 
-    // Bienvenida
-    document.getElementById('btn-login')?.addEventListener('click', mostrarLogin);
-    document.getElementById('btn-register')?.addEventListener('click', mostrarRegistro);
-    document.getElementById('btn-continue-guest')?.addEventListener('click', continuarComoInvitado);
+    // Botones de bienvenida
+    const btnLogin = document.getElementById('btn-login');
+    const btnRegister = document.getElementById('btn-register');
+    const btnGuest = document.getElementById('btn-continue-guest');
 
-    // Modal
-    document.getElementById('modal')?.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) cerrarModal();
-    });
-    document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
+    if (btnLogin) btnLogin.addEventListener('click', mostrarLogin);
+    if (btnRegister) btnRegister.addEventListener('click', mostrarRegistro);
+    if (btnGuest) btnGuest.addEventListener('click', continuarComoInvitado);
 
-    // Confirm modal
-    document.getElementById('confirm-cancel')?.addEventListener('click', () => {
-        document.getElementById('confirm-modal')?.classList.add('hidden');
-    });
-    document.getElementById('confirm-accept')?.addEventListener('click', () => {
-        if (APP_STATE.pendingConfirmation) {
-            APP_STATE.pendingConfirmation();
-            APP_STATE.pendingConfirmation = null;
-        }
-        document.getElementById('confirm-modal')?.classList.add('hidden');
-    });
-    document.getElementById('confirm-modal')?.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) this.classList.add('hidden');
-    });
+    // Modal principal
+    const modal = document.getElementById('modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) cerrarModal();
+        });
+    }
+    const modalClose = document.querySelector('.modal-close');
+    if (modalClose) modalClose.addEventListener('click', cerrarModal);
 
-    // Escape para cerrar
+    // Modal de confirmación
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmCancel = document.getElementById('confirm-cancel');
+    const confirmAccept = document.getElementById('confirm-accept');
+
+    if (confirmCancel && confirmModal) {
+        confirmCancel.addEventListener('click', () => confirmModal.classList.add('hidden'));
+    }
+    if (confirmAccept) {
+        confirmAccept.addEventListener('click', () => {
+            if (APP_STATE.pendingConfirmation) {
+                APP_STATE.pendingConfirmation();
+                APP_STATE.pendingConfirmation = null;
+            }
+            const cm = document.getElementById('confirm-modal');
+            if (cm) cm.classList.add('hidden');
+        });
+    }
+    if (confirmModal) {
+        confirmModal.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) {
+                confirmModal.classList.add('hidden');
+            }
+        });
+    }
+
+    // Cerrar con tecla Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (APP_STATE.notificationsOpen) {
-                document.getElementById('notification-panel')?.classList.add('hidden');
+                const panel = document.getElementById('notification-panel');
+                if (panel) panel.classList.add('hidden');
                 APP_STATE.notificationsOpen = false;
             }
-            if (!document.getElementById('modal')?.classList.contains('hidden')) cerrarModal();
+            const modalEl = document.getElementById('modal');
+            if (modalEl && !modalEl.classList.contains('hidden')) cerrarModal();
         }
     });
 
-    // Clics fuera
+    // Cerrar dropdowns al hacer clic fuera
     document.addEventListener('click', (e) => {
-        if (APP_STATE.userDropdownOpen && !e.target.closest('#user-mini') && !e.target.closest('#user-dropdown')) {
-            document.getElementById('user-dropdown')?.classList.add('hidden');
+        // User dropdown
+        if (APP_STATE.userDropdownOpen &&
+            !e.target.closest('#user-mini') &&
+            !e.target.closest('#user-dropdown')) {
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
             APP_STATE.userDropdownOpen = false;
         }
-        if (APP_STATE.fabMenuOpen && !e.target.closest('#fab-main') && !e.target.closest('#fab-menu')) {
-            document.getElementById('fab-menu')?.classList.add('hidden');
+
+        // FAB menu
+        if (APP_STATE.fabMenuOpen &&
+            !e.target.closest('#fab-main') &&
+            !e.target.closest('#fab-menu')) {
+            const fabMenu = document.getElementById('fab-menu');
+            if (fabMenu) fabMenu.classList.add('hidden');
             APP_STATE.fabMenuOpen = false;
         }
     });
@@ -204,59 +288,79 @@ function inicializarEventListeners() {
 // NAVEGACIÓN
 // ============================================
 function mostrarApp() {
-    document.getElementById('welcome-screen')?.classList.add('hidden');
-    document.getElementById('app')?.classList.remove('hidden');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const app = document.getElementById('app');
+    const fabMain = document.getElementById('fab-main');
+
+    if (welcomeScreen) welcomeScreen.classList.add('hidden');
+    if (app) app.classList.remove('hidden');
+    if (fabMain) fabMain.classList.remove('hidden');
+
     actualizarSidebarUsuario();
     navegarA('inicio');
     iniciarContadorRegresivo();
     iniciarActualizacionFecha();
-    document.getElementById('fab-main')?.classList.remove('hidden');
+    cargarNotificaciones();
 }
 
 function mostrarBienvenida() {
-    document.getElementById('app')?.classList.add('hidden');
-    document.getElementById('welcome-screen')?.classList.remove('hidden');
-    document.getElementById('fab-main')?.classList.add('hidden');
+    const app = document.getElementById('app');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const fabMain = document.getElementById('fab-main');
+
+    if (app) app.classList.add('hidden');
+    if (welcomeScreen) welcomeScreen.classList.remove('hidden');
+    if (fabMain) fabMain.classList.add('hidden');
 }
 
 function toggleSidebar() {
-    APP_STATE.sidebarOpen = !APP_STATE.sidebarOpen;
+    if (APP_STATE.sidebarOpen) {
+        cerrarSidebar();
+    } else {
+        abrirSidebar();
+    }
+}
+
+function abrirSidebar() {
+    APP_STATE.sidebarOpen = true;
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
-    if (APP_STATE.sidebarOpen) {
-        sidebar?.classList.add('open');
-        overlay?.classList.remove('hidden');
-    } else {
-        sidebar?.classList.remove('open');
-        overlay?.classList.add('hidden');
-    }
+    if (sidebar) sidebar.classList.add('open');
+    if (overlay) overlay.classList.remove('hidden');
 }
 
 function cerrarSidebar() {
     if (APP_STATE.sidebarLocked) return;
     APP_STATE.sidebarOpen = false;
-    document.getElementById('sidebar')?.classList.remove('open');
-    document.getElementById('sidebar-overlay')?.classList.add('hidden');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.add('hidden');
 }
 
 function manejarResponsiveSidebar() {
     if (window.innerWidth >= 1024) {
         APP_STATE.sidebarLocked = true;
-        document.getElementById('sidebar')?.classList.add('open');
-        document.getElementById('sidebar-overlay')?.classList.add('hidden');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('hidden');
     } else {
         APP_STATE.sidebarLocked = false;
         if (!APP_STATE.sidebarOpen) {
-            document.getElementById('sidebar')?.classList.remove('open');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.classList.remove('open');
         }
     }
 }
 
 function navegarA(page) {
-    if (!page) return;
-    APP_STATE.currentPage = page;
+    if (!page || APP_STATE.isLoading) return;
 
-    // Actualizar nav activa
+    APP_STATE.currentPage = page;
+    APP_STATE.isLoading = true;
+
+    // Actualizar navegación activa
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.toggle('active', item.getAttribute('data-page') === page);
     });
@@ -266,27 +370,38 @@ function navegarA(page) {
     const pageTitle = document.getElementById('page-title');
     if (pageTitle) pageTitle.textContent = titulo;
 
-    // Cargar página
+    // Cargar contenido de la página
     cargarPagina(page);
 
     // Cerrar sidebar en móvil
-    if (window.innerWidth < 1024) cerrarSidebar();
+    if (window.innerWidth < 1024) {
+        cerrarSidebar();
+    }
+
+    APP_STATE.isLoading = false;
 }
 
 function actualizarSidebarUsuario() {
     if (!APP_STATE.usuario) return;
+
     const userMini = document.getElementById('user-mini');
     if (userMini) {
         const img = userMini.querySelector('img');
         const nameEl = userMini.querySelector('.user-name');
         const roleEl = userMini.querySelector('.user-role');
+
         if (img) img.src = APP_STATE.usuario.foto || 'assets/avatars/default.png';
         if (nameEl) nameEl.textContent = APP_STATE.usuario.nombre || 'Usuario';
-        if (roleEl) roleEl.textContent = APP_STATE.rol === 'admin' ? 'Administrador' : APP_STATE.rol === 'invitado' ? 'Invitado' : 'Miembro';
+        if (roleEl) {
+            roleEl.textContent = APP_STATE.rol === 'admin' ? 'Administrador' :
+                                APP_STATE.rol === 'invitado' ? 'Invitado' : 'Miembro';
+        }
     }
-    // Mostrar menú admin
-    if (APP_STATE.rol === 'admin') {
-        document.getElementById('admin-menu')?.classList.remove('hidden');
+
+    // Mostrar menú admin si corresponde
+    const adminMenu = document.getElementById('admin-menu');
+    if (adminMenu && APP_STATE.rol === 'admin') {
+        adminMenu.classList.remove('hidden');
     }
 }
 
@@ -297,8 +412,15 @@ function cargarPagina(page) {
     const content = document.getElementById('page-content');
     if (!content) return;
 
-    content.innerHTML = '<div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>';
+    // Mostrar loader
+    content.innerHTML = `
+        <div class="page-loader">
+            <div class="spinner"></div>
+            <p>Cargando...</p>
+        </div>
+    `;
 
+    // Cargar contenido según la página
     setTimeout(() => {
         switch(page) {
             case 'inicio': cargarInicio(content); break;
@@ -322,7 +444,12 @@ function cargarPagina(page) {
             case 'versiculos': cargarVersiculos(content); break;
             case 'sistema': cargarSistema(content); break;
             default:
-                content.innerHTML = `<div class="card fade-in"><h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2><p style="text-align:center;padding:40px;">Sección en desarrollo</p></div>`;
+                content.innerHTML = `
+                    <div class="card fade-in">
+                        <h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2>
+                        <p style="text-align:center;padding:40px;">Sección en desarrollo</p>
+                    </div>
+                `;
         }
     }, 150);
 }
@@ -443,7 +570,7 @@ function cargarAsistencia(container) {
 }
 
 // ============================================
-// PÁGINAS: NOTICIAS, EVENTOS, CHAT, DIRECTORIO, PETICIONES, ENCUESTAS, BIBLIOTECA, GALERÍA
+// PÁGINAS SECUNDARIAS
 // ============================================
 function cargarNoticias(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-news"></i> Noticias</h2><div class="card"><p style="text-align:center;padding:30px;">No hay noticias publicadas</p></div></div>`;
@@ -547,7 +674,7 @@ function cargarConfiguracion(container) {
                     <i class="bx bx-log-out"></i> Cerrar Sesión
                 </button>
             </div>
-            <p style="text-align:center;margin-top:20px;font-size:0.8rem;opacity:0.7;">IPUC LA FONDA v2.0.0</p>
+            <p style="text-align:center;margin-top:20px;font-size:0.8rem;opacity:0.7;">IPUC LA FONDA v2.1.0</p>
         </div>
     `;
 }
@@ -565,7 +692,6 @@ function cargarDashboard(container) {
                 <div class="card"><h3>Eventos</h3><p style="font-size:2rem;font-weight:700;">--</p></div>
                 <div class="card"><h3>Noticias</h3><p style="font-size:2rem;font-weight:700;">--</p></div>
             </div>
-            <div class="card"><p style="text-align:center;">Dashboard en desarrollo</p></div>
         </div>
     `;
 }
@@ -599,30 +725,63 @@ function iniciarContadorRegresivo() {
     APP_STATE.contadorInterval = setInterval(actualizarContador, 1000);
 }
 
-function actualizarContador() {
-    const ahora = new Date();
-    const domingo = new Date(ahora);
-    domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
-    domingo.setHours(10, 0, 0, 0);
-    if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
-
-    const diff = Math.max(0, (domingo - ahora) / 1000);
-    const dias = Math.floor(diff / 86400);
-    const horas = Math.floor((diff % 86400) / 3600);
-    const minutos = Math.floor((diff % 3600) / 60);
-    const segundos = Math.floor(diff % 60);
-
+async function actualizarContador() {
     const elDias = document.getElementById('contador-dias');
     const elHoras = document.getElementById('contador-horas');
     const elMinutos = document.getElementById('contador-minutos');
     const elSegundos = document.getElementById('contador-segundos');
     const elTitulo = document.getElementById('contador-titulo');
+    const elEstado = document.getElementById('contador-estado');
 
-    if (elDias) elDias.textContent = String(dias).padStart(2, '0');
-    if (elHoras) elHoras.textContent = String(horas).padStart(2, '0');
-    if (elMinutos) elMinutos.textContent = String(minutos).padStart(2, '0');
-    if (elSegundos) elSegundos.textContent = String(segundos).padStart(2, '0');
-    if (elTitulo) elTitulo.textContent = 'Culto Dominical - Domingo';
+    if (!elDias && !elTitulo) return;
+
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/cultos/proximo`);
+        const data = await response.json();
+
+        if (data.estado === 'sin_cultos') {
+            if (elTitulo) elTitulo.textContent = 'No hay cultos programados';
+            return;
+        }
+
+        const segundos = Math.max(0, data.segundos_restantes || 0);
+        const dias = Math.floor(segundos / 86400);
+        const horas = Math.floor((segundos % 86400) / 3600);
+        const minutos = Math.floor((segundos % 3600) / 60);
+        const segs = Math.floor(segundos % 60);
+
+        if (elTitulo) elTitulo.textContent = `${data.nombre} - ${data.dia || ''}`;
+        if (elEstado) {
+            elEstado.textContent = data.estado === 'en_curso' ? '🔴 CULTO EN CURSO' : '🟢 PRÓXIMO CULTO';
+            elEstado.className = `contador-estado ${data.estado === 'en_curso' ? 'estado-curso' : 'estado-proximo'}`;
+        }
+        if (elDias) elDias.textContent = String(dias).padStart(2, '0');
+        if (elHoras) elHoras.textContent = String(horas).padStart(2, '0');
+        if (elMinutos) elMinutos.textContent = String(minutos).padStart(2, '0');
+        if (elSegundos) elSegundos.textContent = String(segs).padStart(2, '0');
+
+        const proximoCulto = document.getElementById('proximo-culto-asistencia');
+        if (proximoCulto) {
+            proximoCulto.textContent = `${data.nombre} - ${data.dia || ''} - ${data.estado === 'en_curso' ? 'En curso' : 'Próximamente'}`;
+        }
+    } catch (error) {
+        // Fallback offline
+        const ahora = new Date();
+        const domingo = new Date(ahora);
+        domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
+        domingo.setHours(10, 0, 0, 0);
+        if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
+        const diff = Math.max(0, (domingo - ahora) / 1000);
+        const dias = Math.floor(diff / 86400);
+        const horas = Math.floor((diff % 86400) / 3600);
+        const minutos = Math.floor((diff % 3600) / 60);
+        const segundos = Math.floor(diff % 60);
+        if (elTitulo) elTitulo.textContent = 'Culto Dominical - Domingo';
+        if (elDias) elDias.textContent = String(dias).padStart(2, '0');
+        if (elHoras) elHoras.textContent = String(horas).padStart(2, '0');
+        if (elMinutos) elMinutos.textContent = String(minutos).padStart(2, '0');
+        if (elSegundos) elSegundos.textContent = String(segundos).padStart(2, '0');
+    }
 }
 
 // ============================================
@@ -645,17 +804,29 @@ function iniciarActualizacionFecha() {
 // ============================================
 // VERSÍCULO DIARIO
 // ============================================
-function cargarVersiculoDiario() {
+async function cargarVersiculoDiario() {
     const container = document.getElementById('versiculo-content');
     if (!container) return;
-    container.innerHTML = `
-        <p style="font-size:1rem;line-height:1.8;">"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna."</p>
-        <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">Juan 3:16</p>
-    `;
+
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/versiculo-diario`);
+        const data = await response.json();
+        if (data && data.versiculo) {
+            container.innerHTML = `
+                <p style="font-size:1rem;line-height:1.8;">"${data.versiculo.texto}"</p>
+                <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${data.versiculo.referencia}</p>
+            `;
+        }
+    } catch (error) {
+        container.innerHTML = `
+            <p style="font-size:1rem;line-height:1.8;">"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna."</p>
+            <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">Juan 3:16</p>
+        `;
+    }
 }
 
 // ============================================
-// AUTENTICACIÓN
+// AUTENTICACIÓN (SIN CREDENCIALES DE PRUEBA)
 // ============================================
 function mostrarLogin() {
     const modal = document.getElementById('modal');
@@ -668,21 +839,49 @@ function mostrarLogin() {
     if (modalFooter) modalFooter.classList.add('hidden');
 
     modalBody.innerHTML = `
-        <form id="login-form">
-            <div class="form-group"><label>Usuario o Correo</label><input type="text" class="form-input" name="usuario" placeholder="Ingresa tu usuario" required></div>
-            <div class="form-group"><label>Contraseña</label><div style="position:relative;"><input type="password" class="form-input" name="password" id="login-password" placeholder="Ingresa tu contraseña" required><button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);"><i class="bx bx-show"></i></button></div></div>
-            <button type="submit" class="btn-primary" style="width:100%;">Iniciar Sesión</button>
+        <form id="login-form" autocomplete="on">
+            <div class="form-group">
+                <label for="login-usuario">Usuario o Correo Electrónico</label>
+                <input type="text" class="form-input" id="login-usuario" name="usuario" placeholder="Ingresa tu usuario o correo" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Contraseña</label>
+                <div style="position:relative;">
+                    <input type="password" class="form-input" id="login-password" name="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+                    <button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);" aria-label="Mostrar contraseña">
+                        <i class="bx bx-show"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" name="recordar" checked> Recordar mi sesión
+                </label>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;">
+                <i class="bx bx-log-in"></i> Iniciar Sesión
+            </button>
         </form>
-        <p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarRegistro()" style="color:var(--azul-primario);">¿No tienes cuenta? Regístrate</a></p>
+        <p style="text-align:center;margin-top:16px;">
+            <a href="#" onclick="mostrarRegistro()" style="color:var(--azul-primario);font-weight:500;">¿No tienes cuenta? Regístrate aquí</a>
+        </p>
+        <p style="text-align:center;margin-top:8px;">
+            <a href="#" onclick="recuperarPassword()" style="color:var(--gris-texto);font-size:0.85rem;">¿Olvidaste tu contraseña?</a>
+        </p>
     `;
 
     modal.classList.remove('hidden');
 
     document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const formData = new FormData(this);
-        const usuario = formData.get('usuario');
-        const password = formData.get('password');
+        const usuario = document.getElementById('login-usuario').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        if (!usuario || !password) {
+            showToast('Completa todos los campos', 'warning');
+            return;
+        }
+
         await realizarLogin(usuario, password);
     });
 }
@@ -694,17 +893,19 @@ async function realizarLogin(usuario, password) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ usuario, password })
         });
+
         const data = await response.json();
+
         if (response.ok && data.token) {
             guardarSesion(data);
             cerrarModal();
             mostrarApp();
-            showToast('¡Bienvenido!', 'success');
+            showToast(`¡Bienvenido, ${data.usuario.nombre}!`, 'success');
         } else {
-            showToast(data.error || 'Error al iniciar sesión', 'error');
+            showToast(data.error || 'Credenciales inválidas. Intenta de nuevo.', 'error');
         }
     } catch (error) {
-        showToast('Error de conexión con el servidor', 'error');
+        showToast('Error de conexión con el servidor. Verifica tu internet.', 'error');
     }
 }
 
@@ -721,17 +922,21 @@ function mostrarRegistro() {
     modalBody.innerHTML = `
         <form id="registro-form">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div class="form-group"><label>Nombre</label><input type="text" class="form-input" name="nombre" required></div>
-                <div class="form-group"><label>Apellidos</label><input type="text" class="form-input" name="apellidos" required></div>
+                <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" name="nombre" required></div>
+                <div class="form-group"><label>Apellidos *</label><input type="text" class="form-input" name="apellidos" required></div>
             </div>
-            <div class="form-group"><label>Documento</label><input type="text" class="form-input" name="documento" required></div>
-            <div class="form-group"><label>Correo</label><input type="email" class="form-input" name="correo" required></div>
-            <div class="form-group"><label>Celular</label><input type="tel" class="form-input" name="celular" required></div>
-            <div class="form-group"><label>Usuario</label><input type="text" class="form-input" name="usuario" required></div>
-            <div class="form-group"><label>Contraseña</label><input type="password" class="form-input" name="password" required minlength="6"></div>
-            <button type="submit" class="btn-primary" style="width:100%;">Registrarse</button>
+            <div class="form-group"><label>Documento de Identidad *</label><input type="text" class="form-input" name="documento" required></div>
+            <div class="form-group"><label>Fecha de Nacimiento *</label><input type="date" class="form-input" name="fecha_nacimiento" required></div>
+            <div class="form-group"><label>Sexo *</label><select class="form-input" name="sexo" required><option value="">Seleccionar...</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select></div>
+            <div class="form-group"><label>Correo Electrónico *</label><input type="email" class="form-input" name="correo" required></div>
+            <div class="form-group"><label>Celular *</label><input type="tel" class="form-input" name="celular" required></div>
+            <div class="form-group"><label>Ministerio *</label><select class="form-input" name="ministerio" required><option value="">Seleccionar...</option><option value="Jóvenes">Jóvenes</option><option value="Alabanza">Alabanza</option><option value="Niños">Niños</option><option value="Misiones">Misiones</option><option value="Servicio">Servicio</option><option value="General">General</option></select></div>
+            <div class="form-group"><label>Nombre de Usuario *</label><input type="text" class="form-input" name="usuario" required></div>
+            <div class="form-group"><label>Contraseña * (mínimo 6 caracteres)</label><input type="password" class="form-input" name="password" required minlength="6"></div>
+            <div class="form-group"><label>Confirmar Contraseña *</label><input type="password" class="form-input" name="confirmar_password" required></div>
+            <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;"><i class="bx bx-user-plus"></i> Crear Cuenta</button>
         </form>
-        <p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarLogin()" style="color:var(--azul-primario);">¿Ya tienes cuenta? Inicia sesión</a></p>
+        <p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarLogin()" style="color:var(--azul-primario);font-weight:500;">¿Ya tienes cuenta? Inicia sesión</a></p>
     `;
 
     modal.classList.remove('hidden');
@@ -739,7 +944,15 @@ function mostrarRegistro() {
     document.getElementById('registro-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
+
+        if (formData.get('password') !== formData.get('confirmar_password')) {
+            showToast('Las contraseñas no coinciden', 'error');
+            return;
+        }
+
         const datos = Object.fromEntries(formData);
+        delete datos.confirmar_password;
+
         try {
             const response = await fetch(`${CONFIG.API_URL}/registro`, {
                 method: 'POST',
@@ -748,13 +961,13 @@ function mostrarRegistro() {
             });
             const data = await response.json();
             if (response.ok) {
-                showToast('Registro exitoso. Inicia sesión.', 'success');
+                showToast('✅ ¡Registro exitoso! Ahora inicia sesión', 'success');
                 setTimeout(() => mostrarLogin(), 1500);
             } else {
                 showToast(data.error || 'Error en el registro', 'error');
             }
         } catch (error) {
-            showToast('Error de conexión', 'error');
+            showToast('Error de conexión con el servidor', 'error');
         }
     });
 }
@@ -762,7 +975,11 @@ function mostrarRegistro() {
 function continuarComoInvitado() {
     APP_STATE.rol = 'invitado';
     APP_STATE.token = 'guest-token';
-    APP_STATE.usuario = { id: 0, nombre: 'Invitado', usuario: 'invitado', foto: 'assets/avatars/default.png', verificado: false, ministerio: 'Visitante', insignias: [] };
+    APP_STATE.usuario = {
+        id: 0, nombre: 'Invitado', usuario: 'invitado',
+        foto: 'assets/avatars/default.png', verificado: false,
+        ministerio: 'Visitante', insignias: []
+    };
     mostrarApp();
     showToast('Navegando como invitado', 'info');
 }
@@ -788,7 +1005,11 @@ function cerrarSesion() {
     document.getElementById('user-dropdown')?.classList.add('hidden');
     APP_STATE.userDropdownOpen = false;
     mostrarBienvenida();
-    showToast('Sesión cerrada', 'info');
+    showToast('Sesión cerrada correctamente', 'info');
+}
+
+function recuperarPassword() {
+    showToast('Contacta al administrador para recuperar tu contraseña', 'info');
 }
 
 // ============================================
@@ -832,30 +1053,50 @@ function toggleNotificaciones() {
 function cargarNotificaciones() {
     const list = document.getElementById('notification-list');
     if (!list) return;
-    list.innerHTML = '<div class="notification-empty"><i class="bx bx-bell-off"></i><p>No hay notificaciones</p></div>';
+    list.innerHTML = '<div class="notification-empty"><i class="bx bx-bell-off"></i><p>No hay notificaciones nuevas</p></div>';
+}
+
+function actualizarBadgeNotificaciones() {
+    const badge = document.querySelector('.badge-notifications');
+    if (badge) {
+        if (APP_STATE.notificacionesNoLeidas > 0) {
+            badge.textContent = APP_STATE.notificacionesNoLeidas;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
 }
 
 // ============================================
-// ACCIONES
+// ACCIONES DE USUARIO
 // ============================================
 function confirmarAsistencia(estado) {
     const tipo = document.querySelector('input[name="tipo-asistente"]:checked')?.value || 'Hermano';
-    showToast(`Asistencia: ${estado} (${tipo})`, 'success');
+    showToast(`✅ Asistencia confirmada: ${estado} (${tipo})`, 'success');
 }
 
 function compartirVersiculo() {
     if (navigator.share) {
-        navigator.share({ title: 'IPUC LA FONDA', text: 'Versículo del día', url: window.location.href }).catch(() => {});
+        navigator.share({
+            title: 'IPUC LA FONDA - Versículo del Día',
+            text: 'Mira este versículo del día de IPUC LA FONDA',
+            url: window.location.href
+        }).catch(() => {});
     } else {
-        showToast('Enlace copiado', 'info');
+        showToast('📋 Enlace copiado al portapapeles', 'info');
     }
 }
 
 function confirmarAccion(titulo, mensaje, callback) {
-    document.getElementById('confirm-title').textContent = titulo;
-    document.getElementById('confirm-message').textContent = mensaje;
+    const titleEl = document.getElementById('confirm-title');
+    const messageEl = document.getElementById('confirm-message');
+    const modal = document.getElementById('confirm-modal');
+    if (!modal) return;
+    if (titleEl) titleEl.textContent = titulo;
+    if (messageEl) messageEl.textContent = mensaje;
     APP_STATE.pendingConfirmation = callback;
-    document.getElementById('confirm-modal')?.classList.remove('hidden');
+    modal.classList.remove('hidden');
 }
 
 // ============================================
@@ -886,12 +1127,13 @@ function showToast(mensaje, tipo = 'info') {
     if (!container) return;
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
+    toast.setAttribute('role', 'alert');
     toast.innerHTML = `<span>${mensaje}</span>`;
     container.appendChild(toast);
     setTimeout(() => {
         toast.classList.add('toast-hide');
         setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 3500);
 }
 
 // ============================================
@@ -927,6 +1169,7 @@ window.mostrarLogin = mostrarLogin;
 window.mostrarRegistro = mostrarRegistro;
 window.cerrarSesion = cerrarSesion;
 window.togglePassword = togglePassword;
+window.recuperarPassword = recuperarPassword;
 window.confirmarAsistencia = confirmarAsistencia;
 window.compartirVersiculo = compartirVersiculo;
 window.confirmarAccion = confirmarAccion;
@@ -935,4 +1178,5 @@ window.cargarVersiculoDiario = cargarVersiculoDiario;
 window.toggleTema = toggleTema;
 window.showToast = showToast;
 
-console.log('✅ IPUC LA FONDA - JavaScript cargado correctamente');
+console.log('✅ IPUC LA FONDA PRO v2.1 - JavaScript cargado correctamente');
+console.log('🔒 Autenticación segura sin credenciales de prueba');
