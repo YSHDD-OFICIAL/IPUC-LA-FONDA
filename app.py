@@ -543,11 +543,238 @@ def peticiones():
     return jsonify({"mensaje": "Petición creada"}), 201
 
 # ============================================
-# INICIALIZACIÓN (SIN CREDENCIALES DE PRUEBA)
+# RUTA PARA CREAR EL PRIMER ADMINISTRADOR
+# ============================================
+@app.route('/api/admin/crear-primer-admin', methods=['POST'])
+def crear_primer_admin():
+    """
+    Endpoint para crear el primer administrador del sistema.
+    SOLO funciona si NO existe ningún administrador previo.
+    Por seguridad, se deshabilita después del primer uso.
+    """
+    try:
+        datos = request.json
+        if not datos:
+            return jsonify({"error": "Se requieren datos en formato JSON"}), 400
+        
+        # Campos requeridos
+        campos_requeridos = ['nombre', 'apellidos', 'correo', 'usuario', 'password']
+        for campo in campos_requeridos:
+            if campo not in datos or not str(datos[campo]).strip():
+                return jsonify({"error": f"El campo '{campo}' es obligatorio"}), 400
+        
+        # Validar formato de correo
+        if '@' not in datos['correo'] or '.' not in datos['correo']:
+            return jsonify({"error": "Formato de correo electrónico inválido"}), 400
+        
+        # Validar longitud de contraseña
+        if len(datos['password']) < 8:
+            return jsonify({"error": "La contraseña debe tener al menos 8 caracteres"}), 400
+        
+        # Validar formato de usuario
+        import re
+        if not re.match(r'^[a-zA-Z0-9_]{3,20}$', datos['usuario']):
+            return jsonify({"error": "El usuario solo puede contener letras, números y guiones bajos (3-20 caracteres)"}), 400
+        
+        # Verificar que NO exista ningún administrador
+        administradores = db.cargar_json('administradores')
+        if administradores.get('administradores') and len(administradores['administradores']) > 0:
+            registrar_actividad(0, "Intento de crear admin adicional", f"IP: {request.remote_addr}")
+            return jsonify({
+                "error": "Ya existe al menos un administrador en el sistema",
+                "mensaje": "Por seguridad, esta función solo está disponible cuando no hay administradores. Usa el panel de administración para crear más administradores."
+            }), 403
+        
+        # Verificar que el usuario no exista ya
+        usuarios = db.cargar_json('usuarios')
+        if any(u.get('usuario', '').lower() == datos['usuario'].lower() for u in usuarios.get('usuarios', [])):
+            return jsonify({"error": "El nombre de usuario ya existe en el sistema"}), 400
+        
+        if any(u.get('correo', '').lower() == datos['correo'].lower() for u in usuarios.get('usuarios', [])):
+            return jsonify({"error": "El correo electrónico ya está registrado"}), 400
+        
+        # Crear el administrador
+        admin = {
+            "id": 1,
+            "nombre": datos['nombre'].strip(),
+            "apellidos": datos['apellidos'].strip(),
+            "documento": datos.get('documento', ''),
+            "fecha_nacimiento": datos.get('fecha_nacimiento', ''),
+            "sexo": datos.get('sexo', ''),
+            "correo": datos['correo'].strip().lower(),
+            "celular": datos.get('celular', '').strip(),
+            "direccion": datos.get('direccion', '').strip(),
+            "ministerio": datos.get('ministerio', 'Pastoral'),
+            "usuario": datos['usuario'].strip().lower(),
+            "password": hash_password(datos['password']),
+            "foto": "assets/avatars/admin.png",
+            "rol": "admin",
+            "verificado": True,
+            "fecha_registro": datetime.datetime.now().isoformat(),
+            "ultima_conexion": datetime.datetime.now().isoformat(),
+            "estado": "activo",
+            "insignias": ["Administrador", "Cuenta Verificada"]
+        }
+        
+        # Guardar en el archivo de administradores
+        if 'administradores' not in administradores:
+            administradores['administradores'] = []
+        administradores['administradores'].append(admin)
+        administradores['ultimo_id'] = 1
+        db.guardar_json('administradores', administradores)
+        
+        # Actualizar configuración
+        config = db.cargar_json('configuracion')
+        config['aplicacion']['primer_administrador_creado'] = True
+        db.guardar_json('configuracion', config)
+        
+        # Registrar actividad
+        registrar_actividad(1, "Creación del primer administrador", f"Usuario: {datos['usuario']}")
+        
+        # Actualizar estadísticas
+        actualizar_estadisticas_usuarios()
+        
+        print(f"✅ Primer administrador creado exitosamente: {datos['usuario']}")
+        
+        return jsonify({
+            "mensaje": "Primer administrador creado exitosamente. Ahora puedes iniciar sesión en la aplicación.",
+            "admin": {
+                "id": 1,
+                "usuario": datos['usuario'],
+                "nombre": f"{datos['nombre']} {datos['apellidos']}",
+                "correo": datos['correo']
+            }
+        }), 201
+        
+    except Exception as e:
+        print(f"❌ Error al crear primer administrador: {str(e)}")
+        return jsonify({"error": f"Error interno del servidor: {str(e)}"}), 500
+
+        # ============================================
+# INICIALIZACIÓN DEL SERVIDOR (SIN CREDENCIALES DE PRUEBA)
 # ============================================
 if __name__ == '__main__':
-    print("🔥 IPUC LA FONDA API v2.0")
-    db.inicializar_datos()
+    # --- Configuración de logging ---
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    logger = logging.getLogger(__name__)
+    
+    # --- Banner de inicio ---
+    print("=" * 60)
+    print("╔══════════════════════════════════════════════════════════╗")
+    print("║                                                          ║")
+    print("║   🔥  IPUC LA FONDA - API REST v2.1.0                   ║")
+    print("║   Iglesia Pentecostal Unida de Colombia                  ║")
+    print("║   'Donde el Espíritu Santo se mueve'                     ║")
+    print("║                                                          ║")
+    print("╚══════════════════════════════════════════════════════════╝")
+    print("=" * 60)
+    
+    # --- Inicializar base de datos ---
+    print("⏳ Inicializando base de datos...")
+    try:
+        db.inicializar_datos()
+        print("✅ Base de datos inicializada correctamente")
+        
+        # Verificar estado de la base de datos
+        stats = db.obtener_estadisticas_db()
+        print(f"📊 Archivos JSON: {stats.get('total_archivos', 0)}")
+        print(f"💾 Tamaño total: {stats.get('tamaño_total_kb', 0)} KB")
+        
+    except Exception as e:
+        print(f"❌ Error al inicializar la base de datos: {str(e)}")
+        print("⚠️  El servidor puede no funcionar correctamente")
+    
+    # --- Verificar administradores ---
+    administradores = db.cargar_json('administradores')
+    total_admins = len(administradores.get('administradores', []))
+    
+    if total_admins == 0:
+        print("-" * 60)
+        print("⚠️  ADVERTENCIA DE SEGURIDAD:")
+        print("   No existe ningún administrador en el sistema.")
+        print("   Debes crear el primer administrador usando:")
+        print("   POST /api/admin/crear-primer-admin")
+        print("   ")
+        print("   Ejemplo con curl:")
+        print('   curl -X POST http://localhost:5000/api/admin/crear-primer-admin \\')
+        print('     -H "Content-Type: application/json" \\')
+        print('     -d \'{"nombre":"Admin","apellidos":"Principal","correo":"admin@ipuclafonda.org","usuario":"admin","password":"ContraseñaSegura123"}\'')
+        print("-" * 60)
+    else:
+        print(f"👑 Administradores registrados: {total_admins}")
+    
+    # --- Verificar usuarios ---
+    usuarios = db.cargar_json('usuarios')
+    total_usuarios = len(usuarios.get('usuarios', []))
+    print(f"👥 Usuarios registrados: {total_usuarios}")
+    
+    # --- Verificar versículos ---
+    versiculos = db.cargar_json('versiculos')
+    total_versiculos = len(versiculos.get('versiculos', []))
+    print(f"📖 Versículos disponibles: {total_versiculos}")
+    
+    # --- Configurar puerto ---
     port = int(os.environ.get('PORT', 5000))
-    print(f"🌐 Servidor en puerto {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    
+    # --- Información del entorno ---
+    entorno = "PRODUCCIÓN" if os.environ.get('RENDER') else "DESARROLLO"
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    print("-" * 60)
+    print(f"⚙️  Entorno: {entorno}")
+    print(f"🌐 Servidor: http://0.0.0.0:{port}")
+    print(f"📱 URL Local: http://localhost:{port}")
+    print(f"🔍 Debug: {'Activado' if debug_mode else 'Desactivado'}")
+    print(f"🔒 Autenticación: SHA-256 + Salt")
+    print(f"💾 Almacenamiento: JSON local")
+    print(f"⏰ Hora del sistema: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("-" * 60)
+    
+    # --- Endpoints disponibles ---
+    print("📡 Endpoints principales:")
+    print("   GET  /api/health                 - Estado del servidor")
+    print("   POST /api/registro               - Registrar nuevo usuario")
+    print("   POST /api/login                  - Iniciar sesión")
+    print("   POST /api/admin/crear-primer-admin - Crear primer administrador")
+    print("   GET  /api/cultos/proximo         - Próximo culto")
+    print("   GET  /api/versiculo-diario       - Versículo del día")
+    print("   GET  /api/horarios               - Horarios de cultos")
+    print("   GET  /api/usuarios               - Lista de usuarios (auth)")
+    print("   ... (más endpoints disponibles)")
+    print("-" * 60)
+    
+    # --- Mensaje de seguridad final ---
+    if total_admins == 0 and total_usuarios == 0:
+        print("🔒 SISTEMA LIMPIO - Sin usuarios ni administradores")
+        print("   Crea el primer administrador para comenzar.")
+    elif total_admins == 0 and total_usuarios > 0:
+        print("⚠️  Hay usuarios pero NO hay administradores")
+        print("   Promueve a un usuario o crea un administrador.")
+    else:
+        print("✅ Sistema listo para producción")
+    
+    print("=" * 60)
+    print("🚀 Iniciando servidor Flask...")
+    print("=" * 60)
+    
+    # --- Iniciar servidor ---
+    try:
+        app.run(
+            host='0.0.0.0',
+            port=port,
+            debug=debug_mode,
+            use_reloader=False,  # Desactivar reloader en producción
+            threaded=True         # Permitir múltiples hilos
+        )
+    except KeyboardInterrupt:
+        print("\n⏹️  Servidor detenido manualmente")
+        print("👋 ¡Hasta luego! Dios te bendiga.")
+    except Exception as e:
+        print(f"\n❌ Error al iniciar el servidor: {str(e)}")
+        print("⚠️  Verifica que el puerto no esté en uso")
+        print(f"   Intenta: lsof -i :{port} (Linux/Mac) o netstat -ano | findstr :{port} (Windows)")
