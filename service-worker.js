@@ -10,6 +10,7 @@ const RUNTIME_CACHE = 'ipuc-runtime-v2.1.0';
 const PRECACHE_ASSETS = [
     '/',
     '/index.html',
+    '/crear-admin.html',
     '/styles.css',
     '/script.js',
     '/manifest.json',
