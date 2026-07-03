@@ -1,4 +1,10 @@
-# database.py - Gestión de Base de Datos JSON IPUC LA FONDA v2.1 (SIN CREDENCIALES DE PRUEBA)
+# ============================================
+# IPUC LA FONDA - DATABASE v2.1.0
+# Gestión de Base de Datos JSON
+# Sin credenciales de prueba - Seguro
+# "Donde el Espíritu Santo se mueve"
+# ============================================
+
 import json
 import os
 import shutil
@@ -9,7 +15,9 @@ import secrets
 import logging
 from pathlib import Path
 
-# Configuración de logging
+# ============================================
+# CONFIGURACIÓN DE LOGGING
+# ============================================
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -17,17 +25,39 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class Database:
+    """
+    Clase principal para la gestión de la base de datos JSON de IPUC LA FONDA.
+    
+    Características:
+    - Almacenamiento en archivos JSON
+    - Sistema de caché en memoria
+    - Backups automáticos
+    - Recuperación desde backups
+    - Thread-safe con bloqueos
+    - Sin credenciales de prueba
+    """
+    
     def __init__(self, data_dir='data'):
+        """
+        Inicializa la base de datos.
+        
+        Args:
+            data_dir (str): Directorio donde se almacenan los archivos JSON
+        """
         self.data_dir = data_dir
-        self.lock = threading.RLock()
-        self.cache = {}
-        self.cache_timeout = 300
-        self.last_cache_update = {}
+        self.lock = threading.RLock()  # Bloqueo reentrante para thread-safety
+        self.cache = {}                # Caché en memoria
+        self.cache_timeout = 300       # Tiempo de vida de caché en segundos
+        self.last_cache_update = {}    # Timestamp de última actualización
         self._asegurar_directorios()
     
+    # ============================================
+    # GESTIÓN DE DIRECTORIOS
+    # ============================================
     def _asegurar_directorios(self):
-        """Crear directorios necesarios si no existen"""
+        """Crea todos los directorios necesarios si no existen"""
         directorios = [
             'data',
             'data/backups',
@@ -51,8 +81,21 @@ class Database:
                 path.mkdir(parents=True, exist_ok=True)
                 logger.info(f"📁 Directorio creado: {directorio}")
     
+    # ============================================
+    # CARGA Y GUARDADO DE DATOS
+    # ============================================
     def cargar_json(self, nombre_archivo, usar_cache=True):
-        """Cargar datos de un archivo JSON con sistema de caché"""
+        """
+        Carga datos desde un archivo JSON.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo sin extensión
+            usar_cache (bool): Si debe usar la caché en memoria
+            
+        Returns:
+            dict: Datos del archivo JSON o dict vacío si no existe
+        """
+        # Verificar caché primero
         if usar_cache and nombre_archivo in self.cache:
             if nombre_archivo in self.last_cache_update:
                 tiempo_cache = datetime.now().timestamp() - self.last_cache_update[nombre_archivo]
@@ -70,6 +113,7 @@ class Database:
                 with open(ruta, 'r', encoding='utf-8') as f:
                     datos = json.load(f)
                 
+                # Actualizar caché
                 if usar_cache:
                     self.cache[nombre_archivo] = datos.copy()
                     self.last_cache_update[nombre_archivo] = datetime.now().timestamp()
@@ -84,7 +128,17 @@ class Database:
             return {}
     
     def guardar_json(self, nombre_archivo, datos, actualizar_cache=True):
-        """Guardar datos en un archivo JSON con respaldo automático"""
+        """
+        Guarda datos en un archivo JSON con respaldo automático.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo sin extensión
+            datos (dict): Datos a guardar
+            actualizar_cache (bool): Si debe actualizar la caché
+            
+        Returns:
+            bool: True si se guardó correctamente, False en caso contrario
+        """
         ruta = os.path.join(self.data_dir, f"{nombre_archivo}.json")
         temp_ruta = os.path.join(self.data_dir, f"{nombre_archivo}.temp")
         
@@ -92,15 +146,19 @@ class Database:
             if not isinstance(datos, dict):
                 raise ValueError("Los datos deben ser un diccionario")
             
+            # Crear backup antes de sobrescribir
             if os.path.exists(ruta):
                 self._crear_backup(nombre_archivo)
             
+            # Guardar en archivo temporal primero (escritura atómica)
             with self.lock:
                 with open(temp_ruta, 'w', encoding='utf-8') as f:
                     json.dump(datos, f, indent=2, ensure_ascii=False, sort_keys=True)
                 
+                # Mover archivo temporal al definitivo
                 shutil.move(temp_ruta, ruta)
             
+            # Actualizar caché
             if actualizar_cache:
                 self.cache[nombre_archivo] = datos.copy()
                 self.last_cache_update[nombre_archivo] = datetime.now().timestamp()
@@ -114,8 +172,16 @@ class Database:
                 os.remove(temp_ruta)
             return False
     
+    # ============================================
+    # SISTEMA DE BACKUPS
+    # ============================================
     def _crear_backup(self, nombre_archivo):
-        """Crear respaldo de un archivo específico"""
+        """
+        Crea un respaldo de un archivo específico.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo a respaldar
+        """
         try:
             backup_dir = os.path.join(self.data_dir, 'backups')
             if not os.path.exists(backup_dir):
@@ -133,7 +199,13 @@ class Database:
             logger.warning(f"⚠️ Error al crear backup de {nombre_archivo}: {str(e)}")
     
     def _limpiar_backups_antiguos(self, nombre_archivo, max_backups=10):
-        """Eliminar backups antiguos manteniendo solo los más recientes"""
+        """
+        Elimina backups antiguos manteniendo solo los más recientes.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo
+            max_backups (int): Número máximo de backups a mantener
+        """
         backup_dir = os.path.join(self.data_dir, 'backups')
         if not os.path.exists(backup_dir):
             return
@@ -150,7 +222,15 @@ class Database:
                 logger.info(f"🗑️ Backup eliminado: {backup_antiguo}")
     
     def _recuperar_desde_backup(self, nombre_archivo):
-        """Intentar recuperar datos desde el backup más reciente"""
+        """
+        Intenta recuperar datos desde el backup más reciente.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo a recuperar
+            
+        Returns:
+            dict: Datos recuperados o dict vacío si no hay backup
+        """
         backup_dir = os.path.join(self.data_dir, 'backups')
         if not os.path.exists(backup_dir):
             return {}
@@ -175,13 +255,68 @@ class Database:
         logger.error(f"❌ No se encontraron backups válidos para {nombre_archivo}")
         return {}
     
-    def _hash_contraseña_seguro(self, contraseña):
-        """Hashear contraseña de manera segura con salt"""
-        salt = secrets.token_hex(16)
-        return hashlib.sha256((contraseña + salt).encode()).hexdigest()
+    def hacer_backup_completo(self):
+        """
+        Crea un respaldo completo de toda la base de datos.
+        
+        Returns:
+            str: Ruta del directorio de backup o None si falló
+        """
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_dir = os.path.join(self.data_dir, 'backups', 'completos', f"completo_{timestamp}")
+        
+        try:
+            os.makedirs(backup_dir, exist_ok=True)
+            archivos_respaldados = 0
+            
+            for archivo in os.listdir(self.data_dir):
+                if archivo.endswith('.json'):
+                    ruta_original = os.path.join(self.data_dir, archivo)
+                    ruta_backup = os.path.join(backup_dir, archivo)
+                    shutil.copy2(ruta_original, ruta_backup)
+                    archivos_respaldados += 1
+            
+            # Guardar metadatos del backup
+            metadata = {
+                "fecha_backup": datetime.now().isoformat(),
+                "archivos_respaldados": archivos_respaldados,
+                "version": "2.1.0",
+                "tamaño_total_bytes": sum(
+                    os.path.getsize(os.path.join(self.data_dir, f))
+                    for f in os.listdir(self.data_dir) if f.endswith('.json')
+                )
+            }
+            with open(os.path.join(backup_dir, 'metadata.json'), 'w', encoding='utf-8') as f:
+                json.dump(metadata, f, indent=2, ensure_ascii=False)
+            
+            # Limpiar backups antiguos (mantener solo 10)
+            backups_dir = os.path.join(self.data_dir, 'backups', 'completos')
+            backups = sorted([
+                d for d in os.listdir(backups_dir)
+                if d.startswith('completo_') and os.path.isdir(os.path.join(backups_dir, d))
+            ], key=lambda x: os.path.getmtime(os.path.join(backups_dir, x)), reverse=True)
+            
+            if len(backups) > 10:
+                for backup_antiguo in backups[10:]:
+                    ruta_backup_antiguo = os.path.join(backups_dir, backup_antiguo)
+                    shutil.rmtree(ruta_backup_antiguo)
+                    logger.info(f"🗑️ Backup completo eliminado: {backup_antiguo}")
+            
+            logger.info(f"✅ Backup completo creado: {backup_dir} ({archivos_respaldados} archivos)")
+            return backup_dir
+            
+        except Exception as e:
+            logger.error(f"❌ Error al crear backup completo: {str(e)}")
+            return None
     
+    # ============================================
+    # INICIALIZACIÓN DE DATOS
+    # ============================================
     def inicializar_datos(self):
-        """Inicializar datos por defecto si los archivos no existen - SIN CREDENCIALES DE PRUEBA"""
+        """
+        Inicializa los datos por defecto del sistema.
+        ⚠️ NO crea credenciales de prueba.
+        """
         ahora = datetime.now().isoformat()
         
         archivos_iniciales = {
@@ -195,140 +330,62 @@ class Database:
             },
             'versiculos': {
                 "versiculos": [
-                    {
-                        "id": 1,
-                        "texto": "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.",
-                        "referencia": "Juan 3:16",
-                        "tipo": "promesa"
-                    },
-                    {
-                        "id": 2,
-                        "texto": "Jehová es mi pastor; nada me faltará.",
-                        "referencia": "Salmos 23:1",
-                        "tipo": "salmo"
-                    },
-                    {
-                        "id": 3,
-                        "texto": "Todo lo puedo en Cristo que me fortalece.",
-                        "referencia": "Filipenses 4:13",
-                        "tipo": "promesa"
-                    },
-                    {
-                        "id": 4,
-                        "texto": "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.",
-                        "referencia": "Mateo 6:33",
-                        "tipo": "versiculo"
-                    },
-                    {
-                        "id": 5,
-                        "texto": "Jehová te bendiga, y te guarde; Jehová haga resplandecer su rostro sobre ti, y tenga de ti misericordia.",
-                        "referencia": "Números 6:24-25",
-                        "tipo": "bendicion"
-                    },
-                    {
-                        "id": 6,
-                        "texto": "El Señor es mi luz y mi salvación; ¿de quién temeré? El Señor es la fortaleza de mi vida; ¿de quién he de atemorizarme?",
-                        "referencia": "Salmos 27:1",
-                        "tipo": "salmo"
-                    },
-                    {
-                        "id": 7,
-                        "texto": "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.",
-                        "referencia": "Jeremías 29:11",
-                        "tipo": "promesa"
-                    }
+                    {"id": 1, "texto": "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", "referencia": "Juan 3:16", "tipo": "promesa"},
+                    {"id": 2, "texto": "Jehová es mi pastor; nada me faltará.", "referencia": "Salmos 23:1", "tipo": "salmo"},
+                    {"id": 3, "texto": "Todo lo puedo en Cristo que me fortalece.", "referencia": "Filipenses 4:13", "tipo": "promesa"},
+                    {"id": 4, "texto": "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", "referencia": "Mateo 6:33", "tipo": "versiculo"},
+                    {"id": 5, "texto": "Jehová te bendiga, y te guarde; Jehová haga resplandecer su rostro sobre ti, y tenga de ti misericordia.", "referencia": "Números 6:24-25", "tipo": "bendicion"},
+                    {"id": 6, "texto": "El Señor es mi luz y mi salvación; ¿de quién temeré? El Señor es la fortaleza de mi vida; ¿de quién he de atemorizarme?", "referencia": "Salmos 27:1", "tipo": "salmo"},
+                    {"id": 7, "texto": "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", "referencia": "Jeremías 29:11", "tipo": "promesa"}
                 ],
                 "versiculo_actual": None,
                 "ultimo_id": 7
             },
             'noticias': {
-                "noticias": [
-                    {
-                        "id": 1,
-                        "titulo": "Bienvenidos a IPUC LA FONDA",
-                        "contenido": "Bienvenidos a nuestra plataforma digital. Aquí encontrarán información de nuestra iglesia, horarios de cultos, eventos, noticias y más.",
-                        "imagen": "",
-                        "autor_id": 0,
-                        "autor_nombre": "Sistema",
-                        "fecha_publicacion": ahora,
-                        "fecha_actualizacion": ahora,
-                        "estado": "publicado",
-                        "categoria": "General",
-                        "comentarios": [],
-                        "reacciones": {"me_gusta": 0, "amen": 0, "bendiciones": 0, "aleluya": 0}
-                    }
-                ],
+                "noticias": [{
+                    "id": 1,
+                    "titulo": "Bienvenidos a IPUC LA FONDA",
+                    "contenido": "Bienvenidos a nuestra plataforma digital. Aquí encontrarán información de nuestra iglesia, horarios de cultos, eventos, noticias y más.",
+                    "imagen": "",
+                    "autor_id": 0,
+                    "autor_nombre": "Sistema",
+                    "fecha_publicacion": ahora,
+                    "fecha_actualizacion": ahora,
+                    "estado": "publicado",
+                    "categoria": "General",
+                    "comentarios": [],
+                    "reacciones": {"me_gusta": 0, "amen": 0, "bendiciones": 0, "aleluya": 0}
+                }],
                 "ultimo_id": 1
             },
-            'eventos': {
-                "eventos": [],
-                "ultimo_id": 0
-            },
-            'asistencia': {
-                "registros": [],
-                "ultimo_id": 0
-            },
-            'mensajes': {
-                "mensajes": [],
-                "ultimo_id": 0
-            },
-            'notificaciones': {
-                "notificaciones": [],
-                "ultimo_id": 0
-            },
+            'eventos': {"eventos": [], "ultimo_id": 0},
+            'asistencia': {"registros": [], "ultimo_id": 0},
+            'mensajes': {"mensajes": [], "ultimo_id": 0},
+            'notificaciones': {"notificaciones": [], "ultimo_id": 0},
             'estadisticas': {
-                "asistencia": {
-                    "diario": 0,
-                    "mensual": 0,
-                    "anual": 0,
-                    "total": 0,
-                    "ultima_actualizacion": ahora
-                },
-                "usuarios": {
-                    "total": 0,
-                    "activos": 0,
-                    "nuevos_mes": 0,
-                    "ultima_actualizacion": ahora
-                },
-                "crecimiento": {
-                    "porcentaje": 0,
-                    "historico": []
-                }
+                "asistencia": {"diario": 0, "mensual": 0, "anual": 0, "total": 0, "ultima_actualizacion": ahora},
+                "usuarios": {"total": 0, "activos": 0, "nuevos_mes": 0, "ultima_actualizacion": ahora},
+                "crecimiento": {"porcentaje": 0, "historico": []}
             },
-            'actividad': {
-                "registros": [],
-                "ultimo_id": 0
-            },
-            'encuestas': {
-                "encuestas": [],
-                "ultimo_id": 0
-            },
-            'peticiones': {
-                "peticiones": [],
-                "ultimo_id": 0
-            },
+            'actividad': {"registros": [], "ultimo_id": 0},
+            'encuestas': {"encuestas": [], "ultimo_id": 0},
+            'peticiones': {"peticiones": [], "ultimo_id": 0},
             'insignias': {
                 "insignias": [
-                    {"id": 1, "nombre": "Nuevo Miembro", "icono": "bx-user-plus", "color": "#2196f3"},
-                    {"id": 2, "nombre": "Miembro Activo", "icono": "bx-star", "color": "#ff9800"},
-                    {"id": 3, "nombre": "Líder", "icono": "bx-crown", "color": "#ffd700"},
-                    {"id": 4, "nombre": "Maestro", "icono": "bx-book", "color": "#4caf50"},
-                    {"id": 5, "nombre": "Músico", "icono": "bx-music", "color": "#9c27b0"},
-                    {"id": 6, "nombre": "Evangelista", "icono": "bx-bible", "color": "#f44336"},
-                    {"id": 7, "nombre": "Administrador", "icono": "bx-shield", "color": "#607d8b"},
-                    {"id": 8, "nombre": "Cuenta Verificada", "icono": "bx-badge-check", "color": "#2196f3"},
-                    {"id": 9, "nombre": "Servidor Destacado", "icono": "bx-heart", "color": "#e91e63"}
+                    {"id": 1, "nombre": "Nuevo Miembro", "icono": "bx-user-plus", "color": "#2196f3", "descripcion": "Recién llegado a la congregación"},
+                    {"id": 2, "nombre": "Miembro Activo", "icono": "bx-star", "color": "#ff9800", "descripcion": "Participa activamente en la iglesia"},
+                    {"id": 3, "nombre": "Líder", "icono": "bx-crown", "color": "#ffd700", "descripcion": "Líder de ministerio"},
+                    {"id": 4, "nombre": "Maestro", "icono": "bx-book", "color": "#4caf50", "descripcion": "Maestro de Escuela Dominical"},
+                    {"id": 5, "nombre": "Músico", "icono": "bx-music", "color": "#9c27b0", "descripcion": "Parte del ministerio de alabanza"},
+                    {"id": 6, "nombre": "Evangelista", "icono": "bx-bible", "color": "#f44336", "descripcion": "Predicador del evangelio"},
+                    {"id": 7, "nombre": "Administrador", "icono": "bx-shield", "color": "#607d8b", "descripcion": "Administrador de la plataforma"},
+                    {"id": 8, "nombre": "Cuenta Verificada", "icono": "bx-badge-check", "color": "#2196f3", "descripcion": "Cuenta verificada por IPUC LA FONDA"},
+                    {"id": 9, "nombre": "Servidor Destacado", "icono": "bx-heart", "color": "#e91e63", "descripcion": "Servidor destacado de la iglesia"}
                 ],
                 "ultimo_id": 9
             },
-            'comentarios': {
-                "comentarios": [],
-                "ultimo_id": 0
-            },
-            'reacciones': {
-                "reacciones": [],
-                "ultimo_id": 0
-            },
+            'comentarios': {"comentarios": [], "ultimo_id": 0},
+            'reacciones': {"reacciones": [], "ultimo_id": 0},
             'horarios': {
                 "cultos": [
                     {"dia": "Lunes", "cultos": []},
@@ -340,14 +397,8 @@ class Database:
                     {"dia": "Domingo", "cultos": [{"nombre": "Culto Dominical", "inicio": "10:00", "fin": "12:00"}]}
                 ]
             },
-            'biblioteca': {
-                "recursos": [],
-                "ultimo_id": 0
-            },
-            'galeria': {
-                "albumes": [],
-                "ultimo_id": 0
-            },
+            'biblioteca': {"recursos": [], "ultimo_id": 0},
+            'galeria': {"albumes": [], "ultimo_id": 0},
             'configuracion': {
                 "iglesia": {
                     "nombre": "IPUC LA FONDA",
@@ -388,33 +439,59 @@ class Database:
         
         logger.info(f"🎉 Inicialización completada. {archivos_creados} archivos nuevos creados.")
         
+        # Advertencia de seguridad
         logger.warning("=" * 60)
         logger.warning("⚠️  IMPORTANTE: No se han creado credenciales por defecto")
         logger.warning("⚠️  El sistema NO tiene usuarios ni administradores predefinidos")
         logger.warning("⚠️  Debe crear el primer administrador mediante la API")
+        logger.warning("⚠️  Endpoint: POST /api/admin/crear-primer-admin")
         logger.warning("=" * 60)
     
-    def crear_primer_administrador(self, datos_admin):
-        """Crear el primer administrador de la plataforma
+    # ============================================
+    # CREACIÓN DE ADMINISTRADOR
+    # ============================================
+    def _hash_contraseña_seguro(self, contraseña):
+        """
+        Hashea una contraseña de manera segura con salt aleatorio.
+        
         Args:
-            datos_admin: Diccionario con nombre, apellidos, correo, usuario, password
+            contraseña (str): Contraseña en texto plano
+            
         Returns:
-            True si se creó correctamente, False en caso contrario
+            str: Hash de la contraseña
+        """
+        salt = secrets.token_hex(16)
+        return hashlib.sha256((contraseña + salt).encode()).hexdigest()
+    
+    def crear_primer_administrador(self, datos_admin):
+        """
+        Crea el primer administrador de la plataforma.
+        Solo funciona si NO existe ningún administrador previo.
+        
+        Args:
+            datos_admin (dict): Datos del administrador con nombre, apellidos, correo, usuario, password
+            
+        Returns:
+            bool: True si se creó correctamente, False en caso contrario
         """
         try:
+            # Verificar que no exista ningún administrador
             admins = self.cargar_json('administradores')
             if admins.get('administradores', []):
-                logger.warning("⚠️ Ya existe al menos un administrador")
+                logger.warning("⚠️ Ya existe al menos un administrador en el sistema")
                 return False
             
+            # Validar campos requeridos
             campos_requeridos = ['nombre', 'apellidos', 'correo', 'usuario', 'password']
             for campo in campos_requeridos:
                 if campo not in datos_admin or not datos_admin[campo]:
                     logger.error(f"❌ Campo requerido faltante: {campo}")
                     return False
             
+            # Hashear contraseña
             password_hash = self._hash_contraseña_seguro(datos_admin['password'])
             
+            # Crear objeto administrador
             admin = {
                 "id": 1,
                 "nombre": datos_admin['nombre'].strip(),
@@ -428,7 +505,7 @@ class Database:
                 "ministerio": datos_admin.get('ministerio', 'Pastoral'),
                 "usuario": datos_admin['usuario'].strip().lower(),
                 "password": password_hash,
-                "foto": "assets/avatars/admin_default.png",
+                "foto": "assets/avatars/admin.png",
                 "rol": "admin",
                 "verificado": True,
                 "fecha_registro": datetime.now().isoformat(),
@@ -439,66 +516,38 @@ class Database:
                 "bloqueado_hasta": None
             }
             
+            # Guardar administrador
             admins['administradores'].append(admin)
             admins['ultimo_id'] = 1
             
             if self.guardar_json('administradores', admins):
+                # Actualizar configuración
                 config = self.cargar_json('configuracion')
                 config['aplicacion']['primer_administrador_creado'] = True
                 self.guardar_json('configuracion', config)
-                logger.info(f"✅ Primer administrador creado: {admin['usuario']}")
+                
+                logger.info(f"✅ Primer administrador creado exitosamente: {admin['usuario']}")
                 return True
+            
             return False
             
         except Exception as e:
             logger.error(f"❌ Error al crear administrador: {str(e)}")
             return False
     
-    def hacer_backup_completo(self):
-        """Crear respaldo completo de toda la base de datos"""
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_dir = os.path.join(self.data_dir, 'backups', 'completos', f"completo_{timestamp}")
-        
-        try:
-            os.makedirs(backup_dir, exist_ok=True)
-            archivos_respaldados = 0
-            for archivo in os.listdir(self.data_dir):
-                if archivo.endswith('.json'):
-                    ruta_original = os.path.join(self.data_dir, archivo)
-                    ruta_backup = os.path.join(backup_dir, archivo)
-                    shutil.copy2(ruta_original, ruta_backup)
-                    archivos_respaldados += 1
-            
-            metadata = {
-                "fecha_backup": datetime.now().isoformat(),
-                "archivos_respaldados": archivos_respaldados,
-                "version": "2.1.0",
-                "tamaño_total": sum(os.path.getsize(os.path.join(self.data_dir, f))
-                                   for f in os.listdir(self.data_dir) if f.endswith('.json'))
-            }
-            with open(os.path.join(backup_dir, 'metadata.json'), 'w', encoding='utf-8') as f:
-                json.dump(metadata, f, indent=2, ensure_ascii=False)
-            
-            backups_dir = os.path.join(self.data_dir, 'backups', 'completos')
-            backups = sorted([
-                d for d in os.listdir(backups_dir)
-                if d.startswith('completo_') and os.path.isdir(os.path.join(backups_dir, d))
-            ], key=lambda x: os.path.getmtime(os.path.join(backups_dir, x)), reverse=True)
-            
-            if len(backups) > 10:
-                for backup_antiguo in backups[10:]:
-                    ruta_backup_antiguo = os.path.join(backups_dir, backup_antiguo)
-                    shutil.rmtree(ruta_backup_antiguo)
-                    logger.info(f"🗑️ Backup completo eliminado: {backup_antiguo}")
-            
-            logger.info(f"✅ Backup completo creado: {backup_dir} ({archivos_respaldados} archivos)")
-            return backup_dir
-        except Exception as e:
-            logger.error(f"❌ Error al crear backup completo: {str(e)}")
-            return None
-    
+    # ============================================
+    # MANTENIMIENTO Y UTILIDADES
+    # ============================================
     def optimizar_json(self, nombre_archivo):
-        """Optimizar y limpiar archivo JSON"""
+        """
+        Optimiza y limpia un archivo JSON.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo a optimizar
+            
+        Returns:
+            bool: True si se optimizó correctamente
+        """
         try:
             datos = self.cargar_json(nombre_archivo)
             if datos:
@@ -510,17 +559,28 @@ class Database:
             return False
     
     def _limpiar_datos_vacios(self, datos):
-        """Limpiar datos vacíos recursivamente"""
+        """Limpia recursivamente valores vacíos de un diccionario o lista"""
         if isinstance(datos, dict):
-            return {k: v for k, v in ((k, self._limpiar_datos_vacios(v)) for k, v in datos.items())
-                    if v is not None and v != [] and v != {} and v != ""}
+            return {
+                k: v for k, v in (
+                    (k, self._limpiar_datos_vacios(v)) for k, v in datos.items()
+                )
+                if v is not None and v != [] and v != {} and v != ""
+            }
         elif isinstance(datos, list):
-            return [self._limpiar_datos_vacios(item) for item in datos
-                    if item is not None and item != [] and item != {} and item != ""]
+            return [
+                self._limpiar_datos_vacios(item) for item in datos
+                if item is not None and item != [] and item != {} and item != ""
+            ]
         return datos
     
     def obtener_estadisticas_db(self):
-        """Obtener estadísticas de la base de datos"""
+        """
+        Obtiene estadísticas de la base de datos.
+        
+        Returns:
+            dict: Estadísticas de archivos y backups
+        """
         stats = {
             "total_archivos": 0,
             "tamaño_total_kb": 0,
@@ -552,7 +612,15 @@ class Database:
         return stats
     
     def reparar_json(self, nombre_archivo):
-        """Intentar reparar un archivo JSON corrupto"""
+        """
+        Intenta reparar un archivo JSON corrupto.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo a reparar
+            
+        Returns:
+            tuple: (bool, str) - Éxito y mensaje descriptivo
+        """
         ruta = os.path.join(self.data_dir, f"{nombre_archivo}.json")
         if not os.path.exists(ruta):
             return False, "Archivo no encontrado"
@@ -572,13 +640,25 @@ class Database:
                 return True, "Archivo recreado (vacío) - Se perdieron los datos"
     
     def limpiar_cache(self):
-        """Limpiar la caché en memoria"""
+        """Limpia la caché en memoria"""
         self.cache.clear()
         self.last_cache_update.clear()
-        logger.info("🧹 Caché limpiada")
+        logger.info("🧹 Caché limpiada completamente")
     
+    # ============================================
+    # GESTIÓN DE IDs
+    # ============================================
     def get_ultimo_id(self, nombre_archivo, campo_id="id"):
-        """Obtener el último ID usado en un archivo"""
+        """
+        Obtiene el último ID usado en un archivo.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo
+            campo_id (str): Nombre del campo ID
+            
+        Returns:
+            int: Último ID encontrado o 0
+        """
         datos = self.cargar_json(nombre_archivo)
         for key, value in datos.items():
             if isinstance(value, list):
@@ -589,12 +669,31 @@ class Database:
         return 0
     
     def generar_nuevo_id(self, nombre_archivo, campo_id="id"):
-        """Generar un nuevo ID único para un archivo"""
+        """
+        Genera un nuevo ID único para un archivo.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo
+            campo_id (str): Nombre del campo ID
+            
+        Returns:
+            int: Nuevo ID único
+        """
         ultimo_id = self.get_ultimo_id(nombre_archivo, campo_id)
         return ultimo_id + 1
     
     def agregar_registro(self, nombre_archivo, registro, campo_id="id"):
-        """Agregar un nuevo registro a un archivo"""
+        """
+        Agrega un nuevo registro a un archivo JSON.
+        
+        Args:
+            nombre_archivo (str): Nombre del archivo
+            registro (dict): Datos del registro a agregar
+            campo_id (str): Nombre del campo ID
+            
+        Returns:
+            bool: True si se agregó correctamente
+        """
         try:
             datos = self.cargar_json(nombre_archivo)
             for key, value in datos.items():
@@ -609,6 +708,7 @@ class Database:
                             registro[campo_id] = max(ids_existentes) + 1
                         value.append(registro)
                         return self.guardar_json(nombre_archivo, datos)
+            # Si no encontró lista con diccionarios, agregar al primer array
             for key in datos.keys():
                 if isinstance(datos[key], list):
                     datos[key].append(registro)
@@ -618,13 +718,40 @@ class Database:
             logger.error(f"❌ Error al agregar registro: {str(e)}")
             return False
 
+
+# ============================================
+# EJECUCIÓN DIRECTA (SOLO PARA PRUEBAS)
+# ============================================
 if __name__ == "__main__":
     db = Database()
     db.inicializar_datos()
-    print("\n📊 Estadísticas de la base de datos:")
+    
+    print("\n" + "=" * 60)
+    print("📊 ESTADÍSTICAS DE LA BASE DE DATOS")
+    print("=" * 60)
     stats = db.obtener_estadisticas_db()
     print(json.dumps(stats, indent=2, ensure_ascii=False))
-    print("\n⚠️  IMPORTANTE: No existen credenciales por defecto.")
-    print("ℹ️  Para crear el primer administrador, use:")
-    print("    db.crear_primer_administrador({...})")
-               
+    
+    print("\n" + "=" * 60)
+    print("⚠️  INFORMACIÓN IMPORTANTE")
+    print("=" * 60)
+    print("✅ Base de datos inicializada correctamente")
+    print("❌ NO existen credenciales por defecto")
+    print("❌ NO hay usuarios ni administradores predefinidos")
+    print("")
+    print("📝 Para crear el primer administrador:")
+    print("   Opción 1: Usar el endpoint API")
+    print("     POST /api/admin/crear-primer-admin")
+    print("")
+    print("   Opción 2: Usar el formulario HTML")
+    print("     Abre crear-admin.html en tu navegador")
+    print("")
+    print("   Opción 3: Usar Python directamente")
+    print("     db.crear_primer_administrador({")
+    print("         'nombre': 'Admin',")
+    print("         'apellidos': 'Principal',")
+    print("         'correo': 'admin@ipuclafonda.org',")
+    print("         'usuario': 'admin',")
+    print("         'password': 'ContraseñaSegura123'")
+    print("     })")
+    print("=" * 60)
