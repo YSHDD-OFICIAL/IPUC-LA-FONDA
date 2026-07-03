@@ -161,7 +161,6 @@ def crear_sesion(usuario, rol, ip):
         'ip': ip
     }
     
-    # Actualizar última conexión para usuarios normales
     if rol == 'usuario':
         try:
             usuarios = db.cargar_json('usuarios')
@@ -173,7 +172,6 @@ def crear_sesion(usuario, rol, ip):
         except Exception as e:
             logger.error(f"Error actualizando última conexión: {e}")
     
-    # Limpiar intentos fallidos de esta IP
     if ip in INTENTOS_FALLIDOS:
         del INTENTOS_FALLIDOS[ip]
     
@@ -287,7 +285,6 @@ def requiere_admin(f):
 @app.before_request
 def before_request():
     """Se ejecuta antes de cada petición para verificar seguridad"""
-    # Verificar bloqueo de IP en endpoints sensibles
     if request.endpoint in ['login', 'registro', 'crear_primer_admin']:
         ip = request.remote_addr
         bloqueado, segundos = verificar_bloqueo_ip(ip)
@@ -298,7 +295,6 @@ def before_request():
                 "segundos_restantes": segundos
             }), 403
     
-    # Limpiar tokens expirados periódicamente
     if not hasattr(app, 'request_count'):
         app.request_count = 0
     app.request_count += 1
@@ -344,7 +340,6 @@ def registro():
         if not datos:
             return jsonify({"error": "Se requieren datos en formato JSON"}), 400
         
-        # Validar campos requeridos
         campos_requeridos = ['nombre', 'apellidos', 'documento', 'fecha_nacimiento',
                             'sexo', 'correo', 'celular', 'usuario', 'password', 'ministerio']
         
@@ -352,21 +347,17 @@ def registro():
             if campo not in datos or not str(datos[campo]).strip():
                 return jsonify({"error": f"El campo '{campo}' es obligatorio"}), 400
         
-        # Validar formato de correo
         if not validar_email(datos['correo']):
             return jsonify({"error": "Formato de correo electrónico inválido"}), 400
         
-        # Validar formato de usuario
         if not validar_usuario(datos['usuario']):
             return jsonify({
                 "error": "El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)"
             }), 400
         
-        # Validar longitud de contraseña
         if len(datos['password']) < 8:
             return jsonify({"error": "La contraseña debe tener al menos 8 caracteres"}), 400
         
-        # Verificar duplicados
         usuarios = db.cargar_json('usuarios')
         
         if any(str(u.get('documento')) == str(datos['documento']) for u in usuarios.get('usuarios', [])):
@@ -378,7 +369,6 @@ def registro():
         if any(u.get('usuario', '').lower() == datos['usuario'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El nombre de usuario ya existe"}), 400
         
-        # Crear nuevo usuario
         nuevo_usuario = {
             "id": len(usuarios.get('usuarios', [])) + 1,
             "nombre": datos['nombre'].strip(),
@@ -440,7 +430,6 @@ def login():
         
         ip = request.remote_addr
         
-        # Verificar bloqueo de IP
         bloqueado, segundos = verificar_bloqueo_ip(ip)
         if bloqueado:
             return jsonify({
@@ -448,7 +437,6 @@ def login():
                 "mensaje": f"Intente nuevamente en {segundos} segundos"
             }), 403
         
-        # Buscar en administradores primero
         administradores = db.cargar_json('administradores')
         admin = next((a for a in administradores.get('administradores', [])
                      if a['usuario'].lower() == usuario_id.lower()
@@ -457,7 +445,6 @@ def login():
         if admin and admin['password'] == hash_password(password):
             return crear_sesion(admin, 'admin', ip)
         
-        # Buscar en usuarios normales
         usuarios = db.cargar_json('usuarios')
         usuario = next((u for u in usuarios.get('usuarios', [])
                        if u['usuario'].lower() == usuario_id.lower()
@@ -471,7 +458,6 @@ def login():
                 }), 403
             return crear_sesion(usuario, 'usuario', ip)
         
-        # Credenciales inválidas
         return registrar_intento_fallido(ip)
         
     except Exception as e:
@@ -516,20 +502,17 @@ def crear_primer_admin():
     """
     Crea el primer administrador del sistema.
     ⚠️ SOLO funciona si NO existe ningún administrador previo.
-    Después del primer uso, esta ruta se deshabilita automáticamente.
     """
     try:
         datos = request.json
         if not datos:
             return jsonify({"error": "Se requieren datos en formato JSON"}), 400
         
-        # Validar campos requeridos
         campos_requeridos = ['nombre', 'apellidos', 'correo', 'usuario', 'password']
         for campo in campos_requeridos:
             if campo not in datos or not str(datos[campo]).strip():
                 return jsonify({"error": f"El campo '{campo}' es obligatorio"}), 400
         
-        # Validaciones de formato
         if not validar_email(datos['correo']):
             return jsonify({"error": "Formato de correo electrónico inválido"}), 400
         
@@ -541,7 +524,6 @@ def crear_primer_admin():
         if len(datos['password']) < 8:
             return jsonify({"error": "La contraseña debe tener al menos 8 caracteres"}), 400
         
-        # ⚠️ Verificar que NO exista ningún administrador
         administradores = db.cargar_json('administradores')
         if administradores.get('administradores') and len(administradores['administradores']) > 0:
             registrar_actividad(0, "Intento de crear admin adicional", f"IP: {request.remote_addr}")
@@ -551,7 +533,6 @@ def crear_primer_admin():
                 "mensaje": "Por seguridad, esta función solo está disponible cuando no hay administradores."
             }), 403
         
-        # Verificar que el usuario no exista ya
         usuarios = db.cargar_json('usuarios')
         if any(u.get('usuario', '').lower() == datos['usuario'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El nombre de usuario ya existe en el sistema"}), 400
@@ -559,7 +540,6 @@ def crear_primer_admin():
         if any(u.get('correo', '').lower() == datos['correo'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El correo electrónico ya está registrado"}), 400
         
-        # Crear el administrador
         admin = {
             "id": 1,
             "nombre": datos['nombre'].strip(),
@@ -582,19 +562,16 @@ def crear_primer_admin():
             "insignias": ["Administrador", "Cuenta Verificada"]
         }
         
-        # Guardar en la base de datos
         if 'administradores' not in administradores:
             administradores['administradores'] = []
         administradores['administradores'].append(admin)
         administradores['ultimo_id'] = 1
         db.guardar_json('administradores', administradores)
         
-        # Actualizar configuración del sistema
         config = db.cargar_json('configuracion')
         config['aplicacion']['primer_administrador_creado'] = True
         db.guardar_json('configuracion', config)
         
-        # Registrar actividad
         registrar_actividad(1, "Primer administrador creado", f"Usuario: {datos['usuario']}")
         actualizar_estadisticas_usuarios()
         
@@ -647,7 +624,6 @@ def actualizar_usuario(usuario_id):
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     
-    # Solo el propio usuario o un admin pueden editar
     if sesion['rol'] != 'admin' and sesion['usuario']['id'] != usuario_id:
         return jsonify({
             "error": "No autorizado",
@@ -762,7 +738,6 @@ def asistencia():
             "total": len(registros)
         }), 200
     
-    # POST - Registrar nueva asistencia
     datos = request.json
     if not datos:
         return jsonify({"error": "Se requieren datos para registrar asistencia"}), 400
@@ -802,13 +777,13 @@ def proximo_culto():
     """Obtiene información del próximo culto con contador regresivo"""
     ahora = datetime.datetime.now()
     cultos = {
-        0: [],  # Lunes
-        1: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Oración"}],  # Martes
-        2: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto Campal"}],  # Miércoles
-        3: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto de Refrán"}],  # Jueves
-        4: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Jóvenes"}],  # Viernes
-        5: [],  # Sábado
-        6: [{"inicio": "10:00", "fin": "12:00", "nombre": "Culto Dominical"}]  # Domingo
+        0: [],
+        1: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Oración"}],
+        2: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto Campal"}],
+        3: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto de Refrán"}],
+        4: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Jóvenes"}],
+        5: [],
+        6: [{"inicio": "10:00", "fin": "12:00", "nombre": "Culto Dominical"}]
     }
     dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
     
@@ -886,7 +861,6 @@ def versiculos():
             "versiculos": db.cargar_json('versiculos').get('versiculos', [])
         }), 200
     
-    # POST - Solo admin
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if sesion['rol'] != 'admin':
@@ -938,7 +912,6 @@ def noticias():
             "total": len(publicadas)
         }), 200
     
-    # POST - Solo admin
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if not sesion or sesion['rol'] != 'admin':
@@ -997,7 +970,6 @@ def eventos():
             "total": len(proximos)
         }), 200
     
-    # POST - Solo admin
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if not sesion or sesion['rol'] != 'admin':
@@ -1075,7 +1047,6 @@ def peticiones():
 # INICIALIZACIÓN DEL SERVIDOR
 # ============================================
 if __name__ == '__main__':
-    # Banner de inicio
     print("\n")
     print("╔══════════════════════════════════════════════════════════════╗")
     print("║                                                              ║")
@@ -1086,7 +1057,6 @@ if __name__ == '__main__':
     print("╚══════════════════════════════════════════════════════════════╝")
     print("")
     
-    # Inicializar base de datos
     print("⏳ Inicializando base de datos...")
     try:
         db.inicializar_datos()
@@ -1099,7 +1069,6 @@ if __name__ == '__main__':
         print(f"❌ Error al inicializar la base de datos: {str(e)}")
         print("⚠️  El servidor puede no funcionar correctamente")
     
-    # Verificar administradores
     print("")
     administradores = db.cargar_json('administradores')
     total_admins = len(administradores.get('administradores', []))
@@ -1119,13 +1088,11 @@ if __name__ == '__main__':
         for admin in administradores.get('administradores', []):
             print(f"   • {admin.get('nombre', 'N/A')} {admin.get('apellidos', '')} (@{admin.get('usuario', 'N/A')})")
     
-    # Verificar usuarios
     usuarios = db.cargar_json('usuarios')
     total_usuarios = len(usuarios.get('usuarios', []))
     activos = len([u for u in usuarios.get('usuarios', []) if u.get('estado') == 'activo'])
     print(f"👥 Usuarios registrados: {total_usuarios} ({activos} activos)")
     
-    # Configuración del servidor
     port = int(os.environ.get('PORT', 5000))
     entorno = "PRODUCCIÓN 🟢" if os.environ.get('RENDER') else "DESARROLLO 🟡"
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
@@ -1142,7 +1109,6 @@ if __name__ == '__main__':
     print(f"⏰ Hora del sistema: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("-" * 60)
     
-    # Endpoints disponibles
     print("")
     print("📡 Endpoints principales:")
     endpoints_destacados = [
@@ -1165,7 +1131,6 @@ if __name__ == '__main__':
     print("=" * 60)
     print("")
     
-    # Iniciar servidor
     try:
         app.run(
             host='0.0.0.0',
