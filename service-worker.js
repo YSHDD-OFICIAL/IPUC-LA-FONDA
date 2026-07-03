@@ -23,6 +23,7 @@ const PRECACHE_ASSETS = [
     '/generar_hash.py',
     '/app.py',
     '/database.py',
+    '/crear-admin.py',
     
     // Avatares
     '/assets/avatars/default.png',
