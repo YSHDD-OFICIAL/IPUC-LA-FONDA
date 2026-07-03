@@ -22,7 +22,9 @@
             "insignias": [
                 "Administrador",
                 "Cuenta Verificada"
-            ]
+            ],
+            "intentos_fallidos": 0,
+            "bloqueado_hasta": null
         }
     ],
     "ultimo_id": 1
