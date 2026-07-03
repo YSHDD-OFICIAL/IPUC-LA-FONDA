@@ -17,8 +17,12 @@ const PRECACHE_ASSETS = [
     // Otros recursos
     '/administradores.json',
     '/requirements.txt',
+    '/render.yaml',
     '/ipuclafonda.png',
     '/favicon.ico',
+    '/generar_hash.py',
+    '/app.py',
+    '/database.py',
     
     // Avatares
     '/assets/avatars/default.png',
