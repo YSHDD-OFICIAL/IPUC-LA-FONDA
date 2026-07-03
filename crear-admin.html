@@ -11,9 +11,6 @@
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     
     <style>
-        /* ============================================
-           VARIABLES Y CONFIGURACIÓN
-           ============================================ */
         :root {
             --azul-primario: #1a237e;
             --azul-claro: #283593;
@@ -40,9 +37,6 @@
             --transition-normal: 0.3s ease;
         }
 
-        /* ============================================
-           RESET Y ESTILOS BASE
-           ============================================ */
         *,
         *::before,
         *::after {
@@ -63,9 +57,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ============================================
-           PARTÍCULAS DE FONDO
-           ============================================ */
         .background-particles {
             position: fixed;
             top: 0;
@@ -88,9 +79,6 @@
             50% { transform: translateY(-20px); }
         }
 
-        /* ============================================
-           CONTENEDOR PRINCIPAL
-           ============================================ */
         .container {
             position: relative;
             z-index: 1;
@@ -98,9 +86,6 @@
             max-width: 520px;
         }
 
-        /* ============================================
-           TARJETA PRINCIPAL
-           ============================================ */
         .card {
             background: rgba(255, 255, 255, 0.97);
             border-radius: var(--borde-radius);
@@ -110,19 +95,10 @@
         }
 
         @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        /* ============================================
-           ENCABEZADO
-           ============================================ */
         .header {
             text-align: center;
             margin-bottom: 32px;
@@ -187,9 +163,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* ============================================
-           ALERTA DE SEGURIDAD
-           ============================================ */
         .alert {
             display: flex;
             align-items: flex-start;
@@ -213,9 +186,6 @@
             margin-top: 2px;
         }
 
-        /* ============================================
-           FORMULARIO
-           ============================================ */
         .form-section {
             margin-bottom: 24px;
         }
@@ -229,6 +199,9 @@
             margin-bottom: 12px;
             padding-bottom: 6px;
             border-bottom: 1px solid var(--gris-medio);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .form-grid {
@@ -308,9 +281,6 @@
             margin-top: 4px;
         }
 
-        /* ============================================
-           CAMPO DE URL DE API (SOLO LECTURA)
-           ============================================ */
         .api-url-group {
             background: var(--gris-claro);
             padding: 14px 16px;
@@ -323,7 +293,9 @@
             font-size: 0.8rem;
             color: var(--gris-oscuro);
             margin-bottom: 6px;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .api-url-display {
@@ -346,9 +318,6 @@
             flex-shrink: 0;
         }
 
-        /* ============================================
-           BOTONES
-           ============================================ */
         .btn-submit {
             width: 100%;
             padding: 14px 24px;
@@ -408,9 +377,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ============================================
-           RESULTADO
-           ============================================ */
         .resultado {
             margin-top: 20px;
             padding: 16px;
@@ -462,9 +428,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============================================
-           FOOTER
-           ============================================ */
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -482,83 +445,41 @@
             text-decoration: underline;
         }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
         @media (max-width: 600px) {
             .card {
                 padding: 28px 20px;
             }
-
             .form-grid {
                 grid-template-columns: 1fr;
             }
-
             .header h1 {
                 font-size: 1.3rem;
             }
-
             .logo-container {
                 width: 70px;
                 height: 70px;
             }
-
             .logo-ring {
                 width: 86px;
                 height: 86px;
                 top: -6px;
                 left: -6px;
             }
-
             .logo-img {
                 width: 70px;
                 height: 70px;
             }
         }
-
-        /* ============================================
-           TOOLTIP
-           ============================================ */
-        .tooltip {
-            position: relative;
-            cursor: help;
-            border-bottom: 1px dotted var(--gris-texto);
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--gris-oscuro);
-            color: var(--blanco);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-fast);
-        }
-
-        .tooltip:hover::after {
-            opacity: 1;
-        }
     </style>
 </head>
 <body>
 
-    <!-- PARTÍCULAS DE FONDO -->
     <div class="background-particles"></div>
 
-    <!-- CONTENEDOR PRINCIPAL -->
     <div class="container">
         
-        <!-- TARJETA -->
         <div class="card">
             
-            <!-- ENCABEZADO -->
             <div class="header">
                 <div class="logo-container">
                     <div class="logo-ring"></div>
@@ -574,7 +495,6 @@
                 </span>
             </div>
 
-            <!-- ALERTA DE SEGURIDAD -->
             <div class="alert alert-warning">
                 <i class="bx bx-shield-x"></i>
                 <div>
@@ -583,10 +503,8 @@
                 </div>
             </div>
 
-            <!-- FORMULARIO -->
             <form id="formAdmin" autocomplete="off">
                 
-                <!-- SECCIÓN: INFORMACIÓN PERSONAL -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <i class="bx bx-user"></i> Información Personal
@@ -631,7 +549,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN: CREDENCIALES DE ACCESO -->
                 <div class="form-section">
                     <div class="form-section-title">
                         <i class="bx bx-key"></i> Credenciales de Acceso
@@ -674,21 +591,19 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN: URL DE LA API -->
                 <div class="api-url-group">
                     <label>
                         <i class="bx bx-link"></i> URL del Endpoint API
                     </label>
                     <div class="api-url-display">
                         <i class="bx bx-server"></i>
-                        <span id="apiUrlDisplay">https://ipuc-api.onrender.com/api/admin/crear-primer-admin</span>
+                        <span id="apiUrlDisplay">http://localhost:5000/api/admin/crear-primer-admin</span>
                     </div>
                     <p class="input-hint" style="margin-top: 6px;">
                         Esta es la URL donde se enviará la solicitud. Asegúrate de que el backend esté activo.
                     </p>
                 </div>
 
-                <!-- BOTÓN DE ENVÍO -->
                 <button type="submit" class="btn-submit" id="btnSubmit">
                     <span class="btn-text">
                         <i class="bx bx-user-plus"></i> Crear Administrador
@@ -697,12 +612,10 @@
                 </button>
             </form>
 
-            <!-- RESULTADO -->
             <div class="resultado" id="resultado"></div>
 
         </div>
 
-        <!-- FOOTER -->
         <div class="footer">
             <p>IPUC LA FONDA v2.1.0 | 
                <a href="https://ipuclafonda.netlify.app" target="_blank">Ir a la aplicación</a>
@@ -711,14 +624,11 @@
 
     </div>
 
-    <!-- ============================================
-         SCRIPT PRINCIPAL
-         ============================================ -->
     <script>
         // ============================================
-// CONFIGURACIÓN
-// ============================================
-const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
+        // CONFIGURACIÓN
+        // ============================================
+        const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
         
         // Mostrar la URL en el display
         document.getElementById('apiUrlDisplay').textContent = API_ENDPOINT;
@@ -745,34 +655,28 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
         function validarFormulario(formData) {
             const errores = [];
             
-            // Validar nombre
             if (!formData.nombre || formData.nombre.trim().length < 2) {
                 errores.push('El nombre debe tener al menos 2 caracteres');
             }
             
-            // Validar apellidos
             if (!formData.apellidos || formData.apellidos.trim().length < 2) {
                 errores.push('Los apellidos deben tener al menos 2 caracteres');
             }
             
-            // Validar correo
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(formData.correo)) {
                 errores.push('Ingresa un correo electrónico válido');
             }
             
-            // Validar usuario
             const usuarioRegex = /^[a-zA-Z0-9_]{3,20}$/;
             if (!usuarioRegex.test(formData.usuario)) {
                 errores.push('El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)');
             }
             
-            // Validar contraseña
             if (formData.password.length < 8) {
                 errores.push('La contraseña debe tener al menos 8 caracteres');
             }
             
-            // Validar confirmación de contraseña
             if (formData.password !== formData.confirmarPassword) {
                 errores.push('Las contraseñas no coinciden');
             }
@@ -817,7 +721,6 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
             resultadoDiv.className = `resultado show ${tipo}`;
             resultadoDiv.innerHTML = html;
             
-            // Scroll al resultado
             resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
@@ -830,11 +733,9 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
             const btnSubmit = document.getElementById('btnSubmit');
             const resultadoDiv = document.getElementById('resultado');
             
-            // Ocultar resultado anterior
             resultadoDiv.className = 'resultado';
             resultadoDiv.innerHTML = '';
             
-            // Recoger datos del formulario
             const formData = new FormData(this);
             const datos = {
                 nombre: formData.get('nombre').trim(),
@@ -846,18 +747,15 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
                 confirmarPassword: formData.get('confirmarPassword')
             };
             
-            // Validar formulario
             const errores = validarFormulario(datos);
             if (errores.length > 0) {
                 mostrarResultado('error', 'Error de validación', errores.join('<br>'));
                 return;
             }
             
-            // Preparar datos para enviar (sin confirmarPassword)
             const datosEnviar = { ...datos };
             delete datosEnviar.confirmarPassword;
             
-            // Mostrar estado de carga
             btnSubmit.classList.add('loading');
             btnSubmit.disabled = true;
             
@@ -887,11 +785,9 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
                         { usuario: datos.usuario, password: datos.password }
                     );
                     
-                    // Limpiar campos de contraseña
                     document.getElementById('password').value = '';
                     document.getElementById('confirmarPassword').value = '';
                     
-                    // Deshabilitar el botón después del éxito
                     btnSubmit.disabled = true;
                     btnSubmit.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
                     btnSubmit.style.background = 'var(--exito)';
@@ -900,7 +796,7 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
                     mostrarResultado(
                         'info',
                         'ℹ️ Ya existe un administrador',
-                        result.error || 'Ya existe al menos un administrador en el sistema. Esta función está deshabilitada por seguridad.',
+                        result.error || 'Ya existe al menos un administrador en el sistema.',
                         null
                     );
                     btnSubmit.disabled = true;
@@ -925,20 +821,18 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
                     `
                         <strong>No se pudo conectar con el servidor.</strong><br><br>
                         <strong>Posibles causas:</strong><br>
-                        • El backend no está desplegado o no está activo<br>
+                        • El backend no está corriendo localmente<br>
                         • La URL de la API es incorrecta<br>
-                        • Hay un problema de red o firewall<br><br>
+                        • Hay un problema de red<br><br>
                         <strong>Soluciones:</strong><br>
-                        • Verifica que el backend esté corriendo en Render<br>
-                        • Revisa la URL: <code>${API_ENDPOINT}</code><br>
-                        • Intenta acceder a <a href="${API_ENDPOINT.replace('/admin/crear-primer-admin', '/health')}" target="_blank">/api/health</a> para verificar<br>
-                        • Espera unos segundos si el backend está en plan gratuito (puede estar "durmiendo")
+                        • Ejecuta <code>python app.py</code> en la carpeta del backend<br>
+                        • Verifica la URL: <code>${API_ENDPOINT}</code><br>
+                        • Asegúrate de que el puerto 5000 esté disponible
                     `,
                     null
                 );
                 
             } finally {
-                // Restaurar botón
                 btnSubmit.classList.remove('loading');
                 if (btnSubmit.disabled && !resultadoDiv.classList.contains('success') && !resultadoDiv.classList.contains('info')) {
                     btnSubmit.disabled = false;
@@ -946,9 +840,6 @@ const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
             }
         });
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
         console.log('✅ IPUC LA FONDA - Panel de Creación de Administrador cargado');
         console.log('🔗 Endpoint API:', API_ENDPOINT);
         console.log('⚠️  Esta página solo funciona si NO existe ningún administrador previo');
