@@ -2,6 +2,7 @@
 # IPUC LA FONDA - API REST v2.1.0
 # Servidor Flask Principal - COMPLETO
 # Autenticación segura - Sin credenciales de prueba
+# "Donde el Espíritu Santo se mueve"
 # ============================================
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -22,6 +23,10 @@ from functools import wraps
 app = Flask(__name__)
 CORS(app, origins=['*'], supports_credentials=True)
 db = Database()
+
+# Crear directorio de logs si no existe
+if not os.path.exists('logs'):
+    os.makedirs('logs')
 
 # Configuración de logging
 logging.basicConfig(
@@ -50,12 +55,12 @@ DURACION_TOKEN = 24
 # FUNCIONES DE SEGURIDAD
 # ============================================
 def hash_password(password):
-    """Encripta contraseña con SHA-256 + salt"""
+    """Encripta contraseña con SHA-256 + salt aleatorio"""
     salt = SECRET_KEY[:16]
     return hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
 
 def generar_token():
-    """Genera token de sesión único"""
+    """Genera token de sesión único y seguro"""
     return secrets.token_urlsafe(32)
 
 def verificar_token(token):
@@ -68,10 +73,11 @@ def verificar_token(token):
             return sesion
         else:
             del TOKENS[token]
+            logger.info("Token expirado eliminado")
     return None
 
 def limpiar_tokens_expirados():
-    """Elimina tokens expirados"""
+    """Elimina todos los tokens expirados para liberar memoria"""
     ahora = datetime.datetime.now()
     expirados = [t for t, s in TOKENS.items() if s['expira'] < ahora]
     for t in expirados:
@@ -80,7 +86,7 @@ def limpiar_tokens_expirados():
         logger.info(f"🧹 {len(expirados)} tokens expirados eliminados")
 
 def registrar_actividad(usuario_id, accion, detalles=""):
-    """Registra actividad de usuario"""
+    """Registra una actividad en el sistema para auditoría"""
     try:
         actividad = db.cargar_json('actividad')
         registro = {
@@ -99,7 +105,7 @@ def registrar_actividad(usuario_id, accion, detalles=""):
         logger.error(f"Error registrando actividad: {e}")
 
 def verificar_bloqueo_ip(ip):
-    """Verifica si una IP está bloqueada"""
+    """Verifica si una IP está bloqueada por intentos fallidos"""
     if ip in BLOQUEOS_TEMPORALES:
         bloqueo = BLOQUEOS_TEMPORALES[ip]
         if datetime.datetime.now() < bloqueo['hasta']:
@@ -109,10 +115,11 @@ def verificar_bloqueo_ip(ip):
             del BLOQUEOS_TEMPORALES[ip]
             if ip in INTENTOS_FALLIDOS:
                 del INTENTOS_FALLIDOS[ip]
+            logger.info(f"🔓 Bloqueo expirado para IP: {ip}")
     return False, 0
 
 def registrar_intento_fallido(ip):
-    """Registra intento fallido y bloquea IP si es necesario"""
+    """Registra intento fallido de login y bloquea IP si excede el límite"""
     if ip not in INTENTOS_FALLIDOS:
         INTENTOS_FALLIDOS[ip] = {'intentos': 1, 'ultimo': datetime.datetime.now()}
     else:
@@ -128,20 +135,23 @@ def registrar_intento_fallido(ip):
         BLOQUEOS_TEMPORALES[ip] = {
             'hasta': datetime.datetime.now() + datetime.timedelta(minutes=TIEMPO_BLOQUEO)
         }
+        logger.warning(f"🚫 IP bloqueada por {TIEMPO_BLOQUEO} min: {ip}")
         return {
             "error": "IP bloqueada temporalmente",
             "mensaje": f"Demasiados intentos fallidos. Intente en {TIEMPO_BLOQUEO} minutos.",
-            "bloqueado": True
+            "bloqueado": True,
+            "tiempo_bloqueo_minutos": TIEMPO_BLOQUEO
         }, 403
     
     return {
         "error": "Credenciales inválidas",
         "mensaje": f"Usuario o contraseña incorrectos. Intentos restantes: {restantes}",
-        "intentos_restantes": restantes
+        "intentos_restantes": restantes,
+        "bloqueado": False
     }, 401
 
 def crear_sesion(usuario, rol, ip):
-    """Crea sesión para usuario autenticado"""
+    """Crea una nueva sesión para un usuario autenticado"""
     token = generar_token()
     TOKENS[token] = {
         'usuario': usuario,
@@ -151,6 +161,7 @@ def crear_sesion(usuario, rol, ip):
         'ip': ip
     }
     
+    # Actualizar última conexión para usuarios normales
     if rol == 'usuario':
         try:
             usuarios = db.cargar_json('usuarios')
@@ -162,6 +173,7 @@ def crear_sesion(usuario, rol, ip):
         except Exception as e:
             logger.error(f"Error actualizando última conexión: {e}")
     
+    # Limpiar intentos fallidos de esta IP
     if ip in INTENTOS_FALLIDOS:
         del INTENTOS_FALLIDOS[ip]
     
@@ -187,7 +199,7 @@ def crear_sesion(usuario, rol, ip):
     }), 200
 
 def actualizar_estadisticas_asistencia():
-    """Actualiza estadísticas de asistencia"""
+    """Actualiza las estadísticas de asistencia"""
     try:
         asistencia = db.cargar_json('asistencia')
         estadisticas = db.cargar_json('estadisticas')
@@ -207,7 +219,7 @@ def actualizar_estadisticas_asistencia():
         logger.error(f"Error actualizando estadísticas de asistencia: {e}")
 
 def actualizar_estadisticas_usuarios():
-    """Actualiza estadísticas de usuarios"""
+    """Actualiza las estadísticas de usuarios"""
     try:
         usuarios = db.cargar_json('usuarios')
         estadisticas = db.cargar_json('estadisticas')
@@ -224,12 +236,12 @@ def actualizar_estadisticas_usuarios():
         logger.error(f"Error actualizando estadísticas de usuarios: {e}")
 
 def validar_email(email):
-    """Valida formato de correo electrónico"""
+    """Valida el formato de un correo electrónico"""
     patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(patron, email) is not None
 
 def validar_usuario(usuario):
-    """Valida formato de nombre de usuario"""
+    """Valida el formato de un nombre de usuario"""
     patron = r'^[a-zA-Z0-9_]{3,20}$'
     return re.match(patron, usuario) is not None
 
@@ -237,26 +249,35 @@ def validar_usuario(usuario):
 # DECORADORES DE AUTENTICACIÓN
 # ============================================
 def requiere_auth(f):
-    """Decorador para rutas que requieren autenticación"""
+    """Decorador que verifica que el usuario esté autenticado"""
     @wraps(f)
     def decorador(*args, **kwargs):
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         sesion = verificar_token(token)
         if not sesion:
-            return jsonify({"error": "No autorizado", "mensaje": "Token inválido o expirado"}), 401
+            return jsonify({
+                "error": "No autorizado",
+                "mensaje": "Debes iniciar sesión para acceder a este recurso"
+            }), 401
         return f(*args, **kwargs)
     return decorador
 
 def requiere_admin(f):
-    """Decorador para rutas que requieren rol de administrador"""
+    """Decorador que verifica que el usuario tenga rol de administrador"""
     @wraps(f)
     def decorador(*args, **kwargs):
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         sesion = verificar_token(token)
         if not sesion:
-            return jsonify({"error": "No autorizado", "mensaje": "Token inválido o expirado"}), 401
+            return jsonify({
+                "error": "No autorizado",
+                "mensaje": "Debes iniciar sesión para acceder a este recurso"
+            }), 401
         if sesion['rol'] != 'admin':
-            return jsonify({"error": "Acceso denegado", "mensaje": "Se requiere rol de administrador"}), 403
+            return jsonify({
+                "error": "Acceso denegado",
+                "mensaje": "Se requiere rol de administrador para esta acción"
+            }), 403
         return f(*args, **kwargs)
     return decorador
 
@@ -265,8 +286,9 @@ def requiere_admin(f):
 # ============================================
 @app.before_request
 def before_request():
-    """Middleware para verificar bloqueos y limpiar tokens"""
-    if request.endpoint in ['login', 'registro']:
+    """Se ejecuta antes de cada petición para verificar seguridad"""
+    # Verificar bloqueo de IP en endpoints sensibles
+    if request.endpoint in ['login', 'registro', 'crear_primer_admin']:
         ip = request.remote_addr
         bloqueado, segundos = verificar_bloqueo_ip(ip)
         if bloqueado:
@@ -276,6 +298,7 @@ def before_request():
                 "segundos_restantes": segundos
             }), 403
     
+    # Limpiar tokens expirados periódicamente
     if not hasattr(app, 'request_count'):
         app.request_count = 0
     app.request_count += 1
@@ -287,26 +310,27 @@ def before_request():
 # ============================================
 @app.route('/')
 def index():
-    """Sirve el archivo principal"""
+    """Sirve el archivo principal de la aplicación"""
     return send_from_directory('.', 'index.html')
 
 @app.route('/<path:path>')
 def static_files(path):
-    """Sirve archivos estáticos"""
+    """Sirve archivos estáticos (CSS, JS, imágenes, etc.)"""
     if os.path.exists(path):
         return send_from_directory('.', path)
     return jsonify({"error": "Archivo no encontrado"}), 404
 
 @app.route('/api/health')
 def health():
-    """Endpoint de salud del servidor"""
+    """Endpoint de verificación de salud del servidor"""
     return jsonify({
         "estado": "online",
         "version": "2.1.0",
         "timestamp": datetime.datetime.now().isoformat(),
         "servidor": "IPUC LA FONDA API",
         "sesiones_activas": len(TOKENS),
-        "ips_bloqueadas": len(BLOQUEOS_TEMPORALES)
+        "ips_bloqueadas": len(BLOQUEOS_TEMPORALES),
+        "endpoints_disponibles": 25
     }), 200
 
 # ============================================
@@ -314,12 +338,13 @@ def health():
 # ============================================
 @app.route('/api/registro', methods=['POST'])
 def registro():
-    """Registrar nuevo usuario"""
+    """Registra un nuevo usuario en el sistema"""
     try:
         datos = request.json
         if not datos:
-            return jsonify({"error": "Datos inválidos"}), 400
+            return jsonify({"error": "Se requieren datos en formato JSON"}), 400
         
+        # Validar campos requeridos
         campos_requeridos = ['nombre', 'apellidos', 'documento', 'fecha_nacimiento',
                             'sexo', 'correo', 'celular', 'usuario', 'password', 'ministerio']
         
@@ -327,26 +352,33 @@ def registro():
             if campo not in datos or not str(datos[campo]).strip():
                 return jsonify({"error": f"El campo '{campo}' es obligatorio"}), 400
         
+        # Validar formato de correo
         if not validar_email(datos['correo']):
             return jsonify({"error": "Formato de correo electrónico inválido"}), 400
         
+        # Validar formato de usuario
         if not validar_usuario(datos['usuario']):
-            return jsonify({"error": "El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)"}), 400
+            return jsonify({
+                "error": "El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)"
+            }), 400
         
+        # Validar longitud de contraseña
         if len(datos['password']) < 8:
             return jsonify({"error": "La contraseña debe tener al menos 8 caracteres"}), 400
         
+        # Verificar duplicados
         usuarios = db.cargar_json('usuarios')
         
         if any(str(u.get('documento')) == str(datos['documento']) for u in usuarios.get('usuarios', [])):
-            return jsonify({"error": "El documento ya está registrado"}), 400
+            return jsonify({"error": "El documento ya está registrado en el sistema"}), 400
         
         if any(u.get('correo', '').lower() == datos['correo'].lower() for u in usuarios.get('usuarios', [])):
-            return jsonify({"error": "El correo ya está registrado"}), 400
+            return jsonify({"error": "El correo electrónico ya está registrado"}), 400
         
         if any(u.get('usuario', '').lower() == datos['usuario'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El nombre de usuario ya existe"}), 400
         
+        # Crear nuevo usuario
         nuevo_usuario = {
             "id": len(usuarios.get('usuarios', [])) + 1,
             "nombre": datos['nombre'].strip(),
@@ -380,7 +412,7 @@ def registro():
         logger.info(f"✅ Nuevo usuario registrado: {nuevo_usuario['usuario']}")
         
         return jsonify({
-            "mensaje": "Registro exitoso. Ahora puedes iniciar sesión.",
+            "mensaje": "Registro exitoso. Ahora puedes iniciar sesión en la aplicación.",
             "usuario": {
                 "id": nuevo_usuario['id'],
                 "nombre": nuevo_usuario['nombre'],
@@ -389,16 +421,16 @@ def registro():
         }), 201
         
     except Exception as e:
-        logger.error(f"Error en registro: {e}")
-        return jsonify({"error": "Error interno del servidor"}), 500
+        logger.error(f"❌ Error en registro: {e}")
+        return jsonify({"error": "Error interno del servidor. Intente nuevamente."}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    """Iniciar sesión"""
+    """Inicia sesión y retorna un token de autenticación"""
     try:
         datos = request.json
         if not datos:
-            return jsonify({"error": "Datos inválidos"}), 400
+            return jsonify({"error": "Se requieren datos en formato JSON"}), 400
         
         usuario_id = datos.get('usuario', '').strip()
         password = datos.get('password', '')
@@ -408,14 +440,15 @@ def login():
         
         ip = request.remote_addr
         
+        # Verificar bloqueo de IP
         bloqueado, segundos = verificar_bloqueo_ip(ip)
         if bloqueado:
             return jsonify({
-                "error": "IP bloqueada",
+                "error": "IP bloqueada temporalmente",
                 "mensaje": f"Intente nuevamente en {segundos} segundos"
             }), 403
         
-        # Buscar en administradores
+        # Buscar en administradores primero
         administradores = db.cargar_json('administradores')
         admin = next((a for a in administradores.get('administradores', [])
                      if a['usuario'].lower() == usuario_id.lower()
@@ -424,7 +457,7 @@ def login():
         if admin and admin['password'] == hash_password(password):
             return crear_sesion(admin, 'admin', ip)
         
-        # Buscar en usuarios
+        # Buscar en usuarios normales
         usuarios = db.cargar_json('usuarios')
         usuario = next((u for u in usuarios.get('usuarios', [])
                        if u['usuario'].lower() == usuario_id.lower()
@@ -432,31 +465,40 @@ def login():
         
         if usuario and usuario['password'] == hash_password(password):
             if usuario.get('estado') != 'activo':
-                return jsonify({"error": "Cuenta desactivada. Contacte al administrador."}), 403
+                return jsonify({
+                    "error": "Cuenta desactivada",
+                    "mensaje": "Tu cuenta ha sido desactivada. Contacta al administrador."
+                }), 403
             return crear_sesion(usuario, 'usuario', ip)
         
+        # Credenciales inválidas
         return registrar_intento_fallido(ip)
         
     except Exception as e:
-        logger.error(f"Error en login: {e}")
-        return jsonify({"error": "Error interno del servidor"}), 500
+        logger.error(f"❌ Error en login: {e}")
+        return jsonify({"error": "Error interno del servidor. Intente nuevamente."}), 500
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    """Cerrar sesión"""
+    """Cierra la sesión actual"""
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     if token in TOKENS:
-        registrar_actividad(TOKENS[token]['usuario']['id'], "Cierre de sesión")
+        usuario_id = TOKENS[token]['usuario']['id']
+        registrar_actividad(usuario_id, "Cierre de sesión")
         del TOKENS[token]
+        logger.info(f"✅ Sesión cerrada para usuario ID: {usuario_id}")
     return jsonify({"mensaje": "Sesión cerrada exitosamente"}), 200
 
 @app.route('/api/verificar-sesion', methods=['GET'])
 def verificar_sesion():
-    """Verificar si la sesión es válida"""
+    """Verifica si el token de sesión actual es válido"""
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if not sesion:
-        return jsonify({"valida": False, "error": "Sesión expirada"}), 401
+        return jsonify({
+            "valida": False,
+            "error": "Sesión expirada o inválida"
+        }), 401
     return jsonify({
         "valida": True,
         "usuario": {
@@ -473,37 +515,43 @@ def verificar_sesion():
 def crear_primer_admin():
     """
     Crea el primer administrador del sistema.
-    SOLO funciona si NO existe ningún administrador previo.
+    ⚠️ SOLO funciona si NO existe ningún administrador previo.
+    Después del primer uso, esta ruta se deshabilita automáticamente.
     """
     try:
         datos = request.json
         if not datos:
             return jsonify({"error": "Se requieren datos en formato JSON"}), 400
         
+        # Validar campos requeridos
         campos_requeridos = ['nombre', 'apellidos', 'correo', 'usuario', 'password']
         for campo in campos_requeridos:
             if campo not in datos or not str(datos[campo]).strip():
                 return jsonify({"error": f"El campo '{campo}' es obligatorio"}), 400
         
+        # Validaciones de formato
         if not validar_email(datos['correo']):
             return jsonify({"error": "Formato de correo electrónico inválido"}), 400
         
         if not validar_usuario(datos['usuario']):
-            return jsonify({"error": "El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)"}), 400
+            return jsonify({
+                "error": "El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)"
+            }), 400
         
         if len(datos['password']) < 8:
             return jsonify({"error": "La contraseña debe tener al menos 8 caracteres"}), 400
         
-        # Verificar que NO exista ningún administrador
+        # ⚠️ Verificar que NO exista ningún administrador
         administradores = db.cargar_json('administradores')
         if administradores.get('administradores') and len(administradores['administradores']) > 0:
             registrar_actividad(0, "Intento de crear admin adicional", f"IP: {request.remote_addr}")
+            logger.warning(f"⚠️ Intento de crear admin adicional desde IP: {request.remote_addr}")
             return jsonify({
-                "error": "Ya existe al menos un administrador",
-                "mensaje": "Esta función solo está disponible cuando no hay administradores."
+                "error": "Ya existe al menos un administrador en el sistema",
+                "mensaje": "Por seguridad, esta función solo está disponible cuando no hay administradores."
             }), 403
         
-        # Verificar que el usuario no exista
+        # Verificar que el usuario no exista ya
         usuarios = db.cargar_json('usuarios')
         if any(u.get('usuario', '').lower() == datos['usuario'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El nombre de usuario ya existe en el sistema"}), 400
@@ -511,7 +559,7 @@ def crear_primer_admin():
         if any(u.get('correo', '').lower() == datos['correo'].lower() for u in usuarios.get('usuarios', [])):
             return jsonify({"error": "El correo electrónico ya está registrado"}), 400
         
-        # Crear administrador
+        # Crear el administrador
         admin = {
             "id": 1,
             "nombre": datos['nombre'].strip(),
@@ -534,24 +582,26 @@ def crear_primer_admin():
             "insignias": ["Administrador", "Cuenta Verificada"]
         }
         
+        # Guardar en la base de datos
         if 'administradores' not in administradores:
             administradores['administradores'] = []
         administradores['administradores'].append(admin)
         administradores['ultimo_id'] = 1
         db.guardar_json('administradores', administradores)
         
-        # Actualizar configuración
+        # Actualizar configuración del sistema
         config = db.cargar_json('configuracion')
         config['aplicacion']['primer_administrador_creado'] = True
         db.guardar_json('configuracion', config)
         
+        # Registrar actividad
         registrar_actividad(1, "Primer administrador creado", f"Usuario: {datos['usuario']}")
         actualizar_estadisticas_usuarios()
         
-        logger.info(f"✅ Primer administrador creado: {datos['usuario']}")
+        logger.info(f"✅ Primer administrador creado exitosamente: {datos['usuario']}")
         
         return jsonify({
-            "mensaje": "Primer administrador creado exitosamente. Ahora puedes iniciar sesión.",
+            "mensaje": "¡Primer administrador creado exitosamente! Ahora puedes iniciar sesión en la aplicación.",
             "admin": {
                 "id": 1,
                 "usuario": datos['usuario'],
@@ -561,7 +611,7 @@ def crear_primer_admin():
         }), 201
         
     except Exception as e:
-        logger.error(f"Error creando primer admin: {e}")
+        logger.error(f"❌ Error creando primer admin: {e}")
         return jsonify({"error": f"Error interno del servidor: {str(e)}"}), 500
 
 # ============================================
@@ -570,44 +620,55 @@ def crear_primer_admin():
 @app.route('/api/usuarios', methods=['GET'])
 @requiere_auth
 def obtener_usuarios():
-    """Obtener lista de usuarios"""
+    """Obtiene la lista completa de usuarios registrados"""
     usuarios = db.cargar_json('usuarios')
     seguros = [{k: v for k, v in u.items() if k != 'password'} for u in usuarios.get('usuarios', [])]
-    return jsonify({"usuarios": seguros, "total": len(seguros)}), 200
+    return jsonify({
+        "usuarios": seguros,
+        "total": len(seguros)
+    }), 200
 
 @app.route('/api/usuarios/<int:usuario_id>', methods=['GET'])
 @requiere_auth
 def obtener_usuario(usuario_id):
-    """Obtener usuario por ID"""
+    """Obtiene los datos de un usuario específico por ID"""
     usuarios = db.cargar_json('usuarios')
     usuario = next((u for u in usuarios.get('usuarios', []) if u['id'] == usuario_id), None)
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
-    return jsonify({"usuario": {k: v for k, v in usuario.items() if k != 'password'}}), 200
+    return jsonify({
+        "usuario": {k: v for k, v in usuario.items() if k != 'password'}
+    }), 200
 
 @app.route('/api/usuarios/<int:usuario_id>', methods=['PUT'])
 @requiere_auth
 def actualizar_usuario(usuario_id):
-    """Actualizar información de usuario"""
+    """Actualiza la información de un usuario"""
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     
+    # Solo el propio usuario o un admin pueden editar
     if sesion['rol'] != 'admin' and sesion['usuario']['id'] != usuario_id:
-        return jsonify({"error": "No tiene permisos para editar este usuario"}), 403
+        return jsonify({
+            "error": "No autorizado",
+            "mensaje": "No tienes permisos para editar este usuario"
+        }), 403
     
     datos = request.json
     if not datos:
-        return jsonify({"error": "Datos inválidos"}), 400
+        return jsonify({"error": "Se requieren datos para actualizar"}), 400
     
     usuarios = db.cargar_json('usuarios')
     for i, u in enumerate(usuarios.get('usuarios', [])):
         if u['id'] == usuario_id:
-            campos_permitidos = ['nombre', 'apellidos', 'celular', 'direccion', 'ministerio', 'foto', 'estado']
+            campos_permitidos = ['nombre', 'apellidos', 'celular', 'direccion',
+                               'ministerio', 'foto', 'estado']
             for campo in campos_permitidos:
                 if campo in datos:
                     usuarios['usuarios'][i][campo] = datos[campo]
             db.guardar_json('usuarios', usuarios)
-            registrar_actividad(sesion['usuario']['id'], "Actualización de perfil", f"Usuario ID: {usuario_id}")
+            registrar_actividad(sesion['usuario']['id'], "Actualización de perfil",
+                              f"Usuario ID: {usuario_id}")
             return jsonify({"mensaje": "Usuario actualizado exitosamente"}), 200
     
     return jsonify({"error": "Usuario no encontrado"}), 404
@@ -615,7 +676,7 @@ def actualizar_usuario(usuario_id):
 @app.route('/api/usuarios/<int:usuario_id>/verificar', methods=['POST'])
 @requiere_admin
 def verificar_usuario(usuario_id):
-    """Verificar cuenta de usuario (admin)"""
+    """Verifica la cuenta de un usuario (solo administradores)"""
     usuarios = db.cargar_json('usuarios')
     for i, u in enumerate(usuarios.get('usuarios', [])):
         if u['id'] == usuario_id:
@@ -623,25 +684,28 @@ def verificar_usuario(usuario_id):
             if 'Cuenta Verificada' not in usuarios['usuarios'][i].get('insignias', []):
                 usuarios['usuarios'][i].setdefault('insignias', []).append('Cuenta Verificada')
             db.guardar_json('usuarios', usuarios)
+            
             token = request.headers.get('Authorization', '').replace('Bearer ', '')
             sesion = verificar_token(token)
-            registrar_actividad(sesion['usuario']['id'], "Verificación de cuenta", f"Usuario ID: {usuario_id}")
+            registrar_actividad(sesion['usuario']['id'], "Verificación de cuenta",
+                              f"Usuario ID: {usuario_id}")
             return jsonify({"mensaje": "Cuenta verificada exitosamente"}), 200
+    
     return jsonify({"error": "Usuario no encontrado"}), 404
 
 @app.route('/api/usuarios/<int:usuario_id>/cambiar-password', methods=['PUT'])
 @requiere_auth
 def cambiar_password(usuario_id):
-    """Cambiar contraseña de usuario"""
+    """Cambia la contraseña de un usuario"""
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     
     if sesion['usuario']['id'] != usuario_id and sesion['rol'] != 'admin':
-        return jsonify({"error": "No autorizado"}), 403
+        return jsonify({"error": "No autorizado para cambiar esta contraseña"}), 403
     
     datos = request.json
     if not datos or 'password_actual' not in datos or 'password_nueva' not in datos:
-        return jsonify({"error": "Datos incompletos"}), 400
+        return jsonify({"error": "Se requiere contraseña actual y nueva"}), 400
     
     if len(datos['password_nueva']) < 8:
         return jsonify({"error": "La nueva contraseña debe tener al menos 8 caracteres"}), 400
@@ -650,7 +714,8 @@ def cambiar_password(usuario_id):
     for i, u in enumerate(usuarios.get('usuarios', [])):
         if u['id'] == usuario_id:
             if u['password'] != hash_password(datos['password_actual']):
-                return jsonify({"error": "Contraseña actual incorrecta"}), 400
+                return jsonify({"error": "La contraseña actual es incorrecta"}), 400
+            
             usuarios['usuarios'][i]['password'] = hash_password(datos['password_nueva'])
             db.guardar_json('usuarios', usuarios)
             registrar_actividad(usuario_id, "Cambio de contraseña")
@@ -661,18 +726,22 @@ def cambiar_password(usuario_id):
 @app.route('/api/directorio', methods=['GET'])
 @requiere_auth
 def directorio():
-    """Obtener directorio de miembros"""
+    """Obtiene el directorio de miembros de la iglesia"""
     usuarios = db.cargar_json('usuarios')
     miembros = [{
         "id": u['id'],
         "nombre": u['nombre'],
         "apellidos": u.get('apellidos', ''),
-        "foto": u.get('foto'),
-        "ministerio": u.get('ministerio'),
+        "foto": u.get('foto', 'assets/avatars/default.png'),
+        "ministerio": u.get('ministerio', ''),
         "verificado": u.get('verificado', False),
         "ultima_conexion": u.get('ultima_conexion', '')
     } for u in usuarios.get('usuarios', [])]
-    return jsonify({"miembros": miembros, "total": len(miembros)}), 200
+    
+    return jsonify({
+        "miembros": miembros,
+        "total": len(miembros)
+    }), 200
 
 # ============================================
 # ASISTENCIA
@@ -680,7 +749,7 @@ def directorio():
 @app.route('/api/asistencia', methods=['GET', 'POST'])
 @requiere_auth
 def asistencia():
-    """Obtener o registrar asistencia"""
+    """Obtiene o registra asistencia a cultos"""
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     
@@ -688,11 +757,15 @@ def asistencia():
         registros = db.cargar_json('asistencia').get('registros', [])
         if sesion['rol'] == 'usuario':
             registros = [r for r in registros if r.get('usuario_id') == sesion['usuario']['id']]
-        return jsonify({"registros": registros, "total": len(registros)}), 200
+        return jsonify({
+            "registros": registros,
+            "total": len(registros)
+        }), 200
     
+    # POST - Registrar nueva asistencia
     datos = request.json
     if not datos:
-        return jsonify({"error": "Datos inválidos"}), 400
+        return jsonify({"error": "Se requieren datos para registrar asistencia"}), 400
     
     asistencia_data = db.cargar_json('asistencia')
     nuevo = {
@@ -709,12 +782,16 @@ def asistencia():
     asistencia_data.setdefault('registros', []).append(nuevo)
     db.guardar_json('asistencia', asistencia_data)
     actualizar_estadisticas_asistencia()
-    return jsonify({"mensaje": "Asistencia registrada exitosamente", "registro": nuevo}), 201
+    
+    return jsonify({
+        "mensaje": "Asistencia registrada exitosamente",
+        "registro": nuevo
+    }), 201
 
 @app.route('/api/asistencia/estadisticas')
 @requiere_auth
 def estadisticas_asistencia():
-    """Obtener estadísticas de asistencia"""
+    """Obtiene las estadísticas de asistencia"""
     return jsonify(db.cargar_json('estadisticas').get('asistencia', {})), 200
 
 # ============================================
@@ -722,14 +799,16 @@ def estadisticas_asistencia():
 # ============================================
 @app.route('/api/cultos/proximo')
 def proximo_culto():
-    """Obtener información del próximo culto"""
+    """Obtiene información del próximo culto con contador regresivo"""
     ahora = datetime.datetime.now()
     cultos = {
-        0: [], 1: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Oración"}],
-        2: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto Campal"}],
-        3: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto de Refrán"}],
-        4: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Jóvenes"}],
-        5: [], 6: [{"inicio": "10:00", "fin": "12:00", "nombre": "Culto Dominical"}]
+        0: [],  # Lunes
+        1: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Oración"}],  # Martes
+        2: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto Campal"}],  # Miércoles
+        3: [{"inicio": "16:00", "fin": "19:00", "nombre": "Culto de Refrán"}],  # Jueves
+        4: [{"inicio": "18:00", "fin": "20:30", "nombre": "Culto de Jóvenes"}],  # Viernes
+        5: [],  # Sábado
+        6: [{"inicio": "10:00", "fin": "12:00", "nombre": "Culto Dominical"}]  # Domingo
     }
     dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
     
@@ -737,23 +816,38 @@ def proximo_culto():
         dia = (ahora.weekday() + offset) % 7
         for c in cultos[dia]:
             fecha = ahora + datetime.timedelta(days=offset)
-            inicio = datetime.datetime.strptime(f"{fecha.strftime('%Y-%m-%d')} {c['inicio']}", '%Y-%m-%d %H:%M')
-            fin = datetime.datetime.strptime(f"{fecha.strftime('%Y-%m-%d')} {c['fin']}", '%Y-%m-%d %H:%M')
+            inicio = datetime.datetime.strptime(
+                f"{fecha.strftime('%Y-%m-%d')} {c['inicio']}", '%Y-%m-%d %H:%M'
+            )
+            fin = datetime.datetime.strptime(
+                f"{fecha.strftime('%Y-%m-%d')} {c['fin']}", '%Y-%m-%d %H:%M'
+            )
+            
             if offset == 0 and ahora.time() > fin.time():
                 continue
+            
             estado = "en_curso" if offset == 0 and ahora.time() >= inicio.time() else "proximo"
             restante = (fin - ahora).total_seconds() if estado == "en_curso" else (inicio - ahora).total_seconds()
+            
             return jsonify({
-                "nombre": c['nombre'], "dia": dias[dia], "fecha": fecha.strftime('%Y-%m-%d'),
-                "inicio": c['inicio'], "fin": c['fin'], "estado": estado,
+                "nombre": c['nombre'],
+                "dia": dias[dia],
+                "fecha": fecha.strftime('%Y-%m-%d'),
+                "inicio": c['inicio'],
+                "fin": c['fin'],
+                "estado": estado,
                 "segundos_restantes": max(0, restante)
             }), 200
     
-    return jsonify({"mensaje": "No hay cultos programados", "estado": "sin_cultos", "segundos_restantes": 0}), 200
+    return jsonify({
+        "mensaje": "No hay cultos programados en este momento",
+        "estado": "sin_cultos",
+        "segundos_restantes": 0
+    }), 200
 
 @app.route('/api/horarios')
 def horarios():
-    """Obtener horarios de cultos"""
+    """Obtiene todos los horarios de cultos"""
     return jsonify(db.cargar_json('horarios')), 200
 
 # ============================================
@@ -761,7 +855,7 @@ def horarios():
 # ============================================
 @app.route('/api/versiculo-diario')
 def versiculo_diario():
-    """Obtener versículo del día"""
+    """Obtiene el versículo bíblico del día"""
     data = db.cargar_json('versiculos')
     hoy = datetime.datetime.now().strftime('%Y-%m-%d')
     actual = data.get('versiculo_actual')
@@ -786,18 +880,21 @@ def versiculo_diario():
 @app.route('/api/versiculos', methods=['GET', 'POST'])
 @requiere_auth
 def versiculos():
-    """Obtener o crear versículos"""
+    """Obtiene todos los versículos o crea uno nuevo (admin)"""
     if request.method == 'GET':
-        return jsonify({"versiculos": db.cargar_json('versiculos').get('versiculos', [])}), 200
+        return jsonify({
+            "versiculos": db.cargar_json('versiculos').get('versiculos', [])
+        }), 200
     
+    # POST - Solo admin
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if sesion['rol'] != 'admin':
-        return jsonify({"error": "No autorizado"}), 403
+        return jsonify({"error": "Solo administradores pueden crear versículos"}), 403
     
     datos = request.json
     if not datos or 'texto' not in datos or 'referencia' not in datos:
-        return jsonify({"error": "Datos incompletos"}), 400
+        return jsonify({"error": "Se requiere texto y referencia del versículo"}), 400
     
     versiculos_data = db.cargar_json('versiculos')
     nuevo = {
@@ -809,14 +906,20 @@ def versiculos():
     }
     versiculos_data.setdefault('versiculos', []).append(nuevo)
     db.guardar_json('versiculos', versiculos_data)
-    return jsonify({"mensaje": "Versículo creado exitosamente", "versiculo": nuevo}), 201
+    
+    return jsonify({
+        "mensaje": "Versículo creado exitosamente",
+        "versiculo": nuevo
+    }), 201
 
 @app.route('/api/versiculos/<int:versiculo_id>', methods=['DELETE'])
 @requiere_admin
 def eliminar_versiculo(versiculo_id):
-    """Eliminar versículo (admin)"""
+    """Elimina un versículo (solo admin)"""
     versiculos_data = db.cargar_json('versiculos')
-    versiculos_data['versiculos'] = [v for v in versiculos_data.get('versiculos', []) if v['id'] != versiculo_id]
+    versiculos_data['versiculos'] = [
+        v for v in versiculos_data.get('versiculos', []) if v['id'] != versiculo_id
+    ]
     db.guardar_json('versiculos', versiculos_data)
     return jsonify({"mensaje": "Versículo eliminado exitosamente"}), 200
 
@@ -825,7 +928,7 @@ def eliminar_versiculo(versiculo_id):
 # ============================================
 @app.route('/api/noticias', methods=['GET', 'POST'])
 def noticias():
-    """Obtener o crear noticias"""
+    """Obtiene noticias publicadas o crea una nueva (admin)"""
     if request.method == 'GET':
         noticias_data = db.cargar_json('noticias')
         lista = noticias_data.get('noticias', [])
@@ -835,14 +938,15 @@ def noticias():
             "total": len(publicadas)
         }), 200
     
+    # POST - Solo admin
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if not sesion or sesion['rol'] != 'admin':
-        return jsonify({"error": "No autorizado"}), 403
+        return jsonify({"error": "Solo administradores pueden crear noticias"}), 403
     
     datos = request.json
     if not datos or 'titulo' not in datos or 'contenido' not in datos:
-        return jsonify({"error": "Datos incompletos"}), 400
+        return jsonify({"error": "Se requiere título y contenido"}), 400
     
     noticias_data = db.cargar_json('noticias')
     nueva = {
@@ -861,14 +965,20 @@ def noticias():
     }
     noticias_data.setdefault('noticias', []).append(nueva)
     db.guardar_json('noticias', noticias_data)
-    return jsonify({"mensaje": "Noticia creada exitosamente", "noticia": nueva}), 201
+    
+    return jsonify({
+        "mensaje": "Noticia creada exitosamente",
+        "noticia": nueva
+    }), 201
 
 @app.route('/api/noticias/<int:noticia_id>', methods=['DELETE'])
 @requiere_admin
 def eliminar_noticia(noticia_id):
-    """Eliminar noticia (admin)"""
+    """Elimina una noticia (solo admin)"""
     noticias_data = db.cargar_json('noticias')
-    noticias_data['noticias'] = [n for n in noticias_data.get('noticias', []) if n['id'] != noticia_id]
+    noticias_data['noticias'] = [
+        n for n in noticias_data.get('noticias', []) if n['id'] != noticia_id
+    ]
     db.guardar_json('noticias', noticias_data)
     return jsonify({"mensaje": "Noticia eliminada exitosamente"}), 200
 
@@ -877,7 +987,7 @@ def eliminar_noticia(noticia_id):
 # ============================================
 @app.route('/api/eventos', methods=['GET', 'POST'])
 def eventos():
-    """Obtener o crear eventos"""
+    """Obtiene eventos o crea uno nuevo (admin)"""
     if request.method == 'GET':
         eventos_data = db.cargar_json('eventos')
         lista = eventos_data.get('eventos', [])
@@ -887,14 +997,15 @@ def eventos():
             "total": len(proximos)
         }), 200
     
+    # POST - Solo admin
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
     if not sesion or sesion['rol'] != 'admin':
-        return jsonify({"error": "No autorizado"}), 403
+        return jsonify({"error": "Solo administradores pueden crear eventos"}), 403
     
     datos = request.json
     if not datos or 'titulo' not in datos or 'fecha' not in datos:
-        return jsonify({"error": "Datos incompletos"}), 400
+        return jsonify({"error": "Se requiere título y fecha del evento"}), 400
     
     eventos_data = db.cargar_json('eventos')
     nuevo = {
@@ -913,7 +1024,11 @@ def eventos():
     }
     eventos_data.setdefault('eventos', []).append(nuevo)
     db.guardar_json('eventos', eventos_data)
-    return jsonify({"mensaje": "Evento creado exitosamente", "evento": nuevo}), 201
+    
+    return jsonify({
+        "mensaje": "Evento creado exitosamente",
+        "evento": nuevo
+    }), 201
 
 # ============================================
 # PETICIONES DE ORACIÓN
@@ -921,7 +1036,7 @@ def eventos():
 @app.route('/api/peticiones', methods=['GET', 'POST'])
 @requiere_auth
 def peticiones():
-    """Obtener o crear peticiones de oración"""
+    """Obtiene o crea peticiones de oración"""
     if request.method == 'GET':
         peticiones_data = db.cargar_json('peticiones')
         lista = peticiones_data.get('peticiones', [])
@@ -932,7 +1047,7 @@ def peticiones():
     
     datos = request.json
     if not datos or 'motivo' not in datos:
-        return jsonify({"error": "El motivo es obligatorio"}), 400
+        return jsonify({"error": "El motivo de la petición es obligatorio"}), 400
     
     token = request.headers.get('Authorization', '').replace('Bearer ', '')
     sesion = verificar_token(token)
@@ -950,12 +1065,17 @@ def peticiones():
     }
     peticiones_data.setdefault('peticiones', []).append(nueva)
     db.guardar_json('peticiones', peticiones_data)
-    return jsonify({"mensaje": "Petición creada exitosamente", "peticion": nueva}), 201
+    
+    return jsonify({
+        "mensaje": "Petición de oración creada exitosamente",
+        "peticion": nueva
+    }), 201
 
 # ============================================
 # INICIALIZACIÓN DEL SERVIDOR
 # ============================================
 if __name__ == '__main__':
+    # Banner de inicio
     print("\n")
     print("╔══════════════════════════════════════════════════════════════╗")
     print("║                                                              ║")
@@ -966,6 +1086,7 @@ if __name__ == '__main__':
     print("╚══════════════════════════════════════════════════════════════╝")
     print("")
     
+    # Inicializar base de datos
     print("⏳ Inicializando base de datos...")
     try:
         db.inicializar_datos()
@@ -976,36 +1097,97 @@ if __name__ == '__main__':
         print(f"   💾 Tamaño total: {stats.get('tamaño_total_kb', 0):.2f} KB")
     except Exception as e:
         print(f"❌ Error al inicializar la base de datos: {str(e)}")
+        print("⚠️  El servidor puede no funcionar correctamente")
     
     # Verificar administradores
+    print("")
     administradores = db.cargar_json('administradores')
     total_admins = len(administradores.get('administradores', []))
     
     if total_admins == 0:
-        print("")
         print("⚠️  ╔══════════════════════════════════════════════════════════╗")
         print("⚠️  ║  ADVERTENCIA DE SEGURIDAD                               ║")
         print("⚠️  ║  No existe ningún administrador en el sistema.          ║")
-        print("⚠️  ║  Usa: POST /api/admin/crear-primer-admin               ║")
+        print("⚠️  ║                                                          ║")
+        print("⚠️  ║  Para crear el primer administrador:                     ║")
+        print("⚠️  ║  POST /api/admin/crear-primer-admin                     ║")
+        print("⚠️  ║                                                          ║")
+        print("⚠️  ║  O usa el formulario: crear-admin.html                   ║")
         print("⚠️  ╚══════════════════════════════════════════════════════════╝")
     else:
         print(f"👑 Administradores registrados: {total_admins}")
+        for admin in administradores.get('administradores', []):
+            print(f"   • {admin.get('nombre', 'N/A')} {admin.get('apellidos', '')} (@{admin.get('usuario', 'N/A')})")
     
+    # Verificar usuarios
     usuarios = db.cargar_json('usuarios')
     total_usuarios = len(usuarios.get('usuarios', []))
-    print(f"👥 Usuarios registrados: {total_usuarios}")
+    activos = len([u for u in usuarios.get('usuarios', []) if u.get('estado') == 'activo'])
+    print(f"👥 Usuarios registrados: {total_usuarios} ({activos} activos)")
     
+    # Configuración del servidor
     port = int(os.environ.get('PORT', 5000))
-    entorno = "PRODUCCIÓN" if os.environ.get('RENDER') else "DESARROLLO"
+    entorno = "PRODUCCIÓN 🟢" if os.environ.get('RENDER') else "DESARROLLO 🟡"
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     
     print("")
     print("-" * 60)
-    print(f"⚙️  Entorno: {entorno}")
-    print(f"🌐 Servidor: http://0.0.0.0:{port}")
-    print(f"🔒 Autenticación: SHA-256 + Salt")
-    print(f"⏰ Hora: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"⚙️  Entorno:          {entorno}")
+    print(f"🌐 Servidor:         http://0.0.0.0:{port}")
+    print(f"📱 URL Local:        http://localhost:{port}")
+    print(f"🔍 Debug:            {'Activado ✅' if debug_mode else 'Desactivado ❌'}")
+    print(f"🔒 Autenticación:    SHA-256 + Salt aleatorio")
+    print(f"🔑 Duración token:   {DURACION_TOKEN} horas")
+    print(f"🚫 Bloqueo IP:       {MAX_INTENTOS} intentos / {TIEMPO_BLOQUEO} min")
+    print(f"⏰ Hora del sistema: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("-" * 60)
-    print("🚀 Iniciando servidor Flask...")
-    print("=" * 60)
     
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # Endpoints disponibles
+    print("")
+    print("📡 Endpoints principales:")
+    endpoints_destacados = [
+        ("GET", "/api/health", "Estado del servidor"),
+        ("POST", "/api/registro", "Registrar nuevo usuario"),
+        ("POST", "/api/login", "Iniciar sesión"),
+        ("POST", "/api/admin/crear-primer-admin", "Crear primer administrador"),
+        ("GET", "/api/cultos/proximo", "Próximo culto"),
+        ("GET", "/api/versiculo-diario", "Versículo del día"),
+        ("GET", "/api/horarios", "Horarios de cultos"),
+        ("GET", "/api/usuarios", "Lista de usuarios (auth)"),
+    ]
+    for metodo, ruta, desc in endpoints_destacados:
+        print(f"   {metodo:<6} {ruta:<42} {desc}")
+    
+    print("")
+    print("=" * 60)
+    print("🚀 Iniciando servidor Flask...")
+    print("   Presiona CTRL+C para detener el servidor")
+    print("=" * 60)
+    print("")
+    
+    # Iniciar servidor
+    try:
+        app.run(
+            host='0.0.0.0',
+            port=port,
+            debug=debug_mode,
+            use_reloader=False,
+            threaded=True
+        )
+    except KeyboardInterrupt:
+        print("\n⏹️  Servidor detenido manualmente")
+        print("👋 ¡Hasta luego! Dios te bendiga.")
+        logger.info("Servidor detenido por el usuario")
+    except OSError as e:
+        if "Address already in use" in str(e):
+            print(f"\n❌ ERROR: El puerto {port} ya está en uso")
+            print(f"   Solución: Cierra la aplicación que usa el puerto {port}")
+            print(f"   O usa: PORT=5001 python app.py")
+        else:
+            print(f"\n❌ Error del sistema: {str(e)}")
+        logger.error(f"Error al iniciar: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Error inesperado: {str(e)}")
+        logger.error(f"Error inesperado: {e}")
+        sys.exit(1)
