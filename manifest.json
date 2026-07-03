@@ -102,9 +102,9 @@
     
     "shortcuts": [
         {
-            "name": "📖 Inicio",
+            "name": "Inicio",
             "short_name": "Inicio",
-            "description": "Ir a la página principal",
+            "description": "Ir a la página principal de IPUC LA FONDA",
             "url": "/#inicio",
             "icons": [
                 {
@@ -115,7 +115,7 @@
             ]
         },
         {
-            "name": "✅ Confirmar Asistencia",
+            "name": "Confirmar Asistencia",
             "short_name": "Asistencia",
             "description": "Confirmar tu asistencia al próximo culto",
             "url": "/#asistencia",
@@ -128,7 +128,7 @@
             ]
         },
         {
-            "name": "📅 Horarios de Cultos",
+            "name": "Horarios de Cultos",
             "short_name": "Horarios",
             "description": "Ver los horarios de cultos semanales",
             "url": "/#horarios",
@@ -141,7 +141,7 @@
             ]
         },
         {
-            "name": "🙏 Devocional Diario",
+            "name": "Devocional Diario",
             "short_name": "Devocional",
             "description": "Leer el devocional y versículo del día",
             "url": "/#devocional",
