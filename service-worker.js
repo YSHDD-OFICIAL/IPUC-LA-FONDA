@@ -14,6 +14,8 @@ const PRECACHE_ASSETS = [
     '/styles.css',
     '/script.js',
     '/manifest.json',
+    // Otros recursos
+    '/administradores.json
     '/ipuclafonda.png',
     '/favicon.ico',
     
