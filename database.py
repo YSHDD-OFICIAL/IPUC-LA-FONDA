@@ -47,10 +47,10 @@ class Database:
             data_dir (str): Directorio donde se almacenan los archivos JSON
         """
         self.data_dir = data_dir
-        self.lock = threading.RLock()  # Bloqueo reentrante para thread-safety
-        self.cache = {}                # Caché en memoria
-        self.cache_timeout = 300       # Tiempo de vida de caché en segundos
-        self.last_cache_update = {}    # Timestamp de última actualización
+        self.lock = threading.RLock()
+        self.cache = {}
+        self.cache_timeout = 300
+        self.last_cache_update = {}
         self._asegurar_directorios()
     
     # ============================================
@@ -95,7 +95,6 @@ class Database:
         Returns:
             dict: Datos del archivo JSON o dict vacío si no existe
         """
-        # Verificar caché primero
         if usar_cache and nombre_archivo in self.cache:
             if nombre_archivo in self.last_cache_update:
                 tiempo_cache = datetime.now().timestamp() - self.last_cache_update[nombre_archivo]
@@ -113,7 +112,6 @@ class Database:
                 with open(ruta, 'r', encoding='utf-8') as f:
                     datos = json.load(f)
                 
-                # Actualizar caché
                 if usar_cache:
                     self.cache[nombre_archivo] = datos.copy()
                     self.last_cache_update[nombre_archivo] = datetime.now().timestamp()
@@ -146,19 +144,15 @@ class Database:
             if not isinstance(datos, dict):
                 raise ValueError("Los datos deben ser un diccionario")
             
-            # Crear backup antes de sobrescribir
             if os.path.exists(ruta):
                 self._crear_backup(nombre_archivo)
             
-            # Guardar en archivo temporal primero (escritura atómica)
             with self.lock:
                 with open(temp_ruta, 'w', encoding='utf-8') as f:
                     json.dump(datos, f, indent=2, ensure_ascii=False, sort_keys=True)
                 
-                # Mover archivo temporal al definitivo
                 shutil.move(temp_ruta, ruta)
             
-            # Actualizar caché
             if actualizar_cache:
                 self.cache[nombre_archivo] = datos.copy()
                 self.last_cache_update[nombre_archivo] = datetime.now().timestamp()
@@ -176,12 +170,7 @@ class Database:
     # SISTEMA DE BACKUPS
     # ============================================
     def _crear_backup(self, nombre_archivo):
-        """
-        Crea un respaldo de un archivo específico.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo a respaldar
-        """
+        """Crea un respaldo de un archivo específico"""
         try:
             backup_dir = os.path.join(self.data_dir, 'backups')
             if not os.path.exists(backup_dir):
@@ -199,13 +188,7 @@ class Database:
             logger.warning(f"⚠️ Error al crear backup de {nombre_archivo}: {str(e)}")
     
     def _limpiar_backups_antiguos(self, nombre_archivo, max_backups=10):
-        """
-        Elimina backups antiguos manteniendo solo los más recientes.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo
-            max_backups (int): Número máximo de backups a mantener
-        """
+        """Elimina backups antiguos manteniendo solo los más recientes"""
         backup_dir = os.path.join(self.data_dir, 'backups')
         if not os.path.exists(backup_dir):
             return
@@ -222,15 +205,7 @@ class Database:
                 logger.info(f"🗑️ Backup eliminado: {backup_antiguo}")
     
     def _recuperar_desde_backup(self, nombre_archivo):
-        """
-        Intenta recuperar datos desde el backup más reciente.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo a recuperar
-            
-        Returns:
-            dict: Datos recuperados o dict vacío si no hay backup
-        """
+        """Intenta recuperar datos desde el backup más reciente"""
         backup_dir = os.path.join(self.data_dir, 'backups')
         if not os.path.exists(backup_dir):
             return {}
@@ -256,12 +231,7 @@ class Database:
         return {}
     
     def hacer_backup_completo(self):
-        """
-        Crea un respaldo completo de toda la base de datos.
-        
-        Returns:
-            str: Ruta del directorio de backup o None si falló
-        """
+        """Crea un respaldo completo de toda la base de datos"""
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         backup_dir = os.path.join(self.data_dir, 'backups', 'completos', f"completo_{timestamp}")
         
@@ -276,7 +246,6 @@ class Database:
                     shutil.copy2(ruta_original, ruta_backup)
                     archivos_respaldados += 1
             
-            # Guardar metadatos del backup
             metadata = {
                 "fecha_backup": datetime.now().isoformat(),
                 "archivos_respaldados": archivos_respaldados,
@@ -289,7 +258,6 @@ class Database:
             with open(os.path.join(backup_dir, 'metadata.json'), 'w', encoding='utf-8') as f:
                 json.dump(metadata, f, indent=2, ensure_ascii=False)
             
-            # Limpiar backups antiguos (mantener solo 10)
             backups_dir = os.path.join(self.data_dir, 'backups', 'completos')
             backups = sorted([
                 d for d in os.listdir(backups_dir)
@@ -439,7 +407,6 @@ class Database:
         
         logger.info(f"🎉 Inicialización completada. {archivos_creados} archivos nuevos creados.")
         
-        # Advertencia de seguridad
         logger.warning("=" * 60)
         logger.warning("⚠️  IMPORTANTE: No se han creado credenciales por defecto")
         logger.warning("⚠️  El sistema NO tiene usuarios ni administradores predefinidos")
@@ -451,15 +418,7 @@ class Database:
     # CREACIÓN DE ADMINISTRADOR
     # ============================================
     def _hash_contraseña_seguro(self, contraseña):
-        """
-        Hashea una contraseña de manera segura con salt aleatorio.
-        
-        Args:
-            contraseña (str): Contraseña en texto plano
-            
-        Returns:
-            str: Hash de la contraseña
-        """
+        """Hashea una contraseña de manera segura con salt aleatorio"""
         salt = secrets.token_hex(16)
         return hashlib.sha256((contraseña + salt).encode()).hexdigest()
     
@@ -469,29 +428,25 @@ class Database:
         Solo funciona si NO existe ningún administrador previo.
         
         Args:
-            datos_admin (dict): Datos del administrador con nombre, apellidos, correo, usuario, password
+            datos_admin (dict): Datos del administrador
             
         Returns:
-            bool: True si se creó correctamente, False en caso contrario
+            bool: True si se creó correctamente
         """
         try:
-            # Verificar que no exista ningún administrador
             admins = self.cargar_json('administradores')
             if admins.get('administradores', []):
                 logger.warning("⚠️ Ya existe al menos un administrador en el sistema")
                 return False
             
-            # Validar campos requeridos
             campos_requeridos = ['nombre', 'apellidos', 'correo', 'usuario', 'password']
             for campo in campos_requeridos:
                 if campo not in datos_admin or not datos_admin[campo]:
                     logger.error(f"❌ Campo requerido faltante: {campo}")
                     return False
             
-            # Hashear contraseña
             password_hash = self._hash_contraseña_seguro(datos_admin['password'])
             
-            # Crear objeto administrador
             admin = {
                 "id": 1,
                 "nombre": datos_admin['nombre'].strip(),
@@ -516,19 +471,15 @@ class Database:
                 "bloqueado_hasta": None
             }
             
-            # Guardar administrador
             admins['administradores'].append(admin)
             admins['ultimo_id'] = 1
             
             if self.guardar_json('administradores', admins):
-                # Actualizar configuración
                 config = self.cargar_json('configuracion')
                 config['aplicacion']['primer_administrador_creado'] = True
                 self.guardar_json('configuracion', config)
-                
                 logger.info(f"✅ Primer administrador creado exitosamente: {admin['usuario']}")
                 return True
-            
             return False
             
         except Exception as e:
@@ -539,15 +490,7 @@ class Database:
     # MANTENIMIENTO Y UTILIDADES
     # ============================================
     def optimizar_json(self, nombre_archivo):
-        """
-        Optimiza y limpia un archivo JSON.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo a optimizar
-            
-        Returns:
-            bool: True si se optimizó correctamente
-        """
+        """Optimiza y limpia un archivo JSON"""
         try:
             datos = self.cargar_json(nombre_archivo)
             if datos:
@@ -559,7 +502,7 @@ class Database:
             return False
     
     def _limpiar_datos_vacios(self, datos):
-        """Limpia recursivamente valores vacíos de un diccionario o lista"""
+        """Limpia recursivamente valores vacíos"""
         if isinstance(datos, dict):
             return {
                 k: v for k, v in (
@@ -575,12 +518,7 @@ class Database:
         return datos
     
     def obtener_estadisticas_db(self):
-        """
-        Obtiene estadísticas de la base de datos.
-        
-        Returns:
-            dict: Estadísticas de archivos y backups
-        """
+        """Obtiene estadísticas de la base de datos"""
         stats = {
             "total_archivos": 0,
             "tamaño_total_kb": 0,
@@ -612,15 +550,7 @@ class Database:
         return stats
     
     def reparar_json(self, nombre_archivo):
-        """
-        Intenta reparar un archivo JSON corrupto.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo a reparar
-            
-        Returns:
-            tuple: (bool, str) - Éxito y mensaje descriptivo
-        """
+        """Intenta reparar un archivo JSON corrupto"""
         ruta = os.path.join(self.data_dir, f"{nombre_archivo}.json")
         if not os.path.exists(ruta):
             return False, "Archivo no encontrado"
@@ -649,16 +579,7 @@ class Database:
     # GESTIÓN DE IDs
     # ============================================
     def get_ultimo_id(self, nombre_archivo, campo_id="id"):
-        """
-        Obtiene el último ID usado en un archivo.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo
-            campo_id (str): Nombre del campo ID
-            
-        Returns:
-            int: Último ID encontrado o 0
-        """
+        """Obtiene el último ID usado en un archivo"""
         datos = self.cargar_json(nombre_archivo)
         for key, value in datos.items():
             if isinstance(value, list):
@@ -669,31 +590,12 @@ class Database:
         return 0
     
     def generar_nuevo_id(self, nombre_archivo, campo_id="id"):
-        """
-        Genera un nuevo ID único para un archivo.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo
-            campo_id (str): Nombre del campo ID
-            
-        Returns:
-            int: Nuevo ID único
-        """
+        """Genera un nuevo ID único para un archivo"""
         ultimo_id = self.get_ultimo_id(nombre_archivo, campo_id)
         return ultimo_id + 1
     
     def agregar_registro(self, nombre_archivo, registro, campo_id="id"):
-        """
-        Agrega un nuevo registro a un archivo JSON.
-        
-        Args:
-            nombre_archivo (str): Nombre del archivo
-            registro (dict): Datos del registro a agregar
-            campo_id (str): Nombre del campo ID
-            
-        Returns:
-            bool: True si se agregó correctamente
-        """
+        """Agrega un nuevo registro a un archivo JSON"""
         try:
             datos = self.cargar_json(nombre_archivo)
             for key, value in datos.items():
@@ -708,7 +610,6 @@ class Database:
                             registro[campo_id] = max(ids_existentes) + 1
                         value.append(registro)
                         return self.guardar_json(nombre_archivo, datos)
-            # Si no encontró lista con diccionarios, agregar al primer array
             for key in datos.keys():
                 if isinstance(datos[key], list):
                     datos[key].append(registro)
@@ -747,11 +648,5 @@ if __name__ == "__main__":
     print("     Abre crear-admin.html en tu navegador")
     print("")
     print("   Opción 3: Usar Python directamente")
-    print("     db.crear_primer_administrador({")
-    print("         'nombre': 'Admin',")
-    print("         'apellidos': 'Principal',")
-    print("         'correo': 'admin@ipuclafonda.org',")
-    print("         'usuario': 'admin',")
-    print("         'password': 'ContraseñaSegura123'")
-    print("     })")
+    print("     db.crear_primer_administrador({...})")
     print("=" * 60)
