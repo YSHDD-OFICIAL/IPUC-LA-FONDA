@@ -5,844 +5,239 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="robots" content="noindex, nofollow">
-    
     <title>IPUC LA FONDA - Crear Primer Administrador</title>
-    
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
-    
     <style>
         :root {
-            --azul-primario: #1a237e;
-            --azul-claro: #283593;
-            --azul-hover: #3949ab;
-            --blanco: #ffffff;
-            --dorado: #ffd700;
-            --dorado-oscuro: #ffc107;
-            --gris-claro: #f5f5f5;
-            --gris-medio: #e0e0e0;
-            --gris-oscuro: #333333;
-            --gris-texto: #666666;
-            --exito: #4caf50;
-            --error: #f44336;
-            --advertencia: #ff9800;
-            --info: #2196f3;
-            --borde-radius: 16px;
-            --borde-radius-sm: 8px;
-            --sombra-suave: 0 2px 8px rgba(0,0,0,0.08);
-            --sombra-media: 0 4px 16px rgba(0,0,0,0.12);
+            --azul-primario: #1a237e; --azul-hover: #3949ab; --blanco: #ffffff;
+            --dorado: #ffd700; --gris-claro: #f5f5f5; --gris-medio: #e0e0e0;
+            --gris-oscuro: #333333; --gris-texto: #666666;
+            --exito: #4caf50; --error: #f44336; --advertencia: #ff9800; --info: #2196f3;
+            --borde-radius: 16px; --borde-radius-sm: 8px;
             --sombra-fuerte: 0 8px 32px rgba(0,0,0,0.16);
-            --sombra-azul: 0 4px 20px rgba(26, 35, 126, 0.2);
-            --font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             --transition-fast: 0.15s ease;
-            --transition-normal: 0.3s ease;
         }
-
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: var(--font-family);
             background: linear-gradient(135deg, #0d1b5e 0%, var(--azul-primario) 50%, #1a237e 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 20px; -webkit-font-smoothing: antialiased;
         }
-
         .background-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            background:
-                radial-gradient(2px 2px at 20% 30%, rgba(255,215,0,0.3), transparent),
-                radial-gradient(2px 2px at 40% 70%, rgba(255,215,0,0.2), transparent),
-                radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.3), transparent),
-                radial-gradient(2px 2px at 80% 50%, rgba(255,215,0,0.2), transparent),
-                radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.2), transparent);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+            background: radial-gradient(2px 2px at 20% 30%, rgba(255,215,0,0.3), transparent),
+                        radial-gradient(2px 2px at 40% 70%, rgba(255,215,0,0.2), transparent);
             animation: particlesFloat 8s ease-in-out infinite;
         }
-
-        @keyframes particlesFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 520px;
-        }
-
+        @keyframes particlesFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 520px; }
         .card {
-            background: rgba(255, 255, 255, 0.97);
-            border-radius: var(--borde-radius);
-            padding: 40px 32px;
-            box-shadow: var(--sombra-fuerte);
-            animation: slideUp 0.5s ease;
+            background: rgba(255,255,255,0.97); border-radius: var(--borde-radius);
+            padding: 40px 32px; box-shadow: var(--sombra-fuerte); animation: slideUp 0.5s ease;
         }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .logo-container {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 16px;
-            position: relative;
-        }
-
-        .logo-ring {
-            position: absolute;
-            top: -8px;
-            left: -8px;
-            width: 106px;
-            height: 106px;
-            border: 3px solid transparent;
-            border-top-color: var(--dorado);
-            border-right-color: var(--dorado);
-            border-radius: 50%;
-            animation: ringSpin 3s linear infinite;
-        }
-
-        @keyframes ringSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .logo-img {
-            width: 90px;
-            height: 90px;
-            object-fit: contain;
-            border-radius: 50%;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            color: var(--azul-primario);
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .header .subtitle {
-            font-size: 0.9rem;
-            color: var(--gris-texto);
-            margin-bottom: 4px;
-        }
-
-        .header .badge {
-            display: inline-block;
-            background: var(--azul-primario);
-            color: var(--blanco);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .alert {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 14px 16px;
-            border-radius: var(--borde-radius-sm);
-            margin-bottom: 24px;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
-        .alert-warning {
-            background: #fff3e0;
-            border-left: 4px solid var(--advertencia);
-            color: #e65100;
-        }
-
-        .alert i {
-            font-size: 1.4rem;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .form-section {
-            margin-bottom: 24px;
-        }
-
-        .form-section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--gris-texto);
-            font-weight: 700;
-            margin-bottom: 12px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--gris-medio);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--gris-oscuro);
-        }
-
-        .form-group label .required {
-            color: var(--error);
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gris-texto);
-            font-size: 1.2rem;
-            z-index: 1;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 11px 14px 11px 42px;
-            border: 2px solid var(--gris-medio);
-            border-radius: var(--borde-radius-sm);
-            font-size: 0.9rem;
-            font-family: var(--font-family);
-            background: var(--blanco);
-            color: var(--gris-oscuro);
-            transition: all var(--transition-fast);
-        }
-
-        .form-input.no-icon {
-            padding-left: 14px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--azul-primario);
-            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
-        }
-
-        .form-input.error {
-            border-color: var(--error);
-            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
-        }
-
-        .form-input::placeholder {
-            color: #aaa;
-        }
-
-        .input-hint {
-            font-size: 0.7rem;
-            color: var(--gris-texto);
-            margin-top: 4px;
-        }
-
-        .api-url-group {
-            background: var(--gris-claro);
-            padding: 14px 16px;
-            border-radius: var(--borde-radius-sm);
-            margin-bottom: 20px;
-        }
-
-        .api-url-group label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--gris-oscuro);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .api-url-display {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--blanco);
-            padding: 10px 14px;
-            border-radius: var(--borde-radius-sm);
-            border: 1px solid var(--gris-medio);
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            color: var(--gris-oscuro);
-            word-break: break-all;
-        }
-
-        .api-url-display i {
-            color: var(--azul-primario);
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px 24px;
-            background: var(--azul-primario);
-            color: var(--blanco);
-            border: none;
-            border-radius: var(--borde-radius);
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: var(--sombra-azul);
-            letter-spacing: 0.5px;
-        }
-
-        .btn-submit:hover {
-            background: var(--azul-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(26, 35, 126, 0.3);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            background: var(--gris-medio);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-submit .spinner {
-            display: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: var(--blanco);
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        .btn-submit.loading .spinner {
-            display: inline-block;
-        }
-
-        .btn-submit.loading .btn-text {
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .resultado {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: var(--borde-radius-sm);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .resultado.show {
-            display: block;
-        }
-
-        .resultado.success {
-            background: #e8f5e9;
-            border-left: 4px solid var(--exito);
-            color: #2e7d32;
-        }
-
-        .resultado.error {
-            background: #ffebee;
-            border-left: 4px solid var(--error);
-            color: #c62828;
-        }
-
-        .resultado.info {
-            background: #e3f2fd;
-            border-left: 4px solid var(--info);
-            color: #1565c0;
-        }
-
-        .resultado .resultado-icon {
-            font-size: 1.5rem;
-            margin-bottom: 4px;
-        }
-
-        .resultado .credenciales-box {
-            background: rgba(0,0,0,0.05);
-            padding: 10px 14px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.8rem;
-        }
-
-        .footer a {
-            color: var(--dorado);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            .card {
-                padding: 28px 20px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .header h1 {
-                font-size: 1.3rem;
-            }
-            .logo-container {
-                width: 70px;
-                height: 70px;
-            }
-            .logo-ring {
-                width: 86px;
-                height: 86px;
-                top: -6px;
-                left: -6px;
-            }
-            .logo-img {
-                width: 70px;
-                height: 70px;
-            }
-        }
+        @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+        .header { text-align: center; margin-bottom: 32px; }
+        .logo-img { width: 90px; height: 90px; object-fit: contain; border-radius: 50%; margin: 0 auto 16px; }
+        .header h1 { font-size: 1.5rem; color: var(--azul-primario); font-weight: 800; margin-bottom: 4px; }
+        .header .subtitle { font-size: 0.9rem; color: var(--gris-texto); }
+        .header .badge { display: inline-block; background: var(--azul-primario); color: var(--blanco); padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-top: 8px; }
+        .alert { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: var(--borde-radius-sm); margin-bottom: 24px; font-size: 0.85rem; line-height: 1.5; background: #e3f2fd; border-left: 4px solid var(--info); color: #1565c0; }
+        .alert i { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+        .form-section { margin-bottom: 24px; }
+        .form-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gris-texto); font-weight: 700; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--gris-medio); display: flex; align-items: center; gap: 6px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85rem; color: var(--gris-oscuro); }
+        .form-group label .required { color: var(--error); }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gris-texto); font-size: 1.2rem; z-index: 1; }
+        .form-input { width: 100%; padding: 11px 14px 11px 42px; border: 2px solid var(--gris-medio); border-radius: var(--borde-radius-sm); font-size: 0.9rem; font-family: var(--font-family); background: var(--blanco); color: var(--gris-oscuro); transition: all var(--transition-fast); }
+        .form-input:focus { outline: none; border-color: var(--azul-primario); box-shadow: 0 0 0 3px rgba(26,35,126,0.1); }
+        .form-input::placeholder { color: #aaa; }
+        .input-hint { font-size: 0.7rem; color: var(--gris-texto); margin-top: 4px; }
+        .btn-submit { width: 100%; padding: 14px 24px; background: var(--azul-primario); color: var(--blanco); border: none; border-radius: var(--borde-radius); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all var(--transition-fast); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 20px rgba(26,35,126,0.2); }
+        .btn-submit:hover { background: var(--azul-hover); transform: translateY(-2px); }
+        .btn-submit:disabled { background: var(--gris-medio); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-submit .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--blanco); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .btn-submit.loading .spinner { display: inline-block; }
+        .btn-submit.loading .btn-text { display: none; }
+        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .resultado { margin-top: 20px; padding: 16px; border-radius: var(--borde-radius-sm); font-size: 0.9rem; line-height: 1.6; display: none; animation: fadeIn 0.3s ease; }
+        .resultado.show { display: block; }
+        .resultado.success { background: #e8f5e9; border-left: 4px solid var(--exito); color: #2e7d32; }
+        .resultado.error { background: #ffebee; border-left: 4px solid var(--error); color: #c62828; }
+        .resultado .credenciales-box { background: rgba(0,0,0,0.05); padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 0.85rem; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .footer { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
+        .footer a { color: var(--dorado); text-decoration: none; font-weight: 500; }
+        @media (max-width: 600px) { .card { padding: 28px 20px; } .form-grid { grid-template-columns: 1fr; } .header h1 { font-size: 1.3rem; } .logo-img { width: 70px; height: 70px; } }
     </style>
 </head>
 <body>
-
     <div class="background-particles"></div>
-
     <div class="container">
-        
         <div class="card">
-            
             <div class="header">
-                <div class="logo-container">
-                    <div class="logo-ring"></div>
-                    <img src="https://ipuclafonda.netlify.app/ipuclafonda.png" 
-                         alt="IPUC LA FONDA" 
-                         class="logo-img"
-                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2290%22 height=%2290%22><rect fill=%22%231a237e%22 width=%2290%22 height=%2290%22 rx=%2245%22/><text fill=%22%23ffd700%22 x=%2245%22 y=%2255%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22>IP</text></svg>'">
-                </div>
+                <img src="https://ipuclafonda.netlify.app/ipuclafonda.png" alt="IPUC LA FONDA" class="logo-img"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2290%22 height=%2290%22><rect fill=%22%231a237e%22 width=%2290%22 height=%2290%22 rx=%2245%22/><text fill=%22%23ffd700%22 x=%2245%22 y=%2255%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22>IP</text></svg>'">
                 <h1>IPUC LA FONDA</h1>
                 <p class="subtitle">Configuración Inicial del Sistema</p>
-                <span class="badge">
-                    <i class="bx bx-shield-quarter"></i> Primer Administrador
-                </span>
+                <span class="badge"><i class="bx bx-shield-quarter"></i> Primer Administrador</span>
             </div>
 
-            <div class="alert alert-warning">
-                <i class="bx bx-shield-x"></i>
+            <div class="alert">
+                <i class="bx bx-info-circle"></i>
                 <div>
-                    <strong>¡Importante!</strong> Esta página solo funciona si <strong>no existe ningún administrador</strong> en el sistema. 
-                    Una vez creado el primer administrador, esta función se deshabilitará automáticamente por seguridad.
+                    <strong>Modo Offline</strong><br>
+                    Los datos se guardarán en el localStorage de este navegador.
+                    Usa este mismo navegador para iniciar sesión después.
                 </div>
             </div>
 
             <form id="formAdmin" autocomplete="off">
-                
                 <div class="form-section">
-                    <div class="form-section-title">
-                        <i class="bx bx-user"></i> Información Personal
-                    </div>
-                    
+                    <div class="form-section-title"><i class="bx bx-user"></i> Información Personal</div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="nombre">Nombre <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-user"></i>
-                                <input type="text" class="form-input" id="nombre" name="nombre" 
-                                       placeholder="Ej: Juan" required autocomplete="off">
-                            </div>
+                            <div class="input-wrapper"><i class="bx bx-user"></i><input type="text" class="form-input" id="nombre" name="nombre" placeholder="Ej: LUIS ESTEBAN" required autocomplete="off"></div>
                         </div>
-                        
                         <div class="form-group">
                             <label for="apellidos">Apellidos <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-user-pin"></i>
-                                <input type="text" class="form-input" id="apellidos" name="apellidos" 
-                                       placeholder="Ej: Pérez García" required autocomplete="off">
-                            </div>
+                            <div class="input-wrapper"><i class="bx bx-user-pin"></i><input type="text" class="form-input" id="apellidos" name="apellidos" placeholder="Ej: POTOSI VENTE" required autocomplete="off"></div>
                         </div>
                     </div>
-                    
                     <div class="form-group">
                         <label for="correo">Correo Electrónico <span class="required">*</span></label>
-                        <div class="input-wrapper">
-                            <i class="bx bx-envelope"></i>
-                            <input type="email" class="form-input" id="correo" name="correo" 
-                                   placeholder="admin@ipuclafonda.org" required autocomplete="off">
-                        </div>
+                        <div class="input-wrapper"><i class="bx bx-envelope"></i><input type="email" class="form-input" id="correo" name="correo" placeholder="estebanpotosi2005@gmail.com" required autocomplete="off"></div>
                     </div>
-                    
                     <div class="form-group">
                         <label for="celular">Celular</label>
-                        <div class="input-wrapper">
-                            <i class="bx bx-phone"></i>
-                            <input type="tel" class="form-input" id="celular" name="celular" 
-                                   placeholder="3001234567" autocomplete="off">
-                        </div>
+                        <div class="input-wrapper"><i class="bx bx-phone"></i><input type="tel" class="form-input" id="celular" name="celular" placeholder="3128813818" autocomplete="off"></div>
                     </div>
                 </div>
 
                 <div class="form-section">
-                    <div class="form-section-title">
-                        <i class="bx bx-key"></i> Credenciales de Acceso
-                    </div>
-                    
+                    <div class="form-section-title"><i class="bx bx-key"></i> Credenciales de Acceso</div>
                     <div class="form-group">
                         <label for="usuario">Nombre de Usuario <span class="required">*</span></label>
-                        <div class="input-wrapper">
-                            <i class="bx bx-at"></i>
-                            <input type="text" class="form-input" id="usuario" name="usuario" 
-                                   placeholder="admin" required autocomplete="off" 
-                                   pattern="[a-zA-Z0-9_]{3,20}" 
-                                   title="Solo letras, números y guiones bajos. Mínimo 3 caracteres.">
-                        </div>
+                        <div class="input-wrapper"><i class="bx bx-at"></i><input type="text" class="form-input" id="usuario" name="usuario" placeholder="admin" required autocomplete="off" pattern="[a-zA-Z0-9_]{3,20}"></div>
                         <p class="input-hint">Solo letras, números y guiones bajos. Mínimo 3 caracteres.</p>
                     </div>
-                    
                     <div class="form-group">
                         <label for="password">Contraseña <span class="required">*</span></label>
                         <div class="input-wrapper">
                             <i class="bx bx-lock-alt"></i>
-                            <input type="password" class="form-input" id="password" name="password" 
-                                   placeholder="Mínimo 8 caracteres" required 
-                                   minlength="8" autocomplete="new-password">
-                            <i class="bx bx-show" id="togglePassword" 
-                               style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--gris-texto); z-index: 1;"
-                               onclick="togglePasswordVisibility()"></i>
+                            <input type="password" class="form-input" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+                            <i class="bx bx-show" id="togglePassword" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--gris-texto);z-index:1;" onclick="togglePasswordVisibility()"></i>
                         </div>
-                        <p class="input-hint">Mínimo 8 caracteres. Usa mayúsculas, números y símbolos para mayor seguridad.</p>
+                        <p class="input-hint">Mínimo 6 caracteres.</p>
                     </div>
-                    
                     <div class="form-group">
                         <label for="confirmarPassword">Confirmar Contraseña <span class="required">*</span></label>
-                        <div class="input-wrapper">
-                            <i class="bx bx-lock-alt"></i>
-                            <input type="password" class="form-input" id="confirmarPassword" name="confirmarPassword" 
-                                   placeholder="Repite la contraseña" required 
-                                   minlength="8" autocomplete="new-password">
-                        </div>
+                        <div class="input-wrapper"><i class="bx bx-lock-alt"></i><input type="password" class="form-input" id="confirmarPassword" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="6" autocomplete="new-password"></div>
                     </div>
-                </div>
-
-                <div class="api-url-group">
-                    <label>
-                        <i class="bx bx-link"></i> URL del Endpoint API
-                    </label>
-                    <div class="api-url-display">
-                        <i class="bx bx-server"></i>
-                        <span id="apiUrlDisplay">http://localhost:5000/api/admin/crear-primer-admin</span>
-                    </div>
-                    <p class="input-hint" style="margin-top: 6px;">
-                        Esta es la URL donde se enviará la solicitud. Asegúrate de que el backend esté activo.
-                    </p>
                 </div>
 
                 <button type="submit" class="btn-submit" id="btnSubmit">
-                    <span class="btn-text">
-                        <i class="bx bx-user-plus"></i> Crear Administrador
-                    </span>
+                    <span class="btn-text"><i class="bx bx-user-plus"></i> Crear Administrador</span>
                     <span class="spinner"></span>
                 </button>
             </form>
-
             <div class="resultado" id="resultado"></div>
-
         </div>
-
         <div class="footer">
-            <p>IPUC LA FONDA v2.1.0 | 
-               <a href="https://ipuclafonda.netlify.app" target="_blank">Ir a la aplicación</a>
-            </p>
+            <p>IPUC LA FONDA v2.1.0 | <a href="https://ipuclafonda.netlify.app" target="_blank">Ir a la aplicación</a></p>
         </div>
-
     </div>
 
     <script>
         // ============================================
-        // CONFIGURACIÓN
+        // CONFIGURACIÓN - MODO OFFLINE
         // ============================================
-        const API_ENDPOINT = 'http://localhost:5000/api/admin/crear-primer-admin';
-        
-        // Mostrar la URL en el display
-        document.getElementById('apiUrlDisplay').textContent = API_ENDPOINT;
+        const STORAGE_KEY = 'ipuc_admin_local';
 
-        // ============================================
-        // TOGGLE VISIBILIDAD DE CONTRASEÑA
-        // ============================================
         function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('togglePassword');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'bx bx-hide';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'bx bx-show';
-            }
+            const input = document.getElementById('password');
+            const icon = document.getElementById('togglePassword');
+            if (input.type === 'password') { input.type = 'text'; icon.className = 'bx bx-hide'; }
+            else { input.type = 'password'; icon.className = 'bx bx-show'; }
         }
 
-        // ============================================
-        // VALIDACIÓN DE FORMULARIO
-        // ============================================
-        function validarFormulario(formData) {
-            const errores = [];
-            
-            if (!formData.nombre || formData.nombre.trim().length < 2) {
-                errores.push('El nombre debe tener al menos 2 caracteres');
-            }
-            
-            if (!formData.apellidos || formData.apellidos.trim().length < 2) {
-                errores.push('Los apellidos deben tener al menos 2 caracteres');
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(formData.correo)) {
-                errores.push('Ingresa un correo electrónico válido');
-            }
-            
-            const usuarioRegex = /^[a-zA-Z0-9_]{3,20}$/;
-            if (!usuarioRegex.test(formData.usuario)) {
-                errores.push('El usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)');
-            }
-            
-            if (formData.password.length < 8) {
-                errores.push('La contraseña debe tener al menos 8 caracteres');
-            }
-            
-            if (formData.password !== formData.confirmarPassword) {
-                errores.push('Las contraseñas no coinciden');
-            }
-            
-            return errores;
-        }
-
-        // ============================================
-        // MOSTRAR RESULTADO
-        // ============================================
-        function mostrarResultado(tipo, titulo, mensaje, credenciales = null) {
-            const resultadoDiv = document.getElementById('resultado');
-            
-            const iconos = {
-                success: 'bx bx-check-circle',
-                error: 'bx bx-error-circle',
-                info: 'bx bx-info-circle'
-            };
-            
-            let html = `
-                <div class="resultado-icon">
-                    <i class="${iconos[tipo] || iconos.info}"></i>
-                </div>
-                <strong>${titulo}</strong>
-                <p>${mensaje}</p>
-            `;
-            
+        function mostrarResultado(tipo, titulo, mensaje, credenciales) {
+            const div = document.getElementById('resultado');
+            div.className = `resultado show ${tipo}`;
+            let html = `<strong>${titulo}</strong><p>${mensaje}</p>`;
             if (credenciales) {
-                html += `
-                    <div class="credenciales-box">
-                        <strong>🔑 Credenciales creadas:</strong><br>
-                        Usuario: <strong>${credenciales.usuario}</strong><br>
-                        Contraseña: <strong>${credenciales.password}</strong>
-                    </div>
-                    <p style="margin-top: 8px; font-size: 0.85rem;">
-                        ⚠️ <strong>Guarda estas credenciales en un lugar seguro.</strong> 
-                        No podrás recuperarlas si las pierdes.
-                    </p>
-                `;
+                html += `<div class="credenciales-box"><strong>🔑 Credenciales:</strong><br>Usuario: <strong>${credenciales.usuario}</strong><br>Contraseña: <strong>${credenciales.password}</strong></div>
+                         <p style="margin-top:8px;font-size:0.85rem;">⚠️ <strong>Guarda estas credenciales.</strong></p>`;
             }
-            
-            resultadoDiv.className = `resultado show ${tipo}`;
-            resultadoDiv.innerHTML = html;
-            
-            resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            div.innerHTML = html;
+            div.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // ============================================
-        // MANEJAR ENVÍO DEL FORMULARIO
-        // ============================================
-        document.getElementById('formAdmin').addEventListener('submit', async function(e) {
+        document.getElementById('formAdmin').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const btnSubmit = document.getElementById('btnSubmit');
-            const resultadoDiv = document.getElementById('resultado');
-            
-            resultadoDiv.className = 'resultado';
-            resultadoDiv.innerHTML = '';
-            
-            const formData = new FormData(this);
+            const btn = document.getElementById('btnSubmit');
+            const div = document.getElementById('resultado');
+            div.className = 'resultado'; div.innerHTML = '';
+
             const datos = {
-                nombre: formData.get('nombre').trim(),
-                apellidos: formData.get('apellidos').trim(),
-                correo: formData.get('correo').trim().toLowerCase(),
-                celular: formData.get('celular').trim(),
-                usuario: formData.get('usuario').trim().toLowerCase(),
-                password: formData.get('password'),
-                confirmarPassword: formData.get('confirmarPassword')
+                nombre: document.getElementById('nombre').value.trim(),
+                apellidos: document.getElementById('apellidos').value.trim(),
+                correo: document.getElementById('correo').value.trim().toLowerCase(),
+                celular: document.getElementById('celular').value.trim(),
+                usuario: document.getElementById('usuario').value.trim().toLowerCase(),
+                password: document.getElementById('password').value,
+                confirmar: document.getElementById('confirmarPassword').value
             };
-            
-            const errores = validarFormulario(datos);
-            if (errores.length > 0) {
-                mostrarResultado('error', 'Error de validación', errores.join('<br>'));
-                return;
-            }
-            
-            const datosEnviar = { ...datos };
-            delete datosEnviar.confirmarPassword;
-            
-            btnSubmit.classList.add('loading');
-            btnSubmit.disabled = true;
-            
+
+            // Validaciones
+            if (!datos.nombre || datos.nombre.length < 2) return mostrarResultado('error', 'Error', 'Nombre debe tener al menos 2 caracteres');
+            if (!datos.apellidos || datos.apellidos.length < 2) return mostrarResultado('error', 'Error', 'Apellidos debe tener al menos 2 caracteres');
+            if (!datos.correo.includes('@') || !datos.correo.includes('.')) return mostrarResultado('error', 'Error', 'Ingresa un correo válido');
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(datos.usuario)) return mostrarResultado('error', 'Error', 'Usuario: solo letras, números y guiones (3-20 caracteres)');
+            if (datos.password.length < 6) return mostrarResultado('error', 'Error', 'Contraseña: mínimo 6 caracteres');
+            if (datos.password !== datos.confirmar) return mostrarResultado('error', 'Error', 'Las contraseñas no coinciden');
+
+            btn.classList.add('loading'); btn.disabled = true;
+
+            // Crear admin en localStorage
+            const admin = {
+                nombre: datos.nombre,
+                apellidos: datos.apellidos,
+                correo: datos.correo,
+                celular: datos.celular,
+                usuario: datos.usuario,
+                password: datos.password,
+                ministerio: 'Pastoral',
+                fecha_creacion: new Date().toISOString()
+            };
+
             try {
-                console.log('📤 Enviando solicitud a:', API_ENDPOINT);
-                console.log('📦 Datos:', { ...datosEnviar, password: '***' });
-                
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(datosEnviar)
-                });
-                
-                console.log('📥 Respuesta status:', response.status);
-                
-                const result = await response.json();
-                console.log('📥 Respuesta data:', result);
-                
-                if (response.ok) {
-                    mostrarResultado(
-                        'success',
-                        '✅ ¡Administrador creado exitosamente!',
-                        result.mensaje || 'El primer administrador ha sido creado correctamente.',
-                        { usuario: datos.usuario, password: datos.password }
-                    );
-                    
-                    document.getElementById('password').value = '';
-                    document.getElementById('confirmarPassword').value = '';
-                    
-                    btnSubmit.disabled = true;
-                    btnSubmit.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
-                    btnSubmit.style.background = 'var(--exito)';
-                    
-                } else if (response.status === 403) {
-                    mostrarResultado(
-                        'info',
-                        'ℹ️ Ya existe un administrador',
-                        result.error || 'Ya existe al menos un administrador en el sistema.',
-                        null
-                    );
-                    btnSubmit.disabled = true;
-                    btnSubmit.innerHTML = '<span class="btn-text"><i class="bx bx-lock"></i> Función Deshabilitada</span>';
-                    btnSubmit.style.background = 'var(--gris-medio)';
-                    
-                } else {
-                    mostrarResultado(
-                        'error',
-                        '❌ Error del servidor',
-                        result.error || `Error ${response.status}: No se pudo crear el administrador.`,
-                        null
-                    );
-                }
-                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(admin));
+                console.log('✅ Admin guardado en localStorage');
+
+                mostrarResultado('success', '✅ ¡Administrador creado!',
+                    'El administrador ha sido guardado en este navegador. Ahora puedes iniciar sesión en la aplicación.',
+                    { usuario: datos.usuario, password: datos.password });
+
+                document.getElementById('password').value = '';
+                document.getElementById('confirmarPassword').value = '';
+                btn.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
+                btn.style.background = 'var(--exito)';
             } catch (error) {
-                console.error('❌ Error de conexión:', error);
-                
-                mostrarResultado(
-                    'error',
-                    '❌ Error de Conexión',
-                    `
-                        <strong>No se pudo conectar con el servidor.</strong><br><br>
-                        <strong>Posibles causas:</strong><br>
-                        • El backend no está corriendo localmente<br>
-                        • La URL de la API es incorrecta<br>
-                        • Hay un problema de red<br><br>
-                        <strong>Soluciones:</strong><br>
-                        • Ejecuta <code>python app.py</code> en la carpeta del backend<br>
-                        • Verifica la URL: <code>${API_ENDPOINT}</code><br>
-                        • Asegúrate de que el puerto 5000 esté disponible
-                    `,
-                    null
-                );
-                
-            } finally {
-                btnSubmit.classList.remove('loading');
-                if (btnSubmit.disabled && !resultadoDiv.classList.contains('success') && !resultadoDiv.classList.contains('info')) {
-                    btnSubmit.disabled = false;
-                }
+                console.error('Error:', error);
+                mostrarResultado('error', '❌ Error', 'No se pudo guardar. Verifica que tu navegador permita localStorage.');
+                btn.classList.remove('loading'); btn.disabled = false;
             }
         });
 
-        console.log('✅ IPUC LA FONDA - Panel de Creación de Administrador cargado');
-        console.log('🔗 Endpoint API:', API_ENDPOINT);
-        console.log('⚠️  Esta página solo funciona si NO existe ningún administrador previo');
+        console.log('✅ IPUC LA FONDA - Creador de Admin OFFLINE cargado');
+        console.log('💾 Los datos se guardan en localStorage');
     </script>
 </body>
 </html>
