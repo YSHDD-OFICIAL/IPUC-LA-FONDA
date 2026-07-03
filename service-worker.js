@@ -8,22 +8,20 @@ const RUNTIME_CACHE = 'ipuc-runtime-v2.1.0';
 
 // Assets que se cachean al instalar (shell de la aplicación)
 const PRECACHE_ASSETS = [
+    // Páginas principales
     '/',
     '/index.html',
-    '/crear-admin.html',
+    
+    // Estilos y scripts
     '/styles.css',
     '/script.js',
+    
+    // PWA
     '/manifest.json',
-    // Otros recursos
-    '/administradores.json',
-    '/requirements.txt',
-    '/render.yaml',
+    
+    // Logos e imágenes principales
     '/ipuclafonda.png',
     '/favicon.ico',
-    '/generar_hash.py',
-    '/app.py',
-    '/database.py',
-    '/crear-admin.py',
     
     // Avatares
     '/assets/avatars/default.png',
@@ -135,7 +133,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
     
-    // No interceptar solicitudes a otros orígenes
+    // No interceptar archivos Python ni de configuración (no se sirven al cliente)
+    if (pathname.endsWith('.py') || pathname.endsWith('.json') && pathname.includes('/data/')) {
+        return;
+    }
+    
+    // No interceptar solicitudes a otros orígenes (excepto CDN de boxicons)
     if (url.origin !== self.location.origin && !url.href.includes('unpkg.com')) {
         return;
     }
@@ -220,43 +223,24 @@ self.addEventListener('push', (event) => {
     }
     
     const options = {
-        // Contenido
         body: data.mensaje,
         icon: data.icono || '/assets/icons/icon-192x192.png',
         badge: '/assets/icons/icon-192x192.png',
         image: data.imagen || undefined,
-        
-        // Comportamiento
         data: {
             url: data.url || '/',
             timestamp: Date.now(),
             notificationId: data.id || Date.now()
         },
-        
-        // Vibración y sonido
         vibrate: [100, 50, 100, 50, 100],
         silent: false,
-        
-        // Acciones
         actions: [
-            { 
-                action: 'open', 
-                title: '👁️ Ver', 
-                icon: '/assets/icons/icon-192x192.png' 
-            },
-            { 
-                action: 'close', 
-                title: '❌ Cerrar', 
-                icon: '/assets/icons/icon-192x192.png' 
-            }
+            { action: 'open', title: '👁️ Ver', icon: '/assets/icons/icon-192x192.png' },
+            { action: 'close', title: '❌ Cerrar', icon: '/assets/icons/icon-192x192.png' }
         ],
-        
-        // Configuración
         tag: `ipuc-notif-${data.id || Date.now()}`,
         renotify: true,
         requireInteraction: data.importante || false,
-        
-        // Timestamp
         timestamp: Date.now()
     };
     
@@ -270,39 +254,28 @@ self.addEventListener('push', (event) => {
 // ============================================
 self.addEventListener('notificationclick', (event) => {
     console.log('👆 Clic en notificación:', event.action);
-    
-    // Cerrar la notificación
     event.notification.close();
-    
-    // Si eligió cerrar, no hacer nada más
     if (event.action === 'close') return;
     
-    // URL a abrir
     const urlToOpen = event.notification.data?.url || '/';
     
     event.waitUntil(
-        clients.matchAll({ 
-            type: 'window', 
-            includeUncontrolled: true 
-        })
-        .then((windowClients) => {
-            // Buscar si ya existe una ventana con la URL
-            for (const client of windowClients) {
-                if (client.url.includes(urlToOpen) && 'focus' in client) {
-                    return client.focus().then(() => {
-                        client.postMessage({
-                            type: 'NOTIFICATION_CLICKED',
-                            data: event.notification.data
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then((windowClients) => {
+                for (const client of windowClients) {
+                    if (client.url.includes(urlToOpen) && 'focus' in client) {
+                        return client.focus().then(() => {
+                            client.postMessage({
+                                type: 'NOTIFICATION_CLICKED',
+                                data: event.notification.data
+                            });
                         });
-                    });
+                    }
                 }
-            }
-            
-            // Abrir nueva ventana si no existe
-            if (clients.openWindow) {
-                return clients.openWindow(urlToOpen);
-            }
-        })
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
+            })
     );
 });
 
@@ -316,25 +289,20 @@ self.addEventListener('sync', (event) => {
         case 'sync-asistencia':
             event.waitUntil(syncAsistencia());
             break;
-            
         case 'sync-mensajes':
             event.waitUntil(syncMensajes());
             break;
-            
         case 'sync-peticiones':
             event.waitUntil(syncPeticiones());
             break;
-            
         case 'sync-datos':
             event.waitUntil(syncDatosGenerales());
             break;
-            
         default:
             console.log('ℹ️ Tag de sync no reconocido:', event.tag);
     }
 });
 
-// Funciones de sincronización
 async function syncAsistencia() {
     try {
         console.log('✅ Sincronización de asistencia completada');
@@ -385,20 +353,17 @@ self.addEventListener('message', (event) => {
     
     switch (event.data.type) {
         case 'SKIP_WAITING':
-            // Forzar activación del nuevo SW
             self.skipWaiting();
             console.log('⏩ Saltando espera, nuevo SW activado');
             break;
             
         case 'CHECK_FOR_UPDATE':
-            // Verificar si hay actualizaciones
             self.registration.update().then(() => {
                 console.log('🔍 Verificación de actualización completada');
             });
             break;
             
         case 'GET_VERSION':
-            // Enviar versión al cliente
             if (event.ports && event.ports[0]) {
                 event.ports[0].postMessage({
                     version: '2.1.0',
@@ -408,7 +373,6 @@ self.addEventListener('message', (event) => {
             break;
             
         case 'CLEAR_CACHE':
-            // Limpiar todo el cache
             caches.keys().then((names) => {
                 return Promise.all(names.map((name) => caches.delete(name)));
             }).then(() => {
@@ -420,7 +384,6 @@ self.addEventListener('message', (event) => {
             break;
             
         case 'GET_CACHE_STATS':
-            // Obtener estadísticas del cache
             caches.open(CACHE_NAME).then((cache) => {
                 return cache.keys();
             }).then((keys) => {
