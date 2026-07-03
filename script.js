@@ -1,6 +1,6 @@
 // ============================================
 // IPUC LA FONDA - JAVASCRIPT PRO v2.1
-// Autenticación sin credenciales de prueba
+// Autenticación LOCAL sin backend externo
 // Todas las secciones, botones, enlaces y funciones 100% operativas
 // ============================================
 
@@ -8,12 +8,15 @@
 // CONFIGURACIÓN GLOBAL
 // ============================================
 const CONFIG = {
-    API_URL: 'https://ipuc-api.onrender.com/api',
+    API_URL: '',
+    MODO_OFFLINE: true,
     STORAGE_KEYS: {
         TOKEN: 'ipuc_token',
         USUARIO: 'ipuc_usuario',
         ROL: 'ipuc_rol',
-        TEMA: 'ipuc_tema'
+        TEMA: 'ipuc_tema',
+        ADMIN_LOCAL: 'ipuc_admin_local',
+        USUARIOS_LOCALES: 'ipuc_usuarios_locales'
     },
     DIAS_SEMANA: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
     TITULOS_PAGINAS: {
@@ -74,12 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function inicializarApp() {
     try {
-        // Cargar tema guardado
         const temaGuardado = localStorage.getItem(CONFIG.STORAGE_KEYS.TEMA) || 'light';
         APP_STATE.tema = temaGuardado;
         aplicarTema(temaGuardado);
 
-        // Verificar sesión existente
         const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
         const usuarioData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
         const rol = localStorage.getItem(CONFIG.STORAGE_KEYS.ROL);
@@ -91,12 +92,9 @@ function inicializarApp() {
             console.warn('Error al parsear datos de usuario:', e);
         }
 
-        // Ocultar splash después de la animación
         setTimeout(() => {
             const splash = document.getElementById('splash-screen');
-            if (splash) {
-                splash.style.display = 'none';
-            }
+            if (splash) splash.style.display = 'none';
 
             if (token && usuario) {
                 APP_STATE.token = token;
@@ -110,10 +108,7 @@ function inicializarApp() {
             }
         }, 2500);
 
-        // Inicializar event listeners
         inicializarEventListeners();
-
-        // Manejar responsive
         manejarResponsiveSidebar();
         window.addEventListener('resize', () => manejarResponsiveSidebar());
 
@@ -127,7 +122,6 @@ function inicializarApp() {
 // EVENT LISTENERS - TODOS LOS BOTONES Y ENLACES
 // ============================================
 function inicializarEventListeners() {
-    // Sidebar
     const menuToggle = document.getElementById('menu-toggle');
     const closeSidebarBtn = document.getElementById('close-sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -136,7 +130,6 @@ function inicializarEventListeners() {
     if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', cerrarSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', cerrarSidebar);
 
-    // Navegación - Todos los links del sidebar
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
@@ -145,11 +138,9 @@ function inicializarEventListeners() {
         });
     });
 
-    // Tema oscuro/claro
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) themeToggle.addEventListener('click', toggleTema);
 
-    // Notificaciones
     const notificationsToggle = document.getElementById('notifications-toggle');
     const closeNotifications = document.getElementById('close-notifications');
     if (notificationsToggle) notificationsToggle.addEventListener('click', toggleNotificaciones);
@@ -161,7 +152,6 @@ function inicializarEventListeners() {
         });
     }
 
-    // Marcar todas notificaciones como leídas
     const markAllRead = document.getElementById('mark-all-read');
     if (markAllRead) {
         markAllRead.addEventListener('click', () => {
@@ -171,15 +161,12 @@ function inicializarEventListeners() {
         });
     }
 
-    // Usuario dropdown
     const userMini = document.getElementById('user-mini');
     if (userMini) userMini.addEventListener('click', toggleUserDropdown);
 
-    // FAB (Floating Action Button)
     const fabMain = document.getElementById('fab-main');
     if (fabMain) fabMain.addEventListener('click', toggleFabMenu);
 
-    // Acciones del FAB
     document.querySelectorAll('.fab-item').forEach(item => {
         item.addEventListener('click', function() {
             const action = this.getAttribute('data-action');
@@ -191,20 +178,14 @@ function inicializarEventListeners() {
         });
     });
 
-    // Logout
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
-            confirmarAccion(
-                '¿Cerrar sesión?',
-                'Serás redirigido a la pantalla de inicio.',
-                cerrarSesion
-            );
+            confirmarAccion('¿Cerrar sesión?', 'Serás redirigido a la pantalla de inicio.', cerrarSesion);
         });
     }
 
-    // Botones de bienvenida
     const btnLogin = document.getElementById('btn-login');
     const btnRegister = document.getElementById('btn-register');
     const btnGuest = document.getElementById('btn-continue-guest');
@@ -213,7 +194,6 @@ function inicializarEventListeners() {
     if (btnRegister) btnRegister.addEventListener('click', mostrarRegistro);
     if (btnGuest) btnGuest.addEventListener('click', continuarComoInvitado);
 
-    // Modal principal
     const modal = document.getElementById('modal');
     if (modal) {
         modal.addEventListener('click', function(e) {
@@ -223,14 +203,11 @@ function inicializarEventListeners() {
     const modalClose = document.querySelector('.modal-close');
     if (modalClose) modalClose.addEventListener('click', cerrarModal);
 
-    // Modal de confirmación
     const confirmModal = document.getElementById('confirm-modal');
     const confirmCancel = document.getElementById('confirm-cancel');
     const confirmAccept = document.getElementById('confirm-accept');
 
-    if (confirmCancel && confirmModal) {
-        confirmCancel.addEventListener('click', () => confirmModal.classList.add('hidden'));
-    }
+    if (confirmCancel && confirmModal) confirmCancel.addEventListener('click', () => confirmModal.classList.add('hidden'));
     if (confirmAccept) {
         confirmAccept.addEventListener('click', () => {
             if (APP_STATE.pendingConfirmation) {
@@ -243,13 +220,10 @@ function inicializarEventListeners() {
     }
     if (confirmModal) {
         confirmModal.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal-backdrop')) {
-                confirmModal.classList.add('hidden');
-            }
+            if (e.target.classList.contains('modal-backdrop')) confirmModal.classList.add('hidden');
         });
     }
 
-    // Cerrar con tecla Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (APP_STATE.notificationsOpen) {
@@ -262,21 +236,13 @@ function inicializarEventListeners() {
         }
     });
 
-    // Cerrar dropdowns al hacer clic fuera
     document.addEventListener('click', (e) => {
-        // User dropdown
-        if (APP_STATE.userDropdownOpen &&
-            !e.target.closest('#user-mini') &&
-            !e.target.closest('#user-dropdown')) {
+        if (APP_STATE.userDropdownOpen && !e.target.closest('#user-mini') && !e.target.closest('#user-dropdown')) {
             const dropdown = document.getElementById('user-dropdown');
             if (dropdown) dropdown.classList.add('hidden');
             APP_STATE.userDropdownOpen = false;
         }
-
-        // FAB menu
-        if (APP_STATE.fabMenuOpen &&
-            !e.target.closest('#fab-main') &&
-            !e.target.closest('#fab-menu')) {
+        if (APP_STATE.fabMenuOpen && !e.target.closest('#fab-main') && !e.target.closest('#fab-menu')) {
             const fabMenu = document.getElementById('fab-menu');
             if (fabMenu) fabMenu.classList.add('hidden');
             APP_STATE.fabMenuOpen = false;
@@ -291,11 +257,9 @@ function mostrarApp() {
     const welcomeScreen = document.getElementById('welcome-screen');
     const app = document.getElementById('app');
     const fabMain = document.getElementById('fab-main');
-
     if (welcomeScreen) welcomeScreen.classList.add('hidden');
     if (app) app.classList.remove('hidden');
     if (fabMain) fabMain.classList.remove('hidden');
-
     actualizarSidebarUsuario();
     navegarA('inicio');
     iniciarContadorRegresivo();
@@ -307,18 +271,13 @@ function mostrarBienvenida() {
     const app = document.getElementById('app');
     const welcomeScreen = document.getElementById('welcome-screen');
     const fabMain = document.getElementById('fab-main');
-
     if (app) app.classList.add('hidden');
     if (welcomeScreen) welcomeScreen.classList.remove('hidden');
     if (fabMain) fabMain.classList.add('hidden');
 }
 
 function toggleSidebar() {
-    if (APP_STATE.sidebarOpen) {
-        cerrarSidebar();
-    } else {
-        abrirSidebar();
-    }
+    if (APP_STATE.sidebarOpen) { cerrarSidebar(); } else { abrirSidebar(); }
 }
 
 function abrirSidebar() {
@@ -356,53 +315,32 @@ function manejarResponsiveSidebar() {
 
 function navegarA(page) {
     if (!page || APP_STATE.isLoading) return;
-
     APP_STATE.currentPage = page;
     APP_STATE.isLoading = true;
-
-    // Actualizar navegación activa
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.toggle('active', item.getAttribute('data-page') === page);
     });
-
-    // Actualizar título
     const titulo = CONFIG.TITULOS_PAGINAS[page] || page;
     const pageTitle = document.getElementById('page-title');
     if (pageTitle) pageTitle.textContent = titulo;
-
-    // Cargar contenido de la página
     cargarPagina(page);
-
-    // Cerrar sidebar en móvil
-    if (window.innerWidth < 1024) {
-        cerrarSidebar();
-    }
-
+    if (window.innerWidth < 1024) cerrarSidebar();
     APP_STATE.isLoading = false;
 }
 
 function actualizarSidebarUsuario() {
     if (!APP_STATE.usuario) return;
-
     const userMini = document.getElementById('user-mini');
     if (userMini) {
         const img = userMini.querySelector('img');
         const nameEl = userMini.querySelector('.user-name');
         const roleEl = userMini.querySelector('.user-role');
-
         if (img) img.src = APP_STATE.usuario.foto || 'assets/avatars/default.png';
         if (nameEl) nameEl.textContent = APP_STATE.usuario.nombre || 'Usuario';
-        if (roleEl) {
-            roleEl.textContent = APP_STATE.rol === 'admin' ? 'Administrador' :
-                                APP_STATE.rol === 'invitado' ? 'Invitado' : 'Miembro';
-        }
+        if (roleEl) roleEl.textContent = APP_STATE.rol === 'admin' ? 'Administrador' : APP_STATE.rol === 'invitado' ? 'Invitado' : 'Miembro';
     }
-
-    // Mostrar menú admin si corresponde
     const adminMenu = document.getElementById('admin-menu');
-    if (adminMenu && APP_STATE.rol === 'admin') {
-        adminMenu.classList.remove('hidden');
-    }
+    if (adminMenu && APP_STATE.rol === 'admin') adminMenu.classList.remove('hidden');
 }
 
 // ============================================
@@ -411,16 +349,7 @@ function actualizarSidebarUsuario() {
 function cargarPagina(page) {
     const content = document.getElementById('page-content');
     if (!content) return;
-
-    // Mostrar loader
-    content.innerHTML = `
-        <div class="page-loader">
-            <div class="spinner"></div>
-            <p>Cargando...</p>
-        </div>
-    `;
-
-    // Cargar contenido según la página
+    content.innerHTML = '<div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>';
     setTimeout(() => {
         switch(page) {
             case 'inicio': cargarInicio(content); break;
@@ -444,12 +373,7 @@ function cargarPagina(page) {
             case 'versiculos': cargarVersiculos(content); break;
             case 'sistema': cargarSistema(content); break;
             default:
-                content.innerHTML = `
-                    <div class="card fade-in">
-                        <h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2>
-                        <p style="text-align:center;padding:40px;">Sección en desarrollo</p>
-                    </div>
-                `;
+                content.innerHTML = `<div class="card fade-in"><h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2><p style="text-align:center;padding:40px;">Sección en desarrollo</p></div>`;
         }
     }, 150);
 }
@@ -519,7 +443,6 @@ function cargarHorarios(container) {
     ];
     const hoy = new Date().getDay();
     const diaActual = hoy === 0 ? 6 : hoy - 1;
-
     container.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-time-five"></i> Horarios de Cultos</h2>
@@ -575,40 +498,24 @@ function cargarAsistencia(container) {
 function cargarNoticias(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-news"></i> Noticias</h2><div class="card"><p style="text-align:center;padding:30px;">No hay noticias publicadas</p></div></div>`;
 }
-
 function cargarEventos(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-calendar-star"></i> Eventos</h2><div class="card"><p style="text-align:center;padding:30px;">No hay eventos programados</p></div></div>`;
 }
-
 function cargarChat(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-chat"></i> Mensajes</h2><div class="card"><p style="text-align:center;padding:30px;">Selecciona una conversación</p></div></div>`;
 }
-
 function cargarDirectorio(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-group"></i> Directorio</h2><div class="card"><p style="text-align:center;padding:30px;">Cargando miembros...</p></div></div>`;
 }
-
 function cargarPeticiones(container) {
-    container.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-pray"></i> Peticiones de Oración</h2>
-            <div class="card" style="text-align:center;padding:30px;">
-                <i class="bx bx-pray" style="font-size:3rem;color:var(--azul-primario);"></i>
-                <p style="margin-top:12px;">Envía tu petición de oración</p>
-                <button class="btn-primary" style="margin-top:12px;" onclick="showToast('Funcionalidad en desarrollo','info')">Nueva Petición</button>
-            </div>
-        </div>
-    `;
+    container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-pray"></i> Peticiones de Oración</h2><div class="card" style="text-align:center;padding:30px;"><i class="bx bx-pray" style="font-size:3rem;color:var(--azul-primario);"></i><p style="margin-top:12px;">Envía tu petición de oración</p><button class="btn-primary" style="margin-top:12px;" onclick="showToast('Funcionalidad en desarrollo','info')">Nueva Petición</button></div></div>`;
 }
-
 function cargarEncuestas(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-poll"></i> Encuestas</h2><div class="card"><p style="text-align:center;padding:30px;">No hay encuestas activas</p></div></div>`;
 }
-
 function cargarBiblioteca(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-book-open"></i> Biblioteca</h2><div class="card"><p style="text-align:center;padding:30px;">Recursos disponibles pronto</p></div></div>`;
 }
-
 function cargarGaleria(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-images"></i> Galería</h2><div class="card"><p style="text-align:center;padding:30px;">Fotos y videos pronto</p></div></div>`;
 }
@@ -683,41 +590,26 @@ function cargarConfiguracion(container) {
 // PÁGINAS ADMIN
 // ============================================
 function cargarDashboard(container) {
-    container.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-line-chart"></i> Dashboard</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;">
-                <div class="card"><h3>Usuarios</h3><p style="font-size:2rem;font-weight:700;">--</p></div>
-                <div class="card"><h3>Asistencia</h3><p style="font-size:2rem;font-weight:700;">--</p></div>
-                <div class="card"><h3>Eventos</h3><p style="font-size:2rem;font-weight:700;">--</p></div>
-                <div class="card"><h3>Noticias</h3><p style="font-size:2rem;font-weight:700;">--</p></div>
-            </div>
-        </div>
-    `;
+    container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-line-chart"></i> Dashboard</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;"><div class="card"><h3>Usuarios</h3><p style="font-size:2rem;font-weight:700;">--</p></div><div class="card"><h3>Asistencia</h3><p style="font-size:2rem;font-weight:700;">--</p></div><div class="card"><h3>Eventos</h3><p style="font-size:2rem;font-weight:700;">--</p></div><div class="card"><h3>Noticias</h3><p style="font-size:2rem;font-weight:700;">--</p></div></div></div>`;
 }
-
 function cargarGestionUsuarios(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-user-voice"></i> Gestión de Usuarios</h2><div class="card"><p style="text-align:center;padding:30px;">Panel de administración de usuarios</p></div></div>`;
 }
-
 function cargarGestionNoticias(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-edit-alt"></i> Gestión de Noticias</h2><div class="card"><p style="text-align:center;padding:30px;">Crear y administrar noticias</p></div></div>`;
 }
-
 function cargarGestionEventos(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-calendar-edit"></i> Gestión de Eventos</h2><div class="card"><p style="text-align:center;padding:30px;">Crear y administrar eventos</p></div></div>`;
 }
-
 function cargarVersiculos(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-bookmark-plus"></i> Versículos</h2><div class="card"><p style="text-align:center;padding:30px;">Administrar versículos diarios</p></div></div>`;
 }
-
 function cargarSistema(container) {
     container.innerHTML = `<div class="fade-in"><h2><i class="bx bx-server"></i> Sistema</h2><div class="card"><p style="text-align:center;padding:30px;">Configuración del sistema</p></div></div>`;
 }
 
 // ============================================
-// CONTADOR REGRESIVO
+// CONTADOR REGRESIVO (OFFLINE)
 // ============================================
 function iniciarContadorRegresivo() {
     if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
@@ -725,63 +617,31 @@ function iniciarContadorRegresivo() {
     APP_STATE.contadorInterval = setInterval(actualizarContador, 1000);
 }
 
-async function actualizarContador() {
+function actualizarContador() {
     const elDias = document.getElementById('contador-dias');
     const elHoras = document.getElementById('contador-horas');
     const elMinutos = document.getElementById('contador-minutos');
     const elSegundos = document.getElementById('contador-segundos');
     const elTitulo = document.getElementById('contador-titulo');
     const elEstado = document.getElementById('contador-estado');
-
     if (!elDias && !elTitulo) return;
 
-    try {
-        const response = await fetch(`${CONFIG.API_URL}/cultos/proximo`);
-        const data = await response.json();
-
-        if (data.estado === 'sin_cultos') {
-            if (elTitulo) elTitulo.textContent = 'No hay cultos programados';
-            return;
-        }
-
-        const segundos = Math.max(0, data.segundos_restantes || 0);
-        const dias = Math.floor(segundos / 86400);
-        const horas = Math.floor((segundos % 86400) / 3600);
-        const minutos = Math.floor((segundos % 3600) / 60);
-        const segs = Math.floor(segundos % 60);
-
-        if (elTitulo) elTitulo.textContent = `${data.nombre} - ${data.dia || ''}`;
-        if (elEstado) {
-            elEstado.textContent = data.estado === 'en_curso' ? '🔴 CULTO EN CURSO' : '🟢 PRÓXIMO CULTO';
-            elEstado.className = `contador-estado ${data.estado === 'en_curso' ? 'estado-curso' : 'estado-proximo'}`;
-        }
-        if (elDias) elDias.textContent = String(dias).padStart(2, '0');
-        if (elHoras) elHoras.textContent = String(horas).padStart(2, '0');
-        if (elMinutos) elMinutos.textContent = String(minutos).padStart(2, '0');
-        if (elSegundos) elSegundos.textContent = String(segs).padStart(2, '0');
-
-        const proximoCulto = document.getElementById('proximo-culto-asistencia');
-        if (proximoCulto) {
-            proximoCulto.textContent = `${data.nombre} - ${data.dia || ''} - ${data.estado === 'en_curso' ? 'En curso' : 'Próximamente'}`;
-        }
-    } catch (error) {
-        // Fallback offline
-        const ahora = new Date();
-        const domingo = new Date(ahora);
-        domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
-        domingo.setHours(10, 0, 0, 0);
-        if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
-        const diff = Math.max(0, (domingo - ahora) / 1000);
-        const dias = Math.floor(diff / 86400);
-        const horas = Math.floor((diff % 86400) / 3600);
-        const minutos = Math.floor((diff % 3600) / 60);
-        const segundos = Math.floor(diff % 60);
-        if (elTitulo) elTitulo.textContent = 'Culto Dominical - Domingo';
-        if (elDias) elDias.textContent = String(dias).padStart(2, '0');
-        if (elHoras) elHoras.textContent = String(horas).padStart(2, '0');
-        if (elMinutos) elMinutos.textContent = String(minutos).padStart(2, '0');
-        if (elSegundos) elSegundos.textContent = String(segundos).padStart(2, '0');
-    }
+    const ahora = new Date();
+    const domingo = new Date(ahora);
+    domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
+    domingo.setHours(10, 0, 0, 0);
+    if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
+    const diff = Math.max(0, (domingo - ahora) / 1000);
+    const dias = Math.floor(diff / 86400);
+    const horas = Math.floor((diff % 86400) / 3600);
+    const minutos = Math.floor((diff % 3600) / 60);
+    const segundos = Math.floor(diff % 60);
+    
+    if (elTitulo) elTitulo.textContent = 'Culto Dominical - Domingo';
+    if (elDias) elDias.textContent = String(dias).padStart(2, '0');
+    if (elHoras) elHoras.textContent = String(horas).padStart(2, '0');
+    if (elMinutos) elMinutos.textContent = String(minutos).padStart(2, '0');
+    if (elSegundos) elSegundos.textContent = String(segundos).padStart(2, '0');
 }
 
 // ============================================
@@ -794,7 +654,6 @@ function actualizarFechaHora() {
     if (fecha) fecha.textContent = ahora.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     if (hora) hora.textContent = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
-
 function iniciarActualizacionFecha() {
     if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
     actualizarFechaHora();
@@ -802,31 +661,23 @@ function iniciarActualizacionFecha() {
 }
 
 // ============================================
-// VERSÍCULO DIARIO
+// VERSÍCULO DIARIO (OFFLINE)
 // ============================================
-async function cargarVersiculoDiario() {
+function cargarVersiculoDiario() {
     const container = document.getElementById('versiculo-content');
     if (!container) return;
-
-    try {
-        const response = await fetch(`${CONFIG.API_URL}/versiculo-diario`);
-        const data = await response.json();
-        if (data && data.versiculo) {
-            container.innerHTML = `
-                <p style="font-size:1rem;line-height:1.8;">"${data.versiculo.texto}"</p>
-                <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${data.versiculo.referencia}</p>
-            `;
-        }
-    } catch (error) {
-        container.innerHTML = `
-            <p style="font-size:1rem;line-height:1.8;">"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna."</p>
-            <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">Juan 3:16</p>
-        `;
-    }
+    const versiculos = [
+        { texto: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", referencia: "Juan 3:16" },
+        { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
+        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" },
+        { texto: "El Señor es mi luz y mi salvación; ¿de quién temeré?", referencia: "Salmos 27:1" }
+    ];
+    const v = versiculos[new Date().getDay() % versiculos.length];
+    container.innerHTML = `<p style="font-size:1rem;line-height:1.8;">"${v.texto}"</p><p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${v.referencia}</p>`;
 }
 
 // ============================================
-// AUTENTICACIÓN (SIN CREDENCIALES DE PRUEBA)
+// AUTENTICACIÓN LOCAL (SIN BACKEND)
 // ============================================
 function mostrarLogin() {
     const modal = document.getElementById('modal');
@@ -834,7 +685,6 @@ function mostrarLogin() {
     const modalTitle = document.getElementById('modal-title');
     const modalFooter = document.getElementById('modal-footer');
     if (!modal || !modalBody) return;
-
     if (modalTitle) modalTitle.textContent = 'Iniciar Sesión';
     if (modalFooter) modalFooter.classList.add('hidden');
 
@@ -848,65 +698,76 @@ function mostrarLogin() {
                 <label for="login-password">Contraseña</label>
                 <div style="position:relative;">
                     <input type="password" class="form-input" id="login-password" name="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
-                    <button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);" aria-label="Mostrar contraseña">
-                        <i class="bx bx-show"></i>
-                    </button>
+                    <button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);" aria-label="Mostrar contraseña"><i class="bx bx-show"></i></button>
                 </div>
             </div>
-            <div class="form-group">
-                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                    <input type="checkbox" name="recordar" checked> Recordar mi sesión
-                </label>
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%;">
-                <i class="bx bx-log-in"></i> Iniciar Sesión
-            </button>
+            <button type="submit" class="btn-primary" style="width:100%;"><i class="bx bx-log-in"></i> Iniciar Sesión</button>
         </form>
-        <p style="text-align:center;margin-top:16px;">
-            <a href="#" onclick="mostrarRegistro()" style="color:var(--azul-primario);font-weight:500;">¿No tienes cuenta? Regístrate aquí</a>
-        </p>
-        <p style="text-align:center;margin-top:8px;">
-            <a href="#" onclick="recuperarPassword()" style="color:var(--gris-texto);font-size:0.85rem;">¿Olvidaste tu contraseña?</a>
-        </p>
+        <p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarRegistro()" style="color:var(--azul-primario);font-weight:500;">¿No tienes cuenta? Regístrate aquí</a></p>
     `;
-
     modal.classList.remove('hidden');
 
     document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const usuario = document.getElementById('login-usuario').value.trim();
         const password = document.getElementById('login-password').value;
-
-        if (!usuario || !password) {
-            showToast('Completa todos los campos', 'warning');
-            return;
-        }
-
+        if (!usuario || !password) { showToast('Completa todos los campos', 'warning'); return; }
         await realizarLogin(usuario, password);
     });
 }
 
 async function realizarLogin(usuario, password) {
-    try {
-        const response = await fetch(`${CONFIG.API_URL}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuario, password })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.token) {
+    // Verificar administrador local
+    const adminData = localStorage.getItem(CONFIG.STORAGE_KEYS.ADMIN_LOCAL);
+    if (adminData) {
+        const admin = JSON.parse(adminData);
+        if ((admin.usuario === usuario || admin.correo === usuario) && admin.password === password) {
+            const data = {
+                token: 'token-local-' + Date.now(),
+                rol: 'admin',
+                usuario: {
+                    id: 1, nombre: admin.nombre, apellidos: admin.apellidos || '',
+                    usuario: admin.usuario, correo: admin.correo || '',
+                    foto: 'assets/avatars/admin.png', verificado: true,
+                    ministerio: admin.ministerio || 'Pastoral',
+                    insignias: ['Administrador', 'Cuenta Verificada'],
+                    celular: admin.celular || ''
+                }
+            };
             guardarSesion(data);
             cerrarModal();
             mostrarApp();
-            showToast(`¡Bienvenido, ${data.usuario.nombre}!`, 'success');
-        } else {
-            showToast(data.error || 'Credenciales inválidas. Intenta de nuevo.', 'error');
+            showToast('¡Bienvenido, ' + data.usuario.nombre + '!', 'success');
+            return;
         }
-    } catch (error) {
-        showToast('Error de conexión con el servidor. Verifica tu internet.', 'error');
     }
+    // Verificar usuarios locales
+    const usuariosData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS_LOCALES);
+    if (usuariosData) {
+        const usuarios = JSON.parse(usuariosData);
+        const usuarioEncontrado = usuarios.find(u => (u.usuario === usuario || u.correo === usuario) && u.password === password);
+        if (usuarioEncontrado) {
+            if (usuarioEncontrado.estado !== 'activo') { showToast('Cuenta desactivada', 'error'); return; }
+            const data = {
+                token: 'token-local-' + Date.now(), rol: 'usuario',
+                usuario: {
+                    id: usuarioEncontrado.id, nombre: usuarioEncontrado.nombre,
+                    apellidos: usuarioEncontrado.apellidos || '', usuario: usuarioEncontrado.usuario,
+                    correo: usuarioEncontrado.correo || '', foto: usuarioEncontrado.foto || 'assets/avatars/default.png',
+                    verificado: usuarioEncontrado.verificado || false,
+                    ministerio: usuarioEncontrado.ministerio || 'General',
+                    insignias: usuarioEncontrado.insignias || ['Nuevo Miembro'],
+                    celular: usuarioEncontrado.celular || ''
+                }
+            };
+            guardarSesion(data);
+            cerrarModal();
+            mostrarApp();
+            showToast('¡Bienvenido, ' + data.usuario.nombre + '!', 'success');
+            return;
+        }
+    }
+    showToast('Usuario o contraseña incorrectos', 'error');
 }
 
 function mostrarRegistro() {
@@ -915,7 +776,6 @@ function mostrarRegistro() {
     const modalTitle = document.getElementById('modal-title');
     const modalFooter = document.getElementById('modal-footer');
     if (!modal || !modalBody) return;
-
     if (modalTitle) modalTitle.textContent = 'Crear Cuenta';
     if (modalFooter) modalFooter.classList.add('hidden');
 
@@ -926,8 +786,6 @@ function mostrarRegistro() {
                 <div class="form-group"><label>Apellidos *</label><input type="text" class="form-input" name="apellidos" required></div>
             </div>
             <div class="form-group"><label>Documento de Identidad *</label><input type="text" class="form-input" name="documento" required></div>
-            <div class="form-group"><label>Fecha de Nacimiento *</label><input type="date" class="form-input" name="fecha_nacimiento" required></div>
-            <div class="form-group"><label>Sexo *</label><select class="form-input" name="sexo" required><option value="">Seleccionar...</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select></div>
             <div class="form-group"><label>Correo Electrónico *</label><input type="email" class="form-input" name="correo" required></div>
             <div class="form-group"><label>Celular *</label><input type="tel" class="form-input" name="celular" required></div>
             <div class="form-group"><label>Ministerio *</label><select class="form-input" name="ministerio" required><option value="">Seleccionar...</option><option value="Jóvenes">Jóvenes</option><option value="Alabanza">Alabanza</option><option value="Niños">Niños</option><option value="Misiones">Misiones</option><option value="Servicio">Servicio</option><option value="General">General</option></select></div>
@@ -938,48 +796,44 @@ function mostrarRegistro() {
         </form>
         <p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarLogin()" style="color:var(--azul-primario);font-weight:500;">¿Ya tienes cuenta? Inicia sesión</a></p>
     `;
-
     modal.classList.remove('hidden');
 
     document.getElementById('registro-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
-
         if (formData.get('password') !== formData.get('confirmar_password')) {
-            showToast('Las contraseñas no coinciden', 'error');
-            return;
+            showToast('Las contraseñas no coinciden', 'error'); return;
         }
-
+        if (formData.get('password').length < 6) {
+            showToast('La contraseña debe tener al menos 6 caracteres', 'error'); return;
+        }
         const datos = Object.fromEntries(formData);
         delete datos.confirmar_password;
 
-        try {
-            const response = await fetch(`${CONFIG.API_URL}/registro`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            const data = await response.json();
-            if (response.ok) {
-                showToast('✅ ¡Registro exitoso! Ahora inicia sesión', 'success');
-                setTimeout(() => mostrarLogin(), 1500);
-            } else {
-                showToast(data.error || 'Error en el registro', 'error');
-            }
-        } catch (error) {
-            showToast('Error de conexión con el servidor', 'error');
-        }
+        const usuariosData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS_LOCALES);
+        let usuarios = usuariosData ? JSON.parse(usuariosData) : [];
+        if (usuarios.find(u => u.usuario === datos.usuario)) { showToast('El nombre de usuario ya existe', 'error'); return; }
+        if (usuarios.find(u => u.correo === datos.correo)) { showToast('El correo ya está registrado', 'error'); return; }
+
+        const nuevoUsuario = {
+            id: usuarios.length + 1, nombre: datos.nombre, apellidos: datos.apellidos || '',
+            documento: datos.documento || '', correo: datos.correo, celular: datos.celular || '',
+            usuario: datos.usuario, password: datos.password,
+            ministerio: datos.ministerio || 'General', foto: 'assets/avatars/default.png',
+            verificado: false, estado: 'activo', insignias: ['Nuevo Miembro'],
+            fecha_registro: new Date().toISOString()
+        };
+        usuarios.push(nuevoUsuario);
+        localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIOS_LOCALES, JSON.stringify(usuarios));
+        showToast('✅ ¡Registro exitoso! Ahora inicia sesión', 'success');
+        setTimeout(() => mostrarLogin(), 1500);
     });
 }
 
 function continuarComoInvitado() {
     APP_STATE.rol = 'invitado';
     APP_STATE.token = 'guest-token';
-    APP_STATE.usuario = {
-        id: 0, nombre: 'Invitado', usuario: 'invitado',
-        foto: 'assets/avatars/default.png', verificado: false,
-        ministerio: 'Visitante', insignias: []
-    };
+    APP_STATE.usuario = { id: 0, nombre: 'Invitado', usuario: 'invitado', foto: 'assets/avatars/default.png', verificado: false, ministerio: 'Visitante', insignias: [] };
     mostrarApp();
     showToast('Navegando como invitado', 'info');
 }
@@ -997,9 +851,7 @@ function cerrarSesion() {
     localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.ROL);
-    APP_STATE.token = null;
-    APP_STATE.usuario = null;
-    APP_STATE.rol = null;
+    APP_STATE.token = null; APP_STATE.usuario = null; APP_STATE.rol = null;
     if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
     if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
     document.getElementById('user-dropdown')?.classList.add('hidden');
@@ -1020,7 +872,6 @@ function toggleTema() {
     aplicarTema(APP_STATE.tema);
     localStorage.setItem(CONFIG.STORAGE_KEYS.TEMA, APP_STATE.tema);
 }
-
 function aplicarTema(tema) {
     document.documentElement.setAttribute('data-theme', tema);
     const icon = document.querySelector('#theme-toggle i');
@@ -1042,29 +893,19 @@ function toggleNotificaciones() {
     APP_STATE.notificationsOpen = !APP_STATE.notificationsOpen;
     const panel = document.getElementById('notification-panel');
     if (!panel) return;
-    if (APP_STATE.notificationsOpen) {
-        panel.classList.remove('hidden');
-        cargarNotificaciones();
-    } else {
-        panel.classList.add('hidden');
-    }
+    if (APP_STATE.notificationsOpen) { panel.classList.remove('hidden'); cargarNotificaciones(); }
+    else { panel.classList.add('hidden'); }
 }
-
 function cargarNotificaciones() {
     const list = document.getElementById('notification-list');
     if (!list) return;
     list.innerHTML = '<div class="notification-empty"><i class="bx bx-bell-off"></i><p>No hay notificaciones nuevas</p></div>';
 }
-
 function actualizarBadgeNotificaciones() {
     const badge = document.querySelector('.badge-notifications');
     if (badge) {
-        if (APP_STATE.notificacionesNoLeidas > 0) {
-            badge.textContent = APP_STATE.notificacionesNoLeidas;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
+        if (APP_STATE.notificacionesNoLeidas > 0) { badge.textContent = APP_STATE.notificacionesNoLeidas; badge.classList.remove('hidden'); }
+        else { badge.classList.add('hidden'); }
     }
 }
 
@@ -1075,19 +916,10 @@ function confirmarAsistencia(estado) {
     const tipo = document.querySelector('input[name="tipo-asistente"]:checked')?.value || 'Hermano';
     showToast(`✅ Asistencia confirmada: ${estado} (${tipo})`, 'success');
 }
-
 function compartirVersiculo() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'IPUC LA FONDA - Versículo del Día',
-            text: 'Mira este versículo del día de IPUC LA FONDA',
-            url: window.location.href
-        }).catch(() => {});
-    } else {
-        showToast('📋 Enlace copiado al portapapeles', 'info');
-    }
+    if (navigator.share) { navigator.share({ title: 'IPUC LA FONDA - Versículo del Día', text: 'Mira este versículo del día de IPUC LA FONDA', url: window.location.href }).catch(() => {}); }
+    else { showToast('📋 Enlace copiado al portapapeles', 'info'); }
 }
-
 function confirmarAccion(titulo, mensaje, callback) {
     const titleEl = document.getElementById('confirm-title');
     const messageEl = document.getElementById('confirm-message');
@@ -1130,10 +962,7 @@ function showToast(mensaje, tipo = 'info') {
     toast.setAttribute('role', 'alert');
     toast.innerHTML = `<span>${mensaje}</span>`;
     container.appendChild(toast);
-    setTimeout(() => {
-        toast.classList.add('toast-hide');
-        setTimeout(() => toast.remove(), 300);
-    }, 3500);
+    setTimeout(() => { toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 300); }, 3500);
 }
 
 // ============================================
@@ -1143,15 +972,9 @@ function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     if (!input) return;
     const icon = input.parentElement?.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (icon) icon.className = 'bx bx-hide';
-    } else {
-        input.type = 'password';
-        if (icon) icon.className = 'bx bx-show';
-    }
+    if (input.type === 'password') { input.type = 'text'; if (icon) icon.className = 'bx bx-hide'; }
+    else { input.type = 'password'; if (icon) icon.className = 'bx bx-show'; }
 }
-
 function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
     const ahora = new Date();
@@ -1160,6 +983,28 @@ function formatearFecha(fechaISO) {
     if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
     if (diff < 86400000) return `Hace ${Math.floor(diff / 3600000)} h`;
     return fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+}
+
+// ============================================
+// CREAR ADMIN LOCAL
+// ============================================
+function crearAdminLocal(nombre, apellidos, correo, usuario, password, celular) {
+    const admin = {
+        nombre: nombre || 'Administrador',
+        apellidos: apellidos || 'Principal',
+        correo: correo || 'admin@ipuclafonda.org',
+        usuario: usuario || 'admin',
+        password: password || 'admin123',
+        celular: celular || '',
+        ministerio: 'Pastoral',
+        fecha_creacion: new Date().toISOString()
+    };
+    localStorage.setItem(CONFIG.STORAGE_KEYS.ADMIN_LOCAL, JSON.stringify(admin));
+    console.log('✅ Administrador local creado exitosamente');
+    console.log('👤 Usuario:', admin.usuario);
+    console.log('🔑 Contraseña:', admin.password);
+    showToast('✅ Administrador creado exitosamente', 'success');
+    return admin;
 }
 
 // ============================================
@@ -1177,6 +1022,8 @@ window.navegarA = navegarA;
 window.cargarVersiculoDiario = cargarVersiculoDiario;
 window.toggleTema = toggleTema;
 window.showToast = showToast;
+window.crearAdminLocal = crearAdminLocal;
 
-console.log('✅ IPUC LA FONDA PRO v2.1 - JavaScript cargado correctamente');
-console.log('🔒 Autenticación segura sin credenciales de prueba');
+console.log('✅ IPUC LA FONDA PRO v2.1 - Modo OFFLINE cargado correctamente');
+console.log('🔒 Autenticación local sin backend externo');
+console.log('💡 Para crear admin: crearAdminLocal("Nombre","Apellidos","correo@email.com","usuario","contraseña","celular")');
