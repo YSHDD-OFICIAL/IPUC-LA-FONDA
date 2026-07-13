@@ -4,7 +4,7 @@
     "description": "Plataforma oficial de IPUC LA FONDA. Donde el Espíritu Santo se mueve. Accede a cultos, eventos, noticias, devocionales y comunidad cristiana.",
     "start_url": "/",
     "scope": "/",
-    "id": "ipuc-la-fonda-v2.1",
+    "id": "ipuc-la-fonda-v5.0",
     
     "display": "standalone",
     "display_override": [
@@ -89,14 +89,14 @@
             "sizes": "500x500",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "Pantalla principal de IPUC LA FONDA"
+            "label": "Pantalla principal de IPUC LA FONDA v5.0"
         },
         {
             "src": "/ipuclafonda.png",
             "sizes": "500x500",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "IPUC LA FONDA - Versión móvil"
+            "label": "IPUC LA FONDA v5.0 - Versión móvil"
         }
     ],
     
