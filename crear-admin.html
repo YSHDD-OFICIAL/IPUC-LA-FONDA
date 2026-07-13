@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="robots" content="noindex, nofollow">
-    <title>IPUC LA FONDA - Crear Primer Administrador</title>
+    <title>IPUC LA FONDA v5.0 - Crear Primer Administrador</title>
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <style>
         :root {
@@ -40,11 +40,11 @@
         }
         @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
         .header { text-align: center; margin-bottom: 32px; }
-        .logo-img { width: 90px; height: 90px; object-fit: contain; border-radius: 50%; margin: 0 auto 16px; }
+        .logo-img { width: 90px; height: 90px; object-fit: contain; border-radius: 50%; margin: 0 auto 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .header h1 { font-size: 1.5rem; color: var(--azul-primario); font-weight: 800; margin-bottom: 4px; }
         .header .subtitle { font-size: 0.9rem; color: var(--gris-texto); }
         .header .badge { display: inline-block; background: var(--azul-primario); color: var(--blanco); padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-top: 8px; }
-        .alert { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: var(--borde-radius-sm); margin-bottom: 24px; font-size: 0.85rem; line-height: 1.5; background: #e3f2fd; border-left: 4px solid var(--info); color: #1565c0; }
+        .alert { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: var(--borde-radius-sm); margin-bottom: 24px; font-size: 0.85rem; line-height: 1.5; background: #fff3e0; border-left: 4px solid var(--advertencia); color: #e65100; }
         .alert i { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
         .form-section { margin-bottom: 24px; }
         .form-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gris-texto); font-weight: 700; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--gris-medio); display: flex; align-items: center; gap: 6px; }
@@ -89,11 +89,10 @@
             </div>
 
             <div class="alert">
-                <i class="bx bx-info-circle"></i>
+                <i class="bx bx-shield-x"></i>
                 <div>
-                    <strong>Modo Offline</strong><br>
-                    Los datos se guardarán en el localStorage de este navegador.
-                    Usa este mismo navegador para iniciar sesión después.
+                    <strong>¡Importante!</strong> Esta página solo funciona si <strong>no existe ningún administrador</strong> en el sistema. 
+                    Una vez creado, esta función se deshabilitará automáticamente.
                 </div>
             </div>
 
@@ -131,14 +130,14 @@
                         <label for="password">Contraseña <span class="required">*</span></label>
                         <div class="input-wrapper">
                             <i class="bx bx-lock-alt"></i>
-                            <input type="password" class="form-input" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+                            <input type="password" class="form-input" id="password" name="password" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
                             <i class="bx bx-show" id="togglePassword" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--gris-texto);z-index:1;" onclick="togglePasswordVisibility()"></i>
                         </div>
-                        <p class="input-hint">Mínimo 6 caracteres.</p>
+                        <p class="input-hint">Mínimo 8 caracteres. Usa mayúsculas, números y símbolos.</p>
                     </div>
                     <div class="form-group">
                         <label for="confirmarPassword">Confirmar Contraseña <span class="required">*</span></label>
-                        <div class="input-wrapper"><i class="bx bx-lock-alt"></i><input type="password" class="form-input" id="confirmarPassword" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="6" autocomplete="new-password"></div>
+                        <div class="input-wrapper"><i class="bx bx-lock-alt"></i><input type="password" class="form-input" id="confirmarPassword" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="8" autocomplete="new-password"></div>
                     </div>
                 </div>
 
@@ -150,15 +149,19 @@
             <div class="resultado" id="resultado"></div>
         </div>
         <div class="footer">
-            <p>IPUC LA FONDA v2.1.0 | <a href="https://ipuclafonda.netlify.app" target="_blank">Ir a la aplicación</a></p>
+            <p>IPUC LA FONDA v5.0 | <a href="https://ipuclafonda.netlify.app" target="_blank">Ir a la aplicación</a></p>
         </div>
     </div>
 
+    <script src="database.js"></script>
     <script>
         // ============================================
-        // CONFIGURACIÓN - MODO OFFLINE
+        // IPUC LA FONDA v5.0 - Crear Administrador
         // ============================================
-        const STORAGE_KEY = 'ipuc_admin_local';
+        
+        // Inicializar base de datos
+        const db = new Database();
+        db.inicializarDatos();
 
         function togglePasswordVisibility() {
             const input = document.getElementById('password');
@@ -173,7 +176,7 @@
             let html = `<strong>${titulo}</strong><p>${mensaje}</p>`;
             if (credenciales) {
                 html += `<div class="credenciales-box"><strong>🔑 Credenciales:</strong><br>Usuario: <strong>${credenciales.usuario}</strong><br>Contraseña: <strong>${credenciales.password}</strong></div>
-                         <p style="margin-top:8px;font-size:0.85rem;">⚠️ <strong>Guarda estas credenciales.</strong></p>`;
+                         <p style="margin-top:8px;font-size:0.85rem;">⚠️ <strong>Guarda estas credenciales en un lugar seguro.</strong></p>`;
             }
             div.innerHTML = html;
             div.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -200,44 +203,40 @@
             if (!datos.apellidos || datos.apellidos.length < 2) return mostrarResultado('error', 'Error', 'Apellidos debe tener al menos 2 caracteres');
             if (!datos.correo.includes('@') || !datos.correo.includes('.')) return mostrarResultado('error', 'Error', 'Ingresa un correo válido');
             if (!/^[a-zA-Z0-9_]{3,20}$/.test(datos.usuario)) return mostrarResultado('error', 'Error', 'Usuario: solo letras, números y guiones (3-20 caracteres)');
-            if (datos.password.length < 6) return mostrarResultado('error', 'Error', 'Contraseña: mínimo 6 caracteres');
+            if (datos.password.length < 8) return mostrarResultado('error', 'Error', 'Contraseña: mínimo 8 caracteres');
             if (datos.password !== datos.confirmar) return mostrarResultado('error', 'Error', 'Las contraseñas no coinciden');
 
             btn.classList.add('loading'); btn.disabled = true;
 
-            // Crear admin en localStorage
-            const admin = {
+            // Crear admin usando Database v5.0
+            const resultado = db.crearPrimerAdministrador({
                 nombre: datos.nombre,
                 apellidos: datos.apellidos,
                 correo: datos.correo,
                 celular: datos.celular,
                 usuario: datos.usuario,
-                password: datos.password,
-                ministerio: 'Pastoral',
-                fecha_creacion: new Date().toISOString()
-            };
+                password: datos.password
+            });
 
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(admin));
-                console.log('✅ Admin guardado en localStorage');
-
+            if (resultado.exito) {
+                console.log('✅ Admin creado con Database v5.0');
                 mostrarResultado('success', '✅ ¡Administrador creado!',
-                    'El administrador ha sido guardado en este navegador. Ahora puedes iniciar sesión en la aplicación.',
+                    'El administrador ha sido creado exitosamente. Ahora puedes iniciar sesión en la aplicación.',
                     { usuario: datos.usuario, password: datos.password });
 
                 document.getElementById('password').value = '';
                 document.getElementById('confirmarPassword').value = '';
                 btn.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
                 btn.style.background = 'var(--exito)';
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarResultado('error', '❌ Error', 'No se pudo guardar. Verifica que tu navegador permita localStorage.');
+            } else {
+                console.error('Error:', resultado.error);
+                mostrarResultado('error', '❌ Error', resultado.error || 'No se pudo crear el administrador.');
                 btn.classList.remove('loading'); btn.disabled = false;
             }
         });
 
-        console.log('✅ IPUC LA FONDA - Creador de Admin OFFLINE cargado');
-        console.log('💾 Los datos se guardan en localStorage');
+        console.log('✅ IPUC LA FONDA v5.0 - Creador de Admin cargado');
+        console.log('💾 Usando Database v5.0 (localStorage con hash seguro)');
     </script>
 </body>
 </html>
