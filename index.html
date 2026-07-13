@@ -297,19 +297,26 @@ Iglesia Pentecostal Unida de Colombia
         <button class="fab-item" data-action="biblia"><i class="bx bx-bible"></i><span>Biblia</span></button>
     </div>
 
+    <!-- ============================================
+    SCRIPTS - TODOS LOS ARCHIVOS JS v5.0
+    ============================================ -->
+    <script src="database.js" defer></script>
+    <script src="app.js" defer></script>
     <script src="script.js" defer></script>
+
+    <!-- REGISTRO DEL SERVICE WORKER (PWA) -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(reg => {
-                        console.log('✅ SW registrado');
+                        console.log('✅ SW registrado v5.0');
                         reg.addEventListener('updatefound', () => {
                             const nw = reg.installing;
                             nw.addEventListener('statechange', () => {
                                 if (nw.state === 'installed' && navigator.serviceWorker.controller) {
                                     const tc = document.getElementById('toast-container');
-                                    if (tc) { const t = document.createElement('div'); t.className = 'toast info'; t.innerHTML = '<span>Nueva versión</span> <button onclick="location.reload()">Actualizar</button>'; tc.appendChild(t); setTimeout(() => { t.classList.add('toast-hide'); setTimeout(() => t.remove(), 300); }, 10000); }
+                                    if (tc) { const t = document.createElement('div'); t.className = 'toast info'; t.innerHTML = '<span>Nueva versión disponible</span> <button onclick="location.reload()">Actualizar</button>'; tc.appendChild(t); setTimeout(() => { t.classList.add('toast-hide'); setTimeout(() => t.remove(), 300); }, 10000); }
                                 }
                             });
                         });
