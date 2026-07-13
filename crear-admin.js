@@ -27,6 +27,12 @@ function crearAdmin(datosPersonalizados = {}) {
     console.log('='.repeat(60));
     console.log('');
 
+    // Verificar que Database existe
+    if (typeof Database === 'undefined') {
+        console.error('❌ Error: Database no está cargado. Asegúrate de cargar database.js primero.');
+        return false;
+    }
+
     // Inicializar base de datos
     console.log('⏳ Inicializando base de datos...');
     const db = new Database();
@@ -52,11 +58,33 @@ function crearAdmin(datosPersonalizados = {}) {
             console.log('');
         });
 
-        return false;
+        return { exito: false, error: 'Ya existe un administrador' };
     }
 
     // Combinar datos por defecto con personalizados
     const datos = { ...DEFAULT_ADMIN, ...datosPersonalizados };
+
+    // Validar datos
+    if (!datos.nombre || datos.nombre.length < 2) {
+        console.error('❌ El nombre debe tener al menos 2 caracteres');
+        return { exito: false, error: 'Nombre inválido' };
+    }
+    if (!datos.apellidos || datos.apellidos.length < 2) {
+        console.error('❌ Los apellidos deben tener al menos 2 caracteres');
+        return { exito: false, error: 'Apellidos inválidos' };
+    }
+    if (!datos.correo || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(datos.correo)) {
+        console.error('❌ Formato de correo inválido');
+        return { exito: false, error: 'Correo inválido' };
+    }
+    if (!datos.usuario || !/^[a-zA-Z0-9_]{3,20}$/.test(datos.usuario)) {
+        console.error('❌ Usuario inválido (3-20 caracteres, solo letras, números y guiones)');
+        return { exito: false, error: 'Usuario inválido' };
+    }
+    if (!datos.password || datos.password.length < 8) {
+        console.error('❌ La contraseña debe tener al menos 8 caracteres');
+        return { exito: false, error: 'Contraseña muy corta' };
+    }
 
     console.log('📋 DATOS DEL ADMINISTRADOR:');
     console.log(`   Nombre:    ${datos.nombre} ${datos.apellidos}`);
@@ -67,58 +95,23 @@ function crearAdmin(datosPersonalizados = {}) {
     console.log('');
 
     // Confirmar creación (solo en navegador)
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof confirm !== 'undefined') {
         const confirmacion = confirm(`¿Deseas crear el administrador "${datos.nombre} ${datos.apellidos}" (@${datos.usuario})?`);
         if (!confirmacion) {
             console.log('');
             console.log('❌ Operación cancelada por el usuario');
-            return false;
+            return { exito: false, error: 'Cancelado por el usuario' };
         }
     }
 
     console.log('');
     console.log('⏳ Creando administrador...');
 
-    // Crear objeto administrador
-    const admin = {
-        id: 1,
-        nombre: datos.nombre,
-        apellidos: datos.apellidos,
-        documento: datos.documento || '',
-        fecha_nacimiento: datos.fecha_nacimiento || '',
-        sexo: datos.sexo || '',
-        correo: datos.correo,
-        celular: datos.celular,
-        direccion: datos.direccion || '',
-        ministerio: datos.ministerio,
-        usuario: datos.usuario,
-        password: db.hashPassword(datos.password),
-        foto: 'assets/avatars/admin.png',
-        rol: 'admin',
-        verificado: true,
-        fecha_registro: new Date().toISOString(),
-        ultima_conexion: new Date().toISOString(),
-        estado: 'activo',
-        insignias: ['Administrador', 'Cuenta Verificada'],
-        intentos_fallidos: 0,
-        bloqueado_hasta: null
-    };
+    // Usar el método de Database para crear el admin
+    const resultado = db.crearPrimerAdministrador(datos);
 
-    // Guardar en la base de datos
-    try {
-        db.guardar('administradores', {
-            administradores: [admin],
-            ultimo_id: 1
-        });
-
-        // Actualizar configuración
-        const config = db.cargar('configuracion');
-        if (config?.aplicacion) {
-            config.aplicacion.primer_administrador_creado = true;
-            db.guardar('configuracion', config);
-        }
-
-        // Agregar notificación
+    if (resultado.exito) {
+        // Agregar notificación de bienvenida
         db.addNotificacion({
             titulo: '🎉 Administrador creado',
             mensaje: `El primer administrador (@${datos.usuario}) ha sido configurado exitosamente.`,
@@ -149,34 +142,27 @@ function crearAdmin(datosPersonalizados = {}) {
         console.log('   • Si cambias de navegador, deberás crear el admin de nuevo');
         console.log('='.repeat(60));
 
-        return true;
-
-    } catch (error) {
-        console.error(`❌ Error al crear administrador: ${error.message}`);
-        return false;
+        return { exito: true, admin: resultado.admin };
+    } else {
+        console.error(`❌ Error al crear administrador: ${resultado.error}`);
+        return { exito: false, error: resultado.error };
     }
 }
 
 // ============================================
-// FUNCIÓN PARA CREAR ADMIN EN NAVEGADOR
+// FUNCIÓN PARA CREAR ADMIN EN NAVEGADOR (UI)
 // ============================================
 function crearAdminUI() {
-    // Solo ejecutar en navegador
     if (typeof document === 'undefined') return;
 
     // Verificar si ya existe
-    const adminData = localStorage.getItem('ipuc5_administradores');
-    if (adminData) {
-        try {
-            const admins = JSON.parse(adminData);
-            if (admins?.administradores?.length > 0) {
-                alert('⚠️ Ya existe un administrador en este navegador.\n\nUsa el panel de administración para gestionar usuarios.');
-                return;
-            }
-        } catch (e) {}
+    const db = new Database();
+    const admins = db.cargar('administradores');
+    if (admins?.administradores?.length > 0) {
+        alert('⚠️ Ya existe un administrador en este navegador.\n\nUsa el panel de administración para gestionar usuarios.');
+        return;
     }
 
-    // Pedir confirmación
     const confirmacion = confirm(
         '🔧 CREAR PRIMER ADMINISTRADOR\n\n' +
         'Se creará el administrador con estos datos:\n\n' +
@@ -188,10 +174,9 @@ function crearAdminUI() {
 
     if (!confirmacion) return;
 
-    // Crear admin
     const resultado = crearAdmin();
 
-    if (resultado) {
+    if (resultado.exito) {
         alert(
             '✅ ADMINISTRADOR CREADO EXITOSAMENTE\n\n' +
             `Usuario: ${DEFAULT_ADMIN.usuario}\n` +
@@ -199,13 +184,11 @@ function crearAdminUI() {
             '⚠️ Guarda estas credenciales en un lugar seguro.\n\n' +
             'Ahora puedes iniciar sesión en la aplicación.'
         );
-        
-        // Redirigir a la app
         if (confirm('¿Quieres ir a la aplicación ahora?')) {
             window.location.href = 'https://ipuclafonda.netlify.app';
         }
     } else {
-        alert('❌ Error al crear el administrador. Revisa la consola para más detalles.');
+        alert('❌ Error al crear el administrador: ' + (resultado.error || 'Error desconocido'));
     }
 }
 
@@ -215,18 +198,18 @@ function crearAdminUI() {
 function crearAdminPersonalizado(datos) {
     if (!datos.nombre || !datos.apellidos || !datos.correo || !datos.usuario || !datos.password) {
         console.error('❌ Faltan campos requeridos: nombre, apellidos, correo, usuario, password');
-        return false;
+        return { exito: false, error: 'Campos requeridos faltantes' };
     }
 
     if (datos.password.length < 8) {
         console.error('❌ La contraseña debe tener al menos 8 caracteres');
-        return false;
+        return { exito: false, error: 'Contraseña muy corta' };
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(datos.correo)) {
         console.error('❌ Formato de correo inválido');
-        return false;
+        return { exito: false, error: 'Correo inválido' };
     }
 
     return crearAdmin(datos);
@@ -247,4 +230,4 @@ console.log('💡 O ejecuta crearAdminPersonalizado({...}) para datos personaliz
 console.log('');
 console.log('📋 Datos por defecto:');
 console.log(`   Usuario: ${DEFAULT_ADMIN.usuario}`);
-console.log(`   Contraseña: ${DEFAULT_ADMIN.password}`);
+console.log(`   Contraseña: ${'*'.repeat(DEFAULT_ADMIN.password.length)}`);
