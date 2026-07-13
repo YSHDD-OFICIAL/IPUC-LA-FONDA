@@ -7,22 +7,6 @@
 // ============================================
 
 // ============================================
-// INICIALIZACIÓN DE BASE DE DATOS
-// ============================================
-let db;
-try {
-    if (typeof Database !== 'undefined') {
-        db = new Database();
-        db.inicializarDatos();
-        console.log('✅ DB inicializada desde script.js');
-    } else {
-        console.warn('⚠️ Database no disponible');
-    }
-} catch (e) {
-    console.error('❌ Error al crear DB:', e);
-}
-
-// ============================================
 // CONFIGURACIÓN GLOBAL
 // ============================================
 const CONFIG = {
