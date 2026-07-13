@@ -69,6 +69,7 @@
         .resultado.show { display: block; }
         .resultado.success { background: #e8f5e9; border-left: 4px solid var(--exito); color: #2e7d32; }
         .resultado.error { background: #ffebee; border-left: 4px solid var(--error); color: #c62828; }
+        .resultado.info { background: #e3f2fd; border-left: 4px solid var(--info); color: #1565c0; }
         .resultado .credenciales-box { background: rgba(0,0,0,0.05); padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 0.85rem; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
         .footer { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
@@ -92,7 +93,7 @@
                 <i class="bx bx-shield-x"></i>
                 <div>
                     <strong>¡Importante!</strong> Esta página solo funciona si <strong>no existe ningún administrador</strong> en el sistema. 
-                    Una vez creado, esta función se deshabilitará automáticamente.
+                    Una vez creado, esta función se deshabilitará automáticamente. Los datos se guardan en localStorage.
                 </div>
             </div>
 
@@ -153,10 +154,12 @@
         </div>
     </div>
 
+    <!-- Cargar database.js -->
     <script src="database.js"></script>
     <script>
         // ============================================
         // IPUC LA FONDA v5.0 - Crear Administrador
+        // Usa Database v5.0 (localStorage con hash seguro)
         // ============================================
         
         // Inicializar base de datos
@@ -176,7 +179,7 @@
             let html = `<strong>${titulo}</strong><p>${mensaje}</p>`;
             if (credenciales) {
                 html += `<div class="credenciales-box"><strong>🔑 Credenciales:</strong><br>Usuario: <strong>${credenciales.usuario}</strong><br>Contraseña: <strong>${credenciales.password}</strong></div>
-                         <p style="margin-top:8px;font-size:0.85rem;">⚠️ <strong>Guarda estas credenciales en un lugar seguro.</strong></p>`;
+                         <p style="margin-top:8px;font-size:0.85rem;">⚠️ <strong>Guarda estas credenciales en un lugar seguro.</strong> No podrás recuperarlas.</p>`;
             }
             div.innerHTML = html;
             div.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -206,6 +209,13 @@
             if (datos.password.length < 8) return mostrarResultado('error', 'Error', 'Contraseña: mínimo 8 caracteres');
             if (datos.password !== datos.confirmar) return mostrarResultado('error', 'Error', 'Las contraseñas no coinciden');
 
+            // Verificar si ya existe un administrador
+            const admins = db.cargar('administradores');
+            if (admins?.administradores?.length > 0) {
+                return mostrarResultado('info', 'ℹ️ Ya existe un administrador', 
+                    'Ya hay un administrador configurado en este navegador. Usa el panel de administración para gestionar usuarios.');
+            }
+
             btn.classList.add('loading'); btn.disabled = true;
 
             // Crear admin usando Database v5.0
@@ -219,24 +229,35 @@
             });
 
             if (resultado.exito) {
-                console.log('✅ Admin creado con Database v5.0');
-                mostrarResultado('success', '✅ ¡Administrador creado!',
-                    'El administrador ha sido creado exitosamente. Ahora puedes iniciar sesión en la aplicación.',
+                console.log('✅ Administrador creado exitosamente con Database v5.0');
+                console.log('👤 Usuario:', datos.usuario);
+                
+                // Agregar notificación de bienvenida
+                db.addNotificacion({
+                    titulo: '🎉 Bienvenido Administrador',
+                    mensaje: `El sistema ha sido configurado exitosamente. Bienvenido, ${datos.nombre}.`,
+                    tipo: 'sistema'
+                });
+
+                mostrarResultado('success', '✅ ¡Administrador creado exitosamente!',
+                    'El administrador ha sido configurado correctamente. Ahora puedes iniciar sesión en la aplicación con tus credenciales.',
                     { usuario: datos.usuario, password: datos.password });
 
                 document.getElementById('password').value = '';
                 document.getElementById('confirmarPassword').value = '';
                 btn.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
                 btn.style.background = 'var(--exito)';
+                btn.disabled = true;
             } else {
                 console.error('Error:', resultado.error);
-                mostrarResultado('error', '❌ Error', resultado.error || 'No se pudo crear el administrador.');
+                mostrarResultado('error', '❌ Error', resultado.error || 'No se pudo crear el administrador. Intenta de nuevo.');
                 btn.classList.remove('loading'); btn.disabled = false;
             }
         });
 
         console.log('✅ IPUC LA FONDA v5.0 - Creador de Admin cargado');
         console.log('💾 Usando Database v5.0 (localStorage con hash seguro)');
+        console.log('📝 Completa el formulario y haz clic en "Crear Administrador"');
     </script>
 </body>
 </html>
