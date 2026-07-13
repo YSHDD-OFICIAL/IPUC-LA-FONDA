@@ -1,7 +1,8 @@
 <!-- ============================================
-IPUC LA FONDA v5.0 - Web App Profesional
+IPUC LA FONDA v5.0 - Web App Profesional Completa
 Iglesia Pentecostal Unida de Colombia
 "Donde el Espíritu Santo se mueve"
+Sistema de publicaciones, comentarios y reacciones
 ============================================ -->
 <!DOCTYPE html>
 <html lang="es-CO">
@@ -15,7 +16,7 @@ Iglesia Pentecostal Unida de Colombia
 
     <!-- SEO -->
     <meta name="title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
-    <meta name="description" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia. Donde el Espíritu Santo se mueve. Plataforma oficial de la congregación con cultos, eventos, noticias y comunidad cristiana.">
+    <meta name="description" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia. Donde el Espíritu Santo se mueve. Plataforma oficial con cultos, eventos, noticias, publicaciones y comunidad cristiana.">
     <meta name="keywords" content="IPUC, LA FONDA, Iglesia Pentecostal Unida de Colombia, iglesia cristiana, cultos cristianos, comunidad cristiana">
     <meta name="author" content="IPUC LA FONDA">
     <meta name="robots" content="index, follow, max-image-preview:large">
@@ -27,7 +28,7 @@ Iglesia Pentecostal Unida de Colombia
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
     <meta property="og:title" content="IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia">
-    <meta property="og:description" content="Donde el Espíritu Santo se mueve. Plataforma oficial.">
+    <meta property="og:description" content="Donde el Espíritu Santo se mueve. Plataforma oficial con publicaciones y comunidad.">
     <meta property="og:image" content="https://ipuclafonda.netlify.app/ipuclafonda.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -141,6 +142,7 @@ Iglesia Pentecostal Unida de Colombia
                 <div class="nav-section">
                     <span class="nav-section-title">Principal</span>
                     <a href="#inicio" class="nav-item active" data-page="inicio"><i class="bx bx-home-alt-2"></i><span>Inicio</span></a>
+                    <a href="#publicaciones" class="nav-item" data-page="publicaciones"><i class="bx bx-news"></i><span>Publicaciones</span><span class="badge hidden">0</span></a>
                     <a href="#horarios" class="nav-item" data-page="horarios"><i class="bx bx-time-five"></i><span>Horarios</span></a>
                     <a href="#asistencia" class="nav-item" data-page="asistencia"><i class="bx bx-check-shield"></i><span>Asistencia</span></a>
                     <a href="#noticias" class="nav-item" data-page="noticias"><i class="bx bx-news"></i><span>Noticias</span><span class="badge hidden">0</span></a>
@@ -148,11 +150,10 @@ Iglesia Pentecostal Unida de Colombia
                 </div>
                 <div class="nav-section">
                     <span class="nav-section-title">Comunidad</span>
-                    <a href="#chat" class="nav-item" data-page="chat"><i class="bx bx-chat"></i><span>Chat</span><span class="badge hidden">0</span></a>
+                    <a href="#chat" class="nav-item" data-page="chat"><i class="bx bx-chat"></i><span>Chat</span></a>
                     <a href="#directorio" class="nav-item" data-page="directorio"><i class="bx bx-group"></i><span>Directorio</span></a>
                     <a href="#peticiones" class="nav-item" data-page="peticiones"><i class="bx bx-pray"></i><span>Peticiones</span></a>
                     <a href="#encuestas" class="nav-item" data-page="encuestas"><i class="bx bx-poll"></i><span>Encuestas</span></a>
-                    <a href="#cumpleanos" class="nav-item" data-page="cumpleanos"><i class="bx bx-cake"></i><span>Cumpleaños</span></a>
                 </div>
                 <div class="nav-section">
                     <span class="nav-section-title">Recursos</span>
@@ -291,24 +292,21 @@ Iglesia Pentecostal Unida de Colombia
     <!-- FAB -->
     <button id="fab-main" class="fab hidden"><i class="bx bx-plus"></i></button>
     <div id="fab-menu" class="fab-menu hidden">
+        <button class="fab-item" data-action="publicar"><i class="bx bx-news"></i><span>Publicar</span></button>
         <button class="fab-item" data-action="oracion"><i class="bx bx-pray"></i><span>Oración</span></button>
         <button class="fab-item" data-action="asistencia"><i class="bx bx-check-shield"></i><span>Asistencia</span></button>
         <button class="fab-item" data-action="compartir"><i class="bx bx-share-alt"></i><span>Compartir</span></button>
-        <button class="fab-item" data-action="biblia"><i class="bx bx-bible"></i><span>Biblia</span></button>
     </div>
 
     <!-- ============================================
-    SCRIPTS - TODOS LOS ARCHIVOS JS v5.0
+    SCRIPTS - ORDEN CORRECTO DE CARGA
     ============================================ -->
-    <!-- PRIMERO: La clase Database -->
+    <!-- 1. Base de datos (Database class + instancia db) -->
     <script src="database.js" defer></script>
-    <!-- SEGUNDO: Las funciones que usan Database -->
+    <!-- 2. Funciones helper (app.js usa db) -->
     <script src="app.js" defer></script>
-    <!-- TERCERO: La UI que usa db -->
+    <!-- 3. UI principal (script.js usa db y funciones de app.js) -->
     <script src="script.js" defer></script>
-
-    <script src="crear-admin.js" defer></script>
-    <script src="generar_hash.js" defer></script>
 
     <!-- REGISTRO DEL SERVICE WORKER (PWA) -->
     <script>
@@ -330,6 +328,36 @@ Iglesia Pentecostal Unida de Colombia
             });
         }
         if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) document.body.classList.add('pwa-mode');
+
+        // Banner de instalación PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const banner = document.createElement('div');
+            banner.className = 'pwa-install-banner';
+            banner.innerHTML = `
+                <div class="install-banner-content">
+                    <div class="install-banner-icon"><img src="ipuclafonda.png" alt="IPUC LA FONDA" width="48" height="48"></div>
+                    <div class="install-banner-text">
+                        <strong>IPUC LA FONDA</strong>
+                        <p>Instala esta aplicación en tu dispositivo</p>
+                    </div>
+                    <button class="btn-primary btn-sm" id="btn-install-app"><i class="bx bx-download"></i> Instalar</button>
+                    <button class="btn-icon" id="btn-dismiss-install"><i class="bx bx-x"></i></button>
+                </div>`;
+            document.body.appendChild(banner);
+            document.getElementById('btn-install-app')?.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`📱 Usuario ${outcome === 'accepted' ? 'instaló' : 'rechazó'} la app`);
+                deferredPrompt = null;
+                banner.remove();
+            });
+            document.getElementById('btn-dismiss-install')?.addEventListener('click', () => banner.remove());
+        });
+        window.addEventListener('appinstalled', () => { console.log('✅ PWA instalada'); });
     </script>
 </body>
 </html>
