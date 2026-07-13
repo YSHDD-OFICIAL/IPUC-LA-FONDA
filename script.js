@@ -2,10 +2,25 @@
 // IPUC LA FONDA - SCRIPT.JS v5.0 COMPLETO Y PROFESIONAL
 // Web App Profesional - Todas las secciones funcionales
 // Autenticación LOCAL con Database v5.0
-// Formularios, botones, enlaces y funciones 100% operativas
-// Sistema de publicaciones, perfil público, comentarios y reacciones
+// CORREGIDO: Funciones globales, DB, temas
 // "Donde el Espíritu Santo se mueve"
 // ============================================
+
+// ============================================
+// INICIALIZACIÓN DE BASE DE DATOS
+// ============================================
+let db;
+try {
+    if (typeof Database !== 'undefined') {
+        db = new Database();
+        db.inicializarDatos();
+        console.log('✅ DB inicializada desde script.js');
+    } else {
+        console.warn('⚠️ Database no disponible');
+    }
+} catch (e) {
+    console.error('❌ Error al crear DB:', e);
+}
 
 // ============================================
 // CONFIGURACIÓN GLOBAL
@@ -65,6 +80,130 @@ const APP_STATE = {
 };
 
 // ============================================
+// FUNCIONES DE TEMA (DEBEN DEFINIRSE PRIMERO)
+// ============================================
+function toggleTema() { 
+    APP_STATE.tema = APP_STATE.tema === 'light' ? 'dark' : 'light'; 
+    aplicarTema(APP_STATE.tema); 
+    localStorage.setItem(CONFIG.STORAGE_KEYS.TEMA, APP_STATE.tema); 
+}
+
+function aplicarTema(t) { 
+    document.documentElement.setAttribute('data-theme', t); 
+    const i = document.querySelector('#theme-toggle i'); 
+    if (i) i.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon'; 
+}
+
+// ============================================
+// FUNCIONES DE TOAST
+// ============================================
+function showToast(m, tipo = 'info') { 
+    const c = document.getElementById('toast-container'); 
+    if (!c) return; 
+    const t = document.createElement('div'); 
+    t.className = `toast ${tipo}`; 
+    t.setAttribute('role', 'alert'); 
+    t.innerHTML = `<span>${m}</span>`; 
+    c.appendChild(t); 
+    setTimeout(() => { t.classList.add('toast-hide'); setTimeout(() => t.remove(), 300); }, 3500); 
+}
+
+function togglePassword(id) { 
+    const i = document.getElementById(id); 
+    if (!i) return; 
+    const icon = i.parentElement?.querySelector('i'); 
+    if (i.type === 'password') { i.type = 'text'; if (icon) icon.className = 'bx bx-hide'; } 
+    else { i.type = 'password'; if (icon) icon.className = 'bx bx-show'; } 
+}
+
+function formatearFecha(f) { 
+    const d = new Date(f), a = new Date(); 
+    const diff = a - d; 
+    if (diff < 60000) return 'Ahora'; 
+    if (diff < 3600000) return `Hace ${Math.floor(diff/60000)} min`; 
+    if (diff < 86400000) return `Hace ${Math.floor(diff/3600000)} h`; 
+    return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }); 
+}
+
+// ============================================
+// FUNCIONES DE MODAL Y CONFIRMACIÓN
+// ============================================
+function cerrarModal() { 
+    document.getElementById('modal')?.classList.add('hidden'); 
+    document.getElementById('modal-footer')?.classList.add('hidden'); 
+}
+
+function confirmarAccion(ti, me, cb) { 
+    const titleEl = document.getElementById('confirm-title');
+    const messageEl = document.getElementById('confirm-message');
+    const modal = document.getElementById('confirm-modal');
+    if (!modal) return;
+    if (titleEl) titleEl.textContent = ti; 
+    if (messageEl) messageEl.textContent = me; 
+    APP_STATE.pendingConfirmation = cb; 
+    modal.classList.remove('hidden'); 
+}
+
+// ============================================
+// FUNCIONES DE AUTENTICACIÓN
+// ============================================
+function mostrarLogin() {
+    const m = document.getElementById('modal'), b = document.getElementById('modal-body'), t = document.getElementById('modal-title'), f = document.getElementById('modal-footer');
+    if (!m || !b) return; if (t) t.textContent = 'Iniciar Sesión'; if (f) f.classList.add('hidden');
+    b.innerHTML = `<form id="login-form"><div class="form-group"><label>Usuario o Correo</label><input type="text" class="form-input" id="login-usuario" placeholder="Ingresa tu usuario o correo" required></div><div class="form-group"><label>Contraseña</label><div style="position:relative;"><input type="password" class="form-input" id="login-password" placeholder="Ingresa tu contraseña" required><button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);"><i class="bx bx-show"></i></button></div></div><button type="submit" class="btn-primary" style="width:100%;"><i class="bx bx-log-in"></i> Iniciar Sesión</button></form><p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarRegistro()" style="color:var(--azul-primario);">¿No tienes cuenta? Regístrate aquí</a></p>`;
+    m.classList.remove('hidden');
+    document.getElementById('login-form').addEventListener('submit', function(e) { e.preventDefault(); const u = document.getElementById('login-usuario').value.trim(), p = document.getElementById('login-password').value; if (!u || !p) return showToast('Completa los campos','warning'); realizarLogin(u, p); });
+}
+
+function realizarLogin(usuario, password) {
+    if (typeof db === 'undefined') { showToast('Error: Base de datos no disponible', 'error'); return; }
+    const r = db.login(usuario, password);
+    if (r?.error) return showToast(r.error, 'error');
+    if (r?.token) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, r.token);
+        localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIO, JSON.stringify(r.usuario));
+        localStorage.setItem(CONFIG.STORAGE_KEYS.ROL, r.rol);
+        APP_STATE.token = r.token; APP_STATE.usuario = r.usuario; APP_STATE.rol = r.rol;
+        cerrarModal(); mostrarApp(); showToast('¡Bienvenido, ' + r.usuario.nombre + '!', 'success');
+        return;
+    }
+    showToast('Error al iniciar sesión', 'error');
+}
+
+function mostrarRegistro() {
+    const m = document.getElementById('modal'), b = document.getElementById('modal-body'), t = document.getElementById('modal-title'), f = document.getElementById('modal-footer');
+    if (!m || !b) return; if (t) t.textContent = 'Crear Cuenta'; if (f) f.classList.add('hidden');
+    b.innerHTML = `<form id="registro-form"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div class="form-group"><label>Nombre *</label><input type="text" class="form-input" name="nombre" required></div><div class="form-group"><label>Apellidos *</label><input type="text" class="form-input" name="apellidos" required></div></div><div class="form-group"><label>Documento *</label><input type="text" class="form-input" name="documento" required></div><div class="form-group"><label>Fecha Nac. *</label><input type="date" class="form-input" name="fecha_nacimiento" required></div><div class="form-group"><label>Sexo *</label><select class="form-input" name="sexo" required><option value="">Seleccionar...</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select></div><div class="form-group"><label>Correo *</label><input type="email" class="form-input" name="correo" required></div><div class="form-group"><label>Celular *</label><input type="tel" class="form-input" name="celular" required></div><div class="form-group"><label>Ministerio *</label><select class="form-input" name="ministerio" required><option value="">Seleccionar...</option><option value="Jóvenes">Jóvenes</option><option value="Alabanza">Alabanza</option><option value="Niños">Niños</option><option value="Misiones">Misiones</option><option value="Servicio">Servicio</option><option value="General">General</option></select></div><div class="form-group"><label>Usuario *</label><input type="text" class="form-input" name="usuario" required></div><div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" name="password" required minlength="8"></div><button type="submit" class="btn-primary" style="width:100%;margin-top:8px;"><i class="bx bx-user-plus"></i> Crear Cuenta</button></form><p style="text-align:center;margin-top:16px;"><a href="#" onclick="mostrarLogin()" style="color:var(--azul-primario);">¿Ya tienes cuenta? Inicia sesión</a></p>`;
+    m.classList.remove('hidden');
+    document.getElementById('registro-form').addEventListener('submit', function(e) { 
+        e.preventDefault(); 
+        const fd = new FormData(this); 
+        const d = Object.fromEntries(fd);
+        if (typeof db === 'undefined') { showToast('Error: Base de datos no disponible', 'error'); return; }
+        const r = db.registrarUsuario(d); 
+        if (r?.error) return showToast(r.error, 'error'); 
+        showToast('✅ Registro exitoso. Inicia sesión', 'success'); 
+        setTimeout(() => mostrarLogin(), 1500); 
+    });
+}
+
+function continuarComoInvitado() { 
+    APP_STATE.rol = 'invitado'; APP_STATE.token = 'guest'; 
+    APP_STATE.usuario = { id: 0, nombre: 'Invitado', usuario: 'invitado', foto: 'assets/avatars/default.png', verificado: false, ministerio: 'Visitante', insignias: [] }; 
+    mostrarApp(); showToast('Navegando como invitado', 'info'); 
+}
+
+function cerrarSesion() { 
+    [CONFIG.STORAGE_KEYS.TOKEN, CONFIG.STORAGE_KEYS.USUARIO, CONFIG.STORAGE_KEYS.ROL].forEach(k => localStorage.removeItem(k)); 
+    APP_STATE.token = null; APP_STATE.usuario = null; APP_STATE.rol = null; 
+    if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval); 
+    if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval); 
+    document.getElementById('user-dropdown')?.classList.add('hidden'); 
+    APP_STATE.userDropdownOpen = false; 
+    mostrarBienvenida(); showToast('Sesión cerrada', 'info'); 
+}
+
+// ============================================
 // INICIALIZACIÓN PRINCIPAL
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -84,7 +223,6 @@ function inicializarApp() {
         let usuario = null;
         try { usuario = usuarioData ? JSON.parse(usuarioData) : null; } catch (e) {}
 
-        // Cargar publicaciones del localStorage
         APP_STATE.publicaciones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PUBLICACIONES) || '[]');
         APP_STATE.comentarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.COMENTARIOS) || '[]');
         APP_STATE.reacciones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REACCIONES) || '{}');
@@ -231,303 +369,37 @@ function actualizarSidebarUsuario() {
 }
 
 // ============================================
-// CARGAR PÁGINAS
+// CONTADOR, FECHA, VERSÍCULO
 // ============================================
-function cargarPagina(page) {
-    const c = document.getElementById('page-content'); if (!c) return;
-    c.innerHTML = '<div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>';
-    setTimeout(() => {
-        switch(page) {
-            case 'inicio': cargarInicio(c); break;
-            case 'horarios': cargarHorarios(c); break;
-            case 'asistencia': cargarAsistencia(c); break;
-            case 'noticias': cargarNoticias(c); break;
-            case 'eventos': cargarEventos(c); break;
-            case 'chat': cargarChat(c); break;
-            case 'directorio': cargarDirectorio(c); break;
-            case 'peticiones': cargarPeticiones(c); break;
-            case 'encuestas': cargarEncuestas(c); break;
-            case 'biblioteca': cargarBiblioteca(c); break;
-            case 'galeria': cargarGaleria(c); break;
-            case 'devocional': cargarDevocional(c); break;
-            case 'perfil': cargarPerfil(c); break;
-            case 'configuracion': cargarConfiguracion(c); break;
-            case 'publicaciones': cargarPublicaciones(c); break;
-            case 'muro': cargarMuro(c); break;
-            case 'dashboard': cargarDashboard(c); break;
-            case 'gestion-usuarios': cargarGestionUsuarios(c); break;
-            case 'gestion-noticias': cargarGestionNoticias(c); break;
-            case 'gestion-eventos': cargarGestionEventos(c); break;
-            case 'versiculos': cargarVersiculos(c); break;
-            case 'sistema': cargarSistema(c); break;
-            default: c.innerHTML = `<div class="card fade-in"><h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2><p style="text-align:center;padding:40px;">Sección en desarrollo</p></div>`;
-        }
-    }, 150);
+function iniciarContadorRegresivo() { if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval); actualizarContador(); APP_STATE.contadorInterval = setInterval(actualizarContador, 1000); }
+function actualizarContador() {
+    const els = { d: document.getElementById('contador-dias'), h: document.getElementById('contador-horas'), m: document.getElementById('contador-minutos'), s: document.getElementById('contador-segundos'), t: document.getElementById('contador-titulo') };
+    if (!els.d && !els.t) return;
+    const ahora = new Date(); const domingo = new Date(ahora); domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7)); domingo.setHours(10,0,0,0); if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
+    const diff = Math.max(0, (domingo - ahora) / 1000);
+    if (els.t) els.t.textContent = 'Culto Dominical - Domingo';
+    if (els.d) els.d.textContent = String(Math.floor(diff/86400)).padStart(2,'0');
+    if (els.h) els.h.textContent = String(Math.floor((diff%86400)/3600)).padStart(2,'0');
+    if (els.m) els.m.textContent = String(Math.floor((diff%3600)/60)).padStart(2,'0');
+    if (els.s) els.s.textContent = String(Math.floor(diff%60)).padStart(2,'0');
 }
+function actualizarFechaHora() {
+    const a = new Date();
+    const fe = document.getElementById('fecha-actual'); if (fe) fe.textContent = a.toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const ho = document.getElementById('hora-actual'); if (ho) ho.textContent = a.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function iniciarActualizacionFecha() { if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval); actualizarFechaHora(); APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000); }
+function cargarVersiculoDiario() { const c = document.getElementById('versiculo-content'); if (!c) return; const v = CONFIG.VERSICULOS[new Date().getDay() % CONFIG.VERSICULOS.length]; c.innerHTML = `<p>"${v.texto}"</p><p style="font-weight:700;color:var(--azul-primario);">${v.referencia}</p>`; }
 
 // ============================================
-// SISTEMA DE PUBLICACIONES
+// ACCIONES
 // ============================================
-function guardarPublicaciones() {
-    localStorage.setItem(CONFIG.STORAGE_KEYS.PUBLICACIONES, JSON.stringify(APP_STATE.publicaciones));
-    localStorage.setItem(CONFIG.STORAGE_KEYS.COMENTARIOS, JSON.stringify(APP_STATE.comentarios));
-    localStorage.setItem(CONFIG.STORAGE_KEYS.REACCIONES, JSON.stringify(APP_STATE.reacciones));
-}
-
-function crearPublicacion(contenido, imagen = '') {
-    if (!APP_STATE.usuario) return showToast('Inicia sesión para publicar', 'warning');
-    if (!contenido.trim()) return showToast('Escribe algo para publicar', 'warning');
-    
-    const publicacion = {
-        id: Date.now(),
-        usuario_id: APP_STATE.usuario.id,
-        autor: APP_STATE.usuario.nombre + ' ' + (APP_STATE.usuario.apellidos || ''),
-        usuario: APP_STATE.usuario.usuario,
-        foto_autor: APP_STATE.usuario.foto || 'assets/avatars/default.png',
-        verificado: APP_STATE.usuario.verificado || false,
-        contenido: contenido.trim(),
-        imagen: imagen,
-        fecha: new Date().toISOString(),
-        reacciones: { amen: 0, me_gusta: 0, fuego: 0, orando: 0, bendicion: 0 },
-        comentarios_count: 0
-    };
-    
-    APP_STATE.publicaciones.unshift(publicacion);
-    guardarPublicaciones();
-    
-    if (typeof db !== 'undefined' && db.addNotificacion) {
-        db.addNotificacion({ titulo: '📝 Nueva publicación', mensaje: `${publicacion.autor} ha publicado en el muro`, tipo: 'publicacion' });
-    }
-    
-    showToast('✅ Publicación creada', 'success');
-    return publicacion;
-}
-
-function agregarComentario(publicacionId, contenido) {
-    if (!APP_STATE.usuario) return showToast('Inicia sesión para comentar', 'warning');
-    if (!contenido.trim()) return;
-    
-    const comentario = {
-        id: Date.now(),
-        publicacion_id: publicacionId,
-        usuario_id: APP_STATE.usuario.id,
-        autor: APP_STATE.usuario.nombre,
-        usuario: APP_STATE.usuario.usuario,
-        foto_autor: APP_STATE.usuario.foto || 'assets/avatars/default.png',
-        contenido: contenido.trim(),
-        fecha: new Date().toISOString()
-    };
-    
-    APP_STATE.comentarios.push(comentario);
-    
-    const pub = APP_STATE.publicaciones.find(p => p.id === publicacionId);
-    if (pub) pub.comentarios_count = (pub.comentarios_count || 0) + 1;
-    
-    guardarPublicaciones();
-    return comentario;
-}
-
-function toggleReaccion(publicacionId, tipoReaccion) {
-    if (!APP_STATE.usuario) return showToast('Inicia sesión para reaccionar', 'warning');
-    
-    const clave = `${publicacionId}_${APP_STATE.usuario.id}`;
-    const reaccionActual = APP_STATE.reacciones[clave];
-    
-    if (reaccionActual === tipoReaccion) {
-        // Quitar reacción
-        delete APP_STATE.reacciones[clave];
-        const pub = APP_STATE.publicaciones.find(p => p.id === publicacionId);
-        if (pub && pub.reacciones[tipoReaccion] > 0) pub.reacciones[tipoReaccion]--;
-    } else {
-        // Cambiar o agregar reacción
-        if (reaccionActual) {
-            const pub = APP_STATE.publicaciones.find(p => p.id === publicacionId);
-            if (pub && pub.reacciones[reaccionActual] > 0) pub.reacciones[reaccionActual]--;
-        }
-        APP_STATE.reacciones[clave] = tipoReaccion;
-        const pub = APP_STATE.publicaciones.find(p => p.id === publicacionId);
-        if (pub) pub.reacciones[tipoReaccion] = (pub.reacciones[tipoReaccion] || 0) + 1;
-    }
-    
-    guardarPublicaciones();
-}
-
-function getReaccionUsuario(publicacionId) {
-    if (!APP_STATE.usuario) return null;
-    const clave = `${publicacionId}_${APP_STATE.usuario.id}`;
-    return APP_STATE.reacciones[clave] || null;
-}
-
-function getComentariosPublicacion(publicacionId) {
-    return APP_STATE.comentarios.filter(c => c.publicacion_id === publicacionId)
-        .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-}
-
-// ============================================
-// PÁGINA: PUBLICACIONES / MURO
-// ============================================
-function cargarPublicaciones(c) {
-    c.innerHTML = `<div class="fade-in"><h2><i class="bx bx-news"></i> Publicaciones</h2>
-        ${APP_STATE.usuario ? `
-        <div class="card" style="margin-bottom:16px;">
-            <h3>Crear Publicación</h3>
-            <form id="form-publicacion">
-                <div class="form-group"><textarea class="form-input" id="contenido-publicacion" placeholder="¿Qué quieres compartir? ✝️" rows="3" required></textarea></div>
-                <div class="form-group"><input type="text" class="form-input" id="imagen-publicacion" placeholder="URL de imagen (opcional)"></div>
-                <button type="submit" class="btn-primary btn-sm"><i class="bx bx-send"></i> Publicar</button>
-            </form>
-        </div>` : '<div class="card" style="margin-bottom:16px;text-align:center;padding:20px;"><p>Inicia sesión para publicar</p></div>'}
-        <div id="lista-publicaciones">${renderPublicaciones()}</div>
-    </div>`;
-    
-    document.getElementById('form-publicacion')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const contenido = document.getElementById('contenido-publicacion').value;
-        const imagen = document.getElementById('imagen-publicacion').value;
-        crearPublicacion(contenido, imagen);
-        document.getElementById('contenido-publicacion').value = '';
-        document.getElementById('imagen-publicacion').value = '';
-        cargarPublicaciones(c);
-    });
-    
-    // Event listeners para comentarios y reacciones
-    agregarEventosPublicaciones(c);
-}
-
-function renderPublicaciones() {
-    if (APP_STATE.publicaciones.length === 0) {
-        return '<div class="card"><p style="text-align:center;padding:30px;">No hay publicaciones aún. ¡Sé el primero en publicar!</p></div>';
-    }
-    
-    return APP_STATE.publicaciones.map(p => {
-        const miReaccion = getReaccionUsuario(p.id);
-        const comentarios = getComentariosPublicacion(p.id);
-        
-        return `
-        <div class="card" style="margin-bottom:12px;" id="pub-${p.id}">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                <img src="${p.foto_autor}" alt="${p.autor}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
-                <div style="flex:1;">
-                    <strong>${p.autor} ${p.verificado ? '✅' : ''}</strong>
-                    <p style="font-size:0.75rem;color:var(--gris-texto);">@${p.usuario} · ${formatearFecha(p.fecha)}</p>
-                </div>
-                ${APP_STATE.usuario && APP_STATE.usuario.id === p.usuario_id ? `<button class="btn-icon" onclick="eliminarPublicacion(${p.id})" style="font-size:1rem;"><i class="bx bx-trash"></i></button>` : ''}
-            </div>
-            <p style="margin-bottom:12px;line-height:1.6;">${p.contenido}</p>
-            ${p.imagen ? `<img src="${p.imagen}" alt="Imagen" style="width:100%;max-height:300px;object-fit:cover;border-radius:8px;margin-bottom:12px;" onerror="this.style.display='none'">` : ''}
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:8px 0;border-top:1px solid var(--gris-medio);border-bottom:1px solid var(--gris-medio);">
-                ${CONFIG.REACCIONES_TIPOS.map(r => `
-                    <button onclick="toggleReaccion(${p.id},'${r.clave}');cargarPublicaciones(document.getElementById('page-content'))" 
-                            style="padding:6px 12px;border-radius:20px;border:1px solid var(--gris-medio);background:${miReaccion === r.clave ? 'var(--azul-surface)' : 'transparent'};cursor:pointer;font-size:0.85rem;transition:all 0.2s;">
-                        ${r.icono} ${r.nombre} <span style="font-weight:600;margin-left:4px;">${p.reacciones[r.clave] || 0}</span>
-                    </button>
-                `).join('')}
-            </div>
-            ${comentarios.length > 0 ? `
-            <div style="margin-bottom:8px;">
-                ${comentarios.map(c => `
-                    <div style="display:flex;gap:8px;margin-bottom:8px;padding:8px;background:var(--gris-claro);border-radius:8px;">
-                        <img src="${c.foto_autor}" style="width:28px;height:28px;border-radius:50%;">
-                        <div style="flex:1;">
-                            <strong style="font-size:0.8rem;">${c.autor}</strong>
-                            <p style="font-size:0.85rem;margin:2px 0;">${c.contenido}</p>
-                            <small style="color:var(--gris-medio);">${formatearFecha(c.fecha)}</small>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>` : ''}
-            ${APP_STATE.usuario ? `
-            <div style="display:flex;gap:8px;">
-                <input type="text" class="form-input" id="comentario-${p.id}" placeholder="Escribe un comentario..." style="flex:1;padding:8px 12px;font-size:0.85rem;">
-                <button class="btn-primary btn-sm" onclick="agregarComentario(${p.id},document.getElementById('comentario-${p.id}').value);cargarPublicaciones(document.getElementById('page-content'))" style="white-space:nowrap;"><i class="bx bx-send"></i></button>
-            </div>` : ''}
-        </div>`;
-    }).join('');
-}
-
-function eliminarPublicacion(id) {
-    confirmarAccion('¿Eliminar publicación?', 'Esta acción no se puede deshacer.', () => {
-        APP_STATE.publicaciones = APP_STATE.publicaciones.filter(p => p.id !== id);
-        APP_STATE.comentarios = APP_STATE.comentarios.filter(c => c.publicacion_id !== id);
-        guardarPublicaciones();
-        showToast('✅ Publicación eliminada', 'success');
-        cargarPublicaciones(document.getElementById('page-content'));
-    });
-}
-
-function agregarEventosPublicaciones(c) {
-    // Los eventos se manejan con onclick en los botones
-}
-
-function cargarMuro(c) {
-    cargarPublicaciones(c);
-}
-
-// ============================================
-// PÁGINA: INICIO
-// ============================================
-function cargarInicio(c) {
-    c.innerHTML = `
-        <div class="fade-in">
-            <div class="contador-container">
-                <div class="contador-titulo" id="contador-titulo">Cargando próximo culto...</div>
-                <div class="contador-tiempo">
-                    <div class="contador-item"><span class="contador-numero" id="contador-dias">00</span><span class="contador-etiqueta">Días</span></div>
-                    <div class="contador-item"><span class="contador-numero" id="contador-horas">00</span><span class="contador-etiqueta">Horas</span></div>
-                    <div class="contador-item"><span class="contador-numero" id="contador-minutos">00</span><span class="contador-etiqueta">Minutos</span></div>
-                    <div class="contador-item"><span class="contador-numero" id="contador-segundos">00</span><span class="contador-etiqueta">Segundos</span></div>
-                </div>
-                <div class="contador-estado estado-proximo" id="contador-estado">PRÓXIMO CULTO</div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
-                <div class="card card-glass"><div style="display:flex;align-items:center;gap:10px;"><div style="width:44px;height:44px;border-radius:50%;background:var(--azul-primario);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;"><i class="bx bx-calendar"></i></div><div><div style="font-size:0.7rem;opacity:0.7;">Fecha</div><div style="font-weight:700;" id="fecha-actual"></div></div></div></div>
-                <div class="card card-glass"><div style="display:flex;align-items:center;gap:10px;"><div style="width:44px;height:44px;border-radius:50%;background:var(--dorado);display:flex;align-items:center;justify-content:center;color:var(--azul-primario);font-size:1.3rem;"><i class="bx bx-time"></i></div><div><div style="font-size:0.7rem;opacity:0.7;">Hora</div><div style="font-weight:700;" id="hora-actual"></div></div></div></div>
-            </div>
-            <div class="card" style="border-left:4px solid var(--dorado);"><h3><i class="bx bx-bible" style="color:var(--dorado);"></i> Versículo del Día</h3><div id="versiculo-content" style="font-style:italic;font-size:1rem;line-height:1.8;margin-top:8px;">Cargando...</div></div>
-            <div class="card" style="margin-top:12px;"><h3>Accesos Rápidos</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-top:8px;">
-                <button class="btn-outline btn-sm" onclick="navegarA('asistencia')"><i class="bx bx-check-shield"></i> Asistencia</button>
-                <button class="btn-outline btn-sm" onclick="navegarA('peticiones')"><i class="bx bx-pray"></i> Oración</button>
-                <button class="btn-outline btn-sm" onclick="navegarA('publicaciones')"><i class="bx bx-news"></i> Publicaciones</button>
-                <button class="btn-outline btn-sm" onclick="navegarA('devocional')"><i class="bx bx-bible"></i> Devocional</button>
-            </div></div>
-            <div class="card" style="margin-top:12px;"><h3>Últimas Publicaciones</h3><div id="ultimas-publicaciones" style="margin-top:8px;">${APP_STATE.publicaciones.slice(0,3).map(p => `
-                <div style="padding:8px 0;border-bottom:1px solid var(--gris-medio);">
-                    <strong>${p.autor} ${p.verificado?'✅':''}</strong>
-                    <p style="font-size:0.85rem;color:var(--gris-texto);">${p.contenido.substring(0,100)}...</p>
-                    <small>${formatearFecha(p.fecha)}</small>
-                </div>
-            `).join('') || '<p style="text-align:center;color:var(--gris-texto);">No hay publicaciones aún</p>'}</div>
-            <button class="btn-outline btn-sm" onclick="navegarA('publicaciones')" style="margin-top:8px;width:100%;">Ver todas las publicaciones</button></div>
-        </div>`;
-    actualizarFechaHora();
-    if (!APP_STATE.fechaInterval) APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000);
-    cargarVersiculoDiario();
-}
-
-// ============================================
-// PÁGINAS: HORARIOS, ASISTENCIA, ETC. (MANTENIDAS IGUAL)
-// ============================================
-function cargarHorarios(c) {
-    const h = [
-        { dia: 'Lunes', cultos: [] }, { dia: 'Martes', cultos: [{ nombre: 'Culto de Oración', hora: '6:00 PM - 8:30 PM' }] },
-        { dia: 'Miércoles', cultos: [{ nombre: 'Culto Campal', hora: '4:00 PM - 7:00 PM' }] },
-        { dia: 'Jueves', cultos: [{ nombre: 'Culto de Refrán', hora: '4:00 PM - 7:00 PM' }] },
-        { dia: 'Viernes', cultos: [{ nombre: 'Culto de Jóvenes', hora: '6:00 PM - 8:30 PM' }] },
-        { dia: 'Sábado', cultos: [] }, { dia: 'Domingo', cultos: [{ nombre: 'Culto Dominical', hora: '10:00 AM - 12:00 PM' }] }
-    ];
-    const da = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    c.innerHTML = `<div class="fade-in"><h2><i class="bx bx-time-five"></i> Horarios de Cultos</h2><div style="display:grid;gap:10px;margin-top:16px;">
-        ${h.map((d, i) => `<div class="card" style="border-left:4px solid ${i === da ? 'var(--azul-primario)' : 'var(--gris-medio)'};"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3>${d.dia} ${i === da ? '<span style="background:var(--azul-primario);color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;">HOY</span>' : ''}</h3>${d.cultos.length ? d.cultos.map(x => `<p style="color:var(--gris-texto);">${x.nombre} - ${x.hora}</p>`).join('') : '<p style="color:var(--gris-texto);">No hay culto</p>'}</div>${d.cultos.length ? '<button class="btn-primary btn-sm" onclick="navegarA(\'asistencia\')">Asistir</button>' : ''}</div></div>`).join('')}
-    </div></div>`;
-}
-
-// [El resto de funciones de páginas se mantienen igual que en la versión anterior]
-// cargarAsistencia, cargarNoticias, cargarEventos, cargarChat, cargarDirectorio,
-// cargarPeticiones, cargarEncuestas, cargarBiblioteca, cargarGaleria,
-// cargarDevocional, cargarPerfil, cargarConfiguracion,
-// cargarDashboard, cargarGestionUsuarios, cargarGestionNoticias,
-// cargarGestionEventos, cargarVersiculos, cargarSistema
-// ... (incluidas en el código completo)
+function confirmarAsistencia(e) { const t = document.querySelector('input[name="tipo-asistente"]:checked')?.value || 'Hermano'; showToast(`✅ Asistencia: ${e} (${t})`, 'success'); }
+function compartirVersiculo() { const v = CONFIG.VERSICULOS[new Date().getDay() % CONFIG.VERSICULOS.length]; if (navigator.share) navigator.share({ title: 'IPUC LA FONDA', text: `"${v.texto}" - ${v.referencia}` }).catch(()=>{}); else { navigator.clipboard?.writeText(`"${v.texto}" - ${v.referencia}`); showToast('📋 Copiado', 'info'); } }
+function toggleNotificaciones() { APP_STATE.notificationsOpen = !APP_STATE.notificationsOpen; const p = document.getElementById('notification-panel'); if (!p) return; APP_STATE.notificationsOpen ? (p.classList.remove('hidden'), cargarNotificaciones()) : p.classList.add('hidden'); }
+function toggleSearchBar() { APP_STATE.searchBarOpen = !APP_STATE.searchBarOpen; const b = document.getElementById('search-bar'); if (!b) return; APP_STATE.searchBarOpen ? (b.classList.remove('hidden'), document.getElementById('global-search-input')?.focus()) : b.classList.add('hidden'); }
+function toggleFabMenu() { APP_STATE.fabMenuOpen = !APP_STATE.fabMenuOpen; document.getElementById('fab-menu')?.classList.toggle('hidden', !APP_STATE.fabMenuOpen); }
+function toggleUserDropdown() { APP_STATE.userDropdownOpen = !APP_STATE.userDropdownOpen; document.getElementById('user-dropdown')?.classList.toggle('hidden', !APP_STATE.userDropdownOpen); }
 
 // ============================================
 // EXPORTAR A WINDOW
@@ -542,15 +414,8 @@ window.confirmarAccion = confirmarAccion;
 window.navegarA = navegarA;
 window.cargarVersiculoDiario = cargarVersiculoDiario;
 window.toggleTema = toggleTema;
+window.aplicarTema = aplicarTema;
 window.showToast = showToast;
-window.crearPublicacion = crearPublicacion;
-window.agregarComentario = agregarComentario;
-window.toggleReaccion = toggleReaccion;
-window.eliminarPublicacion = eliminarPublicacion;
-window.exportarDatos = exportarDatos;
-window.importarDatos = importarDatos;
+window.db = db;
 
 console.log(`✅ IPUC LA FONDA v${CONFIG.VERSION} - Cargado correctamente`);
-console.log('🔒 Autenticación local con Database v5.0');
-console.log('📱 Sistema de publicaciones, comentarios y reacciones');
-console.log('💡 Ejecuta db.crearPrimerAdministrador({...}) para crear el admin');
