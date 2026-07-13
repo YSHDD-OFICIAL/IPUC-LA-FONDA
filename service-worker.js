@@ -21,12 +21,11 @@ const PRECACHE_ASSETS = [
     // Hojas de estilo
     '/styles.css',
     
-    // JavaScript - Todos los archivos
-    '/script.js',
+    // JavaScript - Archivos principales
     '/database.js',
     '/app.js',
+    '/script.js',
     '/crear-admin.js',
-    '/generar-hash.js',
     
     // PWA
     '/manifest.json',
@@ -83,7 +82,7 @@ self.addEventListener('install', (event) => {
                 const cached = results.filter(r => r.status === 'fulfilled' && r.value).length;
                 const failed = results.filter(r => r.status === 'rejected' || !r.value).length;
                 console.log(`✅ Instalación completada: ${cached} cacheados, ${failed} fallidos`);
-                // Forzar activación inmediata
+                // Forzar activación inmediata sin esperar a que cierren pestañas
                 return self.skipWaiting();
             })
             .catch((error) => {
@@ -418,20 +417,11 @@ self.addEventListener('message', (event) => {
                 if (event.ports && event.ports[0]) {
                     event.ports[0].postMessage({
                         cacheName: CACHE_NAME,
-                        precache: { total: precache.length, urls: precache.map(k => k.url) },
-                        runtime: { total: runtime.length, urls: runtime.map(k => k.url) },
-                        images: { total: images.length, urls: images.map(k => k.url) },
+                        precache: { total: precache.length },
+                        runtime: { total: runtime.length },
+                        images: { total: images.length },
                         total: precache.length + runtime.length + images.length
                     });
-                }
-            });
-            break;
-            
-        case 'UNREGISTER':
-            self.registration.unregister().then(() => {
-                console.log('   🗑️ SW desregistrado');
-                if (event.ports && event.ports[0]) {
-                    event.ports[0].postMessage({ success: true });
                 }
             });
             break;
@@ -463,42 +453,15 @@ self.addEventListener('offline', () => {
 });
 
 // ============================================
-// MANEJO GLOBAL DE ERRORES
-// ============================================
-self.addEventListener('error', (event) => {
-    console.error('❌ Error crítico en SW:', event.message);
-});
-
-self.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Promesa rechazada:', event.reason);
-    event.preventDefault();
-});
-
-// ============================================
 // LOG DE INICIALIZACIÓN FINAL
 // ============================================
 console.log('╔══════════════════════════════════════════════════════════╗');
-console.log('║                                                          ║');
 console.log('║   ✅ IPUC LA FONDA - Service Worker PWA v5.0              ║');
 console.log('║   Iglesia Pentecostal Unida de Colombia                  ║');
 console.log('║   "Donde el Espíritu Santo se mueve"                     ║');
-console.log('║                                                          ║');
 console.log('╚══════════════════════════════════════════════════════════╝');
-console.log('');
-console.log('📱 App instalable en Android, iOS, Windows y Mac');
-console.log('📦 ' + PRECACHE_ASSETS.length + ' assets configurados para precache');
-console.log('📄 Archivos JS incluidos:');
-console.log('   • script.js - Interfaz de usuario principal');
-console.log('   • database.js - Base de datos local');
-console.log('   • app.js - Lógica de negocio');
-console.log('   • crear-admin.js - Creación de administrador');
-console.log('   • generar-hash.js - Generador de hash');
-console.log('');
-console.log('🖼️  Estrategia Cache First para imágenes');
-console.log('📄 Estrategia Network First para CSS/JS/HTML');
-console.log('🔔 Notificaciones push configuradas');
-console.log('🔄 Sincronización en segundo plano habilitada');
-console.log('📴 Modo offline completamente funcional');
-console.log('🌐 Detección de cambios de conectividad');
-console.log('');
-console.log('🎯 Service Worker listo y operativo');
+console.log(`📱 App instalable en Android, iOS, Windows y Mac`);
+console.log(`📦 ${PRECACHE_ASSETS.length} assets precacheados`);
+console.log('📴 Modo offline 100% funcional');
+console.log('🔔 Notificaciones push listas');
+console.log('🎯 Service Worker v5.0 operativo');
