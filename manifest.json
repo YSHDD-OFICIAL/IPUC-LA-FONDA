@@ -4,7 +4,7 @@
     "description": "Plataforma oficial de IPUC LA FONDA. Donde el Espíritu Santo se mueve. Accede a cultos, eventos, noticias, devocionales y comunidad cristiana.",
     "start_url": "/",
     "scope": "/",
-    "id": "ipuc-la-fonda-v5.0",
+    "id": "ipuc-la-fonda-v5.1",
     
     "display": "standalone",
     "display_override": [
@@ -25,7 +25,8 @@
         "lifestyle",
         "utilities",
         "education",
-        "books"
+        "books",
+        "religion"
     ],
     "prefer_related_applications": false,
     "iarc_rating_id": "e10+",
@@ -85,24 +86,38 @@
     
     "screenshots": [
         {
-            "src": "/ipuclafonda.png",
-            "sizes": "500x500",
+            "src": "/assets/screenshots/desktop-home.png",
+            "sizes": "1280x720",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "Pantalla principal de IPUC LA FONDA v5.0"
+            "label": "Pantalla principal de IPUC LA FONDA en escritorio"
         },
         {
-            "src": "/ipuclafonda.png",
-            "sizes": "500x500",
+            "src": "/assets/screenshots/mobile-home.png",
+            "sizes": "360x640",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "IPUC LA FONDA v5.0 - Versión móvil"
+            "label": "IPUC LA FONDA - Vista móvil"
+        },
+        {
+            "src": "/assets/screenshots/mobile-publications.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Muro de publicaciones en móvil"
+        },
+        {
+            "src": "/assets/screenshots/mobile-events.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Eventos y calendario en móvil"
         }
     ],
     
     "shortcuts": [
         {
-            "name": "Inicio",
+            "name": "🏠 Inicio",
             "short_name": "Inicio",
             "description": "Ir a la página principal de IPUC LA FONDA",
             "url": "/#inicio",
@@ -115,7 +130,7 @@
             ]
         },
         {
-            "name": "Confirmar Asistencia",
+            "name": "✅ Asistencia",
             "short_name": "Asistencia",
             "description": "Confirmar tu asistencia al próximo culto",
             "url": "/#asistencia",
@@ -128,7 +143,7 @@
             ]
         },
         {
-            "name": "Horarios de Cultos",
+            "name": "🕐 Horarios",
             "short_name": "Horarios",
             "description": "Ver los horarios de cultos semanales",
             "url": "/#horarios",
@@ -141,10 +156,62 @@
             ]
         },
         {
-            "name": "Devocional Diario",
+            "name": "📖 Devocional",
             "short_name": "Devocional",
             "description": "Leer el devocional y versículo del día",
             "url": "/#devocional",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "📰 Noticias",
+            "short_name": "Noticias",
+            "description": "Últimas noticias de la iglesia",
+            "url": "/#noticias",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "📅 Eventos",
+            "short_name": "Eventos",
+            "description": "Calendario de eventos de la iglesia",
+            "url": "/#eventos",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "🙏 Peticiones",
+            "short_name": "Peticiones",
+            "description": "Compartir peticiones de oración",
+            "url": "/#peticiones",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "💬 Mensajes",
+            "short_name": "Mensajes",
+            "description": "Chat y mensajes de la comunidad",
+            "url": "/#chat",
             "icons": [
                 {
                     "src": "/assets/icons/icon-192x192.png",
@@ -162,5 +229,88 @@
             "protocol": "web+ipuc",
             "url": "/?action=%s"
         }
-    ]
+    ],
+    
+    "share_target": {
+        "action": "/#publicaciones",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    },
+    
+    "file_handlers": [
+        {
+            "action": "/",
+            "accept": {
+                "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
+                "text/*": [".txt", ".md"]
+            }
+        }
+    ],
+    
+    "note_taking": {
+        "new_note_url": "/#publicaciones?action=new"
+    },
+    
+    "widgets": [
+        {
+            "name": "Versículo del Día",
+            "short_name": "Versículo",
+            "description": "Versículo bíblico diario de IPUC LA FONDA",
+            "tag": "ipuc-verse-widget",
+            "preview": "/assets/widgets/verse-preview.png",
+            "screenshots": [
+                {
+                    "src": "/assets/widgets/verse-screenshot.png",
+                    "sizes": "300x200",
+                    "type": "image/png"
+                }
+            ],
+            "data": {
+                "api": "/api/verse",
+                "update": "daily"
+            }
+        },
+        {
+            "name": "Próximo Culto",
+            "short_name": "Culto",
+            "description": "Contador regresivo para el próximo culto",
+            "tag": "ipuc-service-widget",
+            "preview": "/assets/widgets/service-preview.png",
+            "screenshots": [
+                {
+                    "src": "/assets/widgets/service-screenshot.png",
+                    "sizes": "300x200",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ],
+    
+    "splash_pages": [
+        {
+            "src": "/assets/splash/splash-640x1136.png",
+            "sizes": "640x1136",
+            "scale": "fit",
+            "dark": true
+        },
+        {
+            "src": "/assets/splash/splash-750x1334.png",
+            "sizes": "750x1334",
+            "scale": "fit",
+            "dark": true
+        },
+        {
+            "src": "/assets/splash/splash-1242x2208.png",
+            "sizes": "1242x2208",
+            "scale": "fit",
+            "dark": true
+        }
+    ],
+    
+    "prefer_related_applications": false
 }
