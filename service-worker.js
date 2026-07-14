@@ -2,7 +2,6 @@
 // IPUC LA FONDA - SERVICE WORKER PWA v5.1
 // Instalable como App Nativa | Offline | Push
 // MEJORADO - OPTIMIZADO - 100% OPERATIVO
-// Incluye todos los archivos JS necesarios
 // "Donde el Espíritu Santo se mueve"
 // ============================================
 
@@ -16,33 +15,20 @@ const VERSION = '5.1';
 const MAX_AGE = 30 * 24 * 60 * 60; // 30 días en segundos
 
 // ============================================
-// ASSETS A PRECACHEAR (SHELL COMPLETO DE LA APLICACIÓN)
+// ASSETS A PRECACHEAR
 // ============================================
 const PRECACHE_ASSETS = [
-    // Páginas principales
     '/',
     '/index.html',
-    
-    // Hojas de estilo
     '/styles.css',
-    
-    // JavaScript - Archivos principales
     '/database.js',
     '/app.js',
     '/script.js',
-    
-    // PWA
     '/manifest.json',
     '/service-worker.js',
-    
-    // Logos e imágenes principales
     '/ipuclafonda.png',
-    
-    // Avatares
     '/assets/avatars/default.png',
     '/assets/avatars/admin.png',
-    
-    // Iconos PWA (necesarios para instalación)
     '/assets/icons/favicon-16x16.png',
     '/assets/icons/favicon-32x32.png',
     '/assets/icons/icon-144x144.png',
@@ -53,21 +39,17 @@ const PRECACHE_ASSETS = [
 ];
 
 // ============================================
-// FUNCIONES DE UTILIDAD
+// UTILIDADES
 // ============================================
 function shouldCache(url) {
-    // No cachear URLs con parámetros de no-cache
     if (url.includes('nocache=true') || url.includes('_=')) return false;
-    
-    // No cachear URLs de admin
-    if (url.includes('/admin/') && !url.includes('/admin/')) return false;
-    
+    if (url.includes('/admin/') && !url.includes('/admin/login')) return false;
     return true;
 }
 
 function isImageRequest(url) {
     return url.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|bmp|tiff)$/i) || 
-           url.includes('/assets/') && !url.includes('.js');
+           (url.includes('/assets/') && !url.includes('.js'));
 }
 
 function isApiRequest(url) {
@@ -80,18 +62,13 @@ function isHtmlRequest(url) {
 }
 
 // ============================================
-// INSTALACIÓN - Precachea todos los assets con verificación
+// INSTALACIÓN
 // ============================================
 self.addEventListener('install', (event) => {
-    console.log(`📦 IPUC LA FONDA v${VERSION} - Instalando Service Worker...`);
-    console.log(`📦 ${PRECACHE_ASSETS.length} assets para precachear`);
-
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(async (cache) => {
-                console.log('📦 Iniciando precacheo de todos los archivos...');
                 const results = [];
-                
                 for (const url of PRECACHE_ASSETS) {
                     try {
                         const response = await fetch(url, { 
@@ -99,49 +76,25 @@ self.addEventListener('install', (event) => {
                             cache: 'no-cache',
                             headers: { 'Cache-Control': 'no-cache' }
                         });
-                        
                         if (response && (response.status === 200 || response.type === 'opaque')) {
                             await cache.put(url, response);
-                            console.log(`   ✅ Cacheado: ${url}`);
                             results.push({ url, success: true });
                         } else {
-                            console.warn(`   ⚠️ No cacheado: ${url} (status: ${response?.status})`);
                             results.push({ url, success: false });
                         }
-                    } catch (error) {
-                        console.warn(`   ⚠️ Error: ${url} - ${error.message}`);
-                        results.push({ url, success: false, error: error.message });
+                    } catch {
+                        results.push({ url, success: false });
                     }
                 }
-                
-                const cached = results.filter(r => r.success).length;
-                const failed = results.filter(r => !r.success).length;
-                console.log(`✅ Instalación completada: ${cached} cacheados, ${failed} fallidos`);
-                
-                // Guardar estadísticas
-                await cache.put('/__cache_stats', new Response(JSON.stringify({
-                    version: VERSION,
-                    timestamp: Date.now(),
-                    total: results.length,
-                    cached,
-                    failed,
-                    assets: results
-                })));
-                
-                // Forzar activación inmediata
                 return self.skipWaiting();
-            })
-            .catch((error) => {
-                console.error('❌ Error fatal durante instalación:', error);
             })
     );
 });
 
 // ============================================
-// ACTIVACIÓN - Limpia caches antiguos y notifica clientes
+// ACTIVACIÓN
 // ============================================
 self.addEventListener('activate', (event) => {
-    console.log(`🔄 IPUC LA FONDA v${VERSION} - Activando Service Worker...`);
     const CURRENT_CACHES = [CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE, API_CACHE, OFFLINE_CACHE];
 
     event.waitUntil(
@@ -150,42 +103,32 @@ self.addEventListener('activate', (event) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
                         if (!CURRENT_CACHES.includes(cacheName)) {
-                            console.log(`   🗑️ Eliminando cache antiguo: ${cacheName}`);
                             return caches.delete(cacheName);
                         }
                     })
                 );
             })
             .then(async () => {
-                console.log('✅ SW activado - Tomando control de todas las pestañas');
-                
-                // Notificar a todos los clientes
                 const clients = await self.clients.matchAll({ 
                     type: 'window',
                     includeUncontrolled: true 
                 });
-                
                 for (const client of clients) {
                     try {
                         client.postMessage({
                             type: 'SW_ACTIVATED',
                             version: VERSION,
-                            timestamp: Date.now(),
-                            cacheName: CACHE_NAME
+                            timestamp: Date.now()
                         });
-                        console.log(`📢 Cliente notificado: ${client.id}`);
-                    } catch (e) {
-                        console.warn(`⚠️ No se pudo notificar cliente: ${client.id}`);
-                    }
+                    } catch {}
                 }
-                
                 return self.clients.claim();
             })
     );
 });
 
 // ============================================
-// FETCH - Estrategias de cache inteligentes
+// FETCH - ESTRATEGIAS DE CACHE
 // ============================================
 self.addEventListener('fetch', (event) => {
     const { request } = event;
@@ -203,52 +146,40 @@ self.addEventListener('fetch', (event) => {
     }
 
     // ============================================
-    // ESTRATEGIA PARA IMÁGENES: Stale-While-Revalidate
+    // IMÁGENES: Stale-While-Revalidate
     // ============================================
     if (isImageRequest(pathname)) {
         event.respondWith(
             caches.match(request).then(async (cached) => {
-                // Si está en cache y es reciente
                 if (cached) {
                     const cacheTime = cached.headers.get('x-cache-time');
                     if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_AGE * 1000)) {
-                        console.log('🖼️ Imagen desde cache:', pathname);
                         return cached;
                     }
                 }
-                
-                // Actualizar en segundo plano
                 try {
                     const networkResponse = await fetch(request);
                     if (networkResponse && networkResponse.ok) {
                         const cache = await caches.open(IMAGE_CACHE);
                         const headers = new Headers(networkResponse.headers);
                         headers.set('x-cache-time', Date.now().toString());
-                        
                         const responseToCache = new Response(networkResponse.body, {
                             status: networkResponse.status,
                             statusText: networkResponse.statusText,
                             headers: headers
                         });
-                        
                         cache.put(request, responseToCache.clone());
-                        console.log('🖼️ Imagen actualizada:', pathname);
                         return responseToCache;
                     }
-                } catch (error) {
-                    console.warn('⚠️ Error actualizando imagen:', pathname);
-                }
-                
-                // Fallback: imagen por defecto
-                if (cached) return cached;
-                return caches.match('/assets/icons/icon-192x192.png');
+                } catch {}
+                return cached || caches.match('/assets/icons/icon-192x192.png');
             })
         );
         return;
     }
 
     // ============================================
-    // ESTRATEGIA PARA APIs: Network First + Cache
+    // APIs: Network First + Cache
     // ============================================
     if (isApiRequest(pathname)) {
         event.respondWith(
@@ -263,10 +194,7 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(async () => {
                     const cached = await caches.match(request);
-                    if (cached) {
-                        console.log('📡 API desde cache:', pathname);
-                        return cached;
-                    }
+                    if (cached) return cached;
                     return new Response(
                         JSON.stringify({
                             error: true,
@@ -288,7 +216,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     // ============================================
-    // ESTRATEGIA PARA HTML: Network First + Cache Fallback
+    // HTML: Network First + Cache Fallback
     // ============================================
     if (request.mode === 'navigate' || isHtmlRequest(pathname)) {
         event.respondWith(
@@ -297,32 +225,18 @@ self.addEventListener('fetch', (event) => {
                     if (response && response.ok) {
                         const cache = await caches.open(RUNTIME_CACHE);
                         cache.put(request, response.clone());
-                        console.log('📄 HTML actualizado:', pathname);
                         return response;
                     }
                     throw new Error('Respuesta no válida');
                 })
-                .catch(async (error) => {
-                    console.warn('⚠️ Error cargando página:', pathname, error.message);
-                    
-                    // Buscar en cache
+                .catch(async () => {
                     const cached = await caches.match(request);
-                    if (cached) {
-                        console.log('📄 HTML desde cache:', pathname);
-                        return cached;
-                    }
-                    
-                    // Fallback: index.html
+                    if (cached) return cached;
                     const index = await caches.match('/');
-                    if (index) {
-                        console.log('🏠 Sirviendo index.html como fallback');
-                        return index;
-                    }
+                    if (index) return index;
                     
-                    // Página offline
                     return new Response(
-                        `
-                        <!DOCTYPE html>
+                        `<!DOCTYPE html>
                         <html>
                         <head>
                             <meta charset="UTF-8">
@@ -340,14 +254,8 @@ self.addEventListener('fetch', (event) => {
                                     color: white;
                                     text-align: center;
                                 }
-                                .offline-content {
-                                    max-width: 400px;
-                                    padding: 20px;
-                                }
-                                .offline-icon {
-                                    font-size: 4rem;
-                                    margin-bottom: 20px;
-                                }
+                                .offline-content { max-width: 400px; padding: 20px; }
+                                .offline-icon { font-size: 4rem; margin-bottom: 20px; }
                                 .retry-btn {
                                     background: #ffd700;
                                     color: #1a237e;
@@ -365,13 +273,10 @@ self.addEventListener('fetch', (event) => {
                                 <div class="offline-icon">📶</div>
                                 <h1>Sin conexión</h1>
                                 <p>IPUC LA FONDA está en modo offline.<br>Revisa tu conexión a internet.</p>
-                                <button class="retry-btn" onclick="location.reload()">
-                                    🔄 Reintentar
-                                </button>
+                                <button class="retry-btn" onclick="location.reload()">🔄 Reintentar</button>
                             </div>
                         </body>
-                        </html>
-                        `,
+                        </html>`,
                         {
                             status: 503,
                             headers: {
@@ -386,24 +291,18 @@ self.addEventListener('fetch', (event) => {
     }
 
     // ============================================
-    // ESTRATEGIA PARA JS/CSS: Cache First + Update
+    // JS/CSS: Cache First + Update
     // ============================================
     if (request.destination === 'script' || request.destination === 'style') {
         event.respondWith(
             caches.match(request).then(async (cached) => {
-                // Actualizar en segundo plano si es necesario
                 const fetchPromise = fetch(request).then(async (response) => {
                     if (response && response.ok) {
                         const cache = await caches.open(RUNTIME_CACHE);
                         cache.put(request, response.clone());
-                        console.log('📦 JS/CSS actualizado:', pathname);
                     }
                     return response;
-                }).catch(() => {
-                    console.log('📦 JS/CSS desde cache:', pathname);
-                    return cached;
-                });
-                
+                }).catch(() => cached);
                 return cached || fetchPromise;
             })
         );
@@ -411,7 +310,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     // ============================================
-    // ESTRATEGIA PARA EL RESTO: Network First
+    // RESTO: Network First
     // ============================================
     event.respondWith(
         fetch(request)
@@ -424,11 +323,7 @@ self.addEventListener('fetch', (event) => {
             })
             .catch(async () => {
                 const cached = await caches.match(request);
-                if (cached) {
-                    console.log('📄 Cache general:', pathname);
-                    return cached;
-                }
-                
+                if (cached) return cached;
                 return new Response(
                     JSON.stringify({
                         error: true,
@@ -449,11 +344,9 @@ self.addEventListener('fetch', (event) => {
 });
 
 // ============================================
-// PUSH NOTIFICATIONS MEJORADAS
+// PUSH NOTIFICATIONS
 // ============================================
 self.addEventListener('push', (event) => {
-    console.log('📨 Notificación push recibida');
-    
     let data = {
         titulo: 'IPUC LA FONDA',
         mensaje: 'Tienes una nueva notificación',
@@ -469,7 +362,7 @@ self.addEventListener('push', (event) => {
         try {
             const pushData = event.data.json();
             data = { ...data, ...pushData };
-        } catch (e) {
+        } catch {
             data.mensaje = event.data.text() || data.mensaje;
         }
     }
@@ -500,28 +393,20 @@ self.addEventListener('push', (event) => {
     
     event.waitUntil(
         self.registration.showNotification(data.titulo, options)
-            .then(() => console.log('✅ Notificación mostrada'))
-            .catch((error) => console.error('❌ Error al mostrar notificación:', error))
     );
 });
 
 // ============================================
-// CLIC EN NOTIFICACIÓN MEJORADO
+// CLIC EN NOTIFICACIÓN
 // ============================================
 self.addEventListener('notificationclick', (event) => {
-    console.log('👆 Clic en notificación:', event.action);
     event.notification.close();
     
-    if (event.action === 'close') {
-        console.log('   ❌ Notificación cerrada por usuario');
-        return;
-    }
+    if (event.action === 'close') return;
     
     const urlToOpen = event.notification.data?.url || '/';
     const notificationId = event.notification.data?.notificationId;
     const tipo = event.notification.data?.tipo || 'general';
-    
-    console.log(`   📍 Abriendo: ${urlToOpen} (${tipo})`);
     
     event.waitUntil(
         clients.matchAll({ 
@@ -529,42 +414,26 @@ self.addEventListener('notificationclick', (event) => {
             includeUncontrolled: true 
         })
         .then(async (windowClients) => {
-            // Buscar ventana existente con la URL
             for (const client of windowClients) {
                 if (client.url.includes(urlToOpen) && 'focus' in client) {
-                    console.log('   🪟 Ventana existente, enfocando...');
                     await client.focus();
                     client.postMessage({
                         type: 'NOTIFICATION_CLICKED',
-                        data: {
-                            notificationId,
-                            tipo,
-                            url: urlToOpen,
-                            timestamp: Date.now()
-                        }
+                        data: { notificationId, tipo, url: urlToOpen, timestamp: Date.now() }
                     });
                     return;
                 }
             }
-            
-            // Abrir nueva ventana
             if (clients.openWindow) {
-                console.log('   🆕 Abriendo nueva ventana...');
                 const newClient = await clients.openWindow(urlToOpen);
                 if (newClient) {
                     setTimeout(() => {
                         newClient.postMessage({
                             type: 'NOTIFICATION_CLICKED',
-                            data: {
-                                notificationId,
-                                tipo,
-                                url: urlToOpen,
-                                timestamp: Date.now()
-                            }
+                            data: { notificationId, tipo, url: urlToOpen, timestamp: Date.now() }
                         });
                     }, 500);
                 }
-                return;
             }
         })
     );
@@ -574,50 +443,29 @@ self.addEventListener('notificationclick', (event) => {
 // SINCRONIZACIÓN EN SEGUNDO PLANO
 // ============================================
 self.addEventListener('sync', (event) => {
-    console.log(`🔄 Evento sync: ${event.tag}`);
-    
     const syncHandlers = {
-        'sync-asistencia': async () => {
-            console.log('✅ Asistencia sincronizada');
-            // Aquí iría la lógica de sincronización
-        },
-        'sync-mensajes': async () => {
-            console.log('✅ Mensajes sincronizados');
-        },
-        'sync-peticiones': async () => {
-            console.log('✅ Peticiones sincronizadas');
-        },
-        'sync-datos': async () => {
-            console.log('✅ Datos sincronizados');
-        },
-        'sync-noticias': async () => {
-            console.log('✅ Noticias sincronizadas');
-        },
-        'sync-publicaciones': async () => {
-            console.log('✅ Publicaciones sincronizadas');
-        }
+        'sync-asistencia': async () => {},
+        'sync-mensajes': async () => {},
+        'sync-peticiones': async () => {},
+        'sync-datos': async () => {},
+        'sync-noticias': async () => {},
+        'sync-publicaciones': async () => {}
     };
     
     if (syncHandlers[event.tag]) {
         event.waitUntil(Promise.resolve(syncHandlers[event.tag]()));
-    } else {
-        console.log(`   ℹ️ Tag no reconocido: ${event.tag}`);
     }
 });
 
 // ============================================
-// MENSAJES DESDE EL CLIENTE MEJORADO
+// MENSAJES DESDE EL CLIENTE
 // ============================================
 self.addEventListener('message', (event) => {
-    console.log('📩 Mensaje del cliente:', event.data?.type);
-    
     if (!event.data || !event.data.type) return;
     
     switch (event.data.type) {
         case 'SKIP_WAITING':
             self.skipWaiting().then(() => {
-                console.log('   ⏩ Nuevo SW activado');
-                // Notificar a todos los clientes
                 self.clients.matchAll().then(clients => {
                     clients.forEach(client => {
                         client.postMessage({
@@ -631,11 +479,7 @@ self.addEventListener('message', (event) => {
             break;
             
         case 'CHECK_FOR_UPDATE':
-            self.registration.update().then(() => {
-                console.log('   🔍 Actualización verificada');
-            }).catch((error) => {
-                console.error('   ❌ Error verificando:', error);
-            });
+            self.registration.update().catch(() => {});
             break;
             
         case 'GET_VERSION':
@@ -644,9 +488,7 @@ self.addEventListener('message', (event) => {
                     version: VERSION,
                     cache: CACHE_NAME,
                     timestamp: Date.now(),
-                    assets: PRECACHE_ASSETS.length,
-                    runtime: RUNTIME_CACHE,
-                    image: IMAGE_CACHE
+                    assets: PRECACHE_ASSETS.length
                 });
             }
             break;
@@ -655,21 +497,12 @@ self.addEventListener('message', (event) => {
             caches.keys().then((names) => {
                 return Promise.all(names.map((name) => caches.delete(name)));
             }).then(() => {
-                console.log('   🧹 Cache completamente limpiado');
                 if (event.ports && event.ports[0]) {
-                    event.ports[0].postMessage({ 
-                        success: true, 
-                        message: 'Cache limpiado',
-                        timestamp: Date.now()
-                    });
+                    event.ports[0].postMessage({ success: true, message: 'Cache limpiado' });
                 }
             }).catch((error) => {
-                console.error('   ❌ Error:', error);
                 if (event.ports && event.ports[0]) {
-                    event.ports[0].postMessage({ 
-                        success: false, 
-                        error: error.message 
-                    });
+                    event.ports[0].postMessage({ success: false, error: error.message });
                 }
             });
             break;
@@ -693,26 +526,15 @@ self.addEventListener('message', (event) => {
                         timestamp: Date.now()
                     });
                 }
-            }).catch((error) => {
-                if (event.ports && event.ports[0]) {
-                    event.ports[0].postMessage({ 
-                        success: false, 
-                        error: error.message 
-                    });
-                }
-            });
+            }).catch(() => {});
             break;
-            
-        default:
-            console.log('   ℹ️ Tipo no manejado:', event.data.type);
     }
 });
 
 // ============================================
-// DETECCIÓN DE CONECTIVIDAD MEJORADA
+// DETECCIÓN DE CONECTIVIDAD
 // ============================================
 self.addEventListener('online', () => {
-    console.log('🌐 Conexión restaurada');
     self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((client) => {
             try {
@@ -721,15 +543,12 @@ self.addEventListener('online', () => {
                     online: true,
                     timestamp: Date.now()
                 });
-            } catch (e) {
-                // Ignorar errores de clientes desconectados
-            }
+            } catch {}
         });
     });
 });
 
 self.addEventListener('offline', () => {
-    console.log('⚠️ Sin conexión - Modo offline activado');
     self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((client) => {
             try {
@@ -738,20 +557,13 @@ self.addEventListener('offline', () => {
                     online: false,
                     timestamp: Date.now()
                 });
-            } catch (e) {
-                // Ignorar errores de clientes desconectados
-            }
+            } catch {}
         });
     });
 });
 
 // ============================================
-// MANEJO DE ERRORES GLOBALES
+// MANEJO DE ERRORES
 // ============================================
-self.addEventListener('error', (event) => {
-    console.error('❌ Error en Service Worker:', event.message, event.filename, event.lineno);
-});
-
-self.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Promesa rechazada en SW:', event.reason);
-});
+self.addEventListener('error', () => {});
+self.addEventListener('unhandledrejection', () => {});
