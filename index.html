@@ -3,6 +3,7 @@ IPUC LA FONDA v5.0 - Web App Profesional Completa
 Iglesia Pentecostal Unida de Colombia
 "Donde el Espíritu Santo se mueve"
 Sistema de publicaciones, comentarios y reacciones
+Autenticación obligatoria - Sin modo invitado
 ============================================ -->
 <!DOCTYPE html>
 <html lang="es-CO">
@@ -96,7 +97,9 @@ Sistema de publicaciones, comentarios y reacciones
 </head>
 <body>
 
-    <!-- SPLASH SCREEN -->
+    <!-- ============================================
+    SPLASH SCREEN
+    ============================================ -->
     <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive">
         <div class="splash-background">
             <div class="splash-particles"></div>
@@ -120,7 +123,9 @@ Sistema de publicaciones, comentarios y reacciones
         </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
+    <!-- ============================================
+    APP PRINCIPAL
+    ============================================ -->
     <div id="app" class="app hidden" role="main">
 
         <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
@@ -142,10 +147,10 @@ Sistema de publicaciones, comentarios y reacciones
                 <div class="nav-section">
                     <span class="nav-section-title">Principal</span>
                     <a href="#inicio" class="nav-item active" data-page="inicio"><i class="bx bx-home-alt-2"></i><span>Inicio</span></a>
-                    <a href="#publicaciones" class="nav-item" data-page="publicaciones"><i class="bx bx-news"></i><span>Publicaciones</span><span class="badge hidden">0</span></a>
+                    <a href="#publicaciones" class="nav-item" data-page="publicaciones"><i class="bx bx-news"></i><span>Publicaciones</span></a>
                     <a href="#horarios" class="nav-item" data-page="horarios"><i class="bx bx-time-five"></i><span>Horarios</span></a>
                     <a href="#asistencia" class="nav-item" data-page="asistencia"><i class="bx bx-check-shield"></i><span>Asistencia</span></a>
-                    <a href="#noticias" class="nav-item" data-page="noticias"><i class="bx bx-news"></i><span>Noticias</span><span class="badge hidden">0</span></a>
+                    <a href="#noticias" class="nav-item" data-page="noticias"><i class="bx bx-news"></i><span>Noticias</span></a>
                     <a href="#eventos" class="nav-item" data-page="eventos"><i class="bx bx-calendar-star"></i><span>Eventos</span></a>
                 </div>
                 <div class="nav-section">
@@ -181,7 +186,7 @@ Sistema de publicaciones, comentarios y reacciones
             <div class="sidebar-footer">
                 <div class="user-mini" id="user-mini">
                     <div class="user-mini-avatar"><img src="assets/avatars/default.png" alt="Avatar" width="42" height="42"><span class="user-status offline"></span></div>
-                    <div class="user-info"><span class="user-name">Invitado</span><span class="user-role">Sin sesión</span></div>
+                    <div class="user-info"><span class="user-name">Miembro</span><span class="user-role">Sin sesión</span></div>
                     <i class="bx bx-chevron-up"></i>
                 </div>
                 <div id="user-dropdown" class="user-dropdown hidden">
@@ -214,7 +219,9 @@ Sistema de publicaciones, comentarios y reacciones
         </main>
     </div>
 
-    <!-- WELCOME SCREEN -->
+    <!-- ============================================
+    PANTALLA DE BIENVENIDA (SOLO LOGIN/REGISTRO)
+    ============================================ -->
     <div id="welcome-screen" class="welcome-screen" role="main">
         <div class="welcome-background"><div class="welcome-overlay"></div><div class="welcome-particles"></div></div>
         <div class="welcome-container">
@@ -225,10 +232,14 @@ Sistema de publicaciones, comentarios y reacciones
                     <p class="welcome-subtitle">Iglesia Pentecostal Unida de Colombia</p>
                     <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
                 </div>
+                <div class="welcome-info">
+                    <p style="color:var(--gris-texto);font-size:0.9rem;margin-bottom:16px;">
+                        <i class="bx bx-lock-alt"></i> Acceso exclusivo para miembros registrados
+                    </p>
+                </div>
                 <div class="welcome-actions">
                     <button id="btn-login" class="btn-primary btn-lg"><i class="bx bx-log-in"></i> Iniciar Sesión</button>
-                    <button id="btn-register" class="btn-secondary btn-lg"><i class="bx bx-user-plus"></i> Registrarse</button>
-                    <button id="btn-continue-guest" class="btn-outline btn-lg"><i class="bx bx-glasses"></i> Invitado</button>
+                    <button id="btn-register" class="btn-secondary btn-lg"><i class="bx bx-user-plus"></i> Crear Cuenta Nueva</button>
                 </div>
                 <div class="welcome-footer">
                     <div class="welcome-features">
@@ -301,14 +312,11 @@ Sistema de publicaciones, comentarios y reacciones
     <!-- ============================================
     SCRIPTS - ORDEN CORRECTO DE CARGA
     ============================================ -->
-    <!-- 1. Base de datos (Database class + instancia db) -->
     <script src="database.js"></script>
-    <!-- 2. Funciones helper (app.js usa db) -->
     <script src="app.js"></script>
-    <!-- 3. UI principal (script.js usa db y funciones de app.js) -->
     <script src="script.js" defer></script>
 
-    <!-- REGISTRO DEL SERVICE WORKER (PWA) -->
+    <!-- SERVICE WORKER -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -320,7 +328,7 @@ Sistema de publicaciones, comentarios y reacciones
                             nw.addEventListener('statechange', () => {
                                 if (nw.state === 'installed' && navigator.serviceWorker.controller) {
                                     const tc = document.getElementById('toast-container');
-                                    if (tc) { const t = document.createElement('div'); t.className = 'toast info'; t.innerHTML = '<span>Nueva versión disponible</span> <button onclick="location.reload()">Actualizar</button>'; tc.appendChild(t); setTimeout(() => { t.classList.add('toast-hide'); setTimeout(() => t.remove(), 300); }, 10000); }
+                                    if (tc) { const t = document.createElement('div'); t.className = 'toast info'; t.innerHTML = '<span>Nueva versión</span> <button onclick="location.reload()">Actualizar</button>'; tc.appendChild(t); setTimeout(() => { t.classList.add('toast-hide'); setTimeout(() => t.remove(), 300); }, 10000); }
                                 }
                             });
                         });
@@ -339,10 +347,7 @@ Sistema de publicaciones, comentarios y reacciones
             banner.innerHTML = `
                 <div class="install-banner-content">
                     <div class="install-banner-icon"><img src="ipuclafonda.png" alt="IPUC LA FONDA" width="48" height="48"></div>
-                    <div class="install-banner-text">
-                        <strong>IPUC LA FONDA</strong>
-                        <p>Instala esta aplicación en tu dispositivo</p>
-                    </div>
+                    <div class="install-banner-text"><strong>IPUC LA FONDA</strong><p>Instalar aplicación</p></div>
                     <button class="btn-primary btn-sm" id="btn-install-app"><i class="bx bx-download"></i> Instalar</button>
                     <button class="btn-icon" id="btn-dismiss-install"><i class="bx bx-x"></i></button>
                 </div>`;
@@ -350,14 +355,12 @@ Sistema de publicaciones, comentarios y reacciones
             document.getElementById('btn-install-app')?.addEventListener('click', async () => {
                 if (!deferredPrompt) return;
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`📱 Usuario ${outcome === 'accepted' ? 'instaló' : 'rechazó'} la app`);
+                await deferredPrompt.userChoice;
                 deferredPrompt = null;
                 banner.remove();
             });
             document.getElementById('btn-dismiss-install')?.addEventListener('click', () => banner.remove());
         });
-        window.addEventListener('appinstalled', () => { console.log('✅ PWA instalada'); });
     </script>
 </body>
 </html>
