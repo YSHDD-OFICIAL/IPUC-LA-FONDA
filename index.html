@@ -84,11 +84,47 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
 
     <!-- TÍTULO MEJORADO -->
     <title>IPUC LA FONDA v5.1 - Iglesia Pentecostal Unida de Colombia</title>
+
+    <!-- SCHEMA.ORG -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Church",
+        "name": "IPUC LA FONDA",
+        "alternateName": "Iglesia Pentecostal Unida de Colombia - LA FONDA",
+        "description": "Donde el Espíritu Santo se mueve",
+        "url": "https://ipuclafonda.netlify.app",
+        "image": "ipuclafonda.png",
+        "logo": "ipuclafonda.png",
+        "foundingDate": "2024",
+        "openingHours": "Mo-Su 08:00-20:00",
+        "serviceType": "Culto Dominical, Culto de Oración, Culto Campal",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "CO",
+            "addressLocality": "Colombia",
+            "addressRegion": "Cundinamarca",
+            "postalCode": "111111"
+        },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+573128813818",
+            "email": "ipuclafonda@gmail.com",
+            "contactType": "Pastoral"
+        },
+        "sameAs": [
+            "https://facebook.com/ipuclafonda",
+            "https://instagram.com/ipuclafonda",
+            "https://youtube.com/@ipuclafonda",
+            "https://twitter.com/ipuclafonda"
+        ]
+    }
+    </script>
 </head>
 <body>
 
     <!-- ============================================
-    SPLASH SCREEN MEJORADO
+    SPLASH SCREEN
     ============================================ -->
     <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive">
         <div class="splash-background">
@@ -121,7 +157,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
 
         <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
 
-        <!-- SIDEBAR MEJORADO -->
+        <!-- SIDEBAR -->
         <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menú de navegación">
             <div class="sidebar-header">
                 <div class="logo-mini">
@@ -247,7 +283,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
             </div>
         </aside>
 
-        <!-- MAIN MEJORADO -->
+        <!-- MAIN -->
         <main class="main-content">
             <header class="header">
                 <div class="header-left">
@@ -298,7 +334,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
     </div>
 
     <!-- ============================================
-    PANTALLA DE BIENVENIDA MEJORADA
+    PANTALLA DE BIENVENIDA
     ============================================ -->
     <div id="welcome-screen" class="welcome-screen" role="main" aria-label="Pantalla de bienvenida">
         <div class="welcome-background">
@@ -326,6 +362,10 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
                     <button id="btn-register" class="btn-secondary btn-lg">
                         <i class="bx bx-user-plus"></i> Crear Cuenta Nueva
                     </button>
+                    <!-- Botón para crear administrador (visible solo si no existe) -->
+                    <button id="btn-create-admin" class="btn-outline btn-lg" style="display:none;">
+                        <i class="bx bx-shield-quarter"></i> Configurar Administrador
+                    </button>
                 </div>
                 <div class="welcome-footer">
                     <div class="welcome-features">
@@ -348,7 +388,127 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         </div>
     </div>
 
-    <!-- NOTIFICACIONES MEJORADO -->
+    <!-- ============================================
+    SECCIÓN CREAR ADMINISTRADOR
+    ============================================ -->
+    <div id="create-admin-section" class="create-admin-section">
+        <div class="create-admin-card">
+            <button class="create-admin-back" id="btn-back-to-welcome" aria-label="Volver">
+                <i class="bx bx-arrow-back"></i> Volver
+            </button>
+            <div class="header">
+                <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="logo-img"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%231a237e%22 width=%2280%22 height=%2280%22 rx=%2240%22/><text fill=%22%23ffd700%22 x=%2240%22 y=%2250%22 text-anchor=%22middle%22 font-size=%2218%22 font-weight=%22bold%22>IP</text></svg>'">
+                <h2>IPUC LA FONDA</h2>
+                <p class="subtitle">Configuración Inicial del Sistema</p>
+                <span class="badge"><i class="bx bx-shield-quarter"></i> Primer Administrador</span>
+            </div>
+
+            <div class="alert">
+                <i class="bx bx-shield-x"></i>
+                <div>
+                    <strong>¡Importante!</strong> Esta página solo funciona si <strong>no existe ningún administrador</strong> en el sistema. 
+                    Una vez creado, esta función se deshabilitará automáticamente. Los datos se guardan en localStorage.
+                </div>
+            </div>
+
+            <form id="formAdmin" autocomplete="off" novalidate>
+                <div class="form-section">
+                    <div class="form-section-title"><i class="bx bx-user"></i> Información Personal</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="admin-nombre">Nombre <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="bx bx-user"></i>
+                                <input type="text" class="form-input" id="admin-nombre" name="nombre" 
+                                       placeholder="Ej: LUIS ESTEBAN" required autocomplete="off" 
+                                       minlength="2" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-apellidos">Apellidos <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="bx bx-user-pin"></i>
+                                <input type="text" class="form-input" id="admin-apellidos" name="apellidos" 
+                                       placeholder="Ej: POTOSI VENTE" required autocomplete="off" 
+                                       minlength="2" maxlength="50">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-correo">Correo Electrónico <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-envelope"></i>
+                            <input type="email" class="form-input" id="admin-correo" name="correo" 
+                                   placeholder="estebanpotosi2005@gmail.com" required autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-celular">Celular</label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-phone"></i>
+                            <input type="tel" class="form-input" id="admin-celular" name="celular" 
+                                   placeholder="3128813818" autocomplete="off" pattern="[0-9]{10}">
+                        </div>
+                        <p class="input-hint">Opcional. 10 dígitos sin espacios ni guiones.</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title"><i class="bx bx-key"></i> Credenciales de Acceso</div>
+                    <div class="form-group">
+                        <label for="admin-usuario">Nombre de Usuario <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-at"></i>
+                            <input type="text" class="form-input" id="admin-usuario" name="usuario" 
+                                   placeholder="admin" required autocomplete="off" 
+                                   pattern="[a-zA-Z0-9_]{3,20}" minlength="3" maxlength="20">
+                        </div>
+                        <p class="input-hint">Solo letras, números y guiones bajos. Mínimo 3 caracteres.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password">Contraseña <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-lock-alt"></i>
+                            <input type="password" class="form-input" id="admin-password" name="password" 
+                                   placeholder="Mínimo 8 caracteres" required minlength="8" maxlength="100" 
+                                   autocomplete="new-password">
+                            <button type="button" class="toggle-password" id="admin-toggle-password" 
+                                    aria-label="Mostrar/Ocultar contraseña">
+                                <i class="bx bx-show"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <span class="strength-text">Fortaleza:</span>
+                            <div class="strength-bar">
+                                <div class="fill" id="admin-strength-fill"></div>
+                            </div>
+                            <span class="strength-text" id="admin-strength-text">Débil</span>
+                        </div>
+                        <p class="input-hint">Mínimo 8 caracteres. Usa mayúsculas, números y símbolos.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-confirmar-password">Confirmar Contraseña <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="bx bx-lock-alt"></i>
+                            <input type="password" class="form-input" id="admin-confirmar-password" 
+                                   name="confirmarPassword" placeholder="Repite la contraseña" 
+                                   required minlength="8" maxlength="100" autocomplete="new-password">
+                        </div>
+                        <p class="input-hint" id="admin-password-match-hint">Las contraseñas deben coincidir.</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="admin-btn-submit">
+                    <span class="btn-text"><i class="bx bx-user-plus"></i> Crear Administrador</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+            <div class="resultado" id="admin-resultado"></div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
     <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-label="Panel de notificaciones">
         <div class="notification-header">
             <h3>Notificaciones</h3>
@@ -374,7 +534,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         </div>
     </div>
 
-    <!-- MODAL MEJORADO -->
+    <!-- MODAL -->
     <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-backdrop"></div>
         <div class="modal-container">
@@ -389,7 +549,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         </div>
     </div>
 
-    <!-- CONFIRM MODAL MEJORADO -->
+    <!-- CONFIRM MODAL -->
     <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
         <div class="modal-backdrop"></div>
         <div class="modal-container modal-sm">
@@ -405,10 +565,10 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
+    <!-- TOAST -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <!-- FAB MEJORADO -->
+    <!-- FAB -->
     <button id="fab-main" class="fab hidden" aria-label="Menú de acciones rápidas">
         <i class="bx bx-plus"></i>
     </button>
@@ -428,171 +588,378 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
     </div>
 
     <!-- ============================================
-    SCRIPTS - ORDEN CORRECTO DE CARGA (MEJORADO)
+    SCRIPTS
     ============================================ -->
     <script src="database.js"></script>
     <script src="app.js"></script>
     <script src="script.js" defer></script>
 
-    <!-- SERVICE WORKER (MEJORADO) -->
+    <!-- ============================================
+    SCRIPT DE CREACIÓN DE ADMIN (INTEGRADO)
+    ============================================ -->
     <script>
         // ============================================
-        // REGISTRO DEL SERVICE WORKER
+        // IPUC LA FONDA v5.1 - Crear Administrador (integrado)
         // ============================================
+        
+        'use strict';
+
+        // Inicializar base de datos
+        if (typeof db === 'undefined') {
+            var db = new Database();
+            db.inicializarDatos();
+        }
+
+        // ============================================
+        // FUNCIONES DE UTILIDAD
+        // ============================================
+        function adminTogglePassword() {
+            const input = document.getElementById('admin-password');
+            const icon = document.querySelector('#admin-toggle-password i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bx bx-hide';
+            } else {
+                input.type = 'password';
+                icon.className = 'bx bx-show';
+            }
+        }
+
+        function adminCalcularFortaleza(password) {
+            let fuerza = 0;
+            if (password.length >= 8) fuerza++;
+            if (password.length >= 12) fuerza++;
+            if (/[A-Z]/.test(password)) fuerza++;
+            if (/[a-z]/.test(password)) fuerza++;
+            if (/[0-9]/.test(password)) fuerza++;
+            if (/[^A-Za-z0-9]/.test(password)) fuerza++;
+            
+            const niveles = [
+                { min: 0, texto: 'Débil', color: '#f44336' },
+                { min: 2, texto: 'Baja', color: '#ff9800' },
+                { min: 3, texto: 'Media', color: '#ffeb3b' },
+                { min: 5, texto: 'Buena', color: '#4caf50' },
+                { min: 6, texto: 'Fuerte', color: '#2196f3' }
+            ];
+            
+            let nivel = niveles[0];
+            for (const n of niveles) {
+                if (fuerza >= n.min) nivel = n;
+            }
+            
+            return {
+                fuerza,
+                texto: nivel.texto,
+                color: nivel.color,
+                porcentaje: Math.min((fuerza / 6) * 100, 100)
+            };
+        }
+
+        function adminMostrarResultado(tipo, titulo, mensaje, credenciales) {
+            const div = document.getElementById('admin-resultado');
+            div.className = 'resultado show ' + tipo;
+            let html = '<strong>' + titulo + '</strong><p>' + mensaje + '</p>';
+            if (credenciales) {
+                html += '<div class="credenciales-box">' +
+                            '<strong>🔑 Credenciales:</strong><br>' +
+                            'Usuario: <strong>' + credenciales.usuario + '</strong><br>' +
+                            'Contraseña: <strong>' + credenciales.password + '</strong>' +
+                        '</div>' +
+                        '<p style="margin-top:8px;font-size:0.85rem;">' +
+                            '⚠️ <strong>Guarda estas credenciales en un lugar seguro.</strong> ' +
+                            'No podrás recuperarlas si las olvidas.' +
+                        '</p>';
+            }
+            div.innerHTML = html;
+            div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            if (tipo === 'success') {
+                document.getElementById('formAdmin').reset();
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-confirmar-password').value = '';
+                adminActualizarIndicadorFortaleza('');
+                document.getElementById('admin-password-match-hint').textContent = 'Las contraseñas deben coincidir.';
+                document.getElementById('admin-password-match-hint').style.color = 'var(--gris-texto)';
+            }
+        }
+
+        function adminActualizarIndicadorFortaleza(password) {
+            const fill = document.getElementById('admin-strength-fill');
+            const text = document.getElementById('admin-strength-text');
+            
+            if (!password) {
+                fill.style.width = '0%';
+                fill.style.background = 'var(--gris-medio)';
+                text.textContent = 'Débil';
+                text.style.color = 'var(--gris-texto)';
+                return;
+            }
+            
+            const resultado = adminCalcularFortaleza(password);
+            fill.style.width = resultado.porcentaje + '%';
+            fill.style.background = resultado.color;
+            text.textContent = resultado.texto;
+            text.style.color = resultado.color;
+        }
+
+        function adminValidarContraseñas() {
+            const password = document.getElementById('admin-password').value;
+            const confirmar = document.getElementById('admin-confirmar-password').value;
+            const hint = document.getElementById('admin-password-match-hint');
+            
+            if (confirmar.length === 0) {
+                hint.textContent = 'Las contraseñas deben coincidir.';
+                hint.style.color = 'var(--gris-texto)';
+                return;
+            }
+            
+            if (password === confirmar) {
+                hint.textContent = '✅ Las contraseñas coinciden';
+                hint.style.color = 'var(--exito)';
+            } else {
+                hint.textContent = '❌ Las contraseñas no coinciden';
+                hint.style.color = 'var(--error)';
+            }
+        }
+
+        // ============================================
+        // VERIFICAR EXISTENCIA DE ADMIN
+        // ============================================
+        function adminVerificarExistencia() {
+            try {
+                const admins = db.cargar('administradores');
+                const btnCreateAdmin = document.getElementById('btn-create-admin');
+                
+                if (admins?.administradores?.length > 0) {
+                    if (btnCreateAdmin) btnCreateAdmin.style.display = 'none';
+                    return true;
+                } else {
+                    if (btnCreateAdmin) {
+                        btnCreateAdmin.style.display = 'flex';
+                        btnCreateAdmin.addEventListener('click', function() {
+                            document.getElementById('welcome-screen').classList.add('hidden');
+                            document.getElementById('create-admin-section').classList.add('active');
+                        });
+                    }
+                    return false;
+                }
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password
+            document.getElementById('admin-toggle-password').addEventListener('click', adminTogglePassword);
+            
+            // Fortaleza de contraseña
+            document.getElementById('admin-password').addEventListener('input', function() {
+                adminActualizarIndicadorFortaleza(this.value);
+                adminValidarContraseñas();
+            });
+            
+            // Confirmar contraseña
+            document.getElementById('admin-confirmar-password').addEventListener('input', adminValidarContraseñas);
+
+            // Botón volver
+            document.getElementById('btn-back-to-welcome').addEventListener('click', function() {
+                document.getElementById('create-admin-section').classList.remove('active');
+                document.getElementById('welcome-screen').classList.remove('hidden');
+                document.getElementById('admin-resultado').className = 'resultado';
+                document.getElementById('admin-resultado').innerHTML = '';
+                document.getElementById('formAdmin').reset();
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-confirmar-password').value = '';
+                document.getElementById('admin-btn-submit').classList.remove('loading');
+                document.getElementById('admin-btn-submit').disabled = false;
+                document.getElementById('admin-btn-submit').innerHTML = 
+                    '<span class="btn-text"><i class="bx bx-user-plus"></i> Crear Administrador</span><span class="spinner"></span>';
+            });
+
+            // ============================================
+            // ENVÍO DEL FORMULARIO
+            // ============================================
+            document.getElementById('formAdmin').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('admin-btn-submit');
+                const div = document.getElementById('admin-resultado');
+                div.className = 'resultado';
+                div.innerHTML = '';
+
+                const datos = {
+                    nombre: document.getElementById('admin-nombre').value.trim(),
+                    apellidos: document.getElementById('admin-apellidos').value.trim(),
+                    correo: document.getElementById('admin-correo').value.trim().toLowerCase(),
+                    celular: document.getElementById('admin-celular').value.trim(),
+                    usuario: document.getElementById('admin-usuario').value.trim().toLowerCase(),
+                    password: document.getElementById('admin-password').value,
+                    confirmar: document.getElementById('admin-confirmar-password').value
+                };
+
+                // Validaciones
+                if (!datos.nombre || datos.nombre.length < 2) {
+                    return adminMostrarResultado('error', 'Error', 'Nombre debe tener al menos 2 caracteres.');
+                }
+
+                if (!datos.apellidos || datos.apellidos.length < 2) {
+                    return adminMostrarResultado('error', 'Error', 'Apellidos debe tener al menos 2 caracteres.');
+                }
+
+                if (!datos.correo || !datos.correo.includes('@') || !datos.correo.includes('.')) {
+                    return adminMostrarResultado('error', 'Error', 'Ingresa un correo electrónico válido.');
+                }
+
+                if (!datos.usuario || !/^[a-zA-Z0-9_]{3,20}$/.test(datos.usuario)) {
+                    return adminMostrarResultado('error', 'Error', 'Usuario: solo letras, números y guiones bajos (3-20 caracteres).');
+                }
+
+                if (!datos.password || datos.password.length < 8) {
+                    return adminMostrarResultado('error', 'Error', 'Contraseña: mínimo 8 caracteres.');
+                }
+
+                const fortaleza = adminCalcularFortaleza(datos.password);
+                if (fortaleza.fuerza < 3) {
+                    return adminMostrarResultado('warning', '⚠️ Contraseña débil', 
+                        'La contraseña es muy débil. Usa mayúsculas, minúsculas, números y símbolos.');
+                }
+
+                if (datos.password !== datos.confirmar) {
+                    return adminMostrarResultado('error', 'Error', 'Las contraseñas no coinciden.');
+                }
+
+                // Verificar si ya existe admin
+                try {
+                    const admins = db.cargar('administradores');
+                    if (admins?.administradores?.length > 0) {
+                        return adminMostrarResultado('info', 'ℹ️ Ya existe un administrador', 
+                            'Ya hay un administrador configurado en este navegador.');
+                    }
+                } catch (error) {
+                    return adminMostrarResultado('error', 'Error', 'Error al verificar administradores existentes.');
+                }
+
+                // Crear administrador
+                btn.classList.add('loading');
+                btn.disabled = true;
+
+                try {
+                    const resultado = db.crearPrimerAdministrador({
+                        nombre: datos.nombre,
+                        apellidos: datos.apellidos,
+                        correo: datos.correo,
+                        celular: datos.celular,
+                        usuario: datos.usuario,
+                        password: datos.password
+                    });
+
+                    if (resultado.success || resultado.exito) {
+                        try {
+                            db.addNotificacion({
+                                titulo: '🎉 Bienvenido Administrador',
+                                mensaje: 'El sistema ha sido configurado exitosamente. Bienvenido, ' + datos.nombre + '.',
+                                tipo: 'sistema'
+                            });
+                        } catch (e) {}
+
+                        adminMostrarResultado('success', '✅ ¡Administrador creado exitosamente!',
+                            'El administrador ha sido configurado correctamente.',
+                            { usuario: datos.usuario, password: datos.password });
+
+                        btn.innerHTML = '<span class="btn-text"><i class="bx bx-check"></i> Administrador Creado</span>';
+                        btn.style.background = 'var(--exito)';
+                        btn.disabled = true;
+
+                        document.getElementById('btn-create-admin').style.display = 'none';
+
+                    } else {
+                        adminMostrarResultado('error', '❌ Error', 
+                            resultado.error || 'No se pudo crear el administrador.');
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    adminMostrarResultado('error', '❌ Error inesperado', error.message);
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                }
+            });
+
+            // Verificación inicial
+            adminVerificarExistencia();
+        });
+    </script>
+
+    <!-- ============================================
+    SERVICE WORKER Y PWA
+    ============================================ -->
+    <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(reg => {
                         console.log('✅ SW registrado v5.1');
-                        
                         reg.addEventListener('updatefound', () => {
-                            const newWorker = reg.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // Mostrar notificación de actualización
-                                    showUpdateNotification();
+                            const nw = reg.installing;
+                            nw.addEventListener('statechange', () => {
+                                if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                                    const tc = document.getElementById('toast-container');
+                                    if (tc) {
+                                        const t = document.createElement('div');
+                                        t.className = 'toast info';
+                                        t.innerHTML = '<i class="bx bx-refresh"></i> <span>Nueva versión disponible</span> <button onclick="location.reload()" class="btn-text" style="color:white;font-weight:600;">Actualizar</button>';
+                                        tc.appendChild(t);
+                                        setTimeout(() => {
+                                            t.classList.add('toast-hide');
+                                            setTimeout(() => t.remove(), 300);
+                                        }, 10000);
+                                    }
                                 }
                             });
                         });
-                    })
-                    .catch(err => {
-                        console.log('⚠️ SW error:', err);
-                    });
+                    }).catch(err => console.log('SW error:', err));
             });
         }
-
-        function showUpdateNotification() {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            
-            const toast = document.createElement('div');
-            toast.className = 'toast info';
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <i class="bx bx-refresh"></i>
-                <span>Nueva versión disponible</span>
-                <button onclick="location.reload()" class="btn-text" style="color:white;font-weight:600;">
-                    Actualizar
-                </button>
-            `;
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('toast-hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 10000);
-        }
-
-        // ============================================
-        // DETECCIÓN DE MODO PWA
-        // ============================================
+        
         if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
             document.body.classList.add('pwa-mode');
-            console.log('📱 App ejecutándose en modo standalone');
         }
 
-        // ============================================
-        // BANNER DE INSTALACIÓN PWA MEJORADO
-        // ============================================
+        // Banner de instalación PWA
         let deferredPrompt;
-        
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            if (localStorage.getItem('pwa_banner_dismissed') === 'true') return;
             
-            // Verificar si ya se mostró el banner
-            if (localStorage.getItem('pwa_banner_dismissed') === 'true') {
-                return;
-            }
-            
-            // Crear banner
             const banner = document.createElement('div');
             banner.className = 'pwa-install-banner';
-            banner.setAttribute('role', 'alert');
             banner.innerHTML = `
                 <div class="install-banner-content">
-                    <div class="install-banner-icon">
-                        <img src="ipuclafonda.png" alt="IPUC LA FONDA" width="48" height="48">
-                    </div>
-                    <div class="install-banner-text">
-                        <strong>IPUC LA FONDA</strong>
-                        <p>Instala la aplicación para mejor experiencia</p>
-                    </div>
-                    <button class="btn-primary btn-sm" id="btn-install-app">
-                        <i class="bx bx-download"></i> Instalar
-                    </button>
-                    <button class="btn-icon" id="btn-dismiss-install" aria-label="Cerrar">
-                        <i class="bx bx-x"></i>
-                    </button>
-                </div>
-            `;
-            
+                    <div class="install-banner-icon"><img src="ipuclafonda.png" alt="IPUC LA FONDA" width="48" height="48"></div>
+                    <div class="install-banner-text"><strong>IPUC LA FONDA</strong><p>Instalar aplicación</p></div>
+                    <button class="btn-primary btn-sm" id="btn-install-app"><i class="bx bx-download"></i> Instalar</button>
+                    <button class="btn-icon" id="btn-dismiss-install"><i class="bx bx-x"></i></button>
+                </div>`;
             document.body.appendChild(banner);
             
-            // Evento de instalación
             document.getElementById('btn-install-app')?.addEventListener('click', async () => {
                 if (!deferredPrompt) return;
-                
-                try {
-                    deferredPrompt.prompt();
-                    const result = await deferredPrompt.userChoice;
-                    console.log('📱 Instalación:', result.outcome);
-                    
-                    if (result.outcome === 'accepted') {
-                        localStorage.setItem('pwa_installed', 'true');
-                    }
-                    
-                    deferredPrompt = null;
-                    banner.remove();
-                } catch (err) {
-                    console.error('Error en instalación:', err);
-                }
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                banner.remove();
             });
-            
-            // Evento de cierre
             document.getElementById('btn-dismiss-install')?.addEventListener('click', () => {
                 localStorage.setItem('pwa_banner_dismissed', 'true');
                 banner.remove();
             });
         });
 
-        // ============================================
-        // EVENTO DE INSTALACIÓN EXITOSA
-        // ============================================
-        window.addEventListener('appinstalled', () => {
-            console.log('📱 App instalada exitosamente');
-            localStorage.setItem('pwa_installed', 'true');
-            
-            // Mostrar toast de confirmación
-            const container = document.getElementById('toast-container');
-            if (container) {
-                const toast = document.createElement('div');
-                toast.className = 'toast success';
-                toast.innerHTML = `
-                    <i class="bx bx-check-circle"></i>
-                    <span>¡App instalada correctamente!</span>
-                `;
-                container.appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.classList.add('toast-hide');
-                    setTimeout(() => toast.remove(), 300);
-                }, 4000);
-            }
-        });
-
-        // ============================================
-        // LOG DE INICIALIZACIÓN
-        // ============================================
-        console.log('╔══════════════════════════════════════════════════════════╗');
-        console.log('║   ✅ IPUC LA FONDA v5.1 - Web App Profesional           ║');
-        console.log('║   Iglesia Pentecostal Unida de Colombia                  ║');
-        console.log('║   "Donde el Espíritu Santo se mueve"                     ║');
-        console.log('╚══════════════════════════════════════════════════════════╝');
-        console.log('📱 PWA Ready - Instalable en Android, iOS, Windows, Mac');
-        console.log('📦 Modo offline 100% funcional');
-        console.log('🔔 Notificaciones push disponibles');
-        console.log('🎯 Optimizado para rendimiento y accesibilidad');
+        console.log('✅ IPUC LA FONDA v5.1 cargada correctamente');
+        console.log('🔒 Sistema de autenticación y administración integrado');
     </script>
 </body>
 </html>
