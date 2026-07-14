@@ -952,8 +952,20 @@ class Database {
     }
 }
 
-// Instancia global (solo para uso interno de la app)
-const db = new Database();
-db.inicializarDatos();
+// ============================================
+// CREAR INSTANCIA GLOBAL (CON VERIFICACIÓN)
+// ============================================
+// Usar window.db para evitar conflicto con variables locales
+if (typeof window.db === 'undefined') {
+    const db = new Database();
+    db.inicializarDatos();
+    window.db = db;
+} else {
+    // Si ya existe, asegurarse de que esté inicializada
+    if (!window.db.initialized) {
+        window.db.inicializarDatos();
+    }
+}
 
-window.db = db;
+// También exponer la clase para uso general
+window.Database = Database;
