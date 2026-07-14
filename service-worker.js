@@ -22,7 +22,6 @@ const PRECACHE_ASSETS = [
     // Páginas principales
     '/',
     '/index.html',
-    '/crear-admin.html',
     
     // Hojas de estilo
     '/styles.css',
@@ -31,7 +30,6 @@ const PRECACHE_ASSETS = [
     '/database.js',
     '/app.js',
     '/script.js',
-    '/crear-admin.js',
     
     // PWA
     '/manifest.json',
@@ -39,7 +37,6 @@ const PRECACHE_ASSETS = [
     
     // Logos e imágenes principales
     '/ipuclafonda.png',
-    '/favicon.ico',
     
     // Avatares
     '/assets/avatars/default.png',
@@ -758,18 +755,3 @@ self.addEventListener('error', (event) => {
 self.addEventListener('unhandledrejection', (event) => {
     console.error('❌ Promesa rechazada en SW:', event.reason);
 });
-
-// ============================================
-// LOG DE INICIALIZACIÓN FINAL
-// ============================================
-console.log('╔══════════════════════════════════════════════════════════╗');
-console.log(`║   ✅ IPUC LA FONDA - Service Worker PWA v${VERSION}              ║`);
-console.log('║   Iglesia Pentecostal Unida de Colombia                  ║');
-console.log('║   "Donde el Espíritu Santo se mueve"                     ║');
-console.log('╚══════════════════════════════════════════════════════════╝');
-console.log(`📱 App instalable en Android, iOS, Windows y Mac`);
-console.log(`📦 ${PRECACHE_ASSETS.length} assets precacheados`);
-console.log('📴 Modo offline 100% funcional');
-console.log('🔔 Notificaciones push listas');
-console.log('🎯 Service Worker v5.1 operativo');
-console.log(`🔄 Estrategias de cache: Imágenes (SWR), HTML (Network First + Cache), JS/CSS (Cache First + Update)`);
