@@ -415,7 +415,7 @@ ol {
 }
 
 /* ============================================
-   6. SIDEBAR MEJORADA
+   6. SIDEBAR
    ============================================ */
 .sidebar-overlay {
     position: fixed;
@@ -1046,7 +1046,7 @@ ol {
 }
 
 /* ============================================
-   10. BOTONES MEJORADOS
+   10. BOTONES
    ============================================ */
 .btn-primary {
     background: var(--azul-primario);
@@ -1190,7 +1190,7 @@ ol {
 }
 
 /* ============================================
-   11. MODAL MEJORADO
+   11. MODAL
    ============================================ */
 .modal {
     position: fixed;
@@ -1674,7 +1674,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   17. CARDS MEJORADAS
+   17. CARDS
    ============================================ */
 .card {
     background: var(--blanco);
@@ -1894,7 +1894,358 @@ textarea.form-input {
 }
 
 /* ============================================
-   21. UTILIDADES
+   21. CREAR ADMINISTRADOR (SECCIÓN ESPECIAL)
+   ============================================ */
+.create-admin-section {
+    display: none;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 80vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.create-admin-section.active {
+    display: flex;
+}
+
+.create-admin-card {
+    background: var(--blanco);
+    border-radius: var(--borde-radius);
+    padding: 32px 28px;
+    box-shadow: var(--sombra-fuerte);
+    border: 1px solid var(--gris-medio);
+    width: 100%;
+    animation: slideUp 0.5s ease;
+}
+
+.create-admin-card .header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.create-admin-card .header .logo-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: var(--blanco);
+    padding: 4px;
+}
+
+.create-admin-card .header h2 {
+    font-size: 1.3rem;
+    color: var(--azul-primario);
+    font-weight: 700;
+}
+
+.create-admin-card .header .subtitle {
+    font-size: 0.85rem;
+    color: var(--gris-texto);
+}
+
+.create-admin-card .header .badge {
+    display: inline-block;
+    background: var(--azul-primario);
+    color: var(--blanco);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.create-admin-card .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--borde-radius-sm);
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    background: var(--advertencia-claro);
+    border-left: 4px solid var(--advertencia);
+    color: #e65100;
+}
+
+.create-admin-card .alert i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.create-admin-card .alert strong {
+    color: #bf360c;
+}
+
+.create-admin-card .form-section {
+    margin-bottom: 16px;
+}
+
+.create-admin-card .form-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gris-texto);
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--gris-medio);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.create-admin-card .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.create-admin-card .form-group {
+    margin-bottom: 14px;
+}
+
+.create-admin-card .form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--gris-oscuro);
+}
+
+.create-admin-card .form-group label .required {
+    color: var(--error);
+}
+
+.create-admin-card .input-wrapper {
+    position: relative;
+}
+
+.create-admin-card .input-wrapper i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gris-texto);
+    font-size: 1.1rem;
+    z-index: 1;
+}
+
+.create-admin-card .input-wrapper .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--gris-texto);
+    z-index: 1;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    padding: 0;
+    transition: color var(--transition-fast);
+}
+
+.create-admin-card .input-wrapper .toggle-password:hover {
+    color: var(--azul-primario);
+}
+
+.create-admin-card .form-input {
+    width: 100%;
+    padding: 9px 12px 9px 38px;
+    border: 2px solid var(--gris-medio);
+    border-radius: var(--borde-radius-sm);
+    font-size: 0.85rem;
+    font-family: var(--font-family);
+    background: var(--blanco);
+    color: var(--gris-oscuro);
+    transition: all var(--transition-fast);
+}
+
+.create-admin-card .form-input:focus {
+    outline: none;
+    border-color: var(--azul-primario);
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+}
+
+.create-admin-card .form-input.error {
+    border-color: var(--error);
+}
+
+.create-admin-card .form-input.success {
+    border-color: var(--exito);
+}
+
+.create-admin-card .form-input::placeholder {
+    color: #aaa;
+}
+
+.create-admin-card .input-hint {
+    font-size: 0.65rem;
+    color: var(--gris-texto);
+    margin-top: 3px;
+}
+
+.create-admin-card .password-strength {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.create-admin-card .strength-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--gris-medio);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.create-admin-card .strength-bar .fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.create-admin-card .strength-text {
+    font-size: 0.65rem;
+    color: var(--gris-texto);
+    white-space: nowrap;
+}
+
+.create-admin-card .btn-submit {
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--azul-primario);
+    color: var(--blanco);
+    border: none;
+    border-radius: var(--borde-radius);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(26, 35, 126, 0.2);
+}
+
+.create-admin-card .btn-submit:hover:not(:disabled) {
+    background: var(--azul-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(26, 35, 126, 0.3);
+}
+
+.create-admin-card .btn-submit:disabled {
+    background: var(--gris-medio);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.create-admin-card .btn-submit .spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--blanco);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.create-admin-card .btn-submit.loading .spinner {
+    display: inline-block;
+}
+
+.create-admin-card .btn-submit.loading .btn-text {
+    display: none;
+}
+
+.create-admin-card .resultado {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: var(--borde-radius-sm);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.create-admin-card .resultado.show {
+    display: block;
+}
+
+.create-admin-card .resultado.success {
+    background: var(--exito-claro);
+    border-left: 4px solid var(--exito);
+    color: #2e7d32;
+}
+
+.create-admin-card .resultado.error {
+    background: var(--error-claro);
+    border-left: 4px solid var(--error);
+    color: #c62828;
+}
+
+.create-admin-card .resultado.info {
+    background: var(--info-claro);
+    border-left: 4px solid var(--info);
+    color: #1565c0;
+}
+
+.create-admin-card .resultado.warning {
+    background: var(--advertencia-claro);
+    border-left: 4px solid var(--advertencia);
+    color: #e65100;
+}
+
+.create-admin-card .resultado .credenciales-box {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+}
+
+.create-admin-card .resultado .credenciales-box strong {
+    color: var(--azul-primario);
+}
+
+.create-admin-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--azul-primario);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--borde-radius-sm);
+    transition: background var(--transition-fast);
+    margin-bottom: 12px;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+}
+
+.create-admin-back:hover {
+    background: var(--azul-surface);
+}
+
+.create-admin-card .btn-create-admin-welcome {
+    margin-top: 8px;
+    width: 100%;
+}
+
+/* ============================================
+   22. UTILIDADES
    ============================================ */
 .hidden {
     display: none !important;
@@ -2020,7 +2371,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   22. PWA MODE
+   23. PWA MODE
    ============================================ */
 .pwa-mode .header {
     padding-top: env(safe-area-inset-top);
@@ -2036,7 +2387,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   23. RESPONSIVE MEJORADO
+   24. RESPONSIVE
    ============================================ */
 @media (min-width: 1024px) {
     .sidebar {
@@ -2118,6 +2469,19 @@ textarea.form-input {
     .card {
         padding: 14px;
     }
+    
+    .create-admin-card .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .create-admin-card {
+        padding: 20px 16px;
+    }
+    
+    .create-admin-card .header .logo-img {
+        width: 60px;
+        height: 60px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2162,7 +2526,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   24. MODO IMPRESIÓN
+   25. MODO IMPRESIÓN
    ============================================ */
 @media print {
     .sidebar,
@@ -2199,7 +2563,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   25. ACCESIBILIDAD MEJORADA
+   26. ACCESIBILIDAD
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -2228,7 +2592,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   26. LOADING STATES
+   27. LOADING STATES
    ============================================ */
 .loading {
     opacity: 0.7;
@@ -2246,7 +2610,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   27. BADGES Y ETIQUETAS
+   28. BADGES Y ETIQUETAS
    ============================================ */
 .badge {
     display: inline-block;
@@ -2284,7 +2648,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   28. TABLAS
+   29. TABLAS
    ============================================ */
 .table-container {
     overflow-x: auto;
@@ -2319,7 +2683,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   29. TAGS
+   30. TAGS
    ============================================ */
 .tag {
     display: inline-block;
@@ -2352,7 +2716,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   30. FINAL DEL ESTILO
+   31. FINAL DEL ESTILO
    ============================================ */
 /* 
    ✅ IPUC LA FONDA v5.1 - Estilos completos cargados
@@ -2360,4 +2724,5 @@ textarea.form-input {
    🎨 Sistema de temas claro/oscuro
    ⚡ Rendimiento optimizado
    🎯 Listo para producción
+   🔒 Sección de creación de administrador integrada
 */
