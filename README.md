@@ -2,13 +2,13 @@
 
 ![IPUC LA FONDA](ipuclafonda.png)
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/tu-repo/ipuc-la-fonda)
-[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/flask-2.0+-red.svg)](https://flask.palletsprojects.com/)
+[![Version](https://img.shields.io/badge/version-5.1-blue.svg)](https://github.com/tu-repo/ipuc-la-fonda)
 [![PWA](https://img.shields.io/badge/PWA-Instalable-purple.svg)](https://web.dev/progressive-web-apps/)
 [![Netlify](https://img.shields.io/badge/deploy-Netlify-00C7B7.svg)](https://www.netlify.com/)
-[![Render](https://img.shields.io/badge/backend-Render-46E3B7.svg)](https://render.com/)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+[![JavaScript](https://img.shields.io/badge/javascript-ES6+-f7df1e.svg)](https://developer.mozilla.org/es/docs/Web/JavaScript)
+[![CSS3](https://img.shields.io/badge/css-3-blue.svg)](https://developer.mozilla.org/es/docs/Web/CSS)
+[![HTML5](https://img.shields.io/badge/html-5-orange.svg)](https://developer.mozilla.org/es/docs/Web/HTML)
 
 ---
 
@@ -26,7 +26,7 @@ Web App institucional de nivel empresarial para **IPUC LA FONDA** (Iglesia Pente
 - **Autenticación completa** con roles diferenciados (Usuario/Administrador/Invitado)
 - **Sin credenciales por defecto** - Configuración inicial completamente segura
 - **Bloqueo por IP** tras 5 intentos fallidos (15 minutos de bloqueo)
-- **Encriptación de contraseñas** con SHA-256 + salt aleatorio
+- **Encriptación de contraseñas** con hash personalizado + salt
 - **Sesiones con token** de 24 horas de duración
 - **Verificación de cuentas** con distintivo azul propio de IPUC LA FONDA
 - **Registro de actividad** completa de todos los usuarios
@@ -91,3 +91,49 @@ Web App institucional de nivel empresarial para **IPUC LA FONDA** (Iglesia Pente
 - **Responsive** para todos los dispositivos
 
 ---
+
+## 📂 Estructura del Proyecto
+IPUC-LA-FONDA/
+├── index.html # Página principal de la aplicación
+├── styles.css # Estilos completos (claro/oscuro)
+├── database.js # Gestión de base de datos (localStorage)
+├── app.js # Lógica principal de la aplicación
+├── script.js # UI y eventos de la aplicación
+├── manifest.json # Configuración PWA
+├── service-worker.js # Service Worker para offline
+├── ipuclafonda.png # Logo principal de la iglesia
+├── favicon.ico # Icono del sitio
+├── assets/
+│ ├── avatars/
+│ │ ├── default.png # Avatar por defecto
+│ │ └── admin.png # Avatar de administrador
+│ ├── icons/
+│ │ ├── favicon-16x16.png
+│ │ ├── favicon-32x32.png
+│ │ ├── icon-144x144.png
+│ │ ├── icon-192x192.png
+│ │ ├── icon-512x512.png
+│ │ ├── apple-touch-icon.png
+│ │ └── safari-pinned-tab.svg
+│ └── screenshots/
+│ ├── desktop-home.png
+│ ├── mobile-home.png
+│ ├── mobile-publications.png
+│ └── mobile-events.png
+└── README.md # Documentación del proyecto
+
+---
+
+## 🚀 Instalación y Despliegue
+
+### Requisitos Previos
+- Navegador moderno (Chrome, Firefox, Edge, Safari)
+- Conexión a internet (para la primera carga)
+- Opcional: Servidor web para despliegue
+
+### Instalación Local
+
+1. **Clonar el repositorio**
+```bash
+git clone https://github.com/tu-usuario/ipuc-la-fonda.git
+cd ipuc-la-fonda
