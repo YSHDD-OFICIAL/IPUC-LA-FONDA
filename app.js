@@ -20,7 +20,7 @@ const INTENTOS_FALLIDOS = {};
 const BLOQUEOS_TEMPORALES = {};
 
 // ============================================
-// SISTEMA DE LOGS
+// SISTEMA DE LOGS (SILENCIOSO - SIN CONSOLE)
 // ============================================
 function logApp(accion, detalle = '', nivel = 'info') {
     const entry = {
@@ -30,19 +30,18 @@ function logApp(accion, detalle = '', nivel = 'info') {
         nivel,
         version: VERSION
     };
-    console.log(`📝 [${entry.timestamp}] ${accion}: ${detalle}`);
     
-    // Guardar en localStorage para debugging
+    // Guardar en localStorage para debugging (sin console.log)
     try {
         const logs = JSON.parse(localStorage.getItem('ipuc5_app_logs') || '[]');
         logs.push(entry);
-        if (logs.length > 500) logs.shift(); // Mantener solo 500 logs
+        if (logs.length > 500) logs.shift();
         localStorage.setItem('ipuc5_app_logs', JSON.stringify(logs));
     } catch (e) {}
 }
 
 // ============================================
-// FUNCIONES DE SEGURIDAD MEJORADAS
+// FUNCIONES DE SEGURIDAD
 // ============================================
 function generarToken() {
     return 't5_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -109,10 +108,30 @@ function registrarActividad(uid, accion, detalle = '') {
 }
 
 // ============================================
-// FUNCIONES DE AUTENTICACIÓN MEJORADAS
+// OBTENER INSTANCIA DB (SEGURA)
+// ============================================
+function getDB() {
+    if (typeof window.db !== 'undefined' && window.db) {
+        return window.db;
+    }
+    // Intentar cargar si existe en el scope global
+    if (typeof db !== 'undefined' && db) {
+        return db;
+    }
+    logApp('Error: Database no disponible', '', 'error');
+    return null;
+}
+
+// ============================================
+// FUNCIONES DE AUTENTICACIÓN
 // ============================================
 function login(usuario, password) {
     try {
+        const db = getDB();
+        if (!db) {
+            return { success: false, error: 'Base de datos no disponible' };
+        }
+
         // Validar intentos fallidos
         const verificar = verificarIntentosFallidos(usuario);
         if (verificar.bloqueado) {
@@ -124,7 +143,6 @@ function login(usuario, password) {
 
         const resultado = db.login(usuario, password);
         if (!resultado.success) {
-            // Registrar intento fallido
             const intento = registrarIntentoFallido(usuario);
             if (intento.bloqueado) {
                 return { 
@@ -139,7 +157,6 @@ function login(usuario, password) {
             };
         }
 
-        // Crear token
         const token = generarToken();
         const expira = new Date(Date.now() + DURACION_TOKEN * 3600000);
         TOKENS[token] = {
@@ -150,12 +167,10 @@ function login(usuario, password) {
             ip: resultado.ip || 'local'
         };
 
-        // Guardar en localStorage
         localStorage.setItem('ipuc5_token', token);
         localStorage.setItem('ipuc5_usuario', JSON.stringify(resultado.usuario));
         localStorage.setItem('ipuc5_rol', resultado.rol);
 
-        // Limpiar intentos fallidos
         delete INTENTOS_FALLIDOS[usuario];
         delete BLOQUEOS_TEMPORALES[usuario];
 
@@ -177,7 +192,11 @@ function login(usuario, password) {
 
 function registro(datos) {
     try {
-        // Validaciones mejoradas
+        const db = getDB();
+        if (!db) {
+            return { success: false, error: 'Base de datos no disponible' };
+        }
+
         if (!datos.nombre || !datos.apellidos || !datos.correo || !datos.usuario || !datos.password) {
             return { success: false, error: 'Campos obligatorios faltantes' };
         }
@@ -196,11 +215,13 @@ function registro(datos) {
 
         const resultado = db.registrarUsuario(datos);
         if (resultado.success) {
-            db._agregarNotificacion({
-                titulo: '🎉 Nuevo usuario',
-                mensaje: `${datos.nombre} se ha registrado en la comunidad`,
-                tipo: 'usuario'
-            });
+            if (db._agregarNotificacion) {
+                db._agregarNotificacion({
+                    titulo: 'Nuevo usuario',
+                    mensaje: `${datos.nombre} se ha registrado en la comunidad`,
+                    tipo: 'usuario'
+                });
+            }
             registrarActividad(resultado.data.id, 'Registro de usuario');
             logApp('Registro exitoso', `Usuario: ${datos.usuario}`, 'success');
         }
@@ -229,6 +250,11 @@ function logout() {
 
 function verificarSesion() {
     try {
+        const db = getDB();
+        if (!db) {
+            return { success: false, message: 'Base de datos no disponible' };
+        }
+
         const token = localStorage.getItem('ipuc5_token');
         const usuarioData = localStorage.getItem('ipuc5_usuario');
         const rol = localStorage.getItem('ipuc5_rol');
@@ -237,7 +263,6 @@ function verificarSesion() {
             return { success: false, message: 'No hay sesión activa' };
         }
 
-        // Verificar token
         const tokenValido = verificarToken(token);
         if (!tokenValido) {
             localStorage.removeItem('ipuc5_token');
@@ -246,7 +271,6 @@ function verificarSesion() {
 
         const usuario = JSON.parse(usuarioData);
         
-        // Verificar que el usuario exista en la base de datos
         const userExists = db.cargar('usuarios')?.usuarios?.find(u => u.id === usuario.id);
         if (!userExists) {
             const adminExists = db.cargar('administradores')?.administradores?.find(a => a.id === usuario.id);
@@ -271,10 +295,15 @@ function verificarSesion() {
 }
 
 // ============================================
-// FUNCIONES DE ADMINISTRADOR MEJORADAS
+// FUNCIONES DE ADMINISTRADOR
 // ============================================
 function crearPrimerAdmin(datos) {
     try {
+        const db = getDB();
+        if (!db) {
+            return { success: false, error: 'Base de datos no disponible' };
+        }
+
         if (!datos.nombre || !datos.apellidos || !datos.correo || !datos.usuario || !datos.password) {
             return { success: false, error: 'Campos obligatorios faltantes' };
         }
@@ -293,11 +322,13 @@ function crearPrimerAdmin(datos) {
 
         const resultado = db.crearPrimerAdministrador(datos);
         if (resultado.success) {
-            db._agregarNotificacion({
-                titulo: '👑 Administrador creado',
-                mensaje: `El primer administrador ha sido configurado`,
-                tipo: 'sistema'
-            });
+            if (db._agregarNotificacion) {
+                db._agregarNotificacion({
+                    titulo: 'Administrador creado',
+                    mensaje: `El primer administrador ha sido configurado`,
+                    tipo: 'sistema'
+                });
+            }
             registrarActividad(1, 'Primer administrador creado');
             logApp('Admin creado', `Usuario: ${datos.usuario}`, 'success');
         }
@@ -309,10 +340,12 @@ function crearPrimerAdmin(datos) {
 }
 
 // ============================================
-// FUNCIONES DE USUARIOS MEJORADAS
+// FUNCIONES DE USUARIOS
 // ============================================
 function obtenerUsuarios() {
     try {
+        const db = getDB();
+        if (!db) return [];
         const u = db.cargar('usuarios');
         return (u?.usuarios || []).map(x => {
             const { password, ...resto } = x;
@@ -326,6 +359,8 @@ function obtenerUsuarios() {
 
 function obtenerUsuario(id) {
     try {
+        const db = getDB();
+        if (!db) return null;
         const u = db.cargar('usuarios');
         const user = (u?.usuarios || []).find(x => x.id === id);
         if (!user) return null;
@@ -339,6 +374,9 @@ function obtenerUsuario(id) {
 
 function actualizarUsuario(id, datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const u = db.cargar('usuarios');
         const idx = (u?.usuarios || []).findIndex(x => x.id === id);
         if (idx < 0) return { success: false, error: 'Usuario no encontrado' };
@@ -359,6 +397,9 @@ function actualizarUsuario(id, datos) {
 
 function verificarUsuario(id) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const u = db.cargar('usuarios');
         const idx = (u?.usuarios || []).findIndex(x => x.id === id);
         if (idx < 0) return { success: false, error: 'Usuario no encontrado' };
@@ -379,6 +420,9 @@ function verificarUsuario(id) {
 
 function cambiarPassword(id, pwActual, pwNueva) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         if (pwNueva.length < 8) {
             return { success: false, error: 'Mínimo 8 caracteres' };
         }
@@ -403,6 +447,8 @@ function cambiarPassword(id, pwActual, pwNueva) {
 
 function obtenerDirectorio() {
     try {
+        const db = getDB();
+        if (!db) return [];
         const u = db.cargar('usuarios');
         return (u?.usuarios || []).map(x => ({
             id: x.id,
@@ -420,10 +466,12 @@ function obtenerDirectorio() {
 }
 
 // ============================================
-// FUNCIONES DE ASISTENCIA MEJORADAS
+// FUNCIONES DE ASISTENCIA
 // ============================================
 function obtenerAsistencia(uid = null) {
     try {
+        const db = getDB();
+        if (!db) return [];
         const r = db.getAsistencia();
         return uid ? r.filter(x => x.usuario_id === uid) : r;
     } catch (error) {
@@ -434,6 +482,9 @@ function obtenerAsistencia(uid = null) {
 
 function registrarAsistencia(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.addAsistencia(datos);
         if (resultado.success) {
             logApp('Asistencia registrada', `Usuario: ${datos.usuario_id}`, 'info');
@@ -447,6 +498,8 @@ function registrarAsistencia(datos) {
 
 function obtenerEstadisticasAsistencia() {
     try {
+        const db = getDB();
+        if (!db) return {};
         return db.cargar('estadisticas')?.asistencia || {};
     } catch (error) {
         logApp('Error obteniendo estadísticas de asistencia', error.message, 'error');
@@ -455,7 +508,7 @@ function obtenerEstadisticasAsistencia() {
 }
 
 // ============================================
-// FUNCIONES DE CULTOS Y HORARIOS MEJORADAS
+// FUNCIONES DE CULTOS Y HORARIOS
 // ============================================
 function obtenerProximoCulto() {
     try {
@@ -506,6 +559,8 @@ function obtenerProximoCulto() {
 
 function obtenerHorarios() {
     try {
+        const db = getDB();
+        if (!db) return [];
         return db.cargar('horarios')?.cultos || [];
     } catch (error) {
         logApp('Error obteniendo horarios', error.message, 'error');
@@ -514,10 +569,13 @@ function obtenerHorarios() {
 }
 
 // ============================================
-// FUNCIONES DE VERSÍCULOS MEJORADAS
+// FUNCIONES DE VERSÍCULOS
 // ============================================
 function obtenerVersiculoDiario() {
     try {
+        const db = getDB();
+        if (!db) return null;
+
         const data = db.cargar('versiculos');
         const hoy = new Date().toISOString().split('T')[0];
         let actual = data?.versiculo_actual;
@@ -552,6 +610,8 @@ function obtenerVersiculoDiario() {
 
 function obtenerVersiculos() {
     try {
+        const db = getDB();
+        if (!db) return [];
         return db.cargar('versiculos')?.versiculos || [];
     } catch (error) {
         logApp('Error obteniendo versículos', error.message, 'error');
@@ -561,6 +621,9 @@ function obtenerVersiculos() {
 
 function crearVersiculo(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         if (!datos.texto || !datos.referencia) {
             return { success: false, error: 'Texto y referencia requeridos' };
         }
@@ -588,6 +651,9 @@ function crearVersiculo(datos) {
 
 function eliminarVersiculo(id) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const v = db.cargar('versiculos');
         v.versiculos = (v.versiculos || []).filter(x => x.id !== id);
         db.guardar('versiculos', v);
@@ -600,10 +666,12 @@ function eliminarVersiculo(id) {
 }
 
 // ============================================
-// FUNCIONES DE NOTICIAS MEJORADAS
+// FUNCIONES DE NOTICIAS
 // ============================================
 function obtenerNoticias() {
     try {
+        const db = getDB();
+        if (!db) return [];
         const n = db.getNoticias();
         return n.filter(x => x.estado === 'publicado')
             .sort((a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion));
@@ -615,6 +683,9 @@ function obtenerNoticias() {
 
 function crearNoticia(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.addNoticia(datos);
         if (resultado.success) {
             logApp('Noticia creada', `Título: ${datos.titulo}`, 'success');
@@ -628,6 +699,9 @@ function crearNoticia(datos) {
 
 function eliminarNoticia(id) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const n = db.cargar('noticias');
         n.noticias = (n.noticias || []).filter(x => x.id !== id);
         db.guardar('noticias', n);
@@ -640,10 +714,12 @@ function eliminarNoticia(id) {
 }
 
 // ============================================
-// FUNCIONES DE EVENTOS MEJORADAS
+// FUNCIONES DE EVENTOS
 // ============================================
 function obtenerEventos() {
     try {
+        const db = getDB();
+        if (!db) return [];
         const e = db.getEventos();
         const hoy = new Date().toISOString().split('T')[0];
         return e.filter(x => x.fecha >= hoy)
@@ -656,6 +732,9 @@ function obtenerEventos() {
 
 function crearEvento(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.addEvento(datos);
         if (resultado.success) {
             logApp('Evento creado', `Título: ${datos.titulo}`, 'success');
@@ -668,10 +747,12 @@ function crearEvento(datos) {
 }
 
 // ============================================
-// FUNCIONES DE PETICIONES MEJORADAS
+// FUNCIONES DE PETICIONES
 // ============================================
 function obtenerPeticiones() {
     try {
+        const db = getDB();
+        if (!db) return [];
         const p = db.getPeticiones();
         return p.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     } catch (error) {
@@ -682,6 +763,9 @@ function obtenerPeticiones() {
 
 function crearPeticion(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.addPeticion(datos);
         if (resultado.success) {
             logApp('Petición creada', `Motivo: ${datos.motivo}`, 'success');
@@ -694,10 +778,12 @@ function crearPeticion(datos) {
 }
 
 // ============================================
-// FUNCIONES DE NOTIFICACIONES MEJORADAS
+// FUNCIONES DE NOTIFICACIONES
 // ============================================
 function obtenerNotificaciones() {
     try {
+        const db = getDB();
+        if (!db) return [];
         return db.getNotificaciones();
     } catch (error) {
         logApp('Error obteniendo notificaciones', error.message, 'error');
@@ -707,6 +793,8 @@ function obtenerNotificaciones() {
 
 function crearNotificacion(datos) {
     try {
+        const db = getDB();
+        if (!db) return null;
         return db.addNotificacion(datos);
     } catch (error) {
         logApp('Error creando notificación', error.message, 'error');
@@ -716,6 +804,9 @@ function crearNotificacion(datos) {
 
 function marcarNotificacionesLeidas() {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         db.marcarTodasLeidas();
         logApp('Notificaciones marcadas como leídas', '', 'info');
         return { success: true };
@@ -727,6 +818,8 @@ function marcarNotificacionesLeidas() {
 
 function obtenerNoLeidas() {
     try {
+        const db = getDB();
+        if (!db) return 0;
         return db.getNoLeidas();
     } catch (error) {
         logApp('Error obteniendo notificaciones no leídas', error.message, 'error');
@@ -735,10 +828,12 @@ function obtenerNoLeidas() {
 }
 
 // ============================================
-// FUNCIONES DE PUBLICACIONES MEJORADAS
+// FUNCIONES DE PUBLICACIONES
 // ============================================
 function obtenerPublicaciones() {
     try {
+        const db = getDB();
+        if (!db) return [];
         return db.getPublicaciones();
     } catch (error) {
         logApp('Error obteniendo publicaciones', error.message, 'error');
@@ -748,6 +843,9 @@ function obtenerPublicaciones() {
 
 function crearPublicacion(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.addPublicacion(datos);
         if (resultado.success) {
             logApp('Publicación creada', `Autor: ${datos.autor}`, 'success');
@@ -761,6 +859,9 @@ function crearPublicacion(datos) {
 
 function eliminarPublicacion(id) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.deletePublicacion(id);
         if (resultado.success) {
             logApp('Publicación eliminada', `ID: ${id}`, 'info');
@@ -774,6 +875,8 @@ function eliminarPublicacion(id) {
 
 function getComentariosPublicacion(publicacionId) {
     try {
+        const db = getDB();
+        if (!db) return [];
         return db.getComentarios(publicacionId);
     } catch (error) {
         logApp('Error obteniendo comentarios', error.message, 'error');
@@ -783,6 +886,9 @@ function getComentariosPublicacion(publicacionId) {
 
 function agregarComentario(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.addComentario(datos);
         if (resultado.success) {
             logApp('Comentario agregado', `Publicación: ${datos.publicacion_id}`, 'info');
@@ -796,6 +902,9 @@ function agregarComentario(datos) {
 
 function toggleReaccion(publicacionId, usuarioId, tipo) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const resultado = db.toggleReaccion(publicacionId, usuarioId, tipo);
         if (resultado.success) {
             logApp('Reacción actualizada', `Publicación: ${publicacionId}`, 'info');
@@ -809,6 +918,8 @@ function toggleReaccion(publicacionId, usuarioId, tipo) {
 
 function getReaccionUsuario(publicacionId, usuarioId) {
     try {
+        const db = getDB();
+        if (!db) return null;
         return db.getReaccionUsuario(publicacionId, usuarioId);
     } catch (error) {
         logApp('Error obteniendo reacción', error.message, 'error');
@@ -817,10 +928,12 @@ function getReaccionUsuario(publicacionId, usuarioId) {
 }
 
 // ============================================
-// FUNCIONES DE ESTADÍSTICAS Y SISTEMA MEJORADAS
+// FUNCIONES DE ESTADÍSTICAS Y SISTEMA
 // ============================================
 function obtenerEstadisticas() {
     try {
+        const db = getDB();
+        if (!db) return {};
         return db.getEstadisticas();
     } catch (error) {
         logApp('Error obteniendo estadísticas', error.message, 'error');
@@ -830,6 +943,8 @@ function obtenerEstadisticas() {
 
 function obtenerConfiguracion() {
     try {
+        const db = getDB();
+        if (!db) return null;
         return db.cargar('configuracion');
     } catch (error) {
         logApp('Error obteniendo configuración', error.message, 'error');
@@ -839,6 +954,9 @@ function obtenerConfiguracion() {
 
 function actualizarConfiguracion(datos) {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const c = db.cargar('configuracion');
         if (datos.iglesia) Object.assign(c.iglesia, datos.iglesia);
         if (datos.aplicacion) Object.assign(c.aplicacion, datos.aplicacion);
@@ -853,6 +971,9 @@ function actualizarConfiguracion(datos) {
 
 function exportarDatos() {
     try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
         const datos = db.exportarTodo();
         const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -874,6 +995,12 @@ function exportarDatos() {
 function importarDatos(archivo) {
     return new Promise((resolve) => {
         try {
+            const db = getDB();
+            if (!db) {
+                resolve({ success: false, error: 'Base de datos no disponible' });
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -906,18 +1033,21 @@ function importarDatos(archivo) {
 // ============================================
 function iniciarApp() {
     try {
+        const db = getDB();
+        if (!db) {
+            logApp('Error: Database no disponible en iniciarApp', '', 'error');
+            return { success: false, error: 'Database no disponible' };
+        }
+
         logApp('Iniciando aplicación', `Versión ${VERSION}`, 'info');
         
-        // Limpiar tokens expirados
         limpiarTokensExpirados();
         
-        // Verificar sesión
         const sesion = verificarSesion();
         if (sesion.success) {
             logApp('Sesión activa', `Usuario: ${sesion.usuario.usuario}`, 'info');
         }
         
-        // Limpiar logs antiguos
         try {
             const logs = JSON.parse(localStorage.getItem('ipuc5_app_logs') || '[]');
             if (logs.length > 1000) {
@@ -1009,10 +1139,7 @@ window.iniciarApp = iniciarApp;
 // Log
 window.logApp = logApp;
 
-console.log('✅ app.js v5.1 completo cargado - Todas las funciones listas');
-console.log(`📦 Versión: ${VERSION}`);
-console.log('🔐 Sistema de autenticación mejorado con bloqueo por intentos fallidos');
-console.log('📝 Sistema de logs integrado');
-
-// Inicializar automáticamente
+// ============================================
+// INICIALIZAR (SIN CONSOLE.LOG)
+// ============================================
 iniciarApp();
