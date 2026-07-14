@@ -1,24 +1,19 @@
 // ============================================
-// IPUC LA FONDA - DATABASE v5.1 COMPLETA
+// IPUC LA FONDA - DATABASE v5.1 (PRIVADO)
 // Gestión de Base de Datos en localStorage
-// Sistema de publicaciones, comentarios, reacciones
-// MEJORADA - OPTIMIZADA - 100% OPERATIVA
-// "Donde el Espíritu Santo se mueve"
+// Sin mensajes en consola - Acceso restringido
 // ============================================
 
 class Database {
     constructor() {
         this.prefix = 'ipuc5_';
         this.cache = {};
-        this.cacheTimeout = 300; // segundos
+        this.cacheTimeout = 300;
         this.lastCacheUpdate = {};
         this.version = '5.1';
         this.initialized = false;
     }
 
-    // ============================================
-    // SISTEMA DE CLAVES
-    // ============================================
     _getKey(name) {
         return `${this.prefix}${name}`;
     }
@@ -27,90 +22,55 @@ class Database {
         return /^[a-zA-Z0-9_\-]+$/.test(name);
     }
 
-    // ============================================
-    // CARGA Y GUARDADO DE DATOS MEJORADO
-    // ============================================
     cargar(nombreArchivo) {
-        if (!this._isValidKey(nombreArchivo)) {
-            console.error(`❌ Nombre de archivo inválido: ${nombreArchivo}`);
-            return null;
-        }
-
+        if (!this._isValidKey(nombreArchivo)) return null;
         const clave = this._getKey(nombreArchivo);
-        
-        // Verificar caché
         if (this.cache[clave] && this.lastCacheUpdate[clave]) {
             const tiempoCache = (Date.now() - this.lastCacheUpdate[clave]) / 1000;
             if (tiempoCache < this.cacheTimeout) {
                 return JSON.parse(JSON.stringify(this.cache[clave]));
             }
         }
-
         try {
             const datos = localStorage.getItem(clave);
             if (!datos) return this._crearArchivoPorDefecto(nombreArchivo);
-            
             const parsed = JSON.parse(datos);
             this.cache[clave] = JSON.parse(JSON.stringify(parsed));
             this.lastCacheUpdate[clave] = Date.now();
             return parsed;
-        } catch (e) {
-            console.error(`❌ Error al cargar ${nombreArchivo}:`, e);
+        } catch {
             return this._recuperarRespaldo(nombreArchivo);
         }
     }
 
     guardar(nombreArchivo, datos) {
-        if (!this._isValidKey(nombreArchivo)) {
-            console.error(`❌ Nombre de archivo inválido: ${nombreArchivo}`);
-            return false;
-        }
-
-        if (typeof datos !== 'object' || datos === null) {
-            console.error('❌ Los datos deben ser un objeto');
-            return false;
-        }
-
+        if (!this._isValidKey(nombreArchivo) || typeof datos !== 'object' || datos === null) return false;
         const clave = this._getKey(nombreArchivo);
         try {
-            // Crear respaldo antes de sobrescribir
             const datosAnteriores = localStorage.getItem(clave);
-            if (datosAnteriores) {
-                this._crearRespaldo(nombreArchivo, datosAnteriores);
-            }
-
-            // Guardar nuevos datos
+            if (datosAnteriores) this._crearRespaldo(nombreArchivo, datosAnteriores);
             localStorage.setItem(clave, JSON.stringify(datos, null, 2));
-            
-            // Actualizar caché
             this.cache[clave] = JSON.parse(JSON.stringify(datos));
             this.lastCacheUpdate[clave] = Date.now();
-            
             return true;
-        } catch (e) {
-            console.error(`❌ Error al guardar ${nombreArchivo}:`, e);
+        } catch {
             return false;
         }
     }
 
     eliminar(nombreArchivo) {
         if (!this._isValidKey(nombreArchivo)) return false;
-        
         const clave = this._getKey(nombreArchivo);
         try {
             localStorage.removeItem(clave);
             delete this.cache[clave];
             delete this.lastCacheUpdate[clave];
             return true;
-        } catch (e) {
-            console.error(`❌ Error al eliminar ${nombreArchivo}:`, e);
+        } catch {
             return false;
         }
     }
 
-    // ============================================
-    // CREAR ARCHIVO POR DEFECTO
-    // ============================================
     _crearArchivoPorDefecto(nombreArchivo) {
         const datosPorDefecto = {
             'usuarios': { usuarios: [], ultimo_id: 0 },
@@ -131,7 +91,6 @@ class Database {
             'estadisticas': { asistencia: {}, usuarios: {}, publicaciones: {} },
             'configuracion': { iglesia: {}, aplicacion: {} }
         };
-
         if (datosPorDefecto[nombreArchivo]) {
             this.guardar(nombreArchivo, datosPorDefecto[nombreArchivo]);
             return datosPorDefecto[nombreArchivo];
@@ -139,18 +98,13 @@ class Database {
         return null;
     }
 
-    // ============================================
-    // SISTEMA DE RESPALDOS MEJORADO
-    // ============================================
     _crearRespaldo(nombreArchivo, datosAnteriores) {
         try {
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const claveRespaldo = `${this.prefix}backup_${nombreArchivo}_${timestamp}`;
             localStorage.setItem(claveRespaldo, datosAnteriores);
             this._limpiarRespaldosAntiguos(nombreArchivo, 10);
-        } catch (e) {
-            console.warn(`⚠️ Error al crear respaldo de ${nombreArchivo}:`, e);
-        }
+        } catch {}
     }
 
     _limpiarRespaldosAntiguos(nombreArchivo, maxRespaldos = 10) {
@@ -168,9 +122,7 @@ class Database {
                     localStorage.removeItem(respaldos[i]);
                 }
             }
-        } catch (e) {
-            console.warn(`⚠️ Error limpiando respaldos de ${nombreArchivo}:`, e);
-        }
+        } catch {}
     }
 
     _recuperarRespaldo(nombreArchivo) {
@@ -183,7 +135,6 @@ class Database {
                 }
             }
             respaldos.sort((a, b) => b.localeCompare(a));
-            
             for (const claveRespaldo of respaldos) {
                 try {
                     const datos = localStorage.getItem(claveRespaldo);
@@ -192,40 +143,27 @@ class Database {
                         this.guardar(nombreArchivo, parsed);
                         return parsed;
                     }
-                } catch (e) {
-                    console.error(`❌ Error al leer respaldo ${claveRespaldo}:`, e);
-                }
+                } catch {}
             }
             return null;
-        } catch (e) {
-            console.error(`❌ Error en recuperación de respaldo:`, e);
+        } catch {
             return null;
         }
     }
 
-    // ============================================
-    // HASH DE CONTRASEÑA MEJORADO
-    // ============================================
     hashPassword(password) {
-        if (!password || typeof password !== 'string') {
-            throw new Error('Contraseña inválida');
-        }
-        
+        if (!password || typeof password !== 'string') throw new Error('Contraseña inválida');
         let hash = 0;
         const salt = 'ipuc5_salt_2026';
         const str = password + salt;
-        
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convertir a entero de 32 bits
+            hash = hash & hash;
         }
         return Math.abs(hash).toString(16).padStart(8, '0');
     }
 
-    // ============================================
-    // VALIDACIONES
-    // ============================================
     _validarCorreo(correo) {
         return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correo);
     }
@@ -242,37 +180,27 @@ class Database {
         return documento && documento.length >= 5;
     }
 
-    // ============================================
-    // ADMINISTRADOR MEJORADO
-    // ============================================
     crearPrimerAdministrador(datos) {
         try {
             const admins = this.cargar('administradores');
             if (admins?.administradores?.length > 0) {
                 return { success: false, error: 'Ya existe un administrador' };
             }
-
-            // Validaciones
             const campos = ['nombre', 'apellidos', 'correo', 'usuario', 'password'];
             for (const c of campos) {
                 if (!datos[c] || !String(datos[c]).trim()) {
                     return { success: false, error: `El campo '${c}' es obligatorio` };
                 }
             }
-
             if (!this._validarCorreo(datos.correo)) {
                 return { success: false, error: 'Correo inválido' };
             }
-
             if (!this._validarUsuario(datos.usuario)) {
                 return { success: false, error: 'Usuario inválido (3-20 caracteres, solo letras, números y _)' };
             }
-
             if (datos.password.length < 8) {
                 return { success: false, error: 'Contraseña mínima 8 caracteres' };
             }
-
-            // Crear administrador
             const admin = {
                 id: 1,
                 nombre: datos.nombre.trim(),
@@ -289,11 +217,9 @@ class Database {
                 ministerio: datos.ministerio || 'Pastoral',
                 insignias: ['Administrador', 'Cuenta Verificada', 'Líder']
             };
-
             if (!admins.administradores) admins.administradores = [];
             admins.administradores.push(admin);
             admins.ultimo_id = 1;
-
             if (this.guardar('administradores', admins)) {
                 const cfg = this.cargar('configuracion');
                 if (cfg?.aplicacion) {
@@ -303,48 +229,37 @@ class Database {
                 return { success: true, data: admin };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error creando administrador:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al crear administrador' };
         }
     }
 
-    // ============================================
-    // AUTENTICACIÓN MEJORADA
-    // ============================================
     login(usuario, password) {
         try {
             if (!usuario || !password) {
                 return { success: false, error: 'Usuario y contraseña requeridos' };
             }
-
             const hash = this.hashPassword(password);
-            
-            // Buscar en administradores
             const admins = this.cargar('administradores');
-            const admin = admins?.administradores?.find(a => 
+            const admin = admins?.administradores?.find(a =>
                 (a.usuario === usuario || a.correo === usuario) && a.password === hash
             );
-            
             if (admin) {
                 if (admin.estado !== 'activo') {
                     return { success: false, error: 'Cuenta desactivada' };
                 }
                 const { password: _, ...adminSeguro } = admin;
-                return { 
-                    success: true, 
+                return {
+                    success: true,
                     token: 't5_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                     rol: 'admin',
                     usuario: adminSeguro
                 };
             }
-
-            // Buscar en usuarios
             const usuarios = this.cargar('usuarios');
-            const user = usuarios?.usuarios?.find(u => 
+            const user = usuarios?.usuarios?.find(u =>
                 (u.usuario === usuario || u.correo === usuario) && u.password === hash
             );
-            
             if (user) {
                 if (user.estado !== 'activo') {
                     return { success: false, error: 'Cuenta desactivada' };
@@ -357,46 +272,34 @@ class Database {
                     usuario: userSeguro
                 };
             }
-
             return { success: false, error: 'Credenciales inválidas' };
-        } catch (e) {
-            console.error('❌ Error en login:', e);
+        } catch {
             return { success: false, error: 'Error en el servidor' };
         }
     }
 
-    // ============================================
-    // REGISTRO DE USUARIO MEJORADO
-    // ============================================
     registrarUsuario(datos) {
         try {
-            const campos = ['nombre', 'apellidos', 'documento', 'fecha_nacimiento', 
-                          'sexo', 'correo', 'celular', 'usuario', 'password', 'ministerio'];
-            
+            const campos = ['nombre', 'apellidos', 'documento', 'fecha_nacimiento',
+                'sexo', 'correo', 'celular', 'usuario', 'password', 'ministerio'
+            ];
             for (const c of campos) {
                 if (!datos[c] || !String(datos[c]).trim()) {
                     return { success: false, error: `El campo '${c}' es obligatorio` };
                 }
             }
-
-            // Validaciones
             if (!this._validarCorreo(datos.correo)) {
                 return { success: false, error: 'Correo inválido' };
             }
-
             if (!this._validarUsuario(datos.usuario)) {
                 return { success: false, error: 'Usuario inválido (3-20 caracteres)' };
             }
-
             if (!this._validarTelefono(datos.celular)) {
                 return { success: false, error: 'Celular inválido (10 dígitos)' };
             }
-
             if (datos.password.length < 8) {
                 return { success: false, error: 'Contraseña mínima 8 caracteres' };
             }
-
-            // Verificar duplicados
             const usuarios = this.cargar('usuarios');
             if (usuarios?.usuarios?.some(u => String(u.documento) === String(datos.documento))) {
                 return { success: false, error: 'Documento ya registrado' };
@@ -407,8 +310,6 @@ class Database {
             if (usuarios?.usuarios?.some(u => u.usuario?.toLowerCase() === datos.usuario.toLowerCase())) {
                 return { success: false, error: 'Usuario ya existe' };
             }
-
-            // Crear usuario
             const nuevo = {
                 id: (usuarios?.usuarios?.length || 0) + 1,
                 nombre: datos.nombre.trim(),
@@ -429,37 +330,31 @@ class Database {
                 estado: 'activo',
                 insignias: ['Nuevo Miembro']
             };
-
             if (!usuarios.usuarios) usuarios.usuarios = [];
             usuarios.usuarios.push(nuevo);
             usuarios.ultimo_id = nuevo.id;
-
             if (this.guardar('usuarios', usuarios)) {
                 this._actualizarEstadisticasUsuarios();
                 this._agregarNotificacion({
-                    titulo: '🎉 Nuevo miembro',
+                    titulo: 'Nuevo miembro',
                     mensaje: `${nuevo.nombre} se ha unido a la comunidad`,
                     tipo: 'usuario'
                 });
-                return { 
-                    success: true, 
-                    data: { 
-                        id: nuevo.id, 
-                        nombre: nuevo.nombre, 
-                        usuario: nuevo.usuario 
-                    } 
+                return {
+                    success: true,
+                    data: {
+                        id: nuevo.id,
+                        nombre: nuevo.nombre,
+                        usuario: nuevo.usuario
+                    }
                 };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error en registro:', e);
+        } catch {
             return { success: false, error: 'Error en el servidor' };
         }
     }
 
-    // ============================================
-    // PUBLICACIONES MEJORADAS
-    // ============================================
     getPublicaciones() {
         return this.cargar('publicaciones')?.publicaciones || [];
     }
@@ -469,7 +364,6 @@ class Database {
             if (!datos.usuario_id || !datos.autor || !datos.contenido) {
                 return { success: false, error: 'Datos incompletos' };
             }
-
             const publicaciones = this.cargar('publicaciones');
             const nueva = {
                 id: Date.now(),
@@ -484,23 +378,20 @@ class Database {
                 reacciones: { amen: 0, me_gusta: 0, fuego: 0, orando: 0, bendicion: 0 },
                 comentarios_count: 0
             };
-
             if (!publicaciones.publicaciones) publicaciones.publicaciones = [];
             publicaciones.publicaciones.unshift(nueva);
             publicaciones.ultimo_id = nueva.id;
-
             if (this.guardar('publicaciones', publicaciones)) {
                 this._agregarNotificacion({
-                    titulo: '📝 Nueva publicación',
+                    titulo: 'Nueva publicación',
                     mensaje: `${datos.autor} ha publicado en el muro`,
                     tipo: 'publicacion'
                 });
                 return { success: true, data: nueva };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error creando publicación:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al crear publicación' };
         }
     }
 
@@ -510,23 +401,16 @@ class Database {
             publicaciones.publicaciones = (publicaciones.publicaciones || [])
                 .filter(p => p.id !== id);
             this.guardar('publicaciones', publicaciones);
-
-            // Eliminar comentarios asociados
             const comentarios = this.cargar('comentarios');
             comentarios.comentarios = (comentarios.comentarios || [])
                 .filter(c => c.publicacion_id !== id);
             this.guardar('comentarios', comentarios);
-
             return { success: true };
-        } catch (e) {
-            console.error('❌ Error eliminando publicación:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al eliminar publicación' };
         }
     }
 
-    // ============================================
-    // COMENTARIOS MEJORADOS
-    // ============================================
     getComentarios(publicacionId = null) {
         const comentarios = this.cargar('comentarios')?.comentarios || [];
         if (publicacionId) {
@@ -542,7 +426,6 @@ class Database {
             if (!datos.publicacion_id || !datos.usuario_id || !datos.autor || !datos.contenido) {
                 return { success: false, error: 'Datos incompletos' };
             }
-
             const comentarios = this.cargar('comentarios');
             const nuevo = {
                 id: Date.now(),
@@ -554,13 +437,10 @@ class Database {
                 contenido: datos.contenido.trim(),
                 fecha: new Date().toISOString()
             };
-
             if (!comentarios.comentarios) comentarios.comentarios = [];
             comentarios.comentarios.push(nuevo);
             comentarios.ultimo_id = nuevo.id;
             this.guardar('comentarios', comentarios);
-
-            // Actualizar contador en publicación
             const publicaciones = this.cargar('publicaciones');
             const pub = (publicaciones?.publicaciones || [])
                 .find(p => p.id === datos.publicacion_id);
@@ -568,58 +448,42 @@ class Database {
                 pub.comentarios_count = (pub.comentarios_count || 0) + 1;
                 this.guardar('publicaciones', publicaciones);
             }
-
             return { success: true, data: nuevo };
-        } catch (e) {
-            console.error('❌ Error creando comentario:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al agregar comentario' };
         }
     }
 
-    // ============================================
-    // REACCIONES MEJORADAS
-    // ============================================
     toggleReaccion(publicacionId, usuarioId, tipo) {
         try {
             if (!publicacionId || !usuarioId || !tipo) {
                 return { success: false, error: 'Datos incompletos' };
             }
-
             const reacciones = this.cargar('reacciones');
             if (!reacciones.reacciones) reacciones.reacciones = {};
-
             const clave = `${publicacionId}_${usuarioId}`;
             const actual = reacciones.reacciones[clave];
-
-            // Obtener publicación
             const publicaciones = this.cargar('publicaciones');
             const pub = (publicaciones?.publicaciones || [])
                 .find(p => p.id === publicacionId);
-            
             if (!pub) {
                 return { success: false, error: 'Publicación no encontrada' };
             }
-
             if (actual === tipo) {
-                // Quitar reacción
                 delete reacciones.reacciones[clave];
                 if (pub.reacciones[tipo] > 0) pub.reacciones[tipo]--;
             } else {
-                // Cambiar reacción
                 if (actual) {
                     if (pub.reacciones[actual] > 0) pub.reacciones[actual]--;
                 }
                 reacciones.reacciones[clave] = tipo;
                 pub.reacciones[tipo] = (pub.reacciones[tipo] || 0) + 1;
             }
-
             this.guardar('reacciones', reacciones);
             this.guardar('publicaciones', publicaciones);
-
             return { success: true, data: reacciones.reacciones[clave] || null };
-        } catch (e) {
-            console.error('❌ Error en reacción:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al procesar reacción' };
         }
     }
 
@@ -628,9 +492,6 @@ class Database {
         return reacciones?.reacciones?.[`${publicacionId}_${usuarioId}`] || null;
     }
 
-    // ============================================
-    // NOTICIAS MEJORADAS
-    // ============================================
     getNoticias() {
         return this.cargar('noticias')?.noticias || [];
     }
@@ -640,7 +501,6 @@ class Database {
             if (!datos.titulo || !datos.contenido) {
                 return { success: false, error: 'Título y contenido requeridos' };
             }
-
             const noticias = this.cargar('noticias');
             const nueva = {
                 id: (noticias.noticias?.length || 0) + 1,
@@ -654,29 +514,23 @@ class Database {
                 categoria: datos.categoria || 'General',
                 reacciones: { me_gusta: 0, amen: 0, bendiciones: 0, aleluya: 0 }
             };
-
             if (!noticias.noticias) noticias.noticias = [];
             noticias.noticias.unshift(nueva);
             noticias.ultimo_id = nueva.id;
-
             if (this.guardar('noticias', noticias)) {
                 this._agregarNotificacion({
-                    titulo: '📰 Nueva noticia',
+                    titulo: 'Nueva noticia',
                     mensaje: `${nueva.titulo}`,
                     tipo: 'noticia'
                 });
                 return { success: true, data: nueva };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error creando noticia:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al crear noticia' };
         }
     }
 
-    // ============================================
-    // EVENTOS MEJORADOS
-    // ============================================
     getEventos() {
         return this.cargar('eventos')?.eventos || [];
     }
@@ -686,7 +540,6 @@ class Database {
             if (!datos.titulo || !datos.fecha) {
                 return { success: false, error: 'Título y fecha requeridos' };
             }
-
             const eventos = this.cargar('eventos');
             const nuevo = {
                 id: (eventos.eventos?.length || 0) + 1,
@@ -701,29 +554,23 @@ class Database {
                 cupos: datos.cupos || 0,
                 reservados: 0
             };
-
             if (!eventos.eventos) eventos.eventos = [];
             eventos.eventos.push(nuevo);
             eventos.ultimo_id = nuevo.id;
-
             if (this.guardar('eventos', eventos)) {
                 this._agregarNotificacion({
-                    titulo: '📅 Nuevo evento',
+                    titulo: 'Nuevo evento',
                     mensaje: `${nuevo.titulo} - ${nuevo.fecha}`,
                     tipo: 'evento'
                 });
                 return { success: true, data: nuevo };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error creando evento:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al crear evento' };
         }
     }
 
-    // ============================================
-    // ASISTENCIA MEJORADA
-    // ============================================
     getAsistencia() {
         return this.cargar('asistencia')?.registros || [];
     }
@@ -733,7 +580,6 @@ class Database {
             if (!datos.usuario_id || !datos.nombre) {
                 return { success: false, error: 'Datos incompletos' };
             }
-
             const asistencia = this.cargar('asistencia');
             const nuevo = {
                 id: (asistencia.registros?.length || 0) + 1,
@@ -746,25 +592,19 @@ class Database {
                 culto: datos.culto || '',
                 comentario: datos.comentario || ''
             };
-
             if (!asistencia.registros) asistencia.registros = [];
             asistencia.registros.push(nuevo);
             asistencia.ultimo_id = nuevo.id;
-
             if (this.guardar('asistencia', asistencia)) {
                 this._actualizarEstadisticasAsistencia();
                 return { success: true, data: nuevo };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error registrando asistencia:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al registrar asistencia' };
         }
     }
 
-    // ============================================
-    // PETICIONES MEJORADAS
-    // ============================================
     getPeticiones() {
         return this.cargar('peticiones')?.peticiones || [];
     }
@@ -774,7 +614,6 @@ class Database {
             if (!datos.usuario_id || !datos.nombre || !datos.motivo) {
                 return { success: false, error: 'Datos incompletos' };
             }
-
             const peticiones = this.cargar('peticiones');
             const nueva = {
                 id: (peticiones.peticiones?.length || 0) + 1,
@@ -786,29 +625,23 @@ class Database {
                 estado: 'activa',
                 oraciones: 0
             };
-
             if (!peticiones.peticiones) peticiones.peticiones = [];
             peticiones.peticiones.unshift(nueva);
             peticiones.ultimo_id = nueva.id;
-
             if (this.guardar('peticiones', peticiones)) {
                 this._agregarNotificacion({
-                    titulo: '🙏 Nueva petición',
+                    titulo: 'Nueva petición',
                     mensaje: `${nueva.nombre} ha compartido una petición`,
                     tipo: 'peticion'
                 });
                 return { success: true, data: nueva };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error creando petición:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al crear petición' };
         }
     }
 
-    // ============================================
-    // NOTIFICACIONES MEJORADAS
-    // ============================================
     getNotificaciones() {
         return this.cargar('notificaciones')?.notificaciones || [];
     }
@@ -825,14 +658,11 @@ class Database {
                 tipo: datos.tipo || 'general',
                 icono: datos.icono || null
             };
-
             if (!notificaciones.notificaciones) notificaciones.notificaciones = [];
             notificaciones.notificaciones.unshift(nueva);
             notificaciones.ultimo_id = nueva.id;
             this.guardar('notificaciones', notificaciones);
-        } catch (e) {
-            console.error('❌ Error creando notificación:', e);
-        }
+        } catch {}
     }
 
     marcarTodasLeidas() {
@@ -844,9 +674,8 @@ class Database {
                 return { success: true };
             }
             return { success: false, error: 'No hay notificaciones' };
-        } catch (e) {
-            console.error('❌ Error marcando notificaciones:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al marcar notificaciones' };
         }
     }
 
@@ -854,30 +683,22 @@ class Database {
         return this.getNotificaciones().filter(n => !n.leida).length;
     }
 
-    // ============================================
-    // ESTADÍSTICAS MEJORADAS
-    // ============================================
     _actualizarEstadisticasAsistencia() {
         try {
             const asistencia = this.cargar('asistencia');
             const estadisticas = this.cargar('estadisticas');
-            
             const hoy = new Date().toISOString().split('T')[0];
             const mes = hoy.substring(0, 7);
             const año = hoy.substring(0, 4);
             const registros = asistencia?.registros || [];
-
             estadisticas.asistencia = {
                 diario: registros.filter(r => r.fecha === hoy).length,
                 mensual: registros.filter(r => r.fecha?.startsWith(mes)).length,
                 anual: registros.filter(r => r.fecha?.startsWith(año)).length,
                 total: registros.length
             };
-
             this.guardar('estadisticas', estadisticas);
-        } catch (e) {
-            console.error('❌ Error actualizando estadísticas:', e);
-        }
+        } catch {}
     }
 
     _actualizarEstadisticasUsuarios() {
@@ -886,24 +707,19 @@ class Database {
             const estadisticas = this.cargar('estadisticas');
             const usuariosList = usuarios?.usuarios || [];
             const mes = new Date().toISOString().substring(0, 7);
-
             estadisticas.usuarios = {
                 total: usuariosList.length,
                 activos: usuariosList.filter(u => u.estado === 'activo').length,
                 nuevos_mes: usuariosList.filter(u => u.fecha_registro?.startsWith(mes)).length
             };
-
             const publicaciones = this.getPublicaciones();
             const comentarios = this.cargar('comentarios')?.comentarios || [];
             estadisticas.publicaciones = {
                 total: publicaciones.length,
                 comentarios: comentarios.length
             };
-
             this.guardar('estadisticas', estadisticas);
-        } catch (e) {
-            console.error('❌ Error actualizando estadísticas:', e);
-        }
+        } catch {}
     }
 
     getEstadisticas() {
@@ -923,15 +739,11 @@ class Database {
                 peticiones: this.getPeticiones().length,
                 notificaciones_no_leidas: this.getNoLeidas()
             };
-        } catch (e) {
-            console.error('❌ Error obteniendo estadísticas:', e);
+        } catch {
             return {};
         }
     }
 
-    // ============================================
-    // VERSÍCULOS
-    // ============================================
     getVersiculos() {
         return this.cargar('versiculos')?.versiculos || [];
     }
@@ -943,9 +755,6 @@ class Database {
         return versiculos[index];
     }
 
-    // ============================================
-    // INSIGNIAS
-    // ============================================
     getInsignias() {
         return this.cargar('insignias')?.insignias || [];
     }
@@ -956,9 +765,6 @@ class Database {
         return user?.insignias || [];
     }
 
-    // ============================================
-    // UTILIDADES
-    // ============================================
     exportarTodo() {
         const datos = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -966,7 +772,7 @@ class Database {
             if (clave && clave.startsWith(this.prefix)) {
                 try {
                     datos[clave] = JSON.parse(localStorage.getItem(clave));
-                } catch (e) {
+                } catch {
                     datos[clave] = localStorage.getItem(clave);
                 }
             }
@@ -983,22 +789,17 @@ class Database {
             if (!exportData || typeof exportData !== 'object') {
                 return { success: false, error: 'Datos inválidos' };
             }
-
             const datos = exportData.datos || exportData;
             for (const [clave, valor] of Object.entries(datos)) {
                 if (clave.startsWith(this.prefix)) {
                     localStorage.setItem(clave, JSON.stringify(valor));
                 }
             }
-
-            // Limpiar caché
             this.cache = {};
             this.lastCacheUpdate = {};
-            
             return { success: true };
-        } catch (e) {
-            console.error('❌ Error importando datos:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al importar datos' };
         }
     }
 
@@ -1013,15 +814,11 @@ class Database {
             this.cache = {};
             this.lastCacheUpdate = {};
             return { success: true };
-        } catch (e) {
-            console.error('❌ Error limpiando datos:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al limpiar datos' };
         }
     }
 
-    // ============================================
-    // CONFIGURACIÓN
-    // ============================================
     getConfiguracion() {
         return this.cargar('configuracion');
     }
@@ -1034,15 +831,11 @@ class Database {
                 return { success: true };
             }
             return { success: false, error: 'Error al guardar' };
-        } catch (e) {
-            console.error('❌ Error actualizando configuración:', e);
-            return { success: false, error: e.message };
+        } catch {
+            return { success: false, error: 'Error al actualizar configuración' };
         }
     }
 
-    // ============================================
-    // HORARIOS
-    // ============================================
     getHorarios() {
         return this.cargar('horarios')?.cultos || [];
     }
@@ -1052,61 +845,34 @@ class Database {
         return cultos.find(c => c.dia === dia) || null;
     }
 
-    // ============================================
-    // BIBLIOTECA
-    // ============================================
     getRecursos() {
         return this.cargar('biblioteca')?.recursos || [];
     }
 
-    // ============================================
-    // GALERÍA
-    // ============================================
     getAlbumes() {
         return this.cargar('galeria')?.albumes || [];
     }
 
-    // ============================================
-    // INICIALIZACIÓN COMPLETA
-    // ============================================
     inicializarDatos() {
-        console.log('🔧 Inicializando base de datos...');
-        
         const archivos = [
-            'usuarios', 'administradores', 'publicaciones', 'comentarios', 
+            'usuarios', 'administradores', 'publicaciones', 'comentarios',
             'reacciones', 'noticias', 'eventos', 'asistencia', 'notificaciones',
             'peticiones', 'insignias', 'versiculos', 'horarios', 'biblioteca',
             'galeria', 'estadisticas', 'configuracion'
         ];
-
-        let creados = 0;
         for (const archivo of archivos) {
             if (!localStorage.getItem(this._getKey(archivo))) {
                 const datos = this._crearArchivoPorDefecto(archivo);
                 if (datos) {
                     this.guardar(archivo, datos);
-                    creados++;
-                    console.log(`✅ Archivo creado: ${archivo}`);
                 }
             }
         }
-
-        // Inicializar datos por defecto
         this._inicializarDatosPorDefecto();
-
-        if (creados > 0) {
-            console.log(`✅ ${creados} archivos inicializados en IPUC LA FONDA v${this.version}`);
-        } else {
-            console.log('📄 Todos los archivos ya existen - Base de datos lista');
-        }
-
         this.initialized = true;
-        console.warn('⚠️ Sin credenciales de prueba - Usa db.crearPrimerAdministrador()');
-        console.log('✅ Base de datos lista para usar');
     }
 
     _inicializarDatosPorDefecto() {
-        // Inicializar insignias
         const insignias = this.cargar('insignias');
         if (insignias.insignias.length === 0) {
             const insigniasPorDefecto = [
@@ -1127,7 +893,6 @@ class Database {
             this.guardar('insignias', insignias);
         }
 
-        // Inicializar versículos
         const versiculos = this.cargar('versiculos');
         if (versiculos.versiculos.length === 0) {
             const versiculosPorDefecto = [
@@ -1144,7 +909,6 @@ class Database {
             this.guardar('versiculos', versiculos);
         }
 
-        // Inicializar horarios
         const horarios = this.cargar('horarios');
         if (horarios.cultos.length === 0) {
             horarios.cultos = [
@@ -1159,7 +923,6 @@ class Database {
             this.guardar('horarios', horarios);
         }
 
-        // Inicializar configuración
         const config = this.cargar('configuracion');
         if (!config.iglesia.nombre) {
             config.iglesia = {
@@ -1189,17 +952,8 @@ class Database {
     }
 }
 
-// ============================================
-// CREAR INSTANCIA GLOBAL
-// ============================================
+// Instancia global (solo para uso interno de la app)
 const db = new Database();
 db.inicializarDatos();
 
-// Exportar para uso global
-window.Database = Database;
 window.db = db;
-
-console.log('✅ IPUC LA FONDA - Database v5.1 cargada correctamente');
-console.log('💾 Almacenamiento: localStorage con sistema de respaldos');
-console.log('📝 Sistema de publicaciones, comentarios y reacciones integrado');
-console.log('🔒 Sin credenciales de prueba - Use db.crearPrimerAdministrador()');
