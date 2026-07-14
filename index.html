@@ -94,8 +94,8 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         "alternateName": "Iglesia Pentecostal Unida de Colombia - LA FONDA",
         "description": "Donde el Espíritu Santo se mueve",
         "url": "https://ipuclafonda.netlify.app",
-        "image": "ipuclafonda.png",
-        "logo": "ipuclafonda.png",
+        "image": "https://ipuclafonda.netlify.app/ipuclafonda.png",
+        "logo": "https://ipuclafonda.netlify.app/ipuclafonda.png",
         "foundingDate": "2024",
         "openingHours": "Mo-Su 08:00-20:00",
         "serviceType": "Culto Dominical, Culto de Oración, Culto Campal",
@@ -595,7 +595,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
     <script src="script.js" defer></script>
 
     <!-- ============================================
-    SCRIPT DE CREACIÓN DE ADMIN (INTEGRADO)
+    SCRIPT DE CREACIÓN DE ADMIN (INTEGRADO - CORREGIDO)
     ============================================ -->
     <script>
         // ============================================
@@ -604,14 +604,8 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         
         'use strict';
 
-        // Inicializar base de datos
-        if (typeof db === 'undefined') {
-            var db = new Database();
-            db.inicializarDatos();
-        }
-
         // ============================================
-        // FUNCIONES DE UTILIDAD
+        // FUNCIONES DE UTILIDAD PARA ADMIN
         // ============================================
         function adminTogglePassword() {
             const input = document.getElementById('admin-password');
@@ -727,6 +721,12 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         // ============================================
         function adminVerificarExistencia() {
             try {
+                // Usar la instancia db que ya está en window
+                if (typeof db === 'undefined') {
+                    console.warn('⚠️ Database no cargada, esperando...');
+                    return false;
+                }
+                
                 const admins = db.cargar('administradores');
                 const btnCreateAdmin = document.getElementById('btn-create-admin');
                 
@@ -744,6 +744,7 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
                     return false;
                 }
             } catch (error) {
+                console.warn('Error verificando administradores:', error);
                 return false;
             }
         }
@@ -752,6 +753,18 @@ MEJORADO - OPTIMIZADO - 100% OPERATIVO
         // EVENT LISTENERS
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar que db existe
+            if (typeof db === 'undefined') {
+                console.error('❌ Database no cargada. Espera un momento...');
+                // Intentar de nuevo después de un breve retraso
+                setTimeout(function() {
+                    if (typeof db !== 'undefined') {
+                        adminVerificarExistencia();
+                    }
+                }, 500);
+                return;
+            }
+
             // Toggle password
             document.getElementById('admin-toggle-password').addEventListener('click', adminTogglePassword);
             
