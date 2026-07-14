@@ -334,11 +334,6 @@ function mostrarLogin() {
                 ¿No tienes cuenta? Regístrate aquí
             </a>
         </p>
-        <p style="text-align:center;margin-top:8px;font-size:0.8rem;color:var(--gris-texto);">
-            <a href="#" onclick="continuarComoInvitado()" style="color:var(--gris-texto);text-decoration:none;">
-                <i class="bx bx-user"></i> Continuar como invitado
-            </a>
-        </p>
     `;
     m.classList.remove('hidden');
     
@@ -531,7 +526,7 @@ function continuarComoInvitado() {
         id: 0,
         nombre: 'Invitado',
         usuario: 'invitado',
-        foto: 'assets/avatars/default.png',
+        foto: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLQayAYPtcjxG3HTcQ8QZmAN3qA4ZiLnKWxSzeQS96HwaAiGz4upYSBCWH&s=10',
         verificado: false,
         ministerio: 'Visitante',
         insignias: []
@@ -1475,7 +1470,7 @@ function cargarHorarios(c) {
             </div>
             <div class="card" style="margin-top:12px;text-align:center;">
                 <p style="color:var(--gris-texto);font-size:0.8rem;">
-                    <i class="bx bx-map-pin"></i> Dirección: Calle 123 #45-67, Barrio La Fonda
+                    <i class="bx bx-map-pin"></i> Dirección: IPUC La Fonda, Cali, Valle del Cauca
                 </p>
             </div>
         </div>
