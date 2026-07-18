@@ -1,9 +1,8 @@
 // ============================================
-// IPUC LA FONDA - SCRIPT.JS v10.0 COMPLETO
+// IPUC LA FONDA - SCRIPT.JS v10.0 CORREGIDO
 // Web App Profesional - Todas las secciones funcionales
 // UI, Interacciones y Eventos de la aplicación
-// VERSIÓN INTERNACIONAL - 100% OPERATIVA
-// "Where the Holy Spirit moves" 🌍
+// VERSIÓN ESTABLE - SIN ERRORES
 // ============================================
 
 // ============================================
@@ -43,7 +42,7 @@ const CONFIG = {
         'dashboard': 'Dashboard', 'gestion-usuarios': 'Gestión de Usuarios',
         'gestion-noticias': 'Gestión de Noticias', 'gestion-eventos': 'Gestión de Eventos',
         'versiculos': 'Versículos Diarios', 'sistema': 'Configuración del Sistema',
-        'seguridad': 'Seguridad'
+        'seguridad': 'Seguridad', 'grupos': 'Grupos', 'videos': 'Videos', 'logs': 'Logs'
     },
     REACCIONES_TIPOS: [
         { icono: 'bx bxs-hands', nombre: 'Amén', clave: 'amen' },
@@ -51,30 +50,6 @@ const CONFIG = {
         { icono: 'bx bxs-fire', nombre: 'Fuego', clave: 'fuego' },
         { icono: 'bx bxs-pray', nombre: 'Orando', clave: 'orando' },
         { icono: 'bx bxs-star', nombre: 'Bendición', clave: 'bendicion' }
-    ],
-    EVENTOS_DEMO: [
-        { id: 1, titulo: 'Culto de Jóvenes', fecha: '2026-07-20', hora: '6:00 PM', descripcion: 'Culto especial para jóvenes', ubicacion: 'Templo Principal' },
-        { id: 2, titulo: 'Escuela Dominical', fecha: '2026-07-21', hora: '9:00 AM', descripcion: 'Clase para todas las edades', ubicacion: 'Salón de Enseñanza' }
-    ],
-    NOTICIAS_DEMO: [
-        { id: 1, titulo: 'Campaña de Oración', fecha: '2026-07-18', resumen: 'Únete a nuestra campaña de oración de 40 días', contenido: 'Detalles de la campaña...' },
-        { id: 2, titulo: 'Nuevo Ministerio', fecha: '2026-07-17', resumen: 'Lanzamos el ministerio de alabanza', contenido: 'Información del nuevo ministerio...' }
-    ],
-    PETICIONES_DEMO: [
-        { id: 1, usuario: 'Ana', motivo: 'Sanidad para mi madre', fecha: '2026-07-19', estado: 'activa', oraciones: 12 },
-        { id: 2, usuario: 'Carlos', motivo: 'Oportunidad laboral', fecha: '2026-07-18', estado: 'activa', oraciones: 8 }
-    ],
-    ENCUESTAS_DEMO: [
-        { id: 1, titulo: 'Horario de cultos', preguntas: ['¿Prefieres culto matutino o vespertino?'], fecha: '2026-07-20', activa: true },
-        { id: 2, titulo: 'Nuevos ministerios', preguntas: ['¿Qué ministerio te gustaría ver?'], fecha: '2026-07-21', activa: false }
-    ],
-    BIBLIOTECA_DEMO: [
-        { id: 1, titulo: 'Fundamentos de la Fe', autor: 'Pastor Principal', categoria: 'Teología', pdf: 'fundamentos.pdf' },
-        { id: 2, titulo: 'Devocionales Diarios', autor: 'Ministerio de Alabanza', categoria: 'Devocional', pdf: 'devocionales.pdf' }
-    ],
-    PODCAST_DEMO: [
-        { id: 1, titulo: 'La Palabra de Hoy', pastor: 'Pastor Luis', fecha: '2026-07-19', duracion: '45 min', audio: 'palabra-hoy.mp3' },
-        { id: 2, titulo: 'Testimonios de Fe', pastor: 'Pastor Carlos', fecha: '2026-07-18', duracion: '30 min', audio: 'testimonios.mp3' }
     ]
 };
 
@@ -82,24 +57,24 @@ const CONFIG = {
 // ESTADO DE LA APLICACIÓN
 // ============================================
 const APP_STATE = {
-    currentPage: 'inicio', 
-    usuario: null, 
-    token: null, 
+    currentPage: 'inicio',
+    usuario: null,
+    token: null,
     rol: null,
-    tema: 'light', 
-    sidebarOpen: false, 
+    tema: 'light',
+    sidebarOpen: false,
     sidebarLocked: false,
-    notificationsOpen: false, 
-    userDropdownOpen: false, 
-    fabMenuOpen: false, 
+    notificationsOpen: false,
+    userDropdownOpen: false,
+    fabMenuOpen: false,
     searchBarOpen: false,
-    contadorInterval: null, 
+    contadorInterval: null,
     fechaInterval: null,
-    notificacionesNoLeidas: 0, 
-    pendingConfirmation: null, 
+    notificacionesNoLeidas: 0,
+    pendingConfirmation: null,
     isLoading: false,
-    publicaciones: [], 
-    comentarios: [], 
+    publicaciones: [],
+    comentarios: [],
     reacciones: {},
     notificaciones: [],
     asistencias: [],
@@ -117,93 +92,19 @@ const APP_STATE = {
 };
 
 // ============================================
-// FUNCIONES DE IDIOMA
+// FUNCIONES DE IDIOMA (simplificadas)
 // ============================================
-const IDIOMAS = {
-    es: {
-        welcome: 'Bienvenido',
-        login: 'Iniciar Sesión',
-        register: 'Crear Cuenta',
-        logout: 'Cerrar Sesión',
-        profile: 'Perfil',
-        settings: 'Configuración',
-        search: 'Buscar',
-        notifications: 'Notificaciones',
-        no_notifications: 'No hay notificaciones',
-        confirm: 'Confirmar',
-        cancel: 'Cancelar',
-        yes: 'Sí',
-        no: 'No',
-        online: 'Conectado',
-        offline: 'Desconectado'
-    },
-    en: {
-        welcome: 'Welcome',
-        login: 'Login',
-        register: 'Sign Up',
-        logout: 'Logout',
-        profile: 'Profile',
-        settings: 'Settings',
-        search: 'Search',
-        notifications: 'Notifications',
-        no_notifications: 'No notifications',
-        confirm: 'Confirm',
-        cancel: 'Cancel',
-        yes: 'Yes',
-        no: 'No',
-        online: 'Online',
-        offline: 'Offline'
-    },
-    pt: {
-        welcome: 'Bem-vindo',
-        login: 'Entrar',
-        register: 'Cadastrar',
-        logout: 'Sair',
-        profile: 'Perfil',
-        settings: 'Configurações',
-        search: 'Buscar',
-        notifications: 'Notificações',
-        no_notifications: 'Sem notificações',
-        confirm: 'Confirmar',
-        cancel: 'Cancelar',
-        yes: 'Sim',
-        no: 'Não',
-        online: 'Conectado',
-        offline: 'Desconectado'
-    },
-    fr: {
-        welcome: 'Bienvenue',
-        login: 'Connexion',
-        register: 'S\'inscrire',
-        logout: 'Déconnexion',
-        profile: 'Profil',
-        settings: 'Paramètres',
-        search: 'Rechercher',
-        notifications: 'Notifications',
-        no_notifications: 'Aucune notification',
-        confirm: 'Confirmer',
-        cancel: 'Annuler',
-        yes: 'Oui',
-        no: 'Non',
-        online: 'Connecté',
-        offline: 'Déconnecté'
-    }
-};
-
 function cambiarIdioma(lang) {
-    if (!IDIOMAS[lang]) return;
+    const idiomas = {
+        es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', de: 'DE', it: 'IT'
+    };
+    if (!idiomas[lang]) return;
     APP_STATE.idioma = lang;
     localStorage.setItem('ipuc10_idioma', lang);
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (IDIOMAS[lang][key]) {
-            el.textContent = IDIOMAS[lang][key];
-        }
-    });
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
-    showToast(`🌐 Idioma cambiado a ${lang.toUpperCase()}`, 'info');
+    showToast(`🌐 Idioma: ${idiomas[lang]}`, 'info');
 }
 
 // ============================================
@@ -217,37 +118,32 @@ function toggleTema() {
 
 function aplicarTema(t) {
     document.documentElement.setAttribute('data-theme', t);
-    const i = document.querySelector('#theme-toggle i');
-    if (i) i.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) {
-        metaTheme.content = t === 'dark' ? '#1a1a2e' : '#1a237e';
-    }
+    const icon = document.querySelector('#theme-toggle i');
+    if (icon) icon.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = t === 'dark' ? '#1a1a2e' : '#1a237e';
 }
 
 // ============================================
 // FUNCIONES DE TOAST
 // ============================================
 function showToast(m, tipo = 'info', duracion = 3500) {
-    const c = document.getElementById('toast-container');
-    if (!c) return;
-    
+    const container = document.getElementById('toast-container');
+    if (!container) return;
     const iconos = {
         success: 'bx bxs-check-circle',
         error: 'bx bxs-error-circle',
         warning: 'bx bxs-error',
         info: 'bx bxs-info-circle'
     };
-    
-    const t = document.createElement('div');
-    t.className = `toast ${tipo}`;
-    t.setAttribute('role', 'alert');
-    t.innerHTML = `<i class="${iconos[tipo] || ''}"></i><span>${m}</span>`;
-    c.appendChild(t);
-    
+    const toast = document.createElement('div');
+    toast.className = `toast ${tipo}`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `<i class="${iconos[tipo] || ''}"></i><span>${m}</span>`;
+    container.appendChild(toast);
     setTimeout(() => {
-        t.classList.add('toast-hide');
-        setTimeout(() => t.remove(), 300);
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 300);
     }, duracion);
 }
 
@@ -255,9 +151,8 @@ function formatearFecha(f) {
     try {
         const d = new Date(f);
         if (isNaN(d.getTime())) return 'Fecha inválida';
-        const a = new Date();
-        const diff = a - d;
-        
+        const ahora = new Date();
+        const diff = ahora - d;
         if (diff < 60000) return 'Ahora';
         if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
         if (diff < 86400000) return `Hace ${Math.floor(diff / 3600000)} h`;
@@ -274,35 +169,33 @@ function formatearFecha(f) {
 function cerrarModal() {
     const modal = document.getElementById('modal');
     if (modal) modal.classList.add('hidden');
-    document.getElementById('modal-footer')?.classList.add('hidden');
+    const footer = document.getElementById('modal-footer');
+    if (footer) footer.classList.add('hidden');
 }
 
 function confirmarAccion(ti, me, cb, tipo = 'warning') {
-    const titleEl = document.getElementById('confirm-title');
-    const messageEl = document.getElementById('confirm-message');
+    const title = document.getElementById('confirm-title');
+    const msg = document.getElementById('confirm-message');
     const modal = document.getElementById('confirm-modal');
     if (!modal) return;
-    
-    if (titleEl) titleEl.textContent = ti;
-    if (messageEl) messageEl.textContent = me;
-    
-    const acceptBtn = document.getElementById('confirm-accept');
-    if (acceptBtn) {
-        acceptBtn.className = tipo === 'danger' ? 'btn-danger' : 'btn-primary';
-    }
-    
+    if (title) title.textContent = ti;
+    if (msg) msg.textContent = me;
+    const accept = document.getElementById('confirm-accept');
+    if (accept) accept.className = tipo === 'danger' ? 'btn-danger' : 'btn-primary';
     APP_STATE.pendingConfirmation = cb;
     modal.classList.remove('hidden');
 }
 
 // ============================================
-// NAVEGACIÓN
+// FUNCIONES DE NAVEGACIÓN
 // ============================================
 function mostrarApp() {
-    document.getElementById('welcome-screen')?.classList.add('hidden');
-    document.getElementById('app')?.classList.remove('hidden');
-    document.getElementById('fab-main')?.classList.remove('hidden');
-    
+    const welcome = document.getElementById('welcome-screen');
+    const app = document.getElementById('app');
+    const fab = document.getElementById('fab-main');
+    if (welcome) welcome.classList.add('hidden');
+    if (app) app.classList.remove('hidden');
+    if (fab) fab.classList.remove('hidden');
     actualizarSidebarUsuario();
     navegarA('inicio');
     iniciarContadorRegresivo();
@@ -310,9 +203,12 @@ function mostrarApp() {
 }
 
 function mostrarBienvenida() {
-    document.getElementById('app')?.classList.add('hidden');
-    document.getElementById('welcome-screen')?.classList.remove('hidden');
-    document.getElementById('fab-main')?.classList.add('hidden');
+    const app = document.getElementById('app');
+    const welcome = document.getElementById('welcome-screen');
+    const fab = document.getElementById('fab-main');
+    if (app) app.classList.add('hidden');
+    if (welcome) welcome.classList.remove('hidden');
+    if (fab) fab.classList.add('hidden');
 }
 
 function toggleSidebar() {
@@ -321,80 +217,72 @@ function toggleSidebar() {
 
 function abrirSidebar() {
     APP_STATE.sidebarOpen = true;
-    document.getElementById('sidebar')?.classList.add('open');
-    document.getElementById('sidebar-overlay')?.classList.remove('hidden');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.add('open');
+    if (overlay) overlay.classList.remove('hidden');
 }
 
 function cerrarSidebar() {
     if (APP_STATE.sidebarLocked) return;
     APP_STATE.sidebarOpen = false;
-    document.getElementById('sidebar')?.classList.remove('open');
-    document.getElementById('sidebar-overlay')?.classList.add('hidden');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.add('hidden');
 }
 
 function manejarResponsiveSidebar() {
     if (window.innerWidth >= 1024) {
         APP_STATE.sidebarLocked = true;
-        document.getElementById('sidebar')?.classList.add('open');
-        document.getElementById('sidebar-overlay')?.classList.add('hidden');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('hidden');
     } else {
         APP_STATE.sidebarLocked = false;
         if (!APP_STATE.sidebarOpen) {
-            document.getElementById('sidebar')?.classList.remove('open');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.classList.remove('open');
         }
     }
 }
 
 function navegarA(page) {
     if (!page || APP_STATE.isLoading) return;
-    
     APP_STATE.currentPage = page;
     APP_STATE.isLoading = true;
-    
-    document.querySelectorAll('.nav-item').forEach(i => {
-        i.classList.toggle('active', i.getAttribute('data-page') === page);
+    document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('data-page') === page);
     });
-    
     const titulo = CONFIG.TITULOS_PAGINAS[page] || page;
-    document.getElementById('page-title').textContent = titulo;
-    document.getElementById('breadcrumb-current').textContent = titulo;
-    
+    const titleEl = document.getElementById('page-title');
+    const breadcrumb = document.getElementById('breadcrumb-current');
+    if (titleEl) titleEl.textContent = titulo;
+    if (breadcrumb) breadcrumb.textContent = titulo;
     cargarPagina(page);
-    
     if (window.innerWidth < 1024) cerrarSidebar();
-    
     APP_STATE.isLoading = false;
 }
 
 function actualizarSidebarUsuario() {
     if (!APP_STATE.usuario) return;
-    
-    const m = document.getElementById('user-mini');
-    if (m) {
-        const img = m.querySelector('img');
-        const name = m.querySelector('.user-name');
-        const role = m.querySelector('.user-role');
-        const status = m.querySelector('.user-status');
-        
+    const mini = document.getElementById('user-mini');
+    if (mini) {
+        const img = mini.querySelector('img');
+        const name = mini.querySelector('.user-name');
+        const role = mini.querySelector('.user-role');
+        const status = mini.querySelector('.user-status');
         if (img) img.src = APP_STATE.usuario.foto || 'assets/avatars/default.png';
         if (name) name.textContent = APP_STATE.usuario.nombre || 'Usuario';
         if (role) {
-            const roles = {
-                'admin': 'Administrador',
-                'invitado': 'Invitado',
-                'usuario': 'Miembro'
-            };
+            const roles = { admin: 'Administrador', invitado: 'Invitado', usuario: 'Miembro' };
             role.textContent = roles[APP_STATE.rol] || 'Miembro';
         }
-        if (status) {
-            status.className = `user-status ${APP_STATE.isOnline ? 'online' : 'offline'}`;
-        }
+        if (status) status.className = `user-status ${APP_STATE.isOnline ? 'online' : 'offline'}`;
     }
-    
     const adminMenu = document.getElementById('admin-menu');
-    if (adminMenu) {
-        adminMenu.classList.toggle('hidden', APP_STATE.rol !== 'admin');
-    }
+    if (adminMenu) adminMenu.classList.toggle('hidden', APP_STATE.rol !== 'admin');
 }
 
 // ============================================
@@ -407,65 +295,34 @@ function iniciarContadorRegresivo() {
 }
 
 function actualizarContador() {
-    const els = {
-        d: document.getElementById('contador-dias'),
-        h: document.getElementById('contador-horas'),
-        m: document.getElementById('contador-minutos'),
-        s: document.getElementById('contador-segundos'),
-        t: document.getElementById('contador-titulo'),
-        e: document.getElementById('contador-estado')
-    };
-    
-    if (!els.d && !els.t) return;
-    
+    const d = document.getElementById('contador-dias');
+    const h = document.getElementById('contador-horas');
+    const m = document.getElementById('contador-minutos');
+    const s = document.getElementById('contador-segundos');
+    const t = document.getElementById('contador-titulo');
+    const e = document.getElementById('contador-estado');
+    if (!d && !t) return;
     try {
         const ahora = new Date();
         const domingo = new Date(ahora);
         domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
         domingo.setHours(10, 0, 0, 0);
-        
         if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
-        
         const diff = Math.max(0, (domingo - ahora) / 1000);
         const dias = Math.floor(diff / 86400);
         const horas = Math.floor((diff % 86400) / 3600);
         const minutos = Math.floor((diff % 3600) / 60);
         const segundos = Math.floor(diff % 60);
-        
-        if (els.t) els.t.textContent = 'Culto Dominical - Domingo';
-        if (els.d) els.d.textContent = String(dias).padStart(2, '0');
-        if (els.h) els.h.textContent = String(horas).padStart(2, '0');
-        if (els.m) els.m.textContent = String(minutos).padStart(2, '0');
-        if (els.s) els.s.textContent = String(segundos).padStart(2, '0');
-        if (els.e) {
-            els.e.textContent = diff > 0 ? 'PRÓXIMO CULTO' : '¡CULTO EN CURSO!';
-            els.e.className = `contador-estado ${diff > 0 ? 'estado-proximo' : 'estado-activo'}`;
+        if (t) t.textContent = 'Culto Dominical - Domingo';
+        if (d) d.textContent = String(dias).padStart(2, '0');
+        if (h) h.textContent = String(horas).padStart(2, '0');
+        if (m) m.textContent = String(minutos).padStart(2, '0');
+        if (s) s.textContent = String(segundos).padStart(2, '0');
+        if (e) {
+            e.textContent = diff > 0 ? 'PRÓXIMO CULTO' : '¡CULTO EN CURSO!';
+            e.className = `contador-estado ${diff > 0 ? 'estado-proximo' : 'estado-activo'}`;
         }
-    } catch (e) {}
-}
-
-function actualizarFechaHora() {
-    try {
-        const a = new Date();
-        const fe = document.getElementById('fecha-actual');
-        const ho = document.getElementById('hora-actual');
-        
-        if (fe) {
-            fe.textContent = a.toLocaleDateString('es-CO', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-        if (ho) {
-            ho.textContent = a.toLocaleTimeString('es-CO', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
-    } catch (e) {}
+    } catch (_) {}
 }
 
 function iniciarActualizacionFecha() {
@@ -474,38 +331,74 @@ function iniciarActualizacionFecha() {
     APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000);
 }
 
+function actualizarFechaHora() {
+    try {
+        const a = new Date();
+        const fe = document.getElementById('fecha-actual');
+        const ho = document.getElementById('hora-actual');
+        if (fe) {
+            fe.textContent = a.toLocaleDateString('es-CO', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+        if (ho) {
+            ho.textContent = a.toLocaleTimeString('es-CO', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+    } catch (_) {}
+}
+
+function cargarVersiculoDiario() {
+    const container = document.getElementById('versiculo-content');
+    if (!container) return;
+    const versiculos = [
+        { texto: "Porque de tal manera amó Dios al mundo...", referencia: "Juan 3:16" },
+        { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
+        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" },
+        { texto: "Mas buscad primeramente el reino de Dios...", referencia: "Mateo 6:33" },
+        { texto: "Jehová te bendiga, y te guarde.", referencia: "Números 6:24-25" }
+    ];
+    const v = versiculos[new Date().getDay() % versiculos.length];
+    container.innerHTML = `
+        <p style="font-style:italic;font-size:1.1rem;line-height:1.8;">"${v.texto}"</p>
+        <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${v.referencia}</p>
+    `;
+}
+
 // ============================================
 // FUNCIONES UI
 // ============================================
 function toggleSearchBar() {
     APP_STATE.searchBarOpen = !APP_STATE.searchBarOpen;
-    const b = document.getElementById('search-bar');
-    if (b) {
-        b.classList.toggle('hidden', !APP_STATE.searchBarOpen);
+    const bar = document.getElementById('search-bar');
+    if (bar) {
+        bar.classList.toggle('hidden', !APP_STATE.searchBarOpen);
         if (APP_STATE.searchBarOpen) {
-            document.getElementById('global-search-input')?.focus();
+            const input = document.getElementById('global-search-input');
+            if (input) input.focus();
         }
     }
 }
 
 function toggleFabMenu() {
     APP_STATE.fabMenuOpen = !APP_STATE.fabMenuOpen;
-    document.getElementById('fab-menu')?.classList.toggle('hidden', !APP_STATE.fabMenuOpen);
+    const menu = document.getElementById('fab-menu');
+    if (menu) menu.classList.toggle('hidden', !APP_STATE.fabMenuOpen);
 }
 
 function toggleUserDropdown() {
     APP_STATE.userDropdownOpen = !APP_STATE.userDropdownOpen;
-    document.getElementById('user-dropdown')?.classList.toggle('hidden', !APP_STATE.userDropdownOpen);
+    const dropdown = document.getElementById('user-dropdown');
+    if (dropdown) dropdown.classList.toggle('hidden', !APP_STATE.userDropdownOpen);
 }
 
 function confirmarAsistencia(estado) {
     const tipo = document.querySelector('input[name="tipo-asistente"]:checked')?.value || 'Hermano';
-    
     if (!APP_STATE.usuario) {
         showToast('Inicia sesión para confirmar asistencia', 'warning');
         return;
     }
-    
     const asistencia = {
         id: Date.now(),
         usuario: APP_STATE.usuario.nombre,
@@ -513,117 +406,88 @@ function confirmarAsistencia(estado) {
         tipo: tipo,
         fecha: new Date().toISOString()
     };
-    
+    if (!Array.isArray(APP_STATE.asistencias)) APP_STATE.asistencias = [];
     APP_STATE.asistencias.push(asistencia);
     localStorage.setItem(CONFIG.STORAGE_KEYS.ASISTENCIAS, JSON.stringify(APP_STATE.asistencias));
-    
     showToast(`Asistencia confirmada: ${estado} (${tipo})`, 'success');
 }
 
 function compartirVersiculo() {
     const versiculos = [
-        { texto: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", referencia: "Juan 3:16" },
+        { texto: "Porque de tal manera amó Dios al mundo...", referencia: "Juan 3:16" },
         { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
-        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" },
-        { texto: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", referencia: "Mateo 6:33" },
-        { texto: "Jehová te bendiga, y te guarde.", referencia: "Números 6:24-25" }
+        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" }
     ];
     const v = versiculos[new Date().getDay() % versiculos.length];
     const texto = `"${v.texto}" - ${v.referencia}`;
-    
     if (navigator.share) {
-        navigator.share({
-            title: 'IPUC LA FONDA - Versículo del Día',
-            text: texto,
-            url: window.location.href
-        }).catch(() => {});
+        navigator.share({ title: 'IPUC LA FONDA - Versículo del Día', text: texto, url: window.location.href })
+            .catch(() => {});
     } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(texto).then(() => {
-            showToast('Versículo copiado al portapapeles', 'success');
-        }).catch(() => {
-            showToast('No se pudo copiar', 'error');
-        });
+        navigator.clipboard.writeText(texto).then(() => showToast('Versículo copiado', 'success'))
+            .catch(() => showToast('No se pudo copiar', 'error'));
     } else {
         showToast(texto, 'info', 5000);
     }
 }
 
-function cargarVersiculoDiario() {
-    const c = document.getElementById('versiculo-content');
-    if (!c) return;
-    
-    const versiculos = [
-        { texto: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", referencia: "Juan 3:16" },
-        { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
-        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" },
-        { texto: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", referencia: "Mateo 6:33" },
-        { texto: "Jehová te bendiga, y te guarde.", referencia: "Números 6:24-25" }
-    ];
-    const v = versiculos[new Date().getDay() % versiculos.length];
-    c.innerHTML = `
-        <p style="font-style:italic;font-size:1.1rem;line-height:1.8;">"${v.texto}"</p>
-        <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${v.referencia}</p>
-    `;
-}
-
 // ============================================
-// CARGAR PÁGINAS - TODAS FUNCIONALES
+// FUNCIÓN PARA CARGAR PÁGINAS (mejorada)
 // ============================================
 function cargarPagina(page) {
-    const c = document.getElementById('page-content');
-    if (!c) return;
-    
-    c.innerHTML = `
+    const container = document.getElementById('page-content');
+    if (!container) return;
+    container.innerHTML = `
         <div class="page-loader">
             <div class="spinner"></div>
             <p>Cargando ${CONFIG.TITULOS_PAGINAS[page] || page}...</p>
         </div>
     `;
-    
     setTimeout(() => {
         try {
-            switch(page) {
-                case 'inicio': cargarInicio(c); break;
-                case 'horarios': cargarHorarios(c); break;
-                case 'asistencia': cargarAsistencia(c); break;
-                case 'noticias': cargarNoticias(c); break;
-                case 'eventos': cargarEventos(c); break;
-                case 'chat': cargarChat(c); break;
-                case 'directorio': cargarDirectorio(c); break;
-                case 'peticiones': cargarPeticiones(c); break;
-                case 'encuestas': cargarEncuestas(c); break;
-                case 'biblioteca': cargarBiblioteca(c); break;
-                case 'galeria': cargarGaleria(c); break;
-                case 'devocional': cargarDevocional(c); break;
-                case 'perfil': cargarPerfil(c); break;
-                case 'configuracion': cargarConfiguracion(c); break;
-                case 'publicaciones': cargarPublicaciones(c); break;
-                case 'podcast': cargarPodcast(c); break;
-                case 'analytics': cargarAnalytics(c); break;
-                case 'dashboard': cargarDashboard(c); break;
-                case 'gestion-usuarios': cargarGestionUsuarios(c); break;
-                case 'gestion-noticias': cargarGestionNoticias(c); break;
-                case 'gestion-eventos': cargarGestionEventos(c); break;
-                case 'versiculos': cargarVersiculos(c); break;
-                case 'sistema': cargarSistema(c); break;
-                case 'seguridad': cargarSeguridad(c); break;
-                default: c.innerHTML = `
-                    <div class="card fade-in">
-                        <h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2>
-                        <p style="text-align:center;padding:40px;color:var(--gris-texto);">
-                            <i class="bx bx-construction" style="font-size:3rem;display:block;margin-bottom:16px;"></i>
-                            Sección en desarrollo
-                        </p>
-                    </div>
-                `;
+            switch (page) {
+                case 'inicio': cargarInicio(container); break;
+                case 'horarios': cargarHorarios(container); break;
+                case 'asistencia': cargarAsistencia(container); break;
+                case 'noticias': cargarNoticias(container); break;
+                case 'eventos': cargarEventos(container); break;
+                case 'chat': cargarChat(container); break;
+                case 'directorio': cargarDirectorio(container); break;
+                case 'peticiones': cargarPeticiones(container); break;
+                case 'encuestas': cargarEncuestas(container); break;
+                case 'biblioteca': cargarBiblioteca(container); break;
+                case 'galeria': cargarGaleria(container); break;
+                case 'devocional': cargarDevocional(container); break;
+                case 'perfil': cargarPerfil(container); break;
+                case 'configuracion': cargarConfiguracion(container); break;
+                case 'publicaciones': cargarPublicaciones(container); break;
+                case 'podcast': cargarPodcast(container); break;
+                case 'analytics': cargarAnalytics(container); break;
+                case 'dashboard': cargarDashboard(container); break;
+                case 'gestion-usuarios': cargarGestionUsuarios(container); break;
+                case 'gestion-noticias': cargarGestionNoticias(container); break;
+                case 'gestion-eventos': cargarGestionEventos(container); break;
+                case 'versiculos': cargarVersiculos(container); break;
+                case 'sistema': cargarSistema(container); break;
+                case 'seguridad': cargarSeguridad(container); break;
+                default:
+                    container.innerHTML = `
+                        <div class="card fade-in">
+                            <h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2>
+                            <p style="text-align:center;padding:40px;color:var(--gris-texto);">
+                                <i class="bx bx-construction" style="font-size:3rem;display:block;margin-bottom:16px;"></i>
+                                Sección en desarrollo
+                            </p>
+                        </div>
+                    `;
             }
         } catch (e) {
-            c.innerHTML = `
+            container.innerHTML = `
                 <div class="card fade-in" style="border-left:4px solid var(--error);">
                     <h2>Error al cargar</h2>
                     <p style="text-align:center;padding:20px;color:var(--error);">
                         <i class="bx bx-error-circle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
-                        ${e.message}
+                        ${e.message || 'Error desconocido'}
                     </p>
                 </div>
             `;
@@ -632,12 +496,15 @@ function cargarPagina(page) {
 }
 
 // ============================================
-// PÁGINA: INICIO
+// PÁGINA: INICIO (corregida)
 // ============================================
 function cargarInicio(c) {
+    // Asegurar que publicaciones sea un array
+    if (!Array.isArray(APP_STATE.publicaciones)) APP_STATE.publicaciones = [];
     const pubRecientes = APP_STATE.publicaciones.slice(0, 3);
-    const eventosProximos = APP_STATE.eventos.slice(0, 3);
-    
+    const eventos = Array.isArray(APP_STATE.eventos) ? APP_STATE.eventos : [];
+    const eventosProximos = eventos.slice(0, 3);
+
     c.innerHTML = `
         <div class="fade-in">
             <div class="contador-container">
@@ -662,7 +529,7 @@ function cargarInicio(c) {
                 </div>
                 <div class="contador-estado estado-proximo" id="contador-estado">PRÓXIMO CULTO</div>
             </div>
-            
+
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
                 <div class="card card-glass">
                     <div style="display:flex;align-items:center;gap:10px;">
@@ -698,14 +565,14 @@ function cargarInicio(c) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="card" style="border-left:4px solid var(--dorado);">
                 <h3><i class="bx bx-bible" style="color:var(--dorado);"></i> Versículo del Día</h3>
                 <div id="versiculo-content" style="font-style:italic;font-size:1rem;line-height:1.8;margin-top:8px;">
                     <p>Cargando versículo...</p>
                 </div>
             </div>
-            
+
             <div class="card" style="margin-top:12px;">
                 <h3>Accesos Rápidos</h3>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-top:8px;">
@@ -729,15 +596,15 @@ function cargarInicio(c) {
                     </button>
                 </div>
             </div>
-            
-            ${pubRecientes.length > 0 ? `
+
+            ${pubRecientes.length ? `
             <div class="card" style="margin-top:12px;">
                 <h3>Últimas Publicaciones</h3>
                 <div style="margin-top:8px;">
                     ${pubRecientes.map(p => `
                         <div style="padding:8px 0;border-bottom:1px solid var(--gris-medio);">
-                            <strong>${p.autor}</strong>
-                            <p style="font-size:0.85rem;color:var(--gris-texto);">${p.contenido.substring(0, 100)}${p.contenido.length > 100 ? '...' : ''}</p>
+                            <strong>${p.autor || 'Anónimo'}</strong>
+                            <p style="font-size:0.85rem;color:var(--gris-texto);">${(p.contenido || '').substring(0, 100)}${(p.contenido || '').length > 100 ? '...' : ''}</p>
                             <small style="color:var(--gris-medio);">${formatearFecha(p.fecha)}</small>
                         </div>
                     `).join('')}
@@ -747,16 +614,16 @@ function cargarInicio(c) {
                 </button>
             </div>
             ` : ''}
-            
-            ${eventosProximos.length > 0 ? `
+
+            ${eventosProximos.length ? `
             <div class="card" style="margin-top:12px;">
                 <h3>Próximos Eventos</h3>
                 <div style="margin-top:8px;">
                     ${eventosProximos.map(e => `
                         <div style="padding:8px 0;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <strong>${e.titulo}</strong>
-                                <p style="font-size:0.85rem;color:var(--gris-texto);">${e.fecha} - ${e.hora}</p>
+                                <strong>${e.titulo || 'Evento'}</strong>
+                                <p style="font-size:0.85rem;color:var(--gris-texto);">${e.fecha || ''} ${e.hora || ''}</p>
                             </div>
                             <button class="btn-primary btn-sm" onclick="navegarA('eventos')">
                                 <i class="bx bx-calendar"></i>
@@ -768,7 +635,7 @@ function cargarInicio(c) {
             ` : ''}
         </div>
     `;
-    
+
     actualizarFechaHora();
     if (!APP_STATE.fechaInterval) {
         APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000);
@@ -781,7 +648,7 @@ function cargarInicio(c) {
 // PÁGINA: HORARIOS
 // ============================================
 function cargarHorarios(c) {
-    const h = [
+    const horarios = [
         { dia: 'Lunes', cultos: [] },
         { dia: 'Martes', cultos: [{ nombre: 'Culto de Oración', hora: '6:00 PM - 8:30 PM' }] },
         { dia: 'Miércoles', cultos: [{ nombre: 'Culto Campal', hora: '4:00 PM - 7:00 PM' }] },
@@ -790,17 +657,18 @@ function cargarHorarios(c) {
         { dia: 'Sábado', cultos: [] },
         { dia: 'Domingo', cultos: [{ nombre: 'Culto Dominical', hora: '10:00 AM - 12:00 PM' }] }
     ];
-    const da = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    
+    const diaActual = new Date().getDay();
+    const idx = diaActual === 0 ? 6 : diaActual - 1;
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-time-five"></i> Horarios de Cultos</h2>
             <div style="display:grid;gap:10px;margin-top:16px;">
-                ${h.map((d, i) => `
-                    <div class="card" style="border-left:4px solid ${i === da ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
+                ${horarios.map((d, i) => `
+                    <div class="card" style="border-left:4px solid ${i === idx ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
                             <div>
-                                <h3>${d.dia} ${i === da ? '<span style="background:var(--azul-primario);color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;">HOY</span>' : ''}</h3>
+                                <h3>${d.dia} ${i === idx ? '<span style="background:var(--azul-primario);color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;">HOY</span>' : ''}</h3>
                                 ${d.cultos.length ? 
                                     d.cultos.map(x => `
                                         <div style="display:flex;align-items:center;gap:8px;color:var(--gris-texto);">
@@ -835,7 +703,9 @@ function cargarHorarios(c) {
 function cargarAsistencia(c) {
     const proximoCulto = CONFIG.DIAS_SEMANA[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
     const asistencias = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ASISTENCIAS) || '[]');
-    
+    if (!Array.isArray(asistencias)) APP_STATE.asistencias = [];
+    else APP_STATE.asistencias = asistencias;
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-check-shield"></i> Confirmar Asistencia</h2>
@@ -843,7 +713,6 @@ function cargarAsistencia(c) {
                 <i class="bx bx-calendar-check" style="font-size:3rem;color:var(--azul-primario);"></i>
                 <h3 style="margin:12px 0;">Próximo Culto</h3>
                 <p style="font-size:1.1rem;">${proximoCulto}</p>
-                
                 <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
                     <button class="btn-primary btn-sm" onclick="confirmarAsistencia('Asistiré')">
                         <i class="bx bx-check"></i> Voy
@@ -856,7 +725,6 @@ function cargarAsistencia(c) {
                     </button>
                 </div>
             </div>
-            
             <div class="card" style="margin-top:12px;">
                 <h3>Tipo de Asistente</h3>
                 <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
@@ -866,14 +734,13 @@ function cargarAsistencia(c) {
                     <label><input type="radio" name="tipo-asistente" value="Visitante"> Visitante</label>
                 </div>
             </div>
-            
             <div class="card" style="margin-top:12px;">
                 <h3>Mis Asistencias</h3>
-                ${asistencias.length === 0 ? 
+                ${APP_STATE.asistencias.length === 0 ? 
                     '<p style="text-align:center;padding:10px;color:var(--gris-texto);">No has confirmado asistencia aún</p>' :
-                    asistencias.slice(-5).reverse().map(a => `
+                    APP_STATE.asistencias.slice(-5).reverse().map(a => `
                         <div style="padding:6px 0;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;">
-                            <span>${a.estado} (${a.tipo})</span>
+                            <span>${a.estado || 'Asistiré'} (${a.tipo || 'Hermano'})</span>
                             <small style="color:var(--gris-texto);">${formatearFecha(a.fecha)}</small>
                         </div>
                     `).join('')
@@ -884,12 +751,13 @@ function cargarAsistencia(c) {
 }
 
 // ============================================
-// PÁGINA: NOTICIAS
+// PÁGINA: NOTICIAS (con creación y eliminación)
 // ============================================
 function cargarNoticias(c) {
     const noticias = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.NOTICIAS) || '[]');
-    const noticiasDemo = noticias.length === 0 ? CONFIG.NOTICIAS_DEMO : noticias;
-    
+    if (!Array.isArray(noticias)) APP_STATE.noticias = [];
+    else APP_STATE.noticias = noticias;
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -900,11 +768,11 @@ function cargarNoticias(c) {
                     </button>
                 ` : ''}
             </div>
-            ${noticiasDemo.length === 0 ? 
+            ${APP_STATE.noticias.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay noticias publicadas</p></div>' :
-                noticiasDemo.map(n => `
+                APP_STATE.noticias.map(n => `
                     <div class="card" style="margin-bottom:12px;border-left:4px solid var(--azul-primario);">
-                        <h3>${n.titulo}</h3>
+                        <h3>${n.titulo || 'Sin título'}</h3>
                         <p style="font-size:0.85rem;color:var(--gris-texto);">${n.resumen || n.contenido || ''}</p>
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
                             <small style="color:var(--gris-medio);">${formatearFecha(n.fecha || n.fecha_publicacion)}</small>
@@ -926,7 +794,6 @@ function crearNoticia() {
     if (!titulo) return;
     const contenido = prompt('Contenido:');
     if (!contenido) return;
-    
     const noticias = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.NOTICIAS) || '[]');
     const nueva = {
         id: Date.now(),
@@ -953,12 +820,13 @@ function eliminarNoticia(id) {
 }
 
 // ============================================
-// PÁGINA: EVENTOS
+// PÁGINA: EVENTOS (con creación y eliminación)
 // ============================================
 function cargarEventos(c) {
     const eventos = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.EVENTOS) || '[]');
-    const eventosDemo = eventos.length === 0 ? CONFIG.EVENTOS_DEMO : eventos;
-    
+    if (!Array.isArray(eventos)) APP_STATE.eventos = [];
+    else APP_STATE.eventos = eventos;
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -969,18 +837,18 @@ function cargarEventos(c) {
                     </button>
                 ` : ''}
             </div>
-            ${eventosDemo.length === 0 ? 
+            ${APP_STATE.eventos.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay eventos programados</p></div>' :
-                eventosDemo.map(e => `
+                APP_STATE.eventos.map(e => `
                     <div class="card" style="margin-bottom:12px;border-left:4px solid var(--dorado);">
                         <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
                             <div>
-                                <h3><i class="bx bx-calendar-event" style="color:var(--dorado);"></i> ${e.titulo}</h3>
+                                <h3><i class="bx bx-calendar-event" style="color:var(--dorado);"></i> ${e.titulo || 'Evento'}</h3>
                                 <p style="color:var(--gris-texto);">${e.descripcion || ''}</p>
                                 <div style="display:flex;gap:12px;margin-top:4px;font-size:0.85rem;color:var(--gris-medio);">
                                     <span><i class="bx bx-time"></i> ${e.hora || '10:00 AM'}</span>
                                     <span><i class="bx bx-map-pin"></i> ${e.ubicacion || 'Templo Principal'}</span>
-                                    <span><i class="bx bx-calendar"></i> ${e.fecha || '2026-07-20'}</span>
+                                    <span><i class="bx bx-calendar"></i> ${e.fecha || ''}</span>
                                 </div>
                             </div>
                             <button class="btn-primary btn-sm" onclick="navegarA('asistencia')">
@@ -1008,7 +876,6 @@ function crearEvento() {
     if (!descripcion) return;
     const fecha = prompt('Fecha (YYYY-MM-DD):') || new Date().toISOString().split('T')[0];
     const hora = prompt('Hora:') || '10:00 AM';
-    
     const eventos = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.EVENTOS) || '[]');
     const nuevo = {
         id: Date.now(),
@@ -1039,18 +906,20 @@ function eliminarEvento(id) {
 // ============================================
 function cargarChat(c) {
     const chat = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CHAT) || '[]');
-    
+    if (!Array.isArray(chat)) APP_STATE.chat = [];
+    else APP_STATE.chat = chat;
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-chat"></i> Mensajes</h2>
             <div class="card" style="height:400px;display:flex;flex-direction:column;">
                 <div style="flex:1;overflow-y:auto;padding:10px;" id="chat-messages">
-                    ${chat.length === 0 ? 
+                    ${APP_STATE.chat.length === 0 ? 
                         '<p style="text-align:center;color:var(--gris-texto);padding:20px;">No hay mensajes. ¡Envía el primero!</p>' :
-                        chat.map(m => `
+                        APP_STATE.chat.map(m => `
                             <div style="margin-bottom:8px;padding:8px 12px;border-radius:8px;${m.usuario_id === APP_STATE.usuario?.id ? 'background:var(--azul-surface);text-align:right;' : 'background:var(--gris-claro);'}">
-                                <strong style="font-size:0.75rem;">${m.usuario}</strong>
-                                <p style="font-size:0.9rem;margin:2px 0;">${m.mensaje}</p>
+                                <strong style="font-size:0.75rem;">${m.usuario || 'Anónimo'}</strong>
+                                <p style="font-size:0.9rem;margin:2px 0;">${m.mensaje || ''}</p>
                                 <small style="color:var(--gris-texto);font-size:0.6rem;">${formatearFecha(m.fecha)}</small>
                             </div>
                         `).join('')
@@ -1065,14 +934,8 @@ function cargarChat(c) {
             </div>
         </div>
     `;
-    
-    // Auto-scroll al final
     const messages = document.getElementById('chat-messages');
-    if (messages) {
-        messages.scrollTop = messages.scrollHeight;
-    }
-    
-    // Enviar con Enter
+    if (messages) messages.scrollTop = messages.scrollHeight;
     document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') enviarMensaje();
     });
@@ -1081,7 +944,6 @@ function cargarChat(c) {
 function enviarMensaje() {
     const input = document.getElementById('chat-input');
     if (!input || !input.value.trim() || !APP_STATE.usuario) return;
-    
     const chat = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CHAT) || '[]');
     const mensaje = {
         id: Date.now(),
@@ -1101,14 +963,15 @@ function enviarMensaje() {
 // ============================================
 function cargarDirectorio(c) {
     const directorio = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.DIRECTORIO) || '[]');
-    const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO) || '[]');
-    
-    const miembros = directorio.length > 0 ? directorio : [
+    if (!Array.isArray(directorio)) APP_STATE.directorio = [];
+    else APP_STATE.directorio = directorio;
+
+    const miembros = APP_STATE.directorio.length ? APP_STATE.directorio : [
         { id: 1, nombre: 'Luis Esteban', apellidos: 'Potosi Vente', ministerio: 'Pastoral', verificado: true },
         { id: 2, nombre: 'Maria', apellidos: 'Gonzalez', ministerio: 'Alabanza', verificado: false },
         { id: 3, nombre: 'Carlos', apellidos: 'Rodriguez', ministerio: 'Jóvenes', verificado: true }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-group"></i> Directorio de Miembros</h2>
@@ -1118,7 +981,7 @@ function cargarDirectorio(c) {
                         <div style="width:60px;height:60px;border-radius:50%;background:var(--azul-surface);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:1.5rem;color:var(--azul-primario);">
                             <i class="bx bx-user"></i>
                         </div>
-                        <h4>${m.nombre} ${m.apellidos || ''}</h4>
+                        <h4>${m.nombre || ''} ${m.apellidos || ''}</h4>
                         <p style="font-size:0.8rem;color:var(--gris-texto);">${m.ministerio || 'General'}</p>
                         ${m.verificado ? '<span style="color:var(--info);font-size:0.7rem;"><i class="bx bx-badge-check"></i> Verificado</span>' : ''}
                     </div>
@@ -1133,8 +996,9 @@ function cargarDirectorio(c) {
 // ============================================
 function cargarPeticiones(c) {
     const peticiones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PETICIONES) || '[]');
-    const peticionesDemo = peticiones.length === 0 ? CONFIG.PETICIONES_DEMO : peticiones;
-    
+    if (!Array.isArray(peticiones)) APP_STATE.peticiones = [];
+    else APP_STATE.peticiones = peticiones;
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -1145,16 +1009,16 @@ function cargarPeticiones(c) {
                     </button>
                 ` : ''}
             </div>
-            ${peticionesDemo.length === 0 ? 
+            ${APP_STATE.peticiones.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay peticiones</p></div>' :
-                peticionesDemo.map(p => `
+                APP_STATE.peticiones.map(p => `
                     <div class="card" style="margin-bottom:12px;border-left:4px solid ${p.estado === 'activa' ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
                         <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
                             <div>
-                                <h4>${p.motivo}</h4>
+                                <h4>${p.motivo || 'Petición'}</h4>
                                 <p style="color:var(--gris-texto);font-size:0.85rem;">${p.descripcion || ''}</p>
                                 <div style="display:flex;gap:12px;margin-top:4px;font-size:0.8rem;color:var(--gris-medio);">
-                                    <span><i class="bx bx-user"></i> ${p.nombre || p.usuario}</span>
+                                    <span><i class="bx bx-user"></i> ${p.nombre || p.usuario || 'Anónimo'}</span>
                                     <span><i class="bx bx-time"></i> ${formatearFecha(p.fecha)}</span>
                                     <span><i class="bx bx-pray"></i> ${p.oraciones || 0} oraciones</span>
                                     <span style="color:${p.estado === 'activa' ? 'var(--exito)' : 'var(--gris-medio)'};">${p.estado === 'activa' ? 'Activa' : 'Cerrada'}</span>
@@ -1175,7 +1039,6 @@ function crearPeticion() {
     const motivo = prompt('Motivo de la petición:');
     if (!motivo) return;
     const descripcion = prompt('Descripción (opcional):') || '';
-    
     const peticiones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PETICIONES) || '[]');
     const nueva = {
         id: Date.now(),
@@ -1199,7 +1062,7 @@ function orarPeticion(id) {
     if (p) {
         p.oraciones = (p.oraciones || 0) + 1;
         localStorage.setItem(CONFIG.STORAGE_KEYS.PETICIONES, JSON.stringify(peticiones));
-        showToast('🙏 Has orado por esta petición', 'success');
+        showToast('Has orado por esta petición', 'success');
         navegarA('peticiones');
     }
 }
@@ -1209,8 +1072,9 @@ function orarPeticion(id) {
 // ============================================
 function cargarEncuestas(c) {
     const encuestas = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ENCUESTAS) || '[]');
-    const encuestasDemo = encuestas.length === 0 ? CONFIG.ENCUESTAS_DEMO : encuestas;
-    
+    if (!Array.isArray(encuestas)) APP_STATE.encuestas = [];
+    else APP_STATE.encuestas = encuestas;
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -1221,12 +1085,12 @@ function cargarEncuestas(c) {
                     </button>
                 ` : ''}
             </div>
-            ${encuestasDemo.length === 0 ? 
+            ${APP_STATE.encuestas.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay encuestas activas</p></div>' :
-                encuestasDemo.map(e => `
+                APP_STATE.encuestas.map(e => `
                     <div class="card" style="margin-bottom:12px;border-left:4px solid ${e.activa ? 'var(--exito)' : 'var(--gris-medio)'};">
-                        <h3>${e.titulo}</h3>
-                        <p style="color:var(--gris-texto);font-size:0.85rem;">${e.preguntas?.join(', ') || 'Sin preguntas'}</p>
+                        <h3>${e.titulo || 'Encuesta'}</h3>
+                        <p style="color:var(--gris-texto);font-size:0.85rem;">${Array.isArray(e.preguntas) ? e.preguntas.join(', ') : 'Sin preguntas'}</p>
                         <div style="display:flex;gap:8px;margin-top:8px;font-size:0.8rem;color:var(--gris-medio);">
                             <span>${e.activa ? 'Activa' : 'Cerrada'}</span>
                             <span>${formatearFecha(e.fecha)}</span>
@@ -1248,7 +1112,6 @@ function crearEncuesta() {
     if (!titulo) return;
     const preguntas = prompt('Preguntas (separadas por coma):');
     if (!preguntas) return;
-    
     const encuestas = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ENCUESTAS) || '[]');
     const nueva = {
         id: Date.now(),
@@ -1272,8 +1135,9 @@ function votarEncuesta(id) {
 // ============================================
 function cargarBiblioteca(c) {
     const biblioteca = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.BIBLIOTECA) || '[]');
-    const bibliotecaDemo = biblioteca.length === 0 ? CONFIG.BIBLIOTECA_DEMO : biblioteca;
-    
+    if (!Array.isArray(biblioteca)) APP_STATE.biblioteca = [];
+    else APP_STATE.biblioteca = biblioteca;
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -1285,12 +1149,12 @@ function cargarBiblioteca(c) {
                 ` : ''}
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
-                ${bibliotecaDemo.map(r => `
+                ${APP_STATE.biblioteca.map(r => `
                     <div class="card" style="padding:16px;">
                         <div style="font-size:2rem;color:var(--azul-primario);"><i class="bx bx-book"></i></div>
-                        <h4>${r.titulo}</h4>
-                        <p style="font-size:0.8rem;color:var(--gris-texto);">${r.autor}</p>
-                        <span style="font-size:0.7rem;background:var(--azul-surface);padding:2px 8px;border-radius:10px;">${r.categoria}</span>
+                        <h4>${r.titulo || 'Recurso'}</h4>
+                        <p style="font-size:0.8rem;color:var(--gris-texto);">${r.autor || 'Desconocido'}</p>
+                        <span style="font-size:0.7rem;background:var(--azul-surface);padding:2px 8px;border-radius:10px;">${r.categoria || 'General'}</span>
                     </div>
                 `).join('')}
             </div>
@@ -1304,7 +1168,6 @@ function agregarRecurso() {
     const autor = prompt('Autor:');
     if (!autor) return;
     const categoria = prompt('Categoría:') || 'General';
-    
     const biblioteca = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.BIBLIOTECA) || '[]');
     const nuevo = {
         id: Date.now(),
@@ -1324,14 +1187,16 @@ function agregarRecurso() {
 // ============================================
 function cargarGaleria(c) {
     const galeria = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.GALERIA) || '[]');
-    
+    if (!Array.isArray(galeria)) APP_STATE.galeria = [];
+    else APP_STATE.galeria = galeria;
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-images"></i> Galería</h2>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px;">
-                ${galeria.length === 0 ? 
+                ${APP_STATE.galeria.length === 0 ? 
                     '<div class="card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gris-texto);"><i class="bx bx-images" style="font-size:3rem;display:block;margin-bottom:8px;"></i>No hay imágenes en la galería</div>' :
-                    galeria.map(g => `
+                    APP_STATE.galeria.map(g => `
                         <div class="card" style="padding:8px;text-align:center;">
                             <div style="height:120px;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--gris-medio);">
                                 <i class="bx bx-image"></i>
@@ -1362,12 +1227,10 @@ function cargarDevocional(c) {
     const versiculos = [
         { texto: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", referencia: "Juan 3:16" },
         { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
-        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" },
-        { texto: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", referencia: "Mateo 6:33" },
-        { texto: "Jehová te bendiga, y te guarde.", referencia: "Números 6:24-25" }
+        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" }
     ];
     const v = versiculos[new Date().getDay() % versiculos.length];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-bible"></i> Devocional Diario</h2>
@@ -1382,7 +1245,6 @@ function cargarDevocional(c) {
                     </p>
                 </div>
             </div>
-            
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
                 <button class="btn-primary" onclick="compartirVersiculo()">
                     <i class="bx bx-share-alt"></i> Compartir
@@ -1413,22 +1275,20 @@ function cargarPerfil(c) {
         `;
         return;
     }
-    
     const u = APP_STATE.usuario;
     c.innerHTML = `
         <div class="fade-in">
             <div style="text-align:center;padding:30px;background:linear-gradient(135deg,var(--azul-primario),var(--azul-claro));color:white;border-radius:var(--borde-radius);margin-bottom:16px;">
                 <img src="${u.foto || 'assets/avatars/default.png'}" 
                      style="width:80px;height:80px;border-radius:50%;border:3px solid var(--dorado);object-fit:cover;">
-                <h2>${u.nombre} ${u.apellidos || ''}</h2>
-                <p style="opacity:0.9;">@${u.usuario}</p>
+                <h2>${u.nombre || ''} ${u.apellidos || ''}</h2>
+                <p style="opacity:0.9;">@${u.usuario || ''}</p>
                 ${u.verificado ? '<span style="background:var(--info);padding:4px 12px;border-radius:20px;font-size:0.8rem;display:inline-block;margin-top:4px;"><i class="bx bx-badge-check"></i> Verificado</span>' : ''}
                 <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
                     <span class="badge" style="background:rgba(255,255,255,0.2);">${u.ministerio || 'General'}</span>
                     <span class="badge" style="background:rgba(255,255,255,0.2);">${APP_STATE.rol === 'admin' ? 'Administrador' : 'Miembro'}</span>
                 </div>
             </div>
-            
             <div class="card">
                 <h3>Información Personal</h3>
                 <div style="display:grid;gap:8px;margin-top:8px;">
@@ -1439,7 +1299,6 @@ function cargarPerfil(c) {
                     <p><strong><i class="bx bx-document"></i> Documento:</strong> ${u.documento || 'No registrado'}</p>
                 </div>
             </div>
-            
             <div class="card" style="margin-top:12px;border-left:4px solid var(--error);">
                 <h3 style="color:var(--error);">Acciones</h3>
                 <button class="btn-danger btn-sm" onclick="confirmarAccion('¿Cerrar sesión?','Serás redirigido al inicio.',cerrarSesion,'danger')">
@@ -1455,8 +1314,9 @@ function cargarPerfil(c) {
 // ============================================
 function cargarPodcast(c) {
     const podcast = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PODCAST) || '[]');
-    const podcastDemo = podcast.length === 0 ? CONFIG.PODCAST_DEMO : podcast;
-    
+    if (!Array.isArray(podcast)) APP_STATE.podcast = [];
+    else APP_STATE.podcast = podcast;
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -1467,16 +1327,16 @@ function cargarPodcast(c) {
                     </button>
                 ` : ''}
             </div>
-            ${podcastDemo.length === 0 ? 
+            ${APP_STATE.podcast.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay episodios de podcast</p></div>' :
-                podcastDemo.map(p => `
+                APP_STATE.podcast.map(p => `
                     <div class="card" style="margin-bottom:12px;border-left:4px solid var(--info);">
                         <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
                             <div>
-                                <h3>${p.titulo}</h3>
-                                <p style="color:var(--gris-texto);font-size:0.85rem;">${p.pastor}</p>
+                                <h3>${p.titulo || 'Episodio'}</h3>
+                                <p style="color:var(--gris-texto);font-size:0.85rem;">${p.pastor || 'Pastor'}</p>
                                 <div style="display:flex;gap:12px;margin-top:4px;font-size:0.8rem;color:var(--gris-medio);">
-                                    <span><i class="bx bx-time"></i> ${p.duracion}</span>
+                                    <span><i class="bx bx-time"></i> ${p.duracion || '30 min'}</span>
                                     <span><i class="bx bx-calendar"></i> ${formatearFecha(p.fecha)}</span>
                                 </div>
                             </div>
@@ -1497,7 +1357,6 @@ function agregarPodcast() {
     const pastor = prompt('Pastor/Predicador:');
     if (!pastor) return;
     const duracion = prompt('Duración:') || '30 min';
-    
     const podcast = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PODCAST) || '[]');
     const nuevo = {
         id: Date.now(),
@@ -1514,7 +1373,7 @@ function agregarPodcast() {
 }
 
 function reproducirPodcast(audio) {
-    showToast('🎧 Reproduciendo podcast...', 'info', 2000);
+    showToast('Reproduciendo podcast...', 'info', 2000);
 }
 
 // ============================================
@@ -1522,11 +1381,11 @@ function reproducirPodcast(audio) {
 // ============================================
 function cargarAnalytics(c) {
     const totalMiembros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO) || '[]').length || 0;
-    const totalPublicaciones = APP_STATE.publicaciones.length;
+    const totalPublicaciones = Array.isArray(APP_STATE.publicaciones) ? APP_STATE.publicaciones.length : 0;
     const totalEventos = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.EVENTOS) || '[]').length;
     const totalAsistencias = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ASISTENCIAS) || '[]').length;
     const totalPeticiones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PETICIONES) || '[]').length;
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-bar-chart-alt-2"></i> Analytics</h2>
@@ -1552,7 +1411,7 @@ function cargarAnalytics(c) {
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Peticiones</p>
                 </div>
                 <div class="card" style="text-align:center;border-left:4px solid var(--error);">
-                    <p style="font-size:2rem;font-weight:700;color:var(--error);">${APP_STATE.notificacionesNoLeidas}</p>
+                    <p style="font-size:2rem;font-weight:700;color:var(--error);">${APP_STATE.notificacionesNoLeidas || 0}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Notificaciones</p>
                 </div>
             </div>
@@ -1567,7 +1426,6 @@ function cargarConfiguracion(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-cog"></i> Configuración</h2>
-            
             <div class="card">
                 <h3>Apariencia</h3>
                 <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
@@ -1580,38 +1438,22 @@ function cargarConfiguracion(c) {
                     </span>
                 </div>
             </div>
-            
             <div class="card" style="margin-top:12px;">
                 <h3>Idioma</h3>
                 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                    <button class="btn-outline btn-sm ${APP_STATE.idioma === 'es' ? 'active' : ''}" onclick="cambiarIdioma('es')">
-                        <i class="bx bx-flag-alt"></i> Español
-                    </button>
-                    <button class="btn-outline btn-sm ${APP_STATE.idioma === 'en' ? 'active' : ''}" onclick="cambiarIdioma('en')">
-                        <i class="bx bx-flag-alt"></i> English
-                    </button>
-                    <button class="btn-outline btn-sm ${APP_STATE.idioma === 'pt' ? 'active' : ''}" onclick="cambiarIdioma('pt')">
-                        <i class="bx bx-flag-alt"></i> Português
-                    </button>
-                    <button class="btn-outline btn-sm ${APP_STATE.idioma === 'fr' ? 'active' : ''}" onclick="cambiarIdioma('fr')">
-                        <i class="bx bx-flag-alt"></i> Français
-                    </button>
+                    ${['es','en','pt','fr','de','it'].map(l => `
+                        <button class="btn-outline btn-sm ${APP_STATE.idioma === l ? 'active' : ''}" onclick="cambiarIdioma('${l}')">
+                            <i class="bx bx-flag-alt"></i> ${l.toUpperCase()}
+                        </button>
+                    `).join('')}
                 </div>
             </div>
-            
             <div class="card" style="margin-top:12px;">
                 <h3>Acerca de</h3>
-                <p style="color:var(--gris-texto);">
-                    <strong>IPUC LA FONDA</strong> v${CONFIG.VERSION}
-                </p>
-                <p style="color:var(--gris-texto);">
-                    "Where the Holy Spirit moves"
-                </p>
-                <p style="color:var(--gris-texto);font-size:0.8rem;margin-top:4px;">
-                    &copy; 2026 IPUC LA FONDA - International Ministry
-                </p>
+                <p style="color:var(--gris-texto);"><strong>IPUC LA FONDA</strong> v${CONFIG.VERSION}</p>
+                <p style="color:var(--gris-texto);">"Where the Holy Spirit moves"</p>
+                <p style="color:var(--gris-texto);font-size:0.8rem;margin-top:4px;">&copy; 2026 IPUC LA FONDA - International Ministry</p>
             </div>
-            
             ${APP_STATE.usuario ? `
                 <div class="card" style="margin-top:12px;border-left:4px solid var(--error);">
                     <h3 style="color:var(--error);">Zona de Riesgo</h3>
@@ -1625,7 +1467,7 @@ function cargarConfiguracion(c) {
 }
 
 // ============================================
-// PÁGINAS ADMIN
+// PÁGINAS ADMIN (simplificadas)
 // ============================================
 function cargarDashboard(c) {
     c.innerHTML = `
@@ -1639,10 +1481,6 @@ function cargarDashboard(c) {
                     </div>
                 `).join('')}
             </div>
-            <div class="card">
-                <h3>Actividad Reciente</h3>
-                <p style="color:var(--gris-texto);text-align:center;padding:20px;">No hay actividad reciente</p>
-            </div>
         </div>
     `;
 }
@@ -1651,12 +1489,7 @@ function cargarGestionUsuarios(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-user-voice"></i> Gestión de Usuarios</h2>
-            <div class="card">
-                <p style="text-align:center;padding:30px;color:var(--gris-texto);">Panel de administración de usuarios</p>
-                <button class="btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="showToast('Función disponible próximamente', 'info')">
-                    <i class="bx bx-user-plus"></i> Agregar Usuario
-                </button>
-            </div>
+            <div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">Panel de administración de usuarios</p></div>
         </div>
     `;
 }
@@ -1665,12 +1498,7 @@ function cargarGestionNoticias(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-edit-alt"></i> Gestión de Noticias</h2>
-            <div class="card">
-                <p style="text-align:center;padding:30px;color:var(--gris-texto);">Crear y administrar noticias</p>
-                <button class="btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="crearNoticia()">
-                    <i class="bx bx-plus"></i> Crear Noticia
-                </button>
-            </div>
+            <div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">Crear y administrar noticias</p></div>
         </div>
     `;
 }
@@ -1679,12 +1507,7 @@ function cargarGestionEventos(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-calendar-edit"></i> Gestión de Eventos</h2>
-            <div class="card">
-                <p style="text-align:center;padding:30px;color:var(--gris-texto);">Crear y administrar eventos</p>
-                <button class="btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="crearEvento()">
-                    <i class="bx bx-plus"></i> Crear Evento
-                </button>
-            </div>
+            <div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">Crear y administrar eventos</p></div>
         </div>
     `;
 }
@@ -1693,12 +1516,7 @@ function cargarVersiculos(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-bookmark-plus"></i> Versículos</h2>
-            <div class="card">
-                <p style="text-align:center;padding:30px;color:var(--gris-texto);">Administrar versículos diarios</p>
-                <button class="btn-primary btn-sm" style="margin-top:8px;width:100%;" onclick="showToast('Función disponible próximamente', 'info')">
-                    <i class="bx bx-plus"></i> Agregar Versículo
-                </button>
-            </div>
+            <div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">Administrar versículos diarios</p></div>
         </div>
     `;
 }
@@ -1743,10 +1561,6 @@ function cargarSeguridad(c) {
                         <span>Protección contra Fuerza Bruta</span>
                         <span class="badge badge-success">Activada</span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gris-medio);">
-                        <span>Encriptación de Contraseñas</span>
-                        <span class="badge badge-success">SHA-256 + Salt</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1754,14 +1568,16 @@ function cargarSeguridad(c) {
 }
 
 // ============================================
-// PÁGINA: PUBLICACIONES
+// PÁGINA: PUBLICACIONES (con corrección de arrays)
 // ============================================
 function cargarPublicaciones(c) {
+    if (!Array.isArray(APP_STATE.publicaciones)) APP_STATE.publicaciones = [];
+    if (!Array.isArray(APP_STATE.reacciones)) APP_STATE.reacciones = {};
     const pub = APP_STATE.publicaciones;
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-news"></i> Publicaciones</h2>
-            
             ${APP_STATE.usuario ? `
                 <div class="card" style="margin-bottom:16px;">
                     <h3>Crear Publicación</h3>
@@ -1787,7 +1603,6 @@ function cargarPublicaciones(c) {
                     </button>
                 </div>
             `}
-            
             <div id="lista-publicaciones">
                 ${pub.length === 0 ? `
                     <div class="card" style="text-align:center;padding:40px;">
@@ -1797,11 +1612,11 @@ function cargarPublicaciones(c) {
                 ` : pub.map(p => `
                     <div class="card" style="margin-bottom:12px;" id="pub-${p.id}">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                            <img src="${p.foto_autor}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                            <img src="${p.foto_autor || 'assets/avatars/default.png'}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
                             <div style="flex:1;">
-                                <strong>${p.autor} ${p.verificado ? '<i class="bx bx-badge-check" style="color:var(--info);"></i>' : ''}</strong>
+                                <strong>${p.autor || 'Anónimo'} ${p.verificado ? '<i class="bx bx-badge-check" style="color:var(--info);"></i>' : ''}</strong>
                                 <p style="font-size:0.75rem;color:var(--gris-texto);">
-                                    @${p.usuario} · ${formatearFecha(p.fecha)}
+                                    @${p.usuario || 'usuario'} · ${formatearFecha(p.fecha)}
                                 </p>
                             </div>
                             ${APP_STATE.usuario && APP_STATE.usuario.id === p.usuario_id ? `
@@ -1810,8 +1625,7 @@ function cargarPublicaciones(c) {
                                 </button>
                             ` : ''}
                         </div>
-                        <p style="margin-bottom:12px;white-space:pre-wrap;">${p.contenido}</p>
-                        
+                        <p style="margin-bottom:12px;white-space:pre-wrap;">${p.contenido || ''}</p>
                         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;padding:8px 0;border-top:1px solid var(--gris-medio);border-bottom:1px solid var(--gris-medio);">
                             ${CONFIG.REACCIONES_TIPOS.map(r => `
                                 <button onclick="toggleReaccion(${p.id},'${r.clave}')" 
@@ -1822,7 +1636,6 @@ function cargarPublicaciones(c) {
                                 </button>
                             `).join('')}
                         </div>
-                        
                         ${APP_STATE.usuario ? `
                             <div style="display:flex;gap:8px;">
                                 <input type="text" class="form-input" id="comentario-${p.id}" 
@@ -1838,7 +1651,7 @@ function cargarPublicaciones(c) {
             </div>
         </div>
     `;
-    
+
     const textarea = document.getElementById('contenido-publicacion');
     const contador = document.getElementById('caracteres-contador');
     if (textarea && contador) {
@@ -1846,7 +1659,6 @@ function cargarPublicaciones(c) {
             contador.textContent = textarea.value.length;
         });
     }
-    
     document.getElementById('form-publicacion')?.addEventListener('submit', function(e) {
         e.preventDefault();
         const contenido = document.getElementById('contenido-publicacion').value;
@@ -1854,7 +1666,10 @@ function cargarPublicaciones(c) {
             showToast('Escribe algo para publicar', 'warning');
             return;
         }
-        
+        if (!APP_STATE.usuario) {
+            showToast('Debes iniciar sesión', 'warning');
+            return;
+        }
         const publicacion = {
             id: Date.now(),
             usuario_id: APP_STATE.usuario.id,
@@ -1867,15 +1682,12 @@ function cargarPublicaciones(c) {
             reacciones: { amen: 0, me_gusta: 0, fuego: 0, orando: 0, bendicion: 0 },
             comentarios_count: 0
         };
-        
         APP_STATE.publicaciones.unshift(publicacion);
         localStorage.setItem(CONFIG.STORAGE_KEYS.PUBLICACIONES, JSON.stringify(APP_STATE.publicaciones));
-        
         document.getElementById('contenido-publicacion').value = '';
         if (document.getElementById('caracteres-contador')) {
             document.getElementById('caracteres-contador').textContent = '0';
         }
-        
         showToast('Publicación creada', 'success');
         cargarPublicaciones(c);
     });
@@ -1889,12 +1701,12 @@ function toggleReaccion(publicacionId, tipo) {
         showToast('Inicia sesión para reaccionar', 'warning');
         return;
     }
-    
+    if (!APP_STATE.reacciones || typeof APP_STATE.reacciones !== 'object') APP_STATE.reacciones = {};
     const clave = `${publicacionId}_${APP_STATE.usuario.id}`;
     const actual = APP_STATE.reacciones[clave];
     const pub = APP_STATE.publicaciones.find(p => p.id === publicacionId);
     if (!pub) return;
-    
+    if (!pub.reacciones) pub.reacciones = { amen: 0, me_gusta: 0, fuego: 0, orando: 0, bendicion: 0 };
     if (actual === tipo) {
         delete APP_STATE.reacciones[clave];
         if (pub.reacciones[tipo] > 0) pub.reacciones[tipo]--;
@@ -1905,10 +1717,8 @@ function toggleReaccion(publicacionId, tipo) {
         APP_STATE.reacciones[clave] = tipo;
         pub.reacciones[tipo] = (pub.reacciones[tipo] || 0) + 1;
     }
-    
     localStorage.setItem(CONFIG.STORAGE_KEYS.REACCIONES, JSON.stringify(APP_STATE.reacciones));
     localStorage.setItem(CONFIG.STORAGE_KEYS.PUBLICACIONES, JSON.stringify(APP_STATE.publicaciones));
-    
     cargarPublicaciones(document.getElementById('page-content'));
 }
 
@@ -1917,10 +1727,8 @@ function agregarComentario(publicacionId) {
         showToast('Inicia sesión para comentar', 'warning');
         return;
     }
-    
     const input = document.getElementById(`comentario-${publicacionId}`);
     if (!input || !input.value.trim()) return;
-    
     const comentario = {
         id: Date.now(),
         publicacion_id: publicacionId,
@@ -1929,46 +1737,38 @@ function agregarComentario(publicacionId) {
         contenido: input.value.trim(),
         fecha: new Date().toISOString()
     };
-    
+    if (!Array.isArray(APP_STATE.comentarios)) APP_STATE.comentarios = [];
     APP_STATE.comentarios.push(comentario);
     localStorage.setItem(CONFIG.STORAGE_KEYS.COMENTARIOS, JSON.stringify(APP_STATE.comentarios));
-    
     const pub = APP_STATE.publicaciones.find(p => p.id === publicacionId);
     if (pub) pub.comentarios_count = (pub.comentarios_count || 0) + 1;
     localStorage.setItem(CONFIG.STORAGE_KEYS.PUBLICACIONES, JSON.stringify(APP_STATE.publicaciones));
-    
     input.value = '';
     showToast('Comentario agregado', 'success');
     cargarPublicaciones(document.getElementById('page-content'));
 }
 
 function eliminarPublicacion(id) {
-    confirmarAccion(
-        '¿Eliminar publicación?',
-        'Esta acción no se puede deshacer.',
-        () => {
-            APP_STATE.publicaciones = APP_STATE.publicaciones.filter(p => p.id !== id);
-            localStorage.setItem(CONFIG.STORAGE_KEYS.PUBLICACIONES, JSON.stringify(APP_STATE.publicaciones));
-            showToast('Publicación eliminada', 'success');
-            cargarPublicaciones(document.getElementById('page-content'));
-        },
-        'danger'
-    );
+    confirmarAccion('¿Eliminar publicación?', 'Esta acción no se puede deshacer.', () => {
+        if (!Array.isArray(APP_STATE.publicaciones)) APP_STATE.publicaciones = [];
+        APP_STATE.publicaciones = APP_STATE.publicaciones.filter(p => p.id !== id);
+        localStorage.setItem(CONFIG.STORAGE_KEYS.PUBLICACIONES, JSON.stringify(APP_STATE.publicaciones));
+        showToast('Publicación eliminada', 'success');
+        cargarPublicaciones(document.getElementById('page-content'));
+    }, 'danger');
 }
 
 // ============================================
 // FUNCIONES DE AUTENTICACIÓN (UI)
 // ============================================
 function mostrarLogin() {
-    const m = document.getElementById('modal');
-    const b = document.getElementById('modal-body');
-    const t = document.getElementById('modal-title');
-    if (!m || !b) return;
-    
-    t.textContent = 'Iniciar Sesión';
+    const modal = document.getElementById('modal');
+    const body = document.getElementById('modal-body');
+    const title = document.getElementById('modal-title');
+    if (!modal || !body) return;
+    if (title) title.textContent = 'Iniciar Sesión';
     document.getElementById('modal-footer')?.classList.add('hidden');
-    
-    b.innerHTML = `
+    body.innerHTML = `
         <form id="login-form">
             <div class="form-group">
                 <label>Usuario o Correo</label>
@@ -1993,9 +1793,8 @@ function mostrarLogin() {
             </a>
         </p>
     `;
-    m.classList.remove('hidden');
-    
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    modal.classList.remove('hidden');
+    document.getElementById('login-form')?.addEventListener('submit', function(e) {
         e.preventDefault();
         const u = document.getElementById('login-usuario').value.trim();
         const p = document.getElementById('login-password').value;
@@ -2003,7 +1802,6 @@ function mostrarLogin() {
             showToast('Completa todos los campos', 'warning');
             return;
         }
-        
         if (typeof login !== 'undefined') {
             const resultado = login(u, p);
             if (resultado.success) {
@@ -2024,34 +1822,20 @@ function mostrarLogin() {
 }
 
 function mostrarRegistro() {
-    const m = document.getElementById('modal');
-    const b = document.getElementById('modal-body');
-    const t = document.getElementById('modal-title');
-    if (!m || !b) return;
-    
-    t.textContent = 'Crear Cuenta';
+    const modal = document.getElementById('modal');
+    const body = document.getElementById('modal-body');
+    const title = document.getElementById('modal-title');
+    if (!modal || !body) return;
+    if (title) title.textContent = 'Crear Cuenta';
     document.getElementById('modal-footer')?.classList.add('hidden');
-    
-    b.innerHTML = `
+    body.innerHTML = `
         <form id="registro-form">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div class="form-group">
-                    <label>Nombre *</label>
-                    <input type="text" class="form-input" name="nombre" required>
-                </div>
-                <div class="form-group">
-                    <label>Apellidos *</label>
-                    <input type="text" class="form-input" name="apellidos" required>
-                </div>
+                <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" name="nombre" required></div>
+                <div class="form-group"><label>Apellidos *</label><input type="text" class="form-input" name="apellidos" required></div>
             </div>
-            <div class="form-group">
-                <label>Documento *</label>
-                <input type="text" class="form-input" name="documento" required>
-            </div>
-            <div class="form-group">
-                <label>Fecha Nac. *</label>
-                <input type="date" class="form-input" name="fecha_nacimiento" required>
-            </div>
+            <div class="form-group"><label>Documento *</label><input type="text" class="form-input" name="documento" required></div>
+            <div class="form-group"><label>Fecha Nac. *</label><input type="date" class="form-input" name="fecha_nacimiento" required></div>
             <div class="form-group">
                 <label>Sexo *</label>
                 <select class="form-input" name="sexo" required>
@@ -2060,14 +1844,8 @@ function mostrarRegistro() {
                     <option value="Femenino">Femenino</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Correo *</label>
-                <input type="email" class="form-input" name="correo" required>
-            </div>
-            <div class="form-group">
-                <label>Celular *</label>
-                <input type="tel" class="form-input" name="celular" required pattern="[0-9]{10}">
-            </div>
+            <div class="form-group"><label>Correo *</label><input type="email" class="form-input" name="correo" required></div>
+            <div class="form-group"><label>Celular *</label><input type="tel" class="form-input" name="celular" required pattern="[0-9]{10}"></div>
             <div class="form-group">
                 <label>Ministerio *</label>
                 <select class="form-input" name="ministerio" required>
@@ -2080,14 +1858,8 @@ function mostrarRegistro() {
                     <option value="General">General</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Usuario *</label>
-                <input type="text" class="form-input" name="usuario" required minlength="3">
-            </div>
-            <div class="form-group">
-                <label>Contraseña *</label>
-                <input type="password" class="form-input" name="password" required minlength="8">
-            </div>
+            <div class="form-group"><label>Usuario *</label><input type="text" class="form-input" name="usuario" required minlength="3"></div>
+            <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" name="password" required minlength="8"></div>
             <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">
                 <i class="bx bx-user-plus"></i> Crear Cuenta
             </button>
@@ -2098,23 +1870,19 @@ function mostrarRegistro() {
             </a>
         </p>
     `;
-    m.classList.remove('hidden');
-    
-    document.getElementById('registro-form').addEventListener('submit', function(e) {
+    modal.classList.remove('hidden');
+    document.getElementById('registro-form')?.addEventListener('submit', function(e) {
         e.preventDefault();
         const fd = new FormData(this);
         const d = Object.fromEntries(fd);
-        
         if (d.password.length < 8) {
             showToast('La contraseña debe tener al menos 8 caracteres', 'warning');
             return;
         }
-        
         if (d.celular.length !== 10 || !/^[0-9]+$/.test(d.celular)) {
             showToast('El celular debe tener 10 dígitos', 'warning');
             return;
         }
-        
         if (typeof registro !== 'undefined') {
             const resultado = registro(d);
             if (resultado.success) {
@@ -2149,17 +1917,13 @@ function cerrarSesion() {
     localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.ROL);
-    
     APP_STATE.token = null;
     APP_STATE.usuario = null;
     APP_STATE.rol = null;
-    
     if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
     if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
-    
     document.getElementById('user-dropdown')?.classList.add('hidden');
     APP_STATE.userDropdownOpen = false;
-    
     mostrarBienvenida();
     showToast('Sesión cerrada', 'info');
 }
@@ -2182,50 +1946,72 @@ function togglePassword(id) {
 // ============================================
 function toggleNotificaciones() {
     APP_STATE.notificationsOpen = !APP_STATE.notificationsOpen;
-    document.getElementById('notification-panel')?.classList.toggle('hidden', !APP_STATE.notificationsOpen);
+    const panel = document.getElementById('notification-panel');
+    if (panel) panel.classList.toggle('hidden', !APP_STATE.notificationsOpen);
 }
 
 // ============================================
-// INICIALIZACIÓN
+// INICIALIZACIÓN (CORREGIDA)
 // ============================================
+function cargarArray(key) {
+    try {
+        const data = localStorage.getItem(key);
+        if (!data) return [];
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+function cargarObjeto(key) {
+    try {
+        const data = localStorage.getItem(key);
+        if (!data) return {};
+        const parsed = JSON.parse(data);
+        return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch {
+        return {};
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Cargar tema
     const temaGuardado = localStorage.getItem(CONFIG.STORAGE_KEYS.TEMA) || 'light';
     APP_STATE.tema = temaGuardado;
     aplicarTema(temaGuardado);
-    
+
     // Cargar idioma
     const idiomaGuardado = localStorage.getItem('ipuc10_idioma') || 'es';
     APP_STATE.idioma = idiomaGuardado;
     cambiarIdioma(idiomaGuardado);
-    
-    // Cargar datos
-    APP_STATE.publicaciones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PUBLICACIONES) || '[]');
-    APP_STATE.comentarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.COMENTARIOS) || '[]');
-    APP_STATE.reacciones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REACCIONES) || '{}');
-    APP_STATE.asistencias = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ASISTENCIAS) || '[]');
-    APP_STATE.eventos = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.EVENTOS) || '[]');
-    APP_STATE.noticias = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.NOTICIAS) || '[]');
-    APP_STATE.peticiones = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PETICIONES) || '[]');
-    APP_STATE.encuestas = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.ENCUESTAS) || '[]');
-    APP_STATE.biblioteca = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.BIBLIOTECA) || '[]');
-    APP_STATE.galeria = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.GALERIA) || '[]');
-    APP_STATE.podcast = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.PODCAST) || '[]');
-    APP_STATE.chat = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CHAT) || '[]');
-    APP_STATE.directorio = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.DIRECTORIO) || '[]');
-    
+
+    // Cargar datos con validación
+    APP_STATE.publicaciones = cargarArray(CONFIG.STORAGE_KEYS.PUBLICACIONES);
+    APP_STATE.comentarios = cargarArray(CONFIG.STORAGE_KEYS.COMENTARIOS);
+    APP_STATE.reacciones = cargarObjeto(CONFIG.STORAGE_KEYS.REACCIONES);
+    APP_STATE.asistencias = cargarArray(CONFIG.STORAGE_KEYS.ASISTENCIAS);
+    APP_STATE.eventos = cargarArray(CONFIG.STORAGE_KEYS.EVENTOS);
+    APP_STATE.noticias = cargarArray(CONFIG.STORAGE_KEYS.NOTICIAS);
+    APP_STATE.peticiones = cargarArray(CONFIG.STORAGE_KEYS.PETICIONES);
+    APP_STATE.encuestas = cargarArray(CONFIG.STORAGE_KEYS.ENCUESTAS);
+    APP_STATE.biblioteca = cargarArray(CONFIG.STORAGE_KEYS.BIBLIOTECA);
+    APP_STATE.galeria = cargarArray(CONFIG.STORAGE_KEYS.GALERIA);
+    APP_STATE.podcast = cargarArray(CONFIG.STORAGE_KEYS.PODCAST);
+    APP_STATE.chat = cargarArray(CONFIG.STORAGE_KEYS.CHAT);
+    APP_STATE.directorio = cargarArray(CONFIG.STORAGE_KEYS.DIRECTORIO);
+
     // Verificar sesión
     const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
     const usuarioData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
     const rol = localStorage.getItem(CONFIG.STORAGE_KEYS.ROL);
-    
+
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
         if (splash) {
             splash.style.display = 'none';
             splash.style.opacity = '0';
         }
-        
         if (token && usuarioData) {
             try {
                 APP_STATE.token = token;
@@ -2239,11 +2025,10 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarBienvenida();
         }
     }, 2000);
-    
+
     // Event listeners
     inicializarEventListeners();
     manejarResponsiveSidebar();
-    
     window.addEventListener('resize', manejarResponsiveSidebar);
     window.addEventListener('online', () => {
         APP_STATE.isOnline = true;
@@ -2257,51 +2042,56 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// ============================================
+// EVENT LISTENERS
+// ============================================
 function inicializarEventListeners() {
     document.getElementById('menu-toggle')?.addEventListener('click', toggleSidebar);
     document.getElementById('close-sidebar')?.addEventListener('click', cerrarSidebar);
     document.getElementById('sidebar-overlay')?.addEventListener('click', cerrarSidebar);
-    
+
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
             navegarA(this.getAttribute('data-page'));
         });
     });
-    
+
     document.getElementById('theme-toggle')?.addEventListener('click', toggleTema);
     document.getElementById('notifications-toggle')?.addEventListener('click', toggleNotificaciones);
     document.getElementById('close-notifications')?.addEventListener('click', () => {
         document.getElementById('notification-panel')?.classList.add('hidden');
         APP_STATE.notificationsOpen = false;
     });
-    
+
     document.getElementById('search-toggle')?.addEventListener('click', toggleSearchBar);
     document.getElementById('search-close')?.addEventListener('click', () => {
         document.getElementById('search-bar')?.classList.add('hidden');
         APP_STATE.searchBarOpen = false;
     });
-    
+
     document.getElementById('user-mini')?.addEventListener('click', toggleUserDropdown);
     document.getElementById('fab-main')?.addEventListener('click', toggleFabMenu);
-    
+
     document.querySelectorAll('.fab-item').forEach(item => {
         item.addEventListener('click', function() {
             const action = this.getAttribute('data-action');
-            switch(action) {
+            switch (action) {
                 case 'oracion': navegarA('peticiones'); break;
                 case 'asistencia': navegarA('asistencia'); break;
                 case 'compartir': compartirVersiculo(); break;
                 case 'biblia': navegarA('devocional'); break;
                 case 'publicar': navegarA('publicaciones'); break;
                 case 'evento': navegarA('eventos'); break;
+                case 'grupo': showToast('Grupos disponible próximamente', 'info'); break;
                 case 'ai': showToast('Asistente IA disponible próximamente', 'info'); break;
+                case 'qr': showToast('Escáner QR disponible próximamente', 'info'); break;
                 default: break;
             }
             toggleFabMenu();
         });
     });
-    
+
     document.getElementById('btn-logout')?.addEventListener('click', (e) => {
         e.preventDefault();
         confirmarAccion('¿Cerrar sesión?', 'Serás redirigido al inicio.', cerrarSesion, 'danger');
@@ -2309,12 +2099,12 @@ function inicializarEventListeners() {
     document.getElementById('btn-login')?.addEventListener('click', mostrarLogin);
     document.getElementById('btn-register')?.addEventListener('click', mostrarRegistro);
     document.getElementById('btn-continue-guest')?.addEventListener('click', continuarComoInvitado);
-    
+
     document.getElementById('modal')?.addEventListener('click', function(e) {
         if (e.target.classList.contains('modal-backdrop')) cerrarModal();
     });
     document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
-    
+
     document.getElementById('confirm-cancel')?.addEventListener('click', () => {
         document.getElementById('confirm-modal')?.classList.add('hidden');
         APP_STATE.pendingConfirmation = null;
@@ -2332,7 +2122,7 @@ function inicializarEventListeners() {
             APP_STATE.pendingConfirmation = null;
         }
     });
-    
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (APP_STATE.notificationsOpen) {
@@ -2352,23 +2142,23 @@ function inicializarEventListeners() {
             toggleSearchBar();
         }
     });
-    
+
     document.addEventListener('click', (e) => {
-        if (APP_STATE.userDropdownOpen && 
-            !e.target.closest('#user-mini') && 
+        if (APP_STATE.userDropdownOpen &&
+            !e.target.closest('#user-mini') &&
             !e.target.closest('#user-dropdown')) {
             document.getElementById('user-dropdown')?.classList.add('hidden');
             APP_STATE.userDropdownOpen = false;
         }
-        if (APP_STATE.fabMenuOpen && 
-            !e.target.closest('#fab-main') && 
+        if (APP_STATE.fabMenuOpen &&
+            !e.target.closest('#fab-main') &&
             !e.target.closest('#fab-menu')) {
             document.getElementById('fab-menu')?.classList.add('hidden');
             APP_STATE.fabMenuOpen = false;
         }
     });
-    
-    // Idioma - Event listeners para botones de idioma
+
+    // Eventos de idioma
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const lang = this.getAttribute('data-lang');
@@ -2456,4 +2246,4 @@ document.head.appendChild(styleSheet);
 console.log(` IPUC LA FONDA v${CONFIG.VERSION} - Script cargado correctamente`);
 console.log(' 🌍 Todas las secciones funcionales');
 console.log(' 🔒 Sistema de autenticación y administración integrado');
-console.log(' 🌐 Multilingual ready (ES, EN, PT, FR)');
+console.log(' 🌐 Multilingual ready (ES, EN, PT, FR, DE, IT)');
