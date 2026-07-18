@@ -1,16 +1,17 @@
 // ============================================
-// IPUC LA FONDA - DATABASE v5.1 (PRIVADO)
+// IPUC LA FONDA - DATABASE v10.0 (PRIVADO)
 // Gestión de Base de Datos en localStorage
 // Sin mensajes en consola - Acceso restringido
+// VERSIÓN INTERNACIONAL - COMPLETO
 // ============================================
 
 class Database {
     constructor() {
-        this.prefix = 'ipuc5_';
+        this.prefix = 'ipuc10_';
         this.cache = {};
         this.cacheTimeout = 300;
         this.lastCacheUpdate = {};
-        this.version = '5.1';
+        this.version = '10.0';
         this.initialized = false;
     }
 
@@ -22,6 +23,9 @@ class Database {
         return /^[a-zA-Z0-9_\-]+$/.test(name);
     }
 
+    // ============================================
+    // OPERACIONES CRUD BÁSICAS
+    // ============================================
     cargar(nombreArchivo) {
         if (!this._isValidKey(nombreArchivo)) return null;
         const clave = this._getKey(nombreArchivo);
@@ -71,6 +75,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // ARCHIVOS POR DEFECTO
+    // ============================================
     _crearArchivoPorDefecto(nombreArchivo) {
         const datosPorDefecto = {
             'usuarios': { usuarios: [], ultimo_id: 0 },
@@ -88,6 +95,10 @@ class Database {
             'horarios': { cultos: [] },
             'biblioteca': { recursos: [], ultimo_id: 0 },
             'galeria': { albumes: [], ultimo_id: 0 },
+            'encuestas': { encuestas: [], ultimo_id: 0 },
+            'podcast': { episodios: [], ultimo_id: 0 },
+            'chat': { mensajes: [], ultimo_id: 0 },
+            'directorio': { miembros: [], ultimo_id: 0 },
             'estadisticas': { asistencia: {}, usuarios: {}, publicaciones: {} },
             'configuracion': { iglesia: {}, aplicacion: {} }
         };
@@ -98,6 +109,9 @@ class Database {
         return null;
     }
 
+    // ============================================
+    // SISTEMA DE RESPALDOS
+    // ============================================
     _crearRespaldo(nombreArchivo, datosAnteriores) {
         try {
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -151,10 +165,13 @@ class Database {
         }
     }
 
+    // ============================================
+    // SEGURIDAD Y HASH
+    // ============================================
     hashPassword(password) {
         if (!password || typeof password !== 'string') throw new Error('Contraseña inválida');
         let hash = 0;
-        const salt = 'ipuc5_salt_2026';
+        const salt = 'ipuc10_salt_2026';
         const str = password + salt;
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
@@ -164,6 +181,9 @@ class Database {
         return Math.abs(hash).toString(16).padStart(8, '0');
     }
 
+    // ============================================
+    // VALIDACIONES
+    // ============================================
     _validarCorreo(correo) {
         return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correo);
     }
@@ -180,6 +200,9 @@ class Database {
         return documento && documento.length >= 5;
     }
 
+    // ============================================
+    // ADMINISTRADOR
+    // ============================================
     crearPrimerAdministrador(datos) {
         try {
             const admins = this.cargar('administradores');
@@ -234,6 +257,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // AUTENTICACIÓN
+    // ============================================
     login(usuario, password) {
         try {
             if (!usuario || !password) {
@@ -251,7 +277,7 @@ class Database {
                 const { password: _, ...adminSeguro } = admin;
                 return {
                     success: true,
-                    token: 't5_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    token: 't10_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                     rol: 'admin',
                     usuario: adminSeguro
                 };
@@ -267,7 +293,7 @@ class Database {
                 const { password: _, ...userSeguro } = user;
                 return {
                     success: true,
-                    token: 't5_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    token: 't10_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                     rol: 'usuario',
                     usuario: userSeguro
                 };
@@ -278,6 +304,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // REGISTRO DE USUARIO
+    // ============================================
     registrarUsuario(datos) {
         try {
             const campos = ['nombre', 'apellidos', 'documento', 'fecha_nacimiento',
@@ -355,6 +384,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // PUBLICACIONES
+    // ============================================
     getPublicaciones() {
         return this.cargar('publicaciones')?.publicaciones || [];
     }
@@ -411,6 +443,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // COMENTARIOS
+    // ============================================
     getComentarios(publicacionId = null) {
         const comentarios = this.cargar('comentarios')?.comentarios || [];
         if (publicacionId) {
@@ -454,6 +489,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // REACCIONES
+    // ============================================
     toggleReaccion(publicacionId, usuarioId, tipo) {
         try {
             if (!publicacionId || !usuarioId || !tipo) {
@@ -492,6 +530,9 @@ class Database {
         return reacciones?.reacciones?.[`${publicacionId}_${usuarioId}`] || null;
     }
 
+    // ============================================
+    // NOTICIAS
+    // ============================================
     getNoticias() {
         return this.cargar('noticias')?.noticias || [];
     }
@@ -531,6 +572,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // EVENTOS
+    // ============================================
     getEventos() {
         return this.cargar('eventos')?.eventos || [];
     }
@@ -571,6 +615,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // ASISTENCIA
+    // ============================================
     getAsistencia() {
         return this.cargar('asistencia')?.registros || [];
     }
@@ -605,6 +652,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // PETICIONES
+    // ============================================
     getPeticiones() {
         return this.cargar('peticiones')?.peticiones || [];
     }
@@ -642,6 +692,209 @@ class Database {
         }
     }
 
+    // ============================================
+    // ENCUESTAS
+    // ============================================
+    getEncuestas() {
+        return this.cargar('encuestas')?.encuestas || [];
+    }
+
+    addEncuesta(datos) {
+        try {
+            if (!datos.titulo) {
+                return { success: false, error: 'Título requerido' };
+            }
+            const encuestas = this.cargar('encuestas');
+            const nueva = {
+                id: (encuestas.encuestas?.length || 0) + 1,
+                titulo: datos.titulo.trim(),
+                preguntas: datos.preguntas || [],
+                fecha: new Date().toISOString(),
+                activa: true,
+                votos: {}
+            };
+            if (!encuestas.encuestas) encuestas.encuestas = [];
+            encuestas.encuestas.push(nueva);
+            encuestas.ultimo_id = nueva.id;
+            this.guardar('encuestas', encuestas);
+            return { success: true, data: nueva };
+        } catch {
+            return { success: false, error: 'Error al crear encuesta' };
+        }
+    }
+
+    votarEncuesta(encuestaId, opcion) {
+        try {
+            const encuestas = this.cargar('encuestas');
+            const encuesta = encuestas?.encuestas?.find(e => e.id === encuestaId);
+            if (!encuesta) return { success: false, error: 'Encuesta no encontrada' };
+            if (!encuesta.activa) return { success: false, error: 'Encuesta cerrada' };
+            
+            if (!encuesta.votos) encuesta.votos = {};
+            encuesta.votos[opcion] = (encuesta.votos[opcion] || 0) + 1;
+            this.guardar('encuestas', encuestas);
+            return { success: true, data: encuesta };
+        } catch {
+            return { success: false, error: 'Error al votar' };
+        }
+    }
+
+    // ============================================
+    // BIBLIOTECA
+    // ============================================
+    getRecursos() {
+        return this.cargar('biblioteca')?.recursos || [];
+    }
+
+    addRecurso(datos) {
+        try {
+            if (!datos.titulo || !datos.autor) {
+                return { success: false, error: 'Título y autor requeridos' };
+            }
+            const biblioteca = this.cargar('biblioteca');
+            const nuevo = {
+                id: (biblioteca.recursos?.length || 0) + 1,
+                titulo: datos.titulo.trim(),
+                autor: datos.autor.trim(),
+                categoria: datos.categoria || 'General',
+                pdf: datos.pdf || 'recurso.pdf',
+                fecha: new Date().toISOString()
+            };
+            if (!biblioteca.recursos) biblioteca.recursos = [];
+            biblioteca.recursos.push(nuevo);
+            biblioteca.ultimo_id = nuevo.id;
+            this.guardar('biblioteca', biblioteca);
+            return { success: true, data: nuevo };
+        } catch {
+            return { success: false, error: 'Error al agregar recurso' };
+        }
+    }
+
+    // ============================================
+    // GALERIA
+    // ============================================
+    getAlbumes() {
+        return this.cargar('galeria')?.albumes || [];
+    }
+
+    addImagen(datos) {
+        try {
+            if (!datos.titulo) {
+                return { success: false, error: 'Título requerido' };
+            }
+            const galeria = this.cargar('galeria');
+            const nuevo = {
+                id: (galeria.albumes?.length || 0) + 1,
+                titulo: datos.titulo.trim(),
+                url: datos.url || '',
+                fecha: new Date().toISOString(),
+                descripcion: datos.descripcion || ''
+            };
+            if (!galeria.albumes) galeria.albumes = [];
+            galeria.albumes.push(nuevo);
+            galeria.ultimo_id = nuevo.id;
+            this.guardar('galeria', galeria);
+            return { success: true, data: nuevo };
+        } catch {
+            return { success: false, error: 'Error al agregar imagen' };
+        }
+    }
+
+    // ============================================
+    // PODCAST
+    // ============================================
+    getPodcast() {
+        return this.cargar('podcast')?.episodios || [];
+    }
+
+    addPodcast(datos) {
+        try {
+            if (!datos.titulo || !datos.pastor) {
+                return { success: false, error: 'Título y pastor requeridos' };
+            }
+            const podcast = this.cargar('podcast');
+            const nuevo = {
+                id: (podcast.episodios?.length || 0) + 1,
+                titulo: datos.titulo.trim(),
+                pastor: datos.pastor.trim(),
+                duracion: datos.duracion || '30 min',
+                fecha: new Date().toISOString(),
+                audio: datos.audio || 'podcast.mp3'
+            };
+            if (!podcast.episodios) podcast.episodios = [];
+            podcast.episodios.push(nuevo);
+            podcast.ultimo_id = nuevo.id;
+            this.guardar('podcast', podcast);
+            return { success: true, data: nuevo };
+        } catch {
+            return { success: false, error: 'Error al agregar podcast' };
+        }
+    }
+
+    // ============================================
+    // CHAT
+    // ============================================
+    getMensajes() {
+        return this.cargar('chat')?.mensajes || [];
+    }
+
+    addMensaje(datos) {
+        try {
+            if (!datos.usuario || !datos.usuario_id || !datos.mensaje) {
+                return { success: false, error: 'Datos incompletos' };
+            }
+            const chat = this.cargar('chat');
+            const nuevo = {
+                id: Date.now(),
+                usuario: datos.usuario,
+                usuario_id: datos.usuario_id,
+                mensaje: datos.mensaje.trim(),
+                fecha: new Date().toISOString()
+            };
+            if (!chat.mensajes) chat.mensajes = [];
+            chat.mensajes.push(nuevo);
+            chat.ultimo_id = nuevo.id;
+            this.guardar('chat', chat);
+            return { success: true, data: nuevo };
+        } catch {
+            return { success: false, error: 'Error al enviar mensaje' };
+        }
+    }
+
+    // ============================================
+    // DIRECTORIO
+    // ============================================
+    getDirectorio() {
+        return this.cargar('directorio')?.miembros || [];
+    }
+
+    addMiembro(datos) {
+        try {
+            if (!datos.nombre) {
+                return { success: false, error: 'Nombre requerido' };
+            }
+            const directorio = this.cargar('directorio');
+            const nuevo = {
+                id: (directorio.miembros?.length || 0) + 1,
+                nombre: datos.nombre.trim(),
+                apellidos: datos.apellidos || '',
+                ministerio: datos.ministerio || 'General',
+                verificado: datos.verificado || false,
+                fecha: new Date().toISOString()
+            };
+            if (!directorio.miembros) directorio.miembros = [];
+            directorio.miembros.push(nuevo);
+            directorio.ultimo_id = nuevo.id;
+            this.guardar('directorio', directorio);
+            return { success: true, data: nuevo };
+        } catch {
+            return { success: false, error: 'Error al agregar miembro' };
+        }
+    }
+
+    // ============================================
+    // NOTIFICACIONES
+    // ============================================
     getNotificaciones() {
         return this.cargar('notificaciones')?.notificaciones || [];
     }
@@ -683,6 +936,9 @@ class Database {
         return this.getNotificaciones().filter(n => !n.leida).length;
     }
 
+    // ============================================
+    // ESTADÍSTICAS
+    // ============================================
     _actualizarEstadisticasAsistencia() {
         try {
             const asistencia = this.cargar('asistencia');
@@ -737,6 +993,10 @@ class Database {
                 asistencia_mensual: estadisticas?.asistencia?.mensual || 0,
                 asistencia_total: estadisticas?.asistencia?.total || 0,
                 peticiones: this.getPeticiones().length,
+                encuestas: this.getEncuestas().length,
+                recursos: this.getRecursos().length,
+                episodios: this.getPodcast().length,
+                mensajes: this.getMensajes().length,
                 notificaciones_no_leidas: this.getNoLeidas()
             };
         } catch {
@@ -744,6 +1004,9 @@ class Database {
         }
     }
 
+    // ============================================
+    // VERSÍCULOS
+    // ============================================
     getVersiculos() {
         return this.cargar('versiculos')?.versiculos || [];
     }
@@ -755,6 +1018,9 @@ class Database {
         return versiculos[index];
     }
 
+    // ============================================
+    // INSIGNIAS
+    // ============================================
     getInsignias() {
         return this.cargar('insignias')?.insignias || [];
     }
@@ -765,6 +1031,41 @@ class Database {
         return user?.insignias || [];
     }
 
+    // ============================================
+    // HORARIOS
+    // ============================================
+    getHorarios() {
+        return this.cargar('horarios')?.cultos || [];
+    }
+
+    getHorarioDia(dia) {
+        const cultos = this.getHorarios();
+        return cultos.find(c => c.dia === dia) || null;
+    }
+
+    // ============================================
+    // CONFIGURACIÓN
+    // ============================================
+    getConfiguracion() {
+        return this.cargar('configuracion');
+    }
+
+    updateConfiguracion(config) {
+        try {
+            const cfg = this.cargar('configuracion');
+            const nuevaCfg = { ...cfg, ...config };
+            if (this.guardar('configuracion', nuevaCfg)) {
+                return { success: true };
+            }
+            return { success: false, error: 'Error al guardar' };
+        } catch {
+            return { success: false, error: 'Error al actualizar configuración' };
+        }
+    }
+
+    // ============================================
+    // UTILIDADES
+    // ============================================
     exportarTodo() {
         const datos = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -819,46 +1120,16 @@ class Database {
         }
     }
 
-    getConfiguracion() {
-        return this.cargar('configuracion');
-    }
-
-    updateConfiguracion(config) {
-        try {
-            const cfg = this.cargar('configuracion');
-            const nuevaCfg = { ...cfg, ...config };
-            if (this.guardar('configuracion', nuevaCfg)) {
-                return { success: true };
-            }
-            return { success: false, error: 'Error al guardar' };
-        } catch {
-            return { success: false, error: 'Error al actualizar configuración' };
-        }
-    }
-
-    getHorarios() {
-        return this.cargar('horarios')?.cultos || [];
-    }
-
-    getHorarioDia(dia) {
-        const cultos = this.getHorarios();
-        return cultos.find(c => c.dia === dia) || null;
-    }
-
-    getRecursos() {
-        return this.cargar('biblioteca')?.recursos || [];
-    }
-
-    getAlbumes() {
-        return this.cargar('galeria')?.albumes || [];
-    }
-
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
     inicializarDatos() {
         const archivos = [
             'usuarios', 'administradores', 'publicaciones', 'comentarios',
             'reacciones', 'noticias', 'eventos', 'asistencia', 'notificaciones',
             'peticiones', 'insignias', 'versiculos', 'horarios', 'biblioteca',
-            'galeria', 'estadisticas', 'configuracion'
+            'galeria', 'encuestas', 'podcast', 'chat', 'directorio',
+            'estadisticas', 'configuracion'
         ];
         for (const archivo of archivos) {
             if (!localStorage.getItem(this._getKey(archivo))) {
@@ -873,6 +1144,7 @@ class Database {
     }
 
     _inicializarDatosPorDefecto() {
+        // Insignias
         const insignias = this.cargar('insignias');
         if (insignias.insignias.length === 0) {
             const insigniasPorDefecto = [
@@ -893,6 +1165,7 @@ class Database {
             this.guardar('insignias', insignias);
         }
 
+        // Versículos
         const versiculos = this.cargar('versiculos');
         if (versiculos.versiculos.length === 0) {
             const versiculosPorDefecto = [
@@ -909,6 +1182,7 @@ class Database {
             this.guardar('versiculos', versiculos);
         }
 
+        // Horarios
         const horarios = this.cargar('horarios');
         if (horarios.cultos.length === 0) {
             horarios.cultos = [
@@ -923,17 +1197,19 @@ class Database {
             this.guardar('horarios', horarios);
         }
 
+        // Configuración
         const config = this.cargar('configuracion');
         if (!config.iglesia.nombre) {
             config.iglesia = {
                 nombre: "IPUC LA FONDA",
-                lema: "Donde el Espíritu Santo se mueve",
+                lema: "Where the Holy Spirit moves",
                 direccion: "",
                 telefono: "",
                 correo: "",
                 facebook: "",
                 instagram: "",
-                youtube: ""
+                youtube: "",
+                idioma: "es"
             };
             config.aplicacion = {
                 version: this.version,
@@ -955,17 +1231,14 @@ class Database {
 // ============================================
 // CREAR INSTANCIA GLOBAL (CON VERIFICACIÓN)
 // ============================================
-// Usar window.db para evitar conflicto con variables locales
 if (typeof window.db === 'undefined') {
     const db = new Database();
     db.inicializarDatos();
     window.db = db;
 } else {
-    // Si ya existe, asegurarse de que esté inicializada
     if (!window.db.initialized) {
         window.db.inicializarDatos();
     }
 }
 
-// También exponer la clase para uso general
 window.Database = Database;
