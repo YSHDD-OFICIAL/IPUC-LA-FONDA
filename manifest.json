@@ -1,50 +1,54 @@
 {
-    "name": "IPUC LA FONDA - International Pentecostal Church",
+    "name": "IPUC LA FONDA - International Pentecostal Church v15.0",
     "short_name": "IPUC LA FONDA",
-    "description": "Platforma oficial de IPUC LA FONDA. Where the Holy Spirit moves. Accede a cultos, eventos, noticias, devocionales y comunidad cristiana a nivel mundial.",
+    "description": "Plataforma oficial de IPUC LA FONDA. Where the Holy Spirit moves. Accede a cultos, eventos, noticias, devocionales, música, podcast y comunidad cristiana a nivel mundial.",
     "start_url": "/",
     "scope": "/",
-    "id": "ipuc-la-fonda-v10.0",
-    
+    "id": "ipuc-la-fonda-v15.0-pro",
+
     "display": "standalone",
     "display_override": [
         "window-controls-overlay",
         "standalone",
-        "minimal-ui"
+        "minimal-ui",
+        "browser"
     ],
     "orientation": "any",
-    
+
     "background_color": "#1a237e",
     "theme_color": "#1a237e",
-    
+    "dark_background_color": "#0a0a1a",
+    "dark_theme_color": "#0a1628",
+
     "lang": "es-CO",
     "dir": "ltr",
-    
+
     "categories": [
         "social",
         "lifestyle",
         "utilities",
         "education",
         "books",
-        "religion"
+        "religion",
+        "music",
+        "news"
     ],
-    "prefer_related_applications": false,
     "iarc_rating_id": "e10+",
-    
+
     "launch_handler": {
         "client_mode": [
             "navigate-existing",
             "auto"
         ]
     },
-    
+
     "edge_side_panel": {
         "preferred_width": 400
     },
-    
+
     "handle_links": "preferred",
     "capture_links": "existing-client-event",
-    
+
     "icons": [
         {
             "src": "/assets/icons/favicon-16x16.png",
@@ -59,6 +63,30 @@
             "purpose": "any"
         },
         {
+            "src": "/assets/icons/icon-48x48.png",
+            "sizes": "48x48",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/icon-128x128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
             "src": "/assets/icons/icon-144x144.png",
             "sizes": "144x144",
             "type": "image/png",
@@ -67,6 +95,18 @@
         {
             "src": "/assets/icons/icon-192x192.png",
             "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/icon-384x384.png",
+            "sizes": "384x384",
             "type": "image/png",
             "purpose": "any maskable"
         },
@@ -81,9 +121,21 @@
             "sizes": "180x180",
             "type": "image/png",
             "purpose": "any"
+        },
+        {
+            "src": "/assets/icons/maskable-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/assets/icons/monochrome-icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "monochrome"
         }
     ],
-    
+
     "screenshots": [
         {
             "src": "/assets/screenshots/desktop-home.png",
@@ -93,11 +145,39 @@
             "label": "Pantalla principal de IPUC LA FONDA en escritorio"
         },
         {
+            "src": "/assets/screenshots/desktop-music.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Reproductor de música en escritorio"
+        },
+        {
+            "src": "/assets/screenshots/desktop-events.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Calendario de eventos en escritorio"
+        },
+        {
+            "src": "/assets/screenshots/desktop-chat.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Chat y mensajería en escritorio"
+        },
+        {
+            "src": "/assets/screenshots/desktop-admin.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Panel de administración en escritorio"
+        },
+        {
             "src": "/assets/screenshots/mobile-home.png",
             "sizes": "360x640",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "IPUC LA FONDA - Vista móvil"
+            "label": "IPUC LA FONDA - Vista móvil principal"
         },
         {
             "src": "/assets/screenshots/mobile-publications.png",
@@ -125,16 +205,56 @@
             "sizes": "360x640",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "Podcast en móvil"
+            "label": "Podcast y música en móvil"
+        },
+        {
+            "src": "/assets/screenshots/mobile-profile.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Perfil de usuario en móvil"
+        },
+        {
+            "src": "/assets/screenshots/mobile-store.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Tienda cristiana en móvil"
         }
     ],
-    
+
     "shortcuts": [
         {
             "name": "Inicio",
             "short_name": "Inicio",
             "description": "Ir a la página principal de IPUC LA FONDA",
             "url": "/#inicio",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Cultos en Vivo",
+            "short_name": "Cultos",
+            "description": "Ver transmisiones en vivo de cultos",
+            "url": "/#cultos",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Música",
+            "short_name": "Música",
+            "description": "Escuchar música de adoración",
+            "url": "/#musica",
             "icons": [
                 {
                     "src": "/assets/icons/icon-192x192.png",
@@ -248,6 +368,32 @@
             ]
         },
         {
+            "name": "Directorio",
+            "short_name": "Directorio",
+            "description": "Buscar miembros de la comunidad",
+            "url": "/#directorio",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Biblioteca",
+            "short_name": "Biblioteca",
+            "description": "Acceder a recursos y libros",
+            "url": "/#biblioteca",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
             "name": "Encuestas",
             "short_name": "Encuestas",
             "description": "Participar en encuestas de la iglesia",
@@ -259,19 +405,194 @@
                     "type": "image/png"
                 }
             ]
+        },
+        {
+            "name": "Tienda",
+            "short_name": "Tienda",
+            "description": "Tienda cristiana y recursos",
+            "url": "/#tienda",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Donaciones",
+            "short_name": "Donar",
+            "description": "Hacer donaciones a la iglesia",
+            "url": "/#donaciones",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Perfil",
+            "short_name": "Perfil",
+            "description": "Ver y editar tu perfil",
+            "url": "/#perfil",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Configuración",
+            "short_name": "Config",
+            "description": "Configuración de la aplicación",
+            "url": "/#configuracion",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Admin",
+            "short_name": "Admin",
+            "description": "Panel de administración",
+            "url": "/#dashboard",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
         }
     ],
-    
+
     "related_applications": [],
-    
+
     "protocol_handlers": [
         {
             "protocol": "web+ipuc",
             "url": "/?action=%s"
+        },
+        {
+            "protocol": "web+ipuc-prayer",
+            "url": "/#peticiones?prayer=%s"
+        },
+        {
+            "protocol": "web+ipuc-event",
+            "url": "/#eventos?event=%s"
+        },
+        {
+            "protocol": "web+ipuc-music",
+            "url": "/#musica?track=%s"
+        },
+        {
+            "protocol": "web+ipuc-podcast",
+            "url": "/#podcast?episode=%s"
+        },
+        {
+            "protocol": "web+ipuc-notice",
+            "url": "/#noticias?notice=%s"
+        },
+        {
+            "protocol": "web+ipuc-user",
+            "url": "/#directorio?user=%s"
+        },
+        {
+            "protocol": "web+ipuc-group",
+            "url": "/#grupos?group=%s"
         }
     ],
-    
+
     "share_target": {
+        "action": "/#publicaciones",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url",
+            "files": [
+                {
+                    "name": "image",
+                    "accept": ["image/*"]
+                },
+                {
+                    "name": "audio",
+                    "accept": ["audio/*"]
+                },
+                {
+                    "name": "video",
+                    "accept": ["video/*"]
+                }
+            ]
+        }
+    },
+
+    "file_handlers": [
+        {
+            "action": "/#biblioteca?upload=true",
+            "accept": {
+                "application/pdf": [".pdf"],
+                "text/plain": [".txt", ".md"],
+                "application/msword": [".doc", ".docx"],
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+                "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"],
+                "audio/*": [".mp3", ".wav", ".ogg", ".m4a"],
+                "video/*": [".mp4", ".webm", ".ogg"],
+                "application/epub+zip": [".epub"],
+                "application/x-mobipocket-ebook": [".mobi"]
+            }
+        }
+    ],
+
+    "note_taking": {
+        "new_note_url": "/#publicaciones?action=new"
+    },
+
+    "prefer_related_applications": false,
+
+    "serviceworker": {
+        "src": "/service-worker.js",
+        "scope": "/",
+        "use_cache": true,
+        "update_via_cache": "all"
+    },
+
+    "splash_pages": {
+        "dark": {
+            "background_color": "#0a0a1a",
+            "image": "/assets/splash/dark-splash.png"
+        },
+        "light": {
+            "background_color": "#1a237e",
+            "image": "/assets/splash/light-splash.png"
+        }
+    },
+
+    "tabstrip": {
+        "home_tab": {
+            "scope": "/",
+            "start_url": "/#inicio",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
+    },
+
+    "isolated_storage": true,
+
+    "share_auto": {
         "action": "/#publicaciones",
         "method": "POST",
         "enctype": "multipart/form-data",
@@ -281,21 +602,29 @@
             "url": "url"
         }
     },
-    
-    "file_handlers": [
-        {
-            "action": "/",
-            "accept": {
-                "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
-                "text/*": [".txt", ".md"],
-                "audio/*": [".mp3", ".wav", ".ogg"]
-            }
-        }
-    ],
-    
-    "note_taking": {
-        "new_note_url": "/#publicaciones?action=new"
+
+    "window_controls_overlay": {
+        "show": true,
+        "title": "IPUC LA FONDA"
     },
-    
-    "prefer_related_applications": false
+
+    "notifications": {
+        "enabled": true,
+        "vibrate": [100, 50, 100],
+        "sound": "/assets/sounds/notification.mp3",
+        "icon": "/assets/icons/icon-192x192.png",
+        "badge": "/assets/icons/badge-icon.png"
+    },
+
+    "background_sync": {
+        "enabled": true,
+        "network_timeout": 30000
+    },
+
+    "web_share": {
+        "enabled": true,
+        "title": "IPUC LA FONDA",
+        "text": "Where the Holy Spirit moves",
+        "url": "https://ipuclafonda.netlify.app/"
+    }
 }
