@@ -1,16 +1,16 @@
 // ============================================
-// IPUC LA FONDA - app.js v5.1 COMPLETO
+// IPUC LA FONDA - app.js v10.0 COMPLETO
 // Funciones helper para la aplicación
 // Incluye publicaciones, comentarios y reacciones
-// MEJORADA - OPTIMIZADA - 100% OPERATIVA
+// VERSIÓN INTERNACIONAL - 100% OPERATIVA
 // Usa la instancia global "db" de database.js
-// "Donde el Espíritu Santo se mueve"
+// "Where the Holy Spirit moves" 🌍
 // ============================================
 
 // ============================================
 // CONFIGURACIÓN GLOBAL
 // ============================================
-const VERSION = "5.1";
+const VERSION = "10.0";
 const MAX_INTENTOS = 5;
 const TIEMPO_BLOQUEO = 15; // minutos
 const DURACION_TOKEN = 24; // horas
@@ -20,7 +20,7 @@ const INTENTOS_FALLIDOS = {};
 const BLOQUEOS_TEMPORALES = {};
 
 // ============================================
-// SISTEMA DE LOGS (SILENCIOSO - SIN CONSOLE)
+// SISTEMA DE LOGS (SILENCIOSO)
 // ============================================
 function logApp(accion, detalle = '', nivel = 'info') {
     const entry = {
@@ -31,12 +31,11 @@ function logApp(accion, detalle = '', nivel = 'info') {
         version: VERSION
     };
     
-    // Guardar en localStorage para debugging (sin console.log)
     try {
-        const logs = JSON.parse(localStorage.getItem('ipuc5_app_logs') || '[]');
+        const logs = JSON.parse(localStorage.getItem('ipuc10_app_logs') || '[]');
         logs.push(entry);
         if (logs.length > 500) logs.shift();
-        localStorage.setItem('ipuc5_app_logs', JSON.stringify(logs));
+        localStorage.setItem('ipuc10_app_logs', JSON.stringify(logs));
     } catch (e) {}
 }
 
@@ -44,7 +43,7 @@ function logApp(accion, detalle = '', nivel = 'info') {
 // FUNCIONES DE SEGURIDAD
 // ============================================
 function generarToken() {
-    return 't5_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return 't10_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 function verificarToken(token) {
@@ -114,7 +113,6 @@ function getDB() {
     if (typeof window.db !== 'undefined' && window.db) {
         return window.db;
     }
-    // Intentar cargar si existe en el scope global
     if (typeof db !== 'undefined' && db) {
         return db;
     }
@@ -132,7 +130,6 @@ function login(usuario, password) {
             return { success: false, error: 'Base de datos no disponible' };
         }
 
-        // Validar intentos fallidos
         const verificar = verificarIntentosFallidos(usuario);
         if (verificar.bloqueado) {
             return { 
@@ -167,9 +164,9 @@ function login(usuario, password) {
             ip: resultado.ip || 'local'
         };
 
-        localStorage.setItem('ipuc5_token', token);
-        localStorage.setItem('ipuc5_usuario', JSON.stringify(resultado.usuario));
-        localStorage.setItem('ipuc5_rol', resultado.rol);
+        localStorage.setItem('ipuc10_token', token);
+        localStorage.setItem('ipuc10_usuario', JSON.stringify(resultado.usuario));
+        localStorage.setItem('ipuc10_rol', resultado.rol);
 
         delete INTENTOS_FALLIDOS[usuario];
         delete BLOQUEOS_TEMPORALES[usuario];
@@ -234,12 +231,12 @@ function registro(datos) {
 
 function logout() {
     try {
-        const token = localStorage.getItem('ipuc5_token');
+        const token = localStorage.getItem('ipuc10_token');
         if (token && TOKENS[token]) {
             registrarActividad(TOKENS[token].usuario.id, 'Cierre de sesión');
             delete TOKENS[token];
         }
-        ['ipuc5_token', 'ipuc5_usuario', 'ipuc5_rol'].forEach(k => localStorage.removeItem(k));
+        ['ipuc10_token', 'ipuc10_usuario', 'ipuc10_rol'].forEach(k => localStorage.removeItem(k));
         logApp('Logout exitoso', 'Sesión cerrada', 'info');
         return { success: true, mensaje: 'Sesión cerrada correctamente' };
     } catch (error) {
@@ -255,9 +252,9 @@ function verificarSesion() {
             return { success: false, message: 'Base de datos no disponible' };
         }
 
-        const token = localStorage.getItem('ipuc5_token');
-        const usuarioData = localStorage.getItem('ipuc5_usuario');
-        const rol = localStorage.getItem('ipuc5_rol');
+        const token = localStorage.getItem('ipuc10_token');
+        const usuarioData = localStorage.getItem('ipuc10_usuario');
+        const rol = localStorage.getItem('ipuc10_rol');
 
         if (!token || !usuarioData) {
             return { success: false, message: 'No hay sesión activa' };
@@ -265,7 +262,7 @@ function verificarSesion() {
 
         const tokenValido = verificarToken(token);
         if (!tokenValido) {
-            localStorage.removeItem('ipuc5_token');
+            localStorage.removeItem('ipuc10_token');
             return { success: false, message: 'Sesión expirada' };
         }
 
@@ -275,8 +272,8 @@ function verificarSesion() {
         if (!userExists) {
             const adminExists = db.cargar('administradores')?.administradores?.find(a => a.id === usuario.id);
             if (!adminExists) {
-                localStorage.removeItem('ipuc5_token');
-                localStorage.removeItem('ipuc5_usuario');
+                localStorage.removeItem('ipuc10_token');
+                localStorage.removeItem('ipuc10_usuario');
                 return { success: false, message: 'Usuario no encontrado' };
             }
         }
@@ -928,6 +925,206 @@ function getReaccionUsuario(publicacionId, usuarioId) {
 }
 
 // ============================================
+// FUNCIONES DE ENCUESTAS
+// ============================================
+function obtenerEncuestas() {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        return db.cargar('encuestas')?.encuestas || [];
+    } catch (error) {
+        logApp('Error obteniendo encuestas', error.message, 'error');
+        return [];
+    }
+}
+
+function crearEncuesta(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const encuestas = db.cargar('encuestas');
+        if (!encuestas.encuestas) encuestas.encuestas = [];
+        
+        const nueva = {
+            id: (encuestas.encuestas?.length || 0) + 1,
+            titulo: datos.titulo,
+            preguntas: datos.preguntas || [],
+            fecha: new Date().toISOString(),
+            activa: true
+        };
+        encuestas.encuestas.push(nueva);
+        db.guardar('encuestas', encuestas);
+        
+        logApp('Encuesta creada', `Título: ${datos.titulo}`, 'success');
+        return { success: true, data: nueva };
+    } catch (error) {
+        logApp('Error creando encuesta', error.message, 'error');
+        return { success: false, error: 'Error al crear encuesta' };
+    }
+}
+
+// ============================================
+// FUNCIONES DE BIBLIOTECA
+// ============================================
+function obtenerBiblioteca() {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        return db.cargar('biblioteca')?.recursos || [];
+    } catch (error) {
+        logApp('Error obteniendo biblioteca', error.message, 'error');
+        return [];
+    }
+}
+
+function agregarRecurso(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const biblioteca = db.cargar('biblioteca');
+        if (!biblioteca.recursos) biblioteca.recursos = [];
+        
+        const nuevo = {
+            id: (biblioteca.recursos?.length || 0) + 1,
+            titulo: datos.titulo,
+            autor: datos.autor,
+            categoria: datos.categoria || 'General',
+            pdf: datos.pdf || 'recurso.pdf'
+        };
+        biblioteca.recursos.push(nuevo);
+        db.guardar('biblioteca', biblioteca);
+        
+        logApp('Recurso agregado', `Título: ${datos.titulo}`, 'success');
+        return { success: true, data: nuevo };
+    } catch (error) {
+        logApp('Error agregando recurso', error.message, 'error');
+        return { success: false, error: 'Error al agregar recurso' };
+    }
+}
+
+// ============================================
+// FUNCIONES DE PODCAST
+// ============================================
+function obtenerPodcast() {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        return db.cargar('podcast')?.episodios || [];
+    } catch (error) {
+        logApp('Error obteniendo podcast', error.message, 'error');
+        return [];
+    }
+}
+
+function agregarPodcast(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const podcast = db.cargar('podcast');
+        if (!podcast.episodios) podcast.episodios = [];
+        
+        const nuevo = {
+            id: (podcast.episodios?.length || 0) + 1,
+            titulo: datos.titulo,
+            pastor: datos.pastor,
+            duracion: datos.duracion || '30 min',
+            fecha: new Date().toISOString(),
+            audio: datos.audio || 'podcast.mp3'
+        };
+        podcast.episodios.push(nuevo);
+        db.guardar('podcast', podcast);
+        
+        logApp('Podcast agregado', `Título: ${datos.titulo}`, 'success');
+        return { success: true, data: nuevo };
+    } catch (error) {
+        logApp('Error agregando podcast', error.message, 'error');
+        return { success: false, error: 'Error al agregar podcast' };
+    }
+}
+
+// ============================================
+// FUNCIONES DE GALERIA
+// ============================================
+function obtenerGaleria() {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        return db.cargar('galeria')?.albumes || [];
+    } catch (error) {
+        logApp('Error obteniendo galería', error.message, 'error');
+        return [];
+    }
+}
+
+function agregarImagen(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const galeria = db.cargar('galeria');
+        if (!galeria.albumes) galeria.albumes = [];
+        
+        const nuevo = {
+            id: (galeria.albumes?.length || 0) + 1,
+            titulo: datos.titulo || 'Imagen',
+            url: datos.url || '',
+            fecha: new Date().toISOString()
+        };
+        galeria.albumes.push(nuevo);
+        db.guardar('galeria', galeria);
+        
+        logApp('Imagen agregada', `Título: ${datos.titulo}`, 'success');
+        return { success: true, data: nuevo };
+    } catch (error) {
+        logApp('Error agregando imagen', error.message, 'error');
+        return { success: false, error: 'Error al agregar imagen' };
+    }
+}
+
+// ============================================
+// FUNCIONES DE CHAT
+// ============================================
+function obtenerMensajes() {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        return db.cargar('chat')?.mensajes || [];
+    } catch (error) {
+        logApp('Error obteniendo mensajes', error.message, 'error');
+        return [];
+    }
+}
+
+function enviarMensaje(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const chat = db.cargar('chat');
+        if (!chat.mensajes) chat.mensajes = [];
+        
+        const nuevo = {
+            id: Date.now(),
+            usuario: datos.usuario,
+            usuario_id: datos.usuario_id,
+            mensaje: datos.mensaje,
+            fecha: new Date().toISOString()
+        };
+        chat.mensajes.push(nuevo);
+        db.guardar('chat', chat);
+        
+        logApp('Mensaje enviado', `Usuario: ${datos.usuario}`, 'info');
+        return { success: true, data: nuevo };
+    } catch (error) {
+        logApp('Error enviando mensaje', error.message, 'error');
+        return { success: false, error: 'Error al enviar mensaje' };
+    }
+}
+
+// ============================================
 // FUNCIONES DE ESTADÍSTICAS Y SISTEMA
 // ============================================
 function obtenerEstadisticas() {
@@ -1049,9 +1246,9 @@ function iniciarApp() {
         }
         
         try {
-            const logs = JSON.parse(localStorage.getItem('ipuc5_app_logs') || '[]');
+            const logs = JSON.parse(localStorage.getItem('ipuc10_app_logs') || '[]');
             if (logs.length > 1000) {
-                localStorage.setItem('ipuc5_app_logs', JSON.stringify(logs.slice(-500)));
+                localStorage.setItem('ipuc10_app_logs', JSON.stringify(logs.slice(-500)));
             }
         } catch (e) {}
         
@@ -1127,6 +1324,26 @@ window.getComentariosPublicacion = getComentariosPublicacion;
 window.agregarComentario = agregarComentario;
 window.toggleReaccion = toggleReaccion;
 window.getReaccionUsuario = getReaccionUsuario;
+
+// Encuestas
+window.obtenerEncuestas = obtenerEncuestas;
+window.crearEncuesta = crearEncuesta;
+
+// Biblioteca
+window.obtenerBiblioteca = obtenerBiblioteca;
+window.agregarRecurso = agregarRecurso;
+
+// Podcast
+window.obtenerPodcast = obtenerPodcast;
+window.agregarPodcast = agregarPodcast;
+
+// Galeria
+window.obtenerGaleria = obtenerGaleria;
+window.agregarImagen = agregarImagen;
+
+// Chat
+window.obtenerMensajes = obtenerMensajes;
+window.enviarMensaje = enviarMensaje;
 
 // Estadísticas y Sistema
 window.obtenerEstadisticas = obtenerEstadisticas;
