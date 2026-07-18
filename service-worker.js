@@ -1,17 +1,17 @@
 // ============================================
-// IPUC LA FONDA - SERVICE WORKER PWA v5.1
+// IPUC LA FONDA - SERVICE WORKER PWA v10.0
 // Instalable como App Nativa | Offline | Push
-// MEJORADO - OPTIMIZADO - 100% OPERATIVO
-// "Donde el Espíritu Santo se mueve"
+// VERSIÓN INTERNACIONAL - OPTIMIZADO
+// "Where the Holy Spirit moves" 🌍
 // ============================================
 
-const CACHE_NAME = 'ipuc-la-fonda-v5.1';
-const RUNTIME_CACHE = 'ipuc-runtime-v5.1';
-const IMAGE_CACHE = 'ipuc-images-v5.1';
-const API_CACHE = 'ipuc-api-v5.1';
-const OFFLINE_CACHE = 'ipuc-offline-v5.1';
+const CACHE_NAME = 'ipuc-la-fonda-v10.0';
+const RUNTIME_CACHE = 'ipuc-runtime-v10.0';
+const IMAGE_CACHE = 'ipuc-images-v10.0';
+const API_CACHE = 'ipuc-api-v10.0';
+const OFFLINE_CACHE = 'ipuc-offline-v10.0';
 
-const VERSION = '5.1';
+const VERSION = '10.0';
 const MAX_AGE = 30 * 24 * 60 * 60; // 30 días en segundos
 
 // ============================================
@@ -118,7 +118,8 @@ self.addEventListener('activate', (event) => {
                         client.postMessage({
                             type: 'SW_ACTIVATED',
                             version: VERSION,
-                            timestamp: Date.now()
+                            timestamp: Date.now(),
+                            cacheName: CACHE_NAME
                         });
                     } catch {}
                 }
@@ -244,18 +245,20 @@ self.addEventListener('fetch', (event) => {
                             <title>IPUC LA FONDA - Offline</title>
                             <style>
                                 body { 
-                                    font-family: Arial, sans-serif;
+                                    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
                                     display: flex;
                                     justify-content: center;
                                     align-items: center;
                                     height: 100vh;
                                     margin: 0;
-                                    background: #1a237e;
+                                    background: linear-gradient(135deg, #0d1b5e, #1a237e, #283593);
                                     color: white;
                                     text-align: center;
                                 }
                                 .offline-content { max-width: 400px; padding: 20px; }
-                                .offline-icon { font-size: 4rem; margin-bottom: 20px; }
+                                .offline-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+                                .offline-title { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+                                .offline-text { opacity: 0.8; margin-bottom: 24px; line-height: 1.6; }
                                 .retry-btn {
                                     background: #ffd700;
                                     color: #1a237e;
@@ -263,17 +266,25 @@ self.addEventListener('fetch', (event) => {
                                     padding: 12px 30px;
                                     border-radius: 25px;
                                     font-size: 1.1rem;
+                                    font-weight: 600;
                                     cursor: pointer;
-                                    margin-top: 20px;
+                                    transition: transform 0.2s, box-shadow 0.2s;
                                 }
+                                .retry-btn:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+                                }
+                                .retry-btn i { margin-right: 8px; }
                             </style>
                         </head>
                         <body>
                             <div class="offline-content">
                                 <div class="offline-icon">📶</div>
-                                <h1>Sin conexión</h1>
-                                <p>IPUC LA FONDA está en modo offline.<br>Revisa tu conexión a internet.</p>
-                                <button class="retry-btn" onclick="location.reload()">🔄 Reintentar</button>
+                                <h1 class="offline-title">Sin conexión</h1>
+                                <p class="offline-text">IPUC LA FONDA está en modo offline.<br>Revisa tu conexión a internet.</p>
+                                <button class="retry-btn" onclick="location.reload()">
+                                    <i class="bx bx-refresh"></i> Reintentar
+                                </button>
                             </div>
                         </body>
                         </html>`,
@@ -381,8 +392,8 @@ self.addEventListener('push', (event) => {
         vibrate: data.importante ? [200, 100, 200] : [100, 50, 100],
         silent: data.silent || false,
         actions: [
-            { action: 'open', title: '👁️ Ver', icon: '/assets/icons/icon-192x192.png' },
-            { action: 'close', title: '❌ Cerrar', icon: '/assets/icons/icon-192x192.png' }
+            { action: 'open', title: 'Ver', icon: '/assets/icons/icon-192x192.png' },
+            { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
         ],
         tag: `ipuc-notif-${data.id}`,
         renotify: true,
@@ -444,12 +455,38 @@ self.addEventListener('notificationclick', (event) => {
 // ============================================
 self.addEventListener('sync', (event) => {
     const syncHandlers = {
-        'sync-asistencia': async () => {},
-        'sync-mensajes': async () => {},
-        'sync-peticiones': async () => {},
-        'sync-datos': async () => {},
-        'sync-noticias': async () => {},
-        'sync-publicaciones': async () => {}
+        'sync-asistencia': async () => {
+            // Sincronizar asistencias pendientes
+            return;
+        },
+        'sync-mensajes': async () => {
+            // Sincronizar mensajes pendientes
+            return;
+        },
+        'sync-peticiones': async () => {
+            // Sincronizar peticiones pendientes
+            return;
+        },
+        'sync-datos': async () => {
+            // Sincronizar datos generales
+            return;
+        },
+        'sync-noticias': async () => {
+            // Sincronizar noticias pendientes
+            return;
+        },
+        'sync-publicaciones': async () => {
+            // Sincronizar publicaciones pendientes
+            return;
+        },
+        'sync-encuestas': async () => {
+            // Sincronizar encuestas pendientes
+            return;
+        },
+        'sync-podcast': async () => {
+            // Sincronizar podcast pendientes
+            return;
+        }
     };
     
     if (syncHandlers[event.tag]) {
@@ -471,7 +508,8 @@ self.addEventListener('message', (event) => {
                         client.postMessage({
                             type: 'SW_UPDATED',
                             version: VERSION,
-                            timestamp: Date.now()
+                            timestamp: Date.now(),
+                            cacheName: CACHE_NAME
                         });
                     });
                 });
@@ -488,7 +526,11 @@ self.addEventListener('message', (event) => {
                     version: VERSION,
                     cache: CACHE_NAME,
                     timestamp: Date.now(),
-                    assets: PRECACHE_ASSETS.length
+                    assets: PRECACHE_ASSETS.length,
+                    runtime: RUNTIME_CACHE,
+                    image: IMAGE_CACHE,
+                    api: API_CACHE,
+                    offline: OFFLINE_CACHE
                 });
             }
             break;
@@ -498,7 +540,7 @@ self.addEventListener('message', (event) => {
                 return Promise.all(names.map((name) => caches.delete(name)));
             }).then(() => {
                 if (event.ports && event.ports[0]) {
-                    event.ports[0].postMessage({ success: true, message: 'Cache limpiado' });
+                    event.ports[0].postMessage({ success: true, message: 'Cache limpiado', timestamp: Date.now() });
                 }
             }).catch((error) => {
                 if (event.ports && event.ports[0]) {
@@ -512,8 +554,9 @@ self.addEventListener('message', (event) => {
                 caches.open(CACHE_NAME).then((cache) => cache.keys()),
                 caches.open(RUNTIME_CACHE).then((cache) => cache.keys()),
                 caches.open(IMAGE_CACHE).then((cache) => cache.keys()),
-                caches.open(API_CACHE).then((cache) => cache.keys())
-            ]).then(([precache, runtime, images, api]) => {
+                caches.open(API_CACHE).then((cache) => cache.keys()),
+                caches.open(OFFLINE_CACHE).then((cache) => cache.keys())
+            ]).then(([precache, runtime, images, api, offline]) => {
                 if (event.ports && event.ports[0]) {
                     event.ports[0].postMessage({
                         cacheName: CACHE_NAME,
@@ -522,11 +565,27 @@ self.addEventListener('message', (event) => {
                         runtime: { total: runtime.length },
                         images: { total: images.length },
                         api: { total: api.length },
-                        total: precache.length + runtime.length + images.length + api.length,
+                        offline: { total: offline.length },
+                        total: precache.length + runtime.length + images.length + api.length + offline.length,
                         timestamp: Date.now()
                     });
                 }
             }).catch(() => {});
+            break;
+            
+        case 'REGISTER_SYNC':
+            if ('sync' in self.registration) {
+                try {
+                    self.registration.sync.register(event.data.tag || 'sync-datos');
+                    if (event.ports && event.ports[0]) {
+                        event.ports[0].postMessage({ success: true, tag: event.data.tag });
+                    }
+                } catch (error) {
+                    if (event.ports && event.ports[0]) {
+                        event.ports[0].postMessage({ success: false, error: error.message });
+                    }
+                }
+            }
             break;
     }
 });
@@ -567,3 +626,11 @@ self.addEventListener('offline', () => {
 // ============================================
 self.addEventListener('error', () => {});
 self.addEventListener('unhandledrejection', () => {});
+
+// ============================================
+// REGISTRO DE CACHE DE FALLBACK
+// ============================================
+self.addEventListener('fetch', (event) => {
+    // Si la solicitud falla y tenemos un fallback, usarlo
+    // Esto ya está manejado en las estrategias individuales
+});
