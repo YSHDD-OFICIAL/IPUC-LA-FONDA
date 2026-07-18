@@ -1,10 +1,10 @@
 {
-    "name": "IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia",
+    "name": "IPUC LA FONDA - International Pentecostal Church",
     "short_name": "IPUC LA FONDA",
-    "description": "Plataforma oficial de IPUC LA FONDA. Donde el Espíritu Santo se mueve. Accede a cultos, eventos, noticias, devocionales y comunidad cristiana.",
+    "description": "Platforma oficial de IPUC LA FONDA. Where the Holy Spirit moves. Accede a cultos, eventos, noticias, devocionales y comunidad cristiana a nivel mundial.",
     "start_url": "/",
     "scope": "/",
-    "id": "ipuc-la-fonda-v5.1",
+    "id": "ipuc-la-fonda-v10.0",
     
     "display": "standalone",
     "display_override": [
@@ -112,12 +112,26 @@
             "type": "image/png",
             "form_factor": "narrow",
             "label": "Eventos y calendario en móvil"
+        },
+        {
+            "src": "/assets/screenshots/mobile-chat.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Chat y mensajes en móvil"
+        },
+        {
+            "src": "/assets/screenshots/mobile-podcast.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Podcast en móvil"
         }
     ],
     
     "shortcuts": [
         {
-            "name": "🏠 Inicio",
+            "name": "Inicio",
             "short_name": "Inicio",
             "description": "Ir a la página principal de IPUC LA FONDA",
             "url": "/#inicio",
@@ -130,7 +144,7 @@
             ]
         },
         {
-            "name": "✅ Asistencia",
+            "name": "Asistencia",
             "short_name": "Asistencia",
             "description": "Confirmar tu asistencia al próximo culto",
             "url": "/#asistencia",
@@ -143,7 +157,7 @@
             ]
         },
         {
-            "name": "🕐 Horarios",
+            "name": "Horarios",
             "short_name": "Horarios",
             "description": "Ver los horarios de cultos semanales",
             "url": "/#horarios",
@@ -156,7 +170,7 @@
             ]
         },
         {
-            "name": "📖 Devocional",
+            "name": "Devocional",
             "short_name": "Devocional",
             "description": "Leer el devocional y versículo del día",
             "url": "/#devocional",
@@ -169,7 +183,7 @@
             ]
         },
         {
-            "name": "📰 Noticias",
+            "name": "Noticias",
             "short_name": "Noticias",
             "description": "Últimas noticias de la iglesia",
             "url": "/#noticias",
@@ -182,7 +196,7 @@
             ]
         },
         {
-            "name": "📅 Eventos",
+            "name": "Eventos",
             "short_name": "Eventos",
             "description": "Calendario de eventos de la iglesia",
             "url": "/#eventos",
@@ -195,7 +209,7 @@
             ]
         },
         {
-            "name": "🙏 Peticiones",
+            "name": "Peticiones",
             "short_name": "Peticiones",
             "description": "Compartir peticiones de oración",
             "url": "/#peticiones",
@@ -208,10 +222,36 @@
             ]
         },
         {
-            "name": "💬 Mensajes",
-            "short_name": "Mensajes",
+            "name": "Chat",
+            "short_name": "Chat",
             "description": "Chat y mensajes de la comunidad",
             "url": "/#chat",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Podcast",
+            "short_name": "Podcast",
+            "description": "Escuchar episodios de podcast",
+            "url": "/#podcast",
+            "icons": [
+                {
+                    "src": "/assets/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Encuestas",
+            "short_name": "Encuestas",
+            "description": "Participar en encuestas de la iglesia",
+            "url": "/#encuestas",
             "icons": [
                 {
                     "src": "/assets/icons/icon-192x192.png",
@@ -247,7 +287,8 @@
             "action": "/",
             "accept": {
                 "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
-                "text/*": [".txt", ".md"]
+                "text/*": [".txt", ".md"],
+                "audio/*": [".mp3", ".wav", ".ogg"]
             }
         }
     ],
