@@ -94,43 +94,6 @@ VERSIÓN PROFESIONAL COMPLETA
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- ===== SCHEMA.ORG ENRIQUECIDO ===== -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Church",
-        "name": "IPUC LA FONDA International",
-        "alternateName": "Iglesia Pentecostal Unida de Colombia - LA FONDA",
-        "description": "Where the Holy Spirit moves. Ministerio cristiano internacional con música de adoración, eventos y comunidad global.",
-        "url": "https://ipuclafonda.netlify.app",
-        "image": "https://ipuclafonda.netlify.app/ipuclafonda.png",
-        "logo": "https://ipuclafonda.netlify.app/ipuclafonda.png",
-        "foundingDate": "2024",
-        "openingHours": "Mo-Su 08:00-20:00",
-        "serviceType": "Culto Dominical, Culto de Oración, Culto Campal, Culto de Jóvenes, Encuentro de Mujeres, Escuela Bíblica",
-        "address": {
-            "@type": "PostalAddress",
-            "addressCountry": "CO",
-            "addressLocality": "Colombia",
-            "addressRegion": "Cundinamarca"
-        },
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+573128813818",
-            "email": "ipuclafonda@gmail.com",
-            "contactType": "Pastoral",
-            "availableLanguage": ["Spanish", "English", "Portuguese", "French", "German", "Italian"]
-        },
-        "sameAs": [
-            "https://facebook.com/ipuclafonda",
-            "https://instagram.com/ipuclafonda",
-            "https://youtube.com/@ipuclafonda",
-            "https://twitter.com/ipuclafonda",
-            "https://tiktok.com/@ipuclafonda"
-        ]
-    }
-    </script>
-
     <!-- ===== SEGURIDAD DE CLASE MUNDIAL ===== -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
@@ -146,7 +109,7 @@ VERSIÓN PROFESIONAL COMPLETA
     <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=(), payment=(), usb=(), serial=(), hid=(), accelerometer=(), gyroscope=(), magnetometer=(), ambient-light-sensor=()">
 
     <!-- ===== TÍTULO INTERNACIONAL ===== -->
-    <title>IPUC LA FONDA v15.0 PRO - Iglesia Pentecostal Internacional | Música y Adoración</title>
+    <title>IPUC LA FONDA | Música y Adoración</title>
 </head>
 <body>
 
@@ -535,7 +498,7 @@ VERSIÓN PROFESIONAL COMPLETA
                 <div class="music-player-progress">
                     <span class="music-time" id="music-current-time">0:00</span>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="music-progress" style="width:0%"></div>
+                        <div class="progress-fill" id="music-progress" style="inline-size:0%"></div>
                     </div>
                     <span class="music-time" id="music-duration">0:00</span>
                 </div>
@@ -603,7 +566,7 @@ VERSIÓN PROFESIONAL COMPLETA
             </div>
             <div class="mini-player-progress">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="mini-progress" style="width:0%"></div>
+                    <div class="progress-fill" id="mini-progress" style="inline-size:0%"></div>
                 </div>
             </div>
         </div>
@@ -715,7 +678,7 @@ VERSIÓN PROFESIONAL COMPLETA
                 </div>
 
                 <div class="welcome-info">
-                    <p style="color:var(--gris-texto);font-size:0.9rem;margin-bottom:16px;">
+                    <p style="color:var(--gris-texto);font-size:0.9rem;margin-block-end:16px;">
                         <i class="bx bx-lock-alt"></i> Acceso exclusivo para miembros registrados
                     </p>
                     <div class="welcome-security">
@@ -1132,7 +1095,7 @@ VERSIÓN PROFESIONAL COMPLETA
                             'Usuario: <strong>' + credenciales.usuario + '</strong><br>' +
                             'Contraseña: <strong>' + credenciales.password + '</strong>' +
                         '</div>' +
-                        '<p style="margin-top:8px;font-size:0.85rem;">' +
+                        '<p style="margin-block-start:8px;font-size:0.85rem;">' +
                             ' Guarda estas credenciales en un lugar seguro. ' +
                             'No podrás recuperarlas si las olvidas.' +
                         '</p>';

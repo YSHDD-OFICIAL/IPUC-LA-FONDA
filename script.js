@@ -362,7 +362,7 @@ function cargarVersiculoDiario() {
     const v = versiculos[new Date().getDay() % versiculos.length];
     container.innerHTML = `
         <p style="font-style:italic;font-size:1.1rem;line-height:1.8;">"${v.texto}"</p>
-        <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${v.referencia}</p>
+        <p style="font-weight:700;color:var(--azul-primario);margin-block-start:8px;">${v.referencia}</p>
     `;
 }
 
@@ -475,7 +475,7 @@ function cargarPagina(page) {
                         <div class="card fade-in">
                             <h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2>
                             <p style="text-align:center;padding:40px;color:var(--gris-texto);">
-                                <i class="bx bx-construction" style="font-size:3rem;display:block;margin-bottom:16px;"></i>
+                                <i class="bx bx-construction" style="font-size:3rem;display:block;margin-block-end:16px;"></i>
                                 Sección en desarrollo
                             </p>
                         </div>
@@ -483,10 +483,10 @@ function cargarPagina(page) {
             }
         } catch (e) {
             container.innerHTML = `
-                <div class="card fade-in" style="border-left:4px solid var(--error);">
+                <div class="card fade-in" style="border-inline-start:4px solid var(--error);">
                     <h2>Error al cargar</h2>
                     <p style="text-align:center;padding:20px;color:var(--error);">
-                        <i class="bx bx-error-circle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        <i class="bx bx-error-circle" style="font-size:2rem;display:block;margin-block-end:8px;"></i>
                         ${e.message || 'Error desconocido'}
                     </p>
                 </div>
@@ -530,10 +530,10 @@ function cargarInicio(c) {
                 <div class="contador-estado estado-proximo" id="contador-estado">PRÓXIMO CULTO</div>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-block-end:16px;">
                 <div class="card card-glass">
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:44px;height:44px;border-radius:50%;background:var(--azul-primario);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;">
+                        <div style="inline-size:44px;block-size:44px;border-radius:50%;background:var(--azul-primario);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;">
                             <i class="bx bx-calendar"></i>
                         </div>
                         <div>
@@ -544,7 +544,7 @@ function cargarInicio(c) {
                 </div>
                 <div class="card card-glass">
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:44px;height:44px;border-radius:50%;background:var(--dorado);display:flex;align-items:center;justify-content:center;color:var(--azul-primario);font-size:1.3rem;">
+                        <div style="inline-size:44px;block-size:44px;border-radius:50%;background:var(--dorado);display:flex;align-items:center;justify-content:center;color:var(--azul-primario);font-size:1.3rem;">
                             <i class="bx bx-time"></i>
                         </div>
                         <div>
@@ -555,7 +555,7 @@ function cargarInicio(c) {
                 </div>
                 <div class="card card-glass">
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:44px;height:44px;border-radius:50%;background:var(--exito);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;">
+                        <div style="inline-size:44px;block-size:44px;border-radius:50%;background:var(--exito);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;">
                             <i class="bx bx-wifi"></i>
                         </div>
                         <div>
@@ -566,16 +566,16 @@ function cargarInicio(c) {
                 </div>
             </div>
 
-            <div class="card" style="border-left:4px solid var(--dorado);">
+            <div class="card" style="border-inline-start:4px solid var(--dorado);">
                 <h3><i class="bx bx-bible" style="color:var(--dorado);"></i> Versículo del Día</h3>
-                <div id="versiculo-content" style="font-style:italic;font-size:1rem;line-height:1.8;margin-top:8px;">
+                <div id="versiculo-content" style="font-style:italic;font-size:1rem;line-height:1.8;margin-block-start:8px;">
                     <p>Cargando versículo...</p>
                 </div>
             </div>
 
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Accesos Rápidos</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-top:8px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-block-start:8px;">
                     <button class="btn-outline btn-sm" onclick="navegarA('asistencia')">
                         <i class="bx bx-check-shield"></i> Asistencia
                     </button>
@@ -598,29 +598,29 @@ function cargarInicio(c) {
             </div>
 
             ${pubRecientes.length ? `
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Últimas Publicaciones</h3>
-                <div style="margin-top:8px;">
+                <div style="margin-block-start:8px;">
                     ${pubRecientes.map(p => `
-                        <div style="padding:8px 0;border-bottom:1px solid var(--gris-medio);">
+                        <div style="padding:8px 0;border-block-end:1px solid var(--gris-medio);">
                             <strong>${p.autor || 'Anónimo'}</strong>
                             <p style="font-size:0.85rem;color:var(--gris-texto);">${(p.contenido || '').substring(0, 100)}${(p.contenido || '').length > 100 ? '...' : ''}</p>
                             <small style="color:var(--gris-medio);">${formatearFecha(p.fecha)}</small>
                         </div>
                     `).join('')}
                 </div>
-                <button class="btn-outline btn-sm" onclick="navegarA('publicaciones')" style="margin-top:8px;width:100%;">
+                <button class="btn-outline btn-sm" onclick="navegarA('publicaciones')" style="margin-block-start:8px;inline-size:100%;">
                     Ver todas las publicaciones
                 </button>
             </div>
             ` : ''}
 
             ${eventosProximos.length ? `
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Próximos Eventos</h3>
-                <div style="margin-top:8px;">
+                <div style="margin-block-start:8px;">
                     ${eventosProximos.map(e => `
-                        <div style="padding:8px 0;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">
+                        <div style="padding:8px 0;border-block-end:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">
                             <div>
                                 <strong>${e.titulo || 'Evento'}</strong>
                                 <p style="font-size:0.85rem;color:var(--gris-texto);">${e.fecha || ''} ${e.hora || ''}</p>
@@ -663,9 +663,9 @@ function cargarHorarios(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-time-five"></i> Horarios de Cultos</h2>
-            <div style="display:grid;gap:10px;margin-top:16px;">
+            <div style="display:grid;gap:10px;margin-block-start:16px;">
                 ${horarios.map((d, i) => `
-                    <div class="card" style="border-left:4px solid ${i === idx ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
+                    <div class="card" style="border-inline-start:4px solid ${i === idx ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
                             <div>
                                 <h3>${d.dia} ${i === idx ? '<span style="background:var(--azul-primario);color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;">HOY</span>' : ''}</h3>
@@ -688,7 +688,7 @@ function cargarHorarios(c) {
                     </div>
                 `).join('')}
             </div>
-            <div class="card" style="margin-top:12px;text-align:center;">
+            <div class="card" style="margin-block-start:12px;text-align:center;">
                 <p style="color:var(--gris-texto);font-size:0.8rem;">
                     <i class="bx bx-map-pin"></i> Dirección: IPUC La Fonda, Cali, Valle del Cauca
                 </p>
@@ -713,7 +713,7 @@ function cargarAsistencia(c) {
                 <i class="bx bx-calendar-check" style="font-size:3rem;color:var(--azul-primario);"></i>
                 <h3 style="margin:12px 0;">Próximo Culto</h3>
                 <p style="font-size:1.1rem;">${proximoCulto}</p>
-                <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+                <div style="display:flex;gap:10px;justify-content:center;margin-block-start:20px;flex-wrap:wrap;">
                     <button class="btn-primary btn-sm" onclick="confirmarAsistencia('Asistiré')">
                         <i class="bx bx-check"></i> Voy
                     </button>
@@ -725,21 +725,21 @@ function cargarAsistencia(c) {
                     </button>
                 </div>
             </div>
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Tipo de Asistente</h3>
-                <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+                <div style="display:flex;gap:12px;margin-block-start:8px;flex-wrap:wrap;">
                     <label><input type="radio" name="tipo-asistente" value="Hermano" checked> Hermano</label>
                     <label><input type="radio" name="tipo-asistente" value="Amigo"> Amigo</label>
                     <label><input type="radio" name="tipo-asistente" value="Niño"> Niño</label>
                     <label><input type="radio" name="tipo-asistente" value="Visitante"> Visitante</label>
                 </div>
             </div>
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Mis Asistencias</h3>
                 ${APP_STATE.asistencias.length === 0 ? 
                     '<p style="text-align:center;padding:10px;color:var(--gris-texto);">No has confirmado asistencia aún</p>' :
                     APP_STATE.asistencias.slice(-5).reverse().map(a => `
-                        <div style="padding:6px 0;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;">
+                        <div style="padding:6px 0;border-block-end:1px solid var(--gris-medio);display:flex;justify-content:space-between;">
                             <span>${a.estado || 'Asistiré'} (${a.tipo || 'Hermano'})</span>
                             <small style="color:var(--gris-texto);">${formatearFecha(a.fecha)}</small>
                         </div>
@@ -760,7 +760,7 @@ function cargarNoticias(c) {
 
     c.innerHTML = `
         <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;flex-wrap:wrap;gap:8px;">
                 <h2><i class="bx bx-news"></i> Noticias</h2>
                 ${APP_STATE.rol === 'admin' ? `
                     <button class="btn-primary btn-sm" onclick="crearNoticia()">
@@ -771,10 +771,10 @@ function cargarNoticias(c) {
             ${APP_STATE.noticias.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay noticias publicadas</p></div>' :
                 APP_STATE.noticias.map(n => `
-                    <div class="card" style="margin-bottom:12px;border-left:4px solid var(--azul-primario);">
+                    <div class="card" style="margin-block-end:12px;border-inline-start:4px solid var(--azul-primario);">
                         <h3>${n.titulo || 'Sin título'}</h3>
                         <p style="font-size:0.85rem;color:var(--gris-texto);">${n.resumen || n.contenido || ''}</p>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-block-start:8px;">
                             <small style="color:var(--gris-medio);">${formatearFecha(n.fecha || n.fecha_publicacion)}</small>
                             ${APP_STATE.rol === 'admin' ? `
                                 <button class="btn-icon" onclick="eliminarNoticia(${n.id})">
@@ -829,7 +829,7 @@ function cargarEventos(c) {
 
     c.innerHTML = `
         <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;flex-wrap:wrap;gap:8px;">
                 <h2><i class="bx bx-calendar-star"></i> Eventos</h2>
                 ${APP_STATE.rol === 'admin' ? `
                     <button class="btn-primary btn-sm" onclick="crearEvento()">
@@ -840,12 +840,12 @@ function cargarEventos(c) {
             ${APP_STATE.eventos.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay eventos programados</p></div>' :
                 APP_STATE.eventos.map(e => `
-                    <div class="card" style="margin-bottom:12px;border-left:4px solid var(--dorado);">
+                    <div class="card" style="margin-block-end:12px;border-inline-start:4px solid var(--dorado);">
                         <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
                             <div>
                                 <h3><i class="bx bx-calendar-event" style="color:var(--dorado);"></i> ${e.titulo || 'Evento'}</h3>
                                 <p style="color:var(--gris-texto);">${e.descripcion || ''}</p>
-                                <div style="display:flex;gap:12px;margin-top:4px;font-size:0.85rem;color:var(--gris-medio);">
+                                <div style="display:flex;gap:12px;margin-block-start:4px;font-size:0.85rem;color:var(--gris-medio);">
                                     <span><i class="bx bx-time"></i> ${e.hora || '10:00 AM'}</span>
                                     <span><i class="bx bx-map-pin"></i> ${e.ubicacion || 'Templo Principal'}</span>
                                     <span><i class="bx bx-calendar"></i> ${e.fecha || ''}</span>
@@ -856,7 +856,7 @@ function cargarEventos(c) {
                             </button>
                         </div>
                         ${APP_STATE.rol === 'admin' ? `
-                            <div style="margin-top:8px;">
+                            <div style="margin-block-start:8px;">
                                 <button class="btn-icon" onclick="eliminarEvento(${e.id})">
                                     <i class="bx bx-trash" style="color:var(--error);"></i>
                                 </button>
@@ -912,12 +912,12 @@ function cargarChat(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-chat"></i> Mensajes</h2>
-            <div class="card" style="height:400px;display:flex;flex-direction:column;">
+            <div class="card" style="block-size:400px;display:flex;flex-direction:column;">
                 <div style="flex:1;overflow-y:auto;padding:10px;" id="chat-messages">
                     ${APP_STATE.chat.length === 0 ? 
                         '<p style="text-align:center;color:var(--gris-texto);padding:20px;">No hay mensajes. ¡Envía el primero!</p>' :
                         APP_STATE.chat.map(m => `
-                            <div style="margin-bottom:8px;padding:8px 12px;border-radius:8px;${m.usuario_id === APP_STATE.usuario?.id ? 'background:var(--azul-surface);text-align:right;' : 'background:var(--gris-claro);'}">
+                            <div style="margin-block-end:8px;padding:8px 12px;border-radius:8px;${m.usuario_id === APP_STATE.usuario?.id ? 'background:var(--azul-surface);text-align:end;' : 'background:var(--gris-claro);'}">
                                 <strong style="font-size:0.75rem;">${m.usuario || 'Anónimo'}</strong>
                                 <p style="font-size:0.9rem;margin:2px 0;">${m.mensaje || ''}</p>
                                 <small style="color:var(--gris-texto);font-size:0.6rem;">${formatearFecha(m.fecha)}</small>
@@ -925,7 +925,7 @@ function cargarChat(c) {
                         `).join('')
                     }
                 </div>
-                <div style="display:flex;gap:8px;border-top:1px solid var(--gris-medio);padding:10px;">
+                <div style="display:flex;gap:8px;border-block-start:1px solid var(--gris-medio);padding:10px;">
                     <input type="text" class="form-input" id="chat-input" placeholder="Escribe un mensaje..." style="flex:1;">
                     <button class="btn-primary btn-sm" onclick="enviarMensaje()">
                         <i class="bx bx-send"></i>
@@ -975,10 +975,10 @@ function cargarDirectorio(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-group"></i> Directorio de Miembros</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-block-start:16px;">
                 ${miembros.map(m => `
                     <div class="card" style="text-align:center;padding:16px;">
-                        <div style="width:60px;height:60px;border-radius:50%;background:var(--azul-surface);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:1.5rem;color:var(--azul-primario);">
+                        <div style="inline-size:60px;block-size:60px;border-radius:50%;background:var(--azul-surface);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:1.5rem;color:var(--azul-primario);">
                             <i class="bx bx-user"></i>
                         </div>
                         <h4>${m.nombre || ''} ${m.apellidos || ''}</h4>
@@ -1001,7 +1001,7 @@ function cargarPeticiones(c) {
 
     c.innerHTML = `
         <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;flex-wrap:wrap;gap:8px;">
                 <h2><i class="bx bx-pray"></i> Peticiones de Oración</h2>
                 ${APP_STATE.usuario ? `
                     <button class="btn-primary btn-sm" onclick="crearPeticion()">
@@ -1012,12 +1012,12 @@ function cargarPeticiones(c) {
             ${APP_STATE.peticiones.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay peticiones</p></div>' :
                 APP_STATE.peticiones.map(p => `
-                    <div class="card" style="margin-bottom:12px;border-left:4px solid ${p.estado === 'activa' ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
+                    <div class="card" style="margin-block-end:12px;border-inline-start:4px solid ${p.estado === 'activa' ? 'var(--azul-primario)' : 'var(--gris-medio)'};">
                         <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
                             <div>
                                 <h4>${p.motivo || 'Petición'}</h4>
                                 <p style="color:var(--gris-texto);font-size:0.85rem;">${p.descripcion || ''}</p>
-                                <div style="display:flex;gap:12px;margin-top:4px;font-size:0.8rem;color:var(--gris-medio);">
+                                <div style="display:flex;gap:12px;margin-block-start:4px;font-size:0.8rem;color:var(--gris-medio);">
                                     <span><i class="bx bx-user"></i> ${p.nombre || p.usuario || 'Anónimo'}</span>
                                     <span><i class="bx bx-time"></i> ${formatearFecha(p.fecha)}</span>
                                     <span><i class="bx bx-pray"></i> ${p.oraciones || 0} oraciones</span>
@@ -1077,7 +1077,7 @@ function cargarEncuestas(c) {
 
     c.innerHTML = `
         <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;flex-wrap:wrap;gap:8px;">
                 <h2><i class="bx bx-poll"></i> Encuestas</h2>
                 ${APP_STATE.rol === 'admin' ? `
                     <button class="btn-primary btn-sm" onclick="crearEncuesta()">
@@ -1088,15 +1088,15 @@ function cargarEncuestas(c) {
             ${APP_STATE.encuestas.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay encuestas activas</p></div>' :
                 APP_STATE.encuestas.map(e => `
-                    <div class="card" style="margin-bottom:12px;border-left:4px solid ${e.activa ? 'var(--exito)' : 'var(--gris-medio)'};">
+                    <div class="card" style="margin-block-end:12px;border-inline-start:4px solid ${e.activa ? 'var(--exito)' : 'var(--gris-medio)'};">
                         <h3>${e.titulo || 'Encuesta'}</h3>
                         <p style="color:var(--gris-texto);font-size:0.85rem;">${Array.isArray(e.preguntas) ? e.preguntas.join(', ') : 'Sin preguntas'}</p>
-                        <div style="display:flex;gap:8px;margin-top:8px;font-size:0.8rem;color:var(--gris-medio);">
+                        <div style="display:flex;gap:8px;margin-block-start:8px;font-size:0.8rem;color:var(--gris-medio);">
                             <span>${e.activa ? 'Activa' : 'Cerrada'}</span>
                             <span>${formatearFecha(e.fecha)}</span>
                         </div>
                         ${e.activa ? `
-                            <button class="btn-primary btn-sm" style="margin-top:8px;" onclick="votarEncuesta(${e.id})">
+                            <button class="btn-primary btn-sm" style="margin-block-start:8px;" onclick="votarEncuesta(${e.id})">
                                 <i class="bx bx-check"></i> Participar
                             </button>
                         ` : ''}
@@ -1140,7 +1140,7 @@ function cargarBiblioteca(c) {
 
     c.innerHTML = `
         <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;flex-wrap:wrap;gap:8px;">
                 <h2><i class="bx bx-book-open"></i> Biblioteca Digital</h2>
                 ${APP_STATE.rol === 'admin' ? `
                     <button class="btn-primary btn-sm" onclick="agregarRecurso()">
@@ -1193,21 +1193,21 @@ function cargarGaleria(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-images"></i> Galería</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-block-start:16px;">
                 ${APP_STATE.galeria.length === 0 ? 
-                    '<div class="card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gris-texto);"><i class="bx bx-images" style="font-size:3rem;display:block;margin-bottom:8px;"></i>No hay imágenes en la galería</div>' :
+                    '<div class="card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gris-texto);"><i class="bx bx-images" style="font-size:3rem;display:block;margin-block-end:8px;"></i>No hay imágenes en la galería</div>' :
                     APP_STATE.galeria.map(g => `
                         <div class="card" style="padding:8px;text-align:center;">
-                            <div style="height:120px;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--gris-medio);">
+                            <div style="block-size:120px;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--gris-medio);">
                                 <i class="bx bx-image"></i>
                             </div>
-                            <p style="font-size:0.8rem;margin-top:4px;">${g.titulo || 'Imagen'}</p>
+                            <p style="font-size:0.8rem;margin-block-start:4px;">${g.titulo || 'Imagen'}</p>
                         </div>
                     `).join('')
                 }
             </div>
             ${APP_STATE.rol === 'admin' ? `
-                <button class="btn-primary btn-sm" style="margin-top:12px;width:100%;" onclick="agregarImagen()">
+                <button class="btn-primary btn-sm" style="margin-block-start:12px;inline-size:100%;" onclick="agregarImagen()">
                     <i class="bx bx-plus"></i> Agregar Imagen
                 </button>
             ` : ''}
@@ -1234,18 +1234,18 @@ function cargarDevocional(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-bible"></i> Devocional Diario</h2>
-            <div class="card" style="border-left:4px solid var(--dorado);text-align:center;padding:30px;">
+            <div class="card" style="border-inline-start:4px solid var(--dorado);text-align:center;padding:30px;">
                 <div style="font-style:italic;font-size:1.2rem;line-height:1.8;">
                     <p>"${v.texto}"</p>
-                    <p style="font-weight:700;color:var(--azul-primario);margin-top:12px;">${v.referencia}</p>
+                    <p style="font-weight:700;color:var(--azul-primario);margin-block-start:12px;">${v.referencia}</p>
                 </div>
-                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gris-medio);">
+                <div style="margin-block-start:16px;padding-block-start:16px;border-block-start:1px solid var(--gris-medio);">
                     <p style="color:var(--gris-texto);font-size:0.9rem;">
                         Reflexiona sobre la palabra de Dios y permite que transforme tu vida.
                     </p>
                 </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block-start:12px;">
                 <button class="btn-primary" onclick="compartirVersiculo()">
                     <i class="bx bx-share-alt"></i> Compartir
                 </button>
@@ -1267,7 +1267,7 @@ function cargarPerfil(c) {
                 <div class="card" style="text-align:center;padding:40px;">
                     <i class="bx bx-user-circle" style="font-size:4rem;color:var(--gris-medio);"></i>
                     <h3>Inicia sesión para ver tu perfil</h3>
-                    <button class="btn-primary" onclick="mostrarLogin()" style="margin-top:16px;">
+                    <button class="btn-primary" onclick="mostrarLogin()" style="margin-block-start:16px;">
                         <i class="bx bx-log-in"></i> Iniciar Sesión
                     </button>
                 </div>
@@ -1278,20 +1278,20 @@ function cargarPerfil(c) {
     const u = APP_STATE.usuario;
     c.innerHTML = `
         <div class="fade-in">
-            <div style="text-align:center;padding:30px;background:linear-gradient(135deg,var(--azul-primario),var(--azul-claro));color:white;border-radius:var(--borde-radius);margin-bottom:16px;">
+            <div style="text-align:center;padding:30px;background:linear-gradient(135deg,var(--azul-primario),var(--azul-claro));color:white;border-radius:var(--borde-radius);margin-block-end:16px;">
                 <img src="${u.foto || 'assets/avatars/default.png'}" 
-                     style="width:80px;height:80px;border-radius:50%;border:3px solid var(--dorado);object-fit:cover;">
+                     style="inline-size:80px;block-size:80px;border-radius:50%;border:3px solid var(--dorado);object-fit:cover;">
                 <h2>${u.nombre || ''} ${u.apellidos || ''}</h2>
                 <p style="opacity:0.9;">@${u.usuario || ''}</p>
-                ${u.verificado ? '<span style="background:var(--info);padding:4px 12px;border-radius:20px;font-size:0.8rem;display:inline-block;margin-top:4px;"><i class="bx bx-badge-check"></i> Verificado</span>' : ''}
-                <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+                ${u.verificado ? '<span style="background:var(--info);padding:4px 12px;border-radius:20px;font-size:0.8rem;display:inline-block;margin-block-start:4px;"><i class="bx bx-badge-check"></i> Verificado</span>' : ''}
+                <div style="display:flex;gap:8px;justify-content:center;margin-block-start:8px;flex-wrap:wrap;">
                     <span class="badge" style="background:rgba(255,255,255,0.2);">${u.ministerio || 'General'}</span>
                     <span class="badge" style="background:rgba(255,255,255,0.2);">${APP_STATE.rol === 'admin' ? 'Administrador' : 'Miembro'}</span>
                 </div>
             </div>
             <div class="card">
                 <h3>Información Personal</h3>
-                <div style="display:grid;gap:8px;margin-top:8px;">
+                <div style="display:grid;gap:8px;margin-block-start:8px;">
                     <p><strong><i class="bx bx-envelope"></i> Correo:</strong> ${u.correo || 'No registrado'}</p>
                     <p><strong><i class="bx bx-phone"></i> Celular:</strong> ${u.celular || 'No registrado'}</p>
                     <p><strong><i class="bx bx-calendar"></i> Fecha Nac.:</strong> ${u.fecha_nacimiento || 'No registrada'}</p>
@@ -1299,7 +1299,7 @@ function cargarPerfil(c) {
                     <p><strong><i class="bx bx-document"></i> Documento:</strong> ${u.documento || 'No registrado'}</p>
                 </div>
             </div>
-            <div class="card" style="margin-top:12px;border-left:4px solid var(--error);">
+            <div class="card" style="margin-block-start:12px;border-inline-start:4px solid var(--error);">
                 <h3 style="color:var(--error);">Acciones</h3>
                 <button class="btn-danger btn-sm" onclick="confirmarAccion('¿Cerrar sesión?','Serás redirigido al inicio.',cerrarSesion,'danger')">
                     <i class="bx bx-log-out"></i> Cerrar Sesión
@@ -1319,7 +1319,7 @@ function cargarPodcast(c) {
 
     c.innerHTML = `
         <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;flex-wrap:wrap;gap:8px;">
                 <h2><i class="bx bx-microphone"></i> Podcast</h2>
                 ${APP_STATE.rol === 'admin' ? `
                     <button class="btn-primary btn-sm" onclick="agregarPodcast()">
@@ -1330,12 +1330,12 @@ function cargarPodcast(c) {
             ${APP_STATE.podcast.length === 0 ? 
                 '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay episodios de podcast</p></div>' :
                 APP_STATE.podcast.map(p => `
-                    <div class="card" style="margin-bottom:12px;border-left:4px solid var(--info);">
+                    <div class="card" style="margin-block-end:12px;border-inline-start:4px solid var(--info);">
                         <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
                             <div>
                                 <h3>${p.titulo || 'Episodio'}</h3>
                                 <p style="color:var(--gris-texto);font-size:0.85rem;">${p.pastor || 'Pastor'}</p>
-                                <div style="display:flex;gap:12px;margin-top:4px;font-size:0.8rem;color:var(--gris-medio);">
+                                <div style="display:flex;gap:12px;margin-block-start:4px;font-size:0.8rem;color:var(--gris-medio);">
                                     <span><i class="bx bx-time"></i> ${p.duracion || '30 min'}</span>
                                     <span><i class="bx bx-calendar"></i> ${formatearFecha(p.fecha)}</span>
                                 </div>
@@ -1389,28 +1389,28 @@ function cargarAnalytics(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-bar-chart-alt-2"></i> Analytics</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px;">
-                <div class="card" style="text-align:center;border-left:4px solid var(--azul-primario);">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-block-start:16px;">
+                <div class="card" style="text-align:center;border-inline-start:4px solid var(--azul-primario);">
                     <p style="font-size:2rem;font-weight:700;color:var(--azul-primario);">${totalMiembros}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Miembros</p>
                 </div>
-                <div class="card" style="text-align:center;border-left:4px solid var(--dorado);">
+                <div class="card" style="text-align:center;border-inline-start:4px solid var(--dorado);">
                     <p style="font-size:2rem;font-weight:700;color:var(--dorado);">${totalPublicaciones}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Publicaciones</p>
                 </div>
-                <div class="card" style="text-align:center;border-left:4px solid var(--info);">
+                <div class="card" style="text-align:center;border-inline-start:4px solid var(--info);">
                     <p style="font-size:2rem;font-weight:700;color:var(--info);">${totalEventos}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Eventos</p>
                 </div>
-                <div class="card" style="text-align:center;border-left:4px solid var(--exito);">
+                <div class="card" style="text-align:center;border-inline-start:4px solid var(--exito);">
                     <p style="font-size:2rem;font-weight:700;color:var(--exito);">${totalAsistencias}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Asistencias</p>
                 </div>
-                <div class="card" style="text-align:center;border-left:4px solid var(--advertencia);">
+                <div class="card" style="text-align:center;border-inline-start:4px solid var(--advertencia);">
                     <p style="font-size:2rem;font-weight:700;color:var(--advertencia);">${totalPeticiones}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Peticiones</p>
                 </div>
-                <div class="card" style="text-align:center;border-left:4px solid var(--error);">
+                <div class="card" style="text-align:center;border-inline-start:4px solid var(--error);">
                     <p style="font-size:2rem;font-weight:700;color:var(--error);">${APP_STATE.notificacionesNoLeidas || 0}</p>
                     <p style="color:var(--gris-texto);font-size:0.8rem;">Notificaciones</p>
                 </div>
@@ -1428,7 +1428,7 @@ function cargarConfiguracion(c) {
             <h2><i class="bx bx-cog"></i> Configuración</h2>
             <div class="card">
                 <h3>Apariencia</h3>
-                <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-block-start:8px;">
                     <button class="btn-secondary btn-sm" onclick="toggleTema()">
                         <i class="bx ${APP_STATE.tema === 'dark' ? 'bx-sun' : 'bx-moon'}"></i> 
                         ${APP_STATE.tema === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
@@ -1438,9 +1438,9 @@ function cargarConfiguracion(c) {
                     </span>
                 </div>
             </div>
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Idioma</h3>
-                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <div style="display:flex;gap:8px;margin-block-start:8px;flex-wrap:wrap;">
                     ${['es','en','pt','fr','de','it'].map(l => `
                         <button class="btn-outline btn-sm ${APP_STATE.idioma === l ? 'active' : ''}" onclick="cambiarIdioma('${l}')">
                             <i class="bx bx-flag-alt"></i> ${l.toUpperCase()}
@@ -1448,14 +1448,14 @@ function cargarConfiguracion(c) {
                     `).join('')}
                 </div>
             </div>
-            <div class="card" style="margin-top:12px;">
+            <div class="card" style="margin-block-start:12px;">
                 <h3>Acerca de</h3>
                 <p style="color:var(--gris-texto);"><strong>IPUC LA FONDA</strong> v${CONFIG.VERSION}</p>
                 <p style="color:var(--gris-texto);">"Where the Holy Spirit moves"</p>
-                <p style="color:var(--gris-texto);font-size:0.8rem;margin-top:4px;">&copy; 2026 IPUC LA FONDA - International Ministry</p>
+                <p style="color:var(--gris-texto);font-size:0.8rem;margin-block-start:4px;">&copy; 2026 IPUC LA FONDA - International Ministry</p>
             </div>
             ${APP_STATE.usuario ? `
-                <div class="card" style="margin-top:12px;border-left:4px solid var(--error);">
+                <div class="card" style="margin-block-start:12px;border-inline-start:4px solid var(--error);">
                     <h3 style="color:var(--error);">Zona de Riesgo</h3>
                     <button class="btn-danger btn-sm" onclick="confirmarAccion('¿Cerrar sesión?','Serás redirigido al inicio.',cerrarSesion,'danger')">
                         <i class="bx bx-log-out"></i> Cerrar Sesión
@@ -1473,9 +1473,9 @@ function cargarDashboard(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-line-chart"></i> Dashboard</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-block-end:16px;">
                 ${['usuarios', 'publicaciones', 'eventos', 'asistencias', 'peticiones', 'notificaciones'].map(key => `
-                    <div class="card" style="text-align:center;border-left:4px solid var(--azul-primario);">
+                    <div class="card" style="text-align:center;border-inline-start:4px solid var(--azul-primario);">
                         <p style="font-size:2rem;font-weight:700;color:var(--azul-primario);">0</p>
                         <p style="color:var(--gris-texto);font-size:0.8rem;">${key.charAt(0).toUpperCase() + key.slice(1)}</p>
                     </div>
@@ -1527,7 +1527,7 @@ function cargarSistema(c) {
             <h2><i class="bx bx-server"></i> Sistema</h2>
             <div class="card">
                 <h3>Información del Sistema</h3>
-                <div style="display:grid;gap:8px;margin-top:8px;">
+                <div style="display:grid;gap:8px;margin-block-start:8px;">
                     <p><strong>Versión:</strong> ${CONFIG.VERSION}</p>
                     <p><strong>Estado:</strong> ${APP_STATE.isOnline ? 'Conectado' : 'Desconectado'}</p>
                     <p><strong>Usuario:</strong> ${APP_STATE.usuario?.nombre || 'No autenticado'}</p>
@@ -1546,18 +1546,18 @@ function cargarSeguridad(c) {
             <h2><i class="bx bx-shield"></i> Seguridad</h2>
             <div class="card">
                 <h3>Configuración de Seguridad</h3>
-                <div style="display:grid;gap:12px;margin-top:8px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gris-medio);">
+                <div style="display:grid;gap:12px;margin-block-start:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-block-end:1px solid var(--gris-medio);">
                         <span>Autenticación Biométrica</span>
                         <span class="badge ${window.PublicKeyCredential ? 'badge-success' : 'badge-error'}">
                             ${window.PublicKeyCredential ? 'Disponible' : 'No disponible'}
                         </span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gris-medio);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-block-end:1px solid var(--gris-medio);">
                         <span>Conexión Segura (SSL)</span>
                         <span class="badge badge-success">Activada</span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gris-medio);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-block-end:1px solid var(--gris-medio);">
                         <span>Protección contra Fuerza Bruta</span>
                         <span class="badge badge-success">Activada</span>
                     </div>
@@ -1579,7 +1579,7 @@ function cargarPublicaciones(c) {
         <div class="fade-in">
             <h2><i class="bx bx-news"></i> Publicaciones</h2>
             ${APP_STATE.usuario ? `
-                <div class="card" style="margin-bottom:16px;">
+                <div class="card" style="margin-block-end:16px;">
                     <h3>Crear Publicación</h3>
                     <form id="form-publicacion">
                         <div class="form-group">
@@ -1596,9 +1596,9 @@ function cargarPublicaciones(c) {
                     </form>
                 </div>
             ` : `
-                <div class="card" style="margin-bottom:16px;text-align:center;padding:20px;">
+                <div class="card" style="margin-block-end:16px;text-align:center;padding:20px;">
                     <p><i class="bx bx-lock-alt"></i> Inicia sesión para publicar</p>
-                    <button class="btn-primary btn-sm" onclick="mostrarLogin()" style="margin-top:8px;">
+                    <button class="btn-primary btn-sm" onclick="mostrarLogin()" style="margin-block-start:8px;">
                         <i class="bx bx-log-in"></i> Iniciar Sesión
                     </button>
                 </div>
@@ -1607,12 +1607,12 @@ function cargarPublicaciones(c) {
                 ${pub.length === 0 ? `
                     <div class="card" style="text-align:center;padding:40px;">
                         <i class="bx bx-news" style="font-size:3rem;color:var(--gris-medio);"></i>
-                        <p style="margin-top:12px;color:var(--gris-texto);">No hay publicaciones aún. ¡Sé el primero en publicar!</p>
+                        <p style="margin-block-start:12px;color:var(--gris-texto);">No hay publicaciones aún. ¡Sé el primero en publicar!</p>
                     </div>
                 ` : pub.map(p => `
-                    <div class="card" style="margin-bottom:12px;" id="pub-${p.id}">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                            <img src="${p.foto_autor || 'assets/avatars/default.png'}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                    <div class="card" style="margin-block-end:12px;" id="pub-${p.id}">
+                        <div style="display:flex;align-items:center;gap:10px;margin-block-end:12px;">
+                            <img src="${p.foto_autor || 'assets/avatars/default.png'}" style="inline-size:40px;block-size:40px;border-radius:50%;object-fit:cover;">
                             <div style="flex:1;">
                                 <strong>${p.autor || 'Anónimo'} ${p.verificado ? '<i class="bx bx-badge-check" style="color:var(--info);"></i>' : ''}</strong>
                                 <p style="font-size:0.75rem;color:var(--gris-texto);">
@@ -1625,8 +1625,8 @@ function cargarPublicaciones(c) {
                                 </button>
                             ` : ''}
                         </div>
-                        <p style="margin-bottom:12px;white-space:pre-wrap;">${p.contenido || ''}</p>
-                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;padding:8px 0;border-top:1px solid var(--gris-medio);border-bottom:1px solid var(--gris-medio);">
+                        <p style="margin-block-end:12px;white-space:pre-wrap;">${p.contenido || ''}</p>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-block-end:12px;padding:8px 0;border-block-start:1px solid var(--gris-medio);border-block-end:1px solid var(--gris-medio);">
                             ${CONFIG.REACCIONES_TIPOS.map(r => `
                                 <button onclick="toggleReaccion(${p.id},'${r.clave}')" 
                                         style="padding:6px 10px;border-radius:20px;border:1px solid ${APP_STATE.reacciones[`${p.id}_${APP_STATE.usuario?.id}`] === r.clave ? 'var(--azul-primario)' : 'var(--gris-medio)'};
@@ -1644,7 +1644,7 @@ function cargarPublicaciones(c) {
                                     <i class="bx bx-send"></i>
                                 </button>
                             </div>
-                            <div id="comentarios-${p.id}" style="margin-top:8px;"></div>
+                            <div id="comentarios-${p.id}" style="margin-block-start:8px;"></div>
                         ` : ''}
                     </div>
                 `).join('')}
@@ -1778,16 +1778,16 @@ function mostrarLogin() {
                 <label>Contraseña</label>
                 <div style="position:relative;">
                     <input type="password" class="form-input" id="login-password" placeholder="Ingresa tu contraseña" required>
-                    <button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;">
+                    <button type="button" class="btn-icon" onclick="togglePassword('login-password')" style="position:absolute;inset-inline-end:8px;inset-block-start:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;">
                         <i class="bx bx-show"></i>
                     </button>
                 </div>
             </div>
-            <button type="submit" class="btn-primary" style="width:100%;">
+            <button type="submit" class="btn-primary" style="inline-size:100%;">
                 <i class="bx bx-log-in"></i> Iniciar Sesión
             </button>
         </form>
-        <p style="text-align:center;margin-top:16px;">
+        <p style="text-align:center;margin-block-start:16px;">
             <a href="#" onclick="mostrarRegistro()" style="color:var(--azul-primario);text-decoration:none;">
                 ¿No tienes cuenta? Regístrate aquí
             </a>
@@ -1860,11 +1860,11 @@ function mostrarRegistro() {
             </div>
             <div class="form-group"><label>Usuario *</label><input type="text" class="form-input" name="usuario" required minlength="3"></div>
             <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" name="password" required minlength="8"></div>
-            <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">
+            <button type="submit" class="btn-primary" style="inline-size:100%;margin-block-start:8px;">
                 <i class="bx bx-user-plus"></i> Crear Cuenta
             </button>
         </form>
-        <p style="text-align:center;margin-top:16px;">
+        <p style="text-align:center;margin-block-start:16px;">
             <a href="#" onclick="mostrarLogin()" style="color:var(--azul-primario);text-decoration:none;">
                 ¿Ya tienes cuenta? Inicia sesión
             </a>

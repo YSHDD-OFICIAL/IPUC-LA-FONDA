@@ -533,17 +533,17 @@ self.addEventListener('fetch', (event) => {
                                     display: flex;
                                     justify-content: center;
                                     align-items: center;
-                                    min-height: 100vh;
+                                    min-block-size: 100vh;
                                     background: linear-gradient(135deg, #0d1b5e, #1a237e, #283593);
                                     color: #ffffff;
                                     text-align: center;
                                     padding: 20px;
                                 }
-                                .offline-container { max-width: 400px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 24px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-                                .offline-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.6; }
-                                .offline-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
-                                .offline-subtitle { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
-                                .offline-text { color: rgba(255,255,255,0.6); margin-bottom: 24px; line-height: 1.6; font-size: 0.95rem; }
+                                .offline-container { max-inline-size: 400px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 24px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+                                .offline-icon { font-size: 4rem; margin-block-end: 16px; opacity: 0.6; }
+                                .offline-title { font-size: 1.8rem; font-weight: 700; margin-block-end: 8px; }
+                                .offline-subtitle { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-block-end: 8px; }
+                                .offline-text { color: rgba(255,255,255,0.6); margin-block-end: 24px; line-height: 1.6; font-size: 0.95rem; }
                                 .offline-actions { display: flex; flex-direction: column; gap: 10px; }
                                 .btn-retry {
                                     background: #ffd700;
@@ -570,10 +570,10 @@ self.addEventListener('fetch', (event) => {
                                     font-family: inherit;
                                 }
                                 .btn-offline:hover { background: rgba(255,255,255,0.15); }
-                                .offline-version { margin-top: 16px; font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+                                .offline-version { margin-block-start: 16px; font-size: 0.7rem; color: rgba(255,255,255,0.3); }
                                 .offline-pulse { animation: pulse 2s ease-in-out infinite; }
                                 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-                                @media (max-width: 480px) {
+                                @media (max-inline-size: 480px) {
                                     .offline-container { padding: 20px; }
                                     .offline-title { font-size: 1.4rem; }
                                     .offline-icon { font-size: 3rem; }
