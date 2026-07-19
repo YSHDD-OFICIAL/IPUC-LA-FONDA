@@ -1,11 +1,7 @@
 <!-- ============================================
-IPUC LA FONDA v15.0 PRO ULTIMATE - WEB APP DE CLASE MUNDIAL
+IPUC LA FONDA v15.0 PRO ULTIMATE - CORREGIDO
 Iglesia Pentecostal Unida de Colombia
 "Where the Holy Spirit moves"
-Sistema completo con IA, Analytics, Música, Tienda, Donaciones
-Autenticación biométrica y seguridad de nivel bancario
-OPTIMIZADO - ESCALABLE - 100% OPERATIVO
-VERSIÓN PROFESIONAL COMPLETA
 ============================================ -->
 <!DOCTYPE html>
 <html lang="es-CO">
@@ -498,7 +494,8 @@ VERSIÓN PROFESIONAL COMPLETA
                 <div class="music-player-progress">
                     <span class="music-time" id="music-current-time">0:00</span>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="music-progress" style="inline-size:0%"></div>
+                        <!-- ✅ CORREGIDO: inline-size → width -->
+                        <div class="progress-fill" id="music-progress" style="width:0%"></div>
                     </div>
                     <span class="music-time" id="music-duration">0:00</span>
                 </div>
@@ -566,7 +563,8 @@ VERSIÓN PROFESIONAL COMPLETA
             </div>
             <div class="mini-player-progress">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="mini-progress" style="inline-size:0%"></div>
+                    <!-- ✅ CORREGIDO: inline-size → width -->
+                    <div class="progress-fill" id="mini-progress" style="width:0%"></div>
                 </div>
             </div>
         </div>
