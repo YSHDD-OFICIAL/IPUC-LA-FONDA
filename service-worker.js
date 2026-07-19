@@ -133,7 +133,7 @@ function shouldCache(url) {
 }
 
 function matchPattern(url, patterns) {
-    return patterns.some(pattern => {
+    return patterns.some(function(pattern) {
         if (typeof pattern === 'string') {
             return url.includes(pattern);
         }
@@ -170,60 +170,68 @@ function getMaxAgeForCache(cacheName) {
 // ============================================
 // INSTALACIÓN
 // ============================================
-self.addEventListener('install', (event) => {
+self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(async (cache) => {
-                const results = [];
-                const total = PRECACHE_ASSETS.length;
-                let completed = 0;
+            .then(function(cache) {
+                var results = [];
+                var total = PRECACHE_ASSETS.length;
+                var completed = 0;
                 
-                for (const url of PRECACHE_ASSETS) {
-                    try {
-                        const response = await fetch(url, { 
-                            mode: 'no-cors', 
-                            cache: 'no-cache',
-                            headers: { 
-                                'Cache-Control': 'no-cache',
-                                'Pragma': 'no-cache'
-                            }
-                        });
-                        
-                        if (response && (response.status === 200 || response.type === 'opaque')) {
-                            await cache.put(url, response);
-                            results.push({ url, success: true });
-                        } else {
-                            results.push({ url, success: false, status: response?.status });
+                for (var i = 0; i < PRECACHE_ASSETS.length; i++) {
+                    var url = PRECACHE_ASSETS[i];
+                    (function(url) {
+                        try {
+                            fetch(url, { 
+                                mode: 'no-cors', 
+                                cache: 'no-cache',
+                                headers: { 
+                                    'Cache-Control': 'no-cache',
+                                    'Pragma': 'no-cache'
+                                }
+                            })
+                            .then(function(response) {
+                                if (response && (response.status === 200 || response.type === 'opaque')) {
+                                    cache.put(url, response);
+                                    results.push({ url: url, success: true });
+                                } else {
+                                    results.push({ url: url, success: false, status: response ? response.status : null });
+                                }
+                                completed++;
+                                if (completed % Math.ceil(total / 10) === 0 || completed === total) {
+                                    self.clients.matchAll({ type: 'window' }).then(function(clients) {
+                                        for (var j = 0; j < clients.length; j++) {
+                                            try {
+                                                clients[j].postMessage({
+                                                    type: 'SW_INSTALL_PROGRESS',
+                                                    progress: Math.round((completed / total) * 100),
+                                                    total: total,
+                                                    completed: completed
+                                                });
+                                            } catch {}
+                                        }
+                                    });
+                                }
+                            })
+                            .catch(function() {
+                                results.push({ url: url, success: false });
+                                completed++;
+                            });
+                        } catch {
+                            results.push({ url: url, success: false });
+                            completed++;
                         }
-                    } catch (error) {
-                        results.push({ url, success: false, error: error.message });
-                    }
-                    
-                    completed++;
-                    // Notificar progreso cada 10%
-                    if (completed % Math.ceil(total / 10) === 0 || completed === total) {
-                        const clients = await self.clients.matchAll({ type: 'window' });
-                        for (const client of clients) {
-                            try {
-                                client.postMessage({
-                                    type: 'SW_INSTALL_PROGRESS',
-                                    progress: Math.round((completed / total) * 100),
-                                    total,
-                                    completed
-                                });
-                            } catch {}
-                        }
-                    }
+                    })(url);
                 }
                 
-                const failed = results.filter(r => !r.success);
+                var failed = results.filter(function(r) { return !r.success; });
                 if (failed.length > 0) {
-                    console.warn(`SW: ${failed.length} assets failed to cache`);
+                    console.warn('SW: ' + failed.length + ' assets failed to cache');
                 }
                 
                 return self.skipWaiting();
             })
-            .catch((error) => {
+            .catch(function(error) {
                 console.error('SW: Install error', error);
                 return self.skipWaiting();
             })
@@ -233,8 +241,8 @@ self.addEventListener('install', (event) => {
 // ============================================
 // ACTIVACIÓN
 // ============================================
-self.addEventListener('activate', (event) => {
-    const CURRENT_CACHES = [
+self.addEventListener('activate', function(event) {
+    var CURRENT_CACHES = [
         CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE, 
         API_CACHE, OFFLINE_CACHE, AUDIO_CACHE, 
         VIDEO_CACHE, FONT_CACHE
@@ -242,49 +250,52 @@ self.addEventListener('activate', (event) => {
 
     event.waitUntil(
         caches.keys()
-            .then((cacheNames) => {
+            .then(function(cacheNames) {
                 return Promise.all(
-                    cacheNames.map((cacheName) => {
-                        if (!CURRENT_CACHES.includes(cacheName)) {
+                    cacheNames.map(function(cacheName) {
+                        if (CURRENT_CACHES.indexOf(cacheName) === -1) {
                             return caches.delete(cacheName)
-                                .then(() => {
-                                    console.log(`SW: Cache eliminado: ${cacheName}`);
+                                .then(function() {
+                                    console.log('SW: Cache eliminado: ' + cacheName);
                                 })
-                                .catch(() => {});
+                                .catch(function() {});
                         }
                     })
                 );
             })
-            .then(async () => {
+            .then(function() {
                 // Crear cachés necesarios
-                for (const cache of CURRENT_CACHES) {
-                    try {
-                        await caches.open(cache);
-                    } catch {}
+                for (var i = 0; i < CURRENT_CACHES.length; i++) {
+                    (function(cache) {
+                        try {
+                            caches.open(cache);
+                        } catch {}
+                    })(CURRENT_CACHES[i]);
                 }
                 
                 // Notificar a clientes
-                const clients = await self.clients.matchAll({ 
+                self.clients.matchAll({ 
                     type: 'window',
                     includeUncontrolled: true 
+                }).then(function(clients) {
+                    for (var j = 0; j < clients.length; j++) {
+                        try {
+                            clients[j].postMessage({
+                                type: 'SW_ACTIVATED',
+                                version: VERSION,
+                                timestamp: Date.now(),
+                                cacheName: CACHE_NAME,
+                                caches: CURRENT_CACHES
+                            });
+                        } catch {}
+                    }
                 });
-                for (const client of clients) {
-                    try {
-                        client.postMessage({
-                            type: 'SW_ACTIVATED',
-                            version: VERSION,
-                            timestamp: Date.now(),
-                            cacheName: CACHE_NAME,
-                            caches: CURRENT_CACHES
-                        });
-                    } catch {}
-                }
                 return self.clients.claim();
             })
-            .then(() => {
-                console.log(`SW: Activado v${VERSION}`);
+            .then(function() {
+                console.log('SW: Activado v' + VERSION);
             })
-            .catch((error) => {
+            .catch(function(error) {
                 console.error('SW: Activation error', error);
             })
     );
@@ -293,10 +304,12 @@ self.addEventListener('activate', (event) => {
 // ============================================
 // FETCH - ESTRATEGIAS DE CACHÉ AVANZADAS
 // ============================================
-self.addEventListener('fetch', (event) => {
-    const { request } = event;
-    const url = new URL(request.url);
-    const { pathname, origin, search } = url;
+self.addEventListener('fetch', function(event) {
+    var request = event.request;
+    var url = new URL(request.url);
+    var pathname = url.pathname;
+    var origin = url.origin;
+    var search = url.search;
 
     // No interceptar solicitudes a otros orígenes (excepto CDNs)
     if (origin !== self.location.origin && 
@@ -317,48 +330,54 @@ self.addEventListener('fetch', (event) => {
     // ============================================
     if (matchPattern(pathname, CACHE_PATTERNS.images)) {
         event.respondWith(
-            caches.open(IMAGE_CACHE).then(async (cache) => {
-                const cached = await cache.match(request);
-                if (cached) {
-                    const cacheTime = cached.headers.get('x-cache-time');
-                    if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_IMAGE_AGE * 1000)) {
-                        // Devolver caché y actualizar en segundo plano
-                        fetch(request).then(async (response) => {
-                            if (response && response.ok) {
-                                const headers = new Headers(response.headers);
+            caches.open(IMAGE_CACHE).then(function(cache) {
+                return cache.match(request).then(function(cached) {
+                    if (cached) {
+                        var cacheTime = cached.headers.get('x-cache-time');
+                        if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_IMAGE_AGE * 1000)) {
+                            // Devolver caché y actualizar en segundo plano
+                            fetch(request).then(function(response) {
+                                if (response && response.ok) {
+                                    var headers = new Headers(response.headers);
+                                    headers.set('x-cache-time', Date.now().toString());
+                                    var responseToCache = new Response(response.body, {
+                                        status: response.status,
+                                        statusText: response.statusText,
+                                        headers: headers
+                                    });
+                                    cache.put(request, responseToCache);
+                                }
+                            }).catch(function() {});
+                            return cached;
+                        }
+                    }
+                    
+                    try {
+                        return fetch(request).then(function(networkResponse) {
+                            if (networkResponse && networkResponse.ok) {
+                                var headers = new Headers(networkResponse.headers);
                                 headers.set('x-cache-time', Date.now().toString());
-                                const responseToCache = new Response(response.body, {
-                                    status: response.status,
-                                    statusText: response.statusText,
+                                var responseToCache = new Response(networkResponse.body, {
+                                    status: networkResponse.status,
+                                    statusText: networkResponse.statusText,
                                     headers: headers
                                 });
-                                await cache.put(request, responseToCache);
+                                cache.put(request, responseToCache.clone());
+                                return responseToCache;
                             }
-                        }).catch(() => {});
-                        return cached;
-                    }
-                }
-                
-                try {
-                    const networkResponse = await fetch(request);
-                    if (networkResponse && networkResponse.ok) {
-                        const headers = new Headers(networkResponse.headers);
-                        headers.set('x-cache-time', Date.now().toString());
-                        const responseToCache = new Response(networkResponse.body, {
-                            status: networkResponse.status,
-                            statusText: networkResponse.statusText,
-                            headers: headers
+                            throw new Error('Network response no válida');
+                        }).catch(function() {
+                            if (cached) return cached;
+                            // Fallback a imagen por defecto
+                            return caches.match('/assets/icons/icon-192x192.png') || 
+                                   new Response('', { status: 404 });
                         });
-                        await cache.put(request, responseToCache.clone());
-                        return responseToCache;
+                    } catch {
+                        if (cached) return cached;
+                        return caches.match('/assets/icons/icon-192x192.png') || 
+                               new Response('', { status: 404 });
                     }
-                    throw new Error('Network response no válida');
-                } catch {
-                    if (cached) return cached;
-                    // Fallback a imagen por defecto
-                    return caches.match('/assets/icons/icon-192x192.png') || 
-                           new Response('', { status: 404 });
-                }
+                });
             })
         );
         return;
@@ -369,29 +388,34 @@ self.addEventListener('fetch', (event) => {
     // ============================================
     if (matchPattern(pathname, CACHE_PATTERNS.audio)) {
         event.respondWith(
-            caches.open(AUDIO_CACHE).then(async (cache) => {
-                const cached = await cache.match(request);
-                if (cached) {
-                    const cacheTime = cached.headers.get('x-cache-time');
-                    if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_AUDIO_AGE * 1000)) {
-                        return cached;
+            caches.open(AUDIO_CACHE).then(function(cache) {
+                return cache.match(request).then(function(cached) {
+                    if (cached) {
+                        var cacheTime = cached.headers.get('x-cache-time');
+                        if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_AUDIO_AGE * 1000)) {
+                            return cached;
+                        }
                     }
-                }
-                try {
-                    const response = await fetch(request);
-                    if (response && response.ok) {
-                        const headers = new Headers(response.headers);
-                        headers.set('x-cache-time', Date.now().toString());
-                        const responseToCache = new Response(response.body, {
-                            status: response.status,
-                            statusText: response.statusText,
-                            headers: headers
+                    try {
+                        return fetch(request).then(function(response) {
+                            if (response && response.ok) {
+                                var headers = new Headers(response.headers);
+                                headers.set('x-cache-time', Date.now().toString());
+                                var responseToCache = new Response(response.body, {
+                                    status: response.status,
+                                    statusText: response.statusText,
+                                    headers: headers
+                                });
+                                cache.put(request, responseToCache.clone());
+                                return responseToCache;
+                            }
+                        }).catch(function() {
+                            return cached || new Response('', { status: 404 });
                         });
-                        await cache.put(request, responseToCache.clone());
-                        return responseToCache;
+                    } catch {
+                        return cached || new Response('', { status: 404 });
                     }
-                } catch {}
-                return cached || new Response('', { status: 404 });
+                });
             })
         );
         return;
@@ -402,29 +426,34 @@ self.addEventListener('fetch', (event) => {
     // ============================================
     if (matchPattern(pathname, CACHE_PATTERNS.video)) {
         event.respondWith(
-            caches.open(VIDEO_CACHE).then(async (cache) => {
-                const cached = await cache.match(request);
-                if (cached) {
-                    const cacheTime = cached.headers.get('x-cache-time');
-                    if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_VIDEO_AGE * 1000)) {
-                        return cached;
+            caches.open(VIDEO_CACHE).then(function(cache) {
+                return cache.match(request).then(function(cached) {
+                    if (cached) {
+                        var cacheTime = cached.headers.get('x-cache-time');
+                        if (cacheTime && (Date.now() - parseInt(cacheTime)) < (MAX_VIDEO_AGE * 1000)) {
+                            return cached;
+                        }
                     }
-                }
-                try {
-                    const response = await fetch(request);
-                    if (response && response.ok) {
-                        const headers = new Headers(response.headers);
-                        headers.set('x-cache-time', Date.now().toString());
-                        const responseToCache = new Response(response.body, {
-                            status: response.status,
-                            statusText: response.statusText,
-                            headers: headers
+                    try {
+                        return fetch(request).then(function(response) {
+                            if (response && response.ok) {
+                                var headers = new Headers(response.headers);
+                                headers.set('x-cache-time', Date.now().toString());
+                                var responseToCache = new Response(response.body, {
+                                    status: response.status,
+                                    statusText: response.statusText,
+                                    headers: headers
+                                });
+                                cache.put(request, responseToCache.clone());
+                                return responseToCache;
+                            }
+                        }).catch(function() {
+                            return cached || new Response('', { status: 404 });
                         });
-                        await cache.put(request, responseToCache.clone());
-                        return responseToCache;
+                    } catch {
+                        return cached || new Response('', { status: 404 });
                     }
-                } catch {}
-                return cached || new Response('', { status: 404 });
+                });
             })
         );
         return;
@@ -435,24 +464,29 @@ self.addEventListener('fetch', (event) => {
     // ============================================
     if (matchPattern(pathname, CACHE_PATTERNS.fonts)) {
         event.respondWith(
-            caches.open(FONT_CACHE).then(async (cache) => {
-                const cached = await cache.match(request);
-                if (cached) {
-                    fetch(request).then(async (response) => {
-                        if (response && response.ok) {
-                            await cache.put(request, response);
-                        }
-                    }).catch(() => {});
-                    return cached;
-                }
-                try {
-                    const response = await fetch(request);
-                    if (response && response.ok) {
-                        await cache.put(request, response.clone());
-                        return response;
+            caches.open(FONT_CACHE).then(function(cache) {
+                return cache.match(request).then(function(cached) {
+                    if (cached) {
+                        fetch(request).then(function(response) {
+                            if (response && response.ok) {
+                                cache.put(request, response);
+                            }
+                        }).catch(function() {});
+                        return cached;
                     }
-                } catch {}
-                return cached || new Response('', { status: 404 });
+                    try {
+                        return fetch(request).then(function(response) {
+                            if (response && response.ok) {
+                                cache.put(request, response.clone());
+                                return response;
+                            }
+                        }).catch(function() {
+                            return cached || new Response('', { status: 404 });
+                        });
+                    } catch {
+                        return cached || new Response('', { status: 404 });
+                    }
+                });
             })
         );
         return;
@@ -464,34 +498,36 @@ self.addEventListener('fetch', (event) => {
     if (matchPattern(pathname, CACHE_PATTERNS.api)) {
         event.respondWith(
             fetch(request)
-                .then(async (response) => {
+                .then(function(response) {
                     if (response && response.ok) {
-                        const cache = await caches.open(API_CACHE);
-                        const responseToCache = response.clone();
-                        cache.put(request, responseToCache);
+                        caches.open(API_CACHE).then(function(cache) {
+                            var responseToCache = response.clone();
+                            cache.put(request, responseToCache);
+                        });
                         return response;
                     }
                     throw new Error('Network response no válida');
                 })
-                .catch(async () => {
-                    const cached = await caches.match(request);
-                    if (cached) return cached;
-                    return new Response(
-                        JSON.stringify({
-                            error: true,
-                            mensaje: 'Sin conexión a internet',
-                            offline: true,
-                            timestamp: Date.now(),
-                            version: VERSION
-                        }),
-                        {
-                            status: 503,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Offline': 'true'
+                .catch(function() {
+                    return caches.match(request).then(function(cached) {
+                        if (cached) return cached;
+                        return new Response(
+                            JSON.stringify({
+                                error: true,
+                                mensaje: 'Sin conexión a internet',
+                                offline: true,
+                                timestamp: Date.now(),
+                                version: VERSION
+                            }),
+                            {
+                                status: 503,
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Offline': 'true'
+                                }
                             }
-                        }
-                    );
+                        );
+                    });
                 })
         );
         return;
@@ -503,110 +539,113 @@ self.addEventListener('fetch', (event) => {
     if (request.mode === 'navigate' || matchPattern(pathname, CACHE_PATTERNS.html)) {
         event.respondWith(
             fetch(request)
-                .then(async (response) => {
+                .then(function(response) {
                     if (response && response.ok) {
-                        const cache = await caches.open(RUNTIME_CACHE);
-                        cache.put(request, response.clone());
+                        caches.open(RUNTIME_CACHE).then(function(cache) {
+                            cache.put(request, response.clone());
+                        });
                         return response;
                     }
                     throw new Error('Respuesta no válida');
                 })
-                .catch(async () => {
-                    const cached = await caches.match(request);
-                    if (cached) return cached;
-                    const index = await caches.match('/');
-                    if (index) return index;
-                    
-                    // Página offline personalizada
-                    return new Response(
-                        `<!DOCTYPE html>
-                        <html lang="es-CO">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <meta name="theme-color" content="#1a237e">
-                            <title>IPUC LA FONDA - Offline</title>
-                            <style>
-                                * { margin: 0; padding: 0; box-sizing: border-box; }
-                                body { 
-                                    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    min-block-size: 100vh;
-                                    background: linear-gradient(135deg, #0d1b5e, #1a237e, #283593);
-                                    color: #ffffff;
-                                    text-align: center;
-                                    padding: 20px;
+                .catch(function() {
+                    return caches.match(request).then(function(cached) {
+                        if (cached) return cached;
+                        return caches.match('/').then(function(index) {
+                            if (index) return index;
+                            
+                            // Página offline personalizada
+                            return new Response(
+                                '<!DOCTYPE html>' +
+                                '<html lang="es-CO">' +
+                                '<head>' +
+                                    '<meta charset="UTF-8">' +
+                                    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+                                    '<meta name="theme-color" content="#1a237e">' +
+                                    '<title>IPUC LA FONDA - Offline</title>' +
+                                    '<style>' +
+                                        '* { margin: 0; padding: 0; box-sizing: border-box; }' +
+                                        'body { ' +
+                                            'font-family: \'Inter\', \'Segoe UI\', system-ui, sans-serif;' +
+                                            'display: flex;' +
+                                            'justify-content: center;' +
+                                            'align-items: center;' +
+                                            'min-height: 100vh;' +
+                                            'background: linear-gradient(135deg, #0d1b5e, #1a237e, #283593);' +
+                                            'color: #ffffff;' +
+                                            'text-align: center;' +
+                                            'padding: 20px;' +
+                                        '}' +
+                                        '.offline-container { max-width: 400px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 24px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }' +
+                                        '.offline-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.6; }' +
+                                        '.offline-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }' +
+                                        '.offline-subtitle { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 8px; }' +
+                                        '.offline-text { color: rgba(255,255,255,0.6); margin-bottom: 24px; line-height: 1.6; font-size: 0.95rem; }' +
+                                        '.offline-actions { display: flex; flex-direction: column; gap: 10px; }' +
+                                        '.btn-retry {' +
+                                            'background: #ffd700;' +
+                                            'color: #1a237e;' +
+                                            'border: none;' +
+                                            'padding: 12px 24px;' +
+                                            'border-radius: 12px;' +
+                                            'font-size: 1rem;' +
+                                            'font-weight: 600;' +
+                                            'cursor: pointer;' +
+                                            'transition: all 0.3s ease;' +
+                                            'font-family: inherit;' +
+                                        '}' +
+                                        '.btn-retry:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3); }' +
+                                        '.btn-offline {' +
+                                            'background: rgba(255,255,255,0.1);' +
+                                            'color: #ffffff;' +
+                                            'border: 1px solid rgba(255,255,255,0.15);' +
+                                            'padding: 10px 24px;' +
+                                            'border-radius: 12px;' +
+                                            'font-size: 0.9rem;' +
+                                            'cursor: pointer;' +
+                                            'transition: all 0.3s ease;' +
+                                            'font-family: inherit;' +
+                                        '}' +
+                                        '.btn-offline:hover { background: rgba(255,255,255,0.15); }' +
+                                        '.offline-version { margin-top: 16px; font-size: 0.7rem; color: rgba(255,255,255,0.3); }' +
+                                        '.offline-pulse { animation: pulse 2s ease-in-out infinite; }' +
+                                        '@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }' +
+                                        '@media (max-width: 480px) {' +
+                                            '.offline-container { padding: 20px; }' +
+                                            '.offline-title { font-size: 1.4rem; }' +
+                                            '.offline-icon { font-size: 3rem; }' +
+                                        '}' +
+                                    '</style>' +
+                                    '<link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">' +
+                                '</head>' +
+                                '<body>' +
+                                    '<div class="offline-container">' +
+                                        '<div class="offline-icon"><i class="bx bx-wifi-off"></i></div>' +
+                                        '<h1 class="offline-title">Sin conexión</h1>' +
+                                        '<p class="offline-subtitle">IPUC LA FONDA está en modo offline</p>' +
+                                        '<p class="offline-text">Verifica tu conexión a internet para acceder a todo el contenido.</p>' +
+                                        '<div class="offline-actions">' +
+                                            '<button class="btn-retry" onclick="location.reload()">' +
+                                                '<i class="bx bx-refresh"></i> Reintentar' +
+                                            '</button>' +
+                                            '<button class="btn-offline" onclick="document.querySelector(\'.offline-text\').textContent = \'Estamos orando por ti. ¡Dios te bendiga! 🙏\'">' +
+                                                '<i class="bx bx-pray"></i> Está bien, seguir offline' +
+                                            '</button>' +
+                                        '</div>' +
+                                        '<div class="offline-version">v' + VERSION + ' &copy; 2026 IPUC LA FONDA</div>' +
+                                    '</div>' +
+                                '</body>' +
+                                '</html>',
+                                {
+                                    status: 503,
+                                    headers: {
+                                        'Content-Type': 'text/html',
+                                        'X-Offline': 'true'
+                                    }
                                 }
-                                .offline-container { max-inline-size: 400px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 24px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-                                .offline-icon { font-size: 4rem; margin-block-end: 16px; opacity: 0.6; }
-                                .offline-title { font-size: 1.8rem; font-weight: 700; margin-block-end: 8px; }
-                                .offline-subtitle { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-block-end: 8px; }
-                                .offline-text { color: rgba(255,255,255,0.6); margin-block-end: 24px; line-height: 1.6; font-size: 0.95rem; }
-                                .offline-actions { display: flex; flex-direction: column; gap: 10px; }
-                                .btn-retry {
-                                    background: #ffd700;
-                                    color: #1a237e;
-                                    border: none;
-                                    padding: 12px 24px;
-                                    border-radius: 12px;
-                                    font-size: 1rem;
-                                    font-weight: 600;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    font-family: inherit;
-                                }
-                                .btn-retry:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3); }
-                                .btn-offline {
-                                    background: rgba(255,255,255,0.1);
-                                    color: #ffffff;
-                                    border: 1px solid rgba(255,255,255,0.15);
-                                    padding: 10px 24px;
-                                    border-radius: 12px;
-                                    font-size: 0.9rem;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    font-family: inherit;
-                                }
-                                .btn-offline:hover { background: rgba(255,255,255,0.15); }
-                                .offline-version { margin-block-start: 16px; font-size: 0.7rem; color: rgba(255,255,255,0.3); }
-                                .offline-pulse { animation: pulse 2s ease-in-out infinite; }
-                                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-                                @media (max-inline-size: 480px) {
-                                    .offline-container { padding: 20px; }
-                                    .offline-title { font-size: 1.4rem; }
-                                    .offline-icon { font-size: 3rem; }
-                                }
-                            </style>
-                            <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
-                        </head>
-                        <body>
-                            <div class="offline-container">
-                                <div class="offline-icon"><i class="bx bx-wifi-off"></i></div>
-                                <h1 class="offline-title">Sin conexión</h1>
-                                <p class="offline-subtitle">IPUC LA FONDA está en modo offline</p>
-                                <p class="offline-text">Verifica tu conexión a internet para acceder a todo el contenido.</p>
-                                <div class="offline-actions">
-                                    <button class="btn-retry" onclick="location.reload()">
-                                        <i class="bx bx-refresh"></i> Reintentar
-                                    </button>
-                                    <button class="btn-offline" onclick="document.querySelector('.offline-text').textContent = 'Estamos orando por ti. ¡Dios te bendiga! 🙏'">
-                                        <i class="bx bx-pray"></i> Está bien, seguir offline
-                                    </button>
-                                </div>
-                                <div class="offline-version">v${VERSION} &copy; 2026 IPUC LA FONDA</div>
-                            </div>
-                        </body>
-                        </html>`,
-                        {
-                            status: 503,
-                            headers: {
-                                'Content-Type': 'text/html',
-                                'X-Offline': 'true'
-                            }
-                        }
-                    );
+                            );
+                        });
+                    });
                 })
         );
         return;
@@ -617,16 +656,17 @@ self.addEventListener('fetch', (event) => {
     // ============================================
     if (matchPattern(pathname, CACHE_PATTERNS.js) || matchPattern(pathname, CACHE_PATTERNS.css)) {
         event.respondWith(
-            caches.match(request).then(async (cached) => {
-                const fetchPromise = fetch(request)
-                    .then(async (response) => {
+            caches.match(request).then(function(cached) {
+                var fetchPromise = fetch(request)
+                    .then(function(response) {
                         if (response && response.ok) {
-                            const cache = await caches.open(RUNTIME_CACHE);
-                            cache.put(request, response.clone());
+                            caches.open(RUNTIME_CACHE).then(function(cache) {
+                                cache.put(request, response.clone());
+                            });
                         }
                         return response;
                     })
-                    .catch(() => cached);
+                    .catch(function() { return cached; });
                 return cached || fetchPromise;
             })
         );
@@ -638,32 +678,34 @@ self.addEventListener('fetch', (event) => {
     // ============================================
     event.respondWith(
         fetch(request)
-            .then(async (response) => {
+            .then(function(response) {
                 if (response && response.ok && shouldCache(pathname)) {
-                    const cacheName = getCacheForRequest(pathname);
-                    const cache = await caches.open(cacheName);
-                    cache.put(request, response.clone());
+                    var cacheName = getCacheForRequest(pathname);
+                    caches.open(cacheName).then(function(cache) {
+                        cache.put(request, response.clone());
+                    });
                 }
                 return response;
             })
-            .catch(async () => {
-                const cached = await caches.match(request);
-                if (cached) return cached;
-                return new Response(
-                    JSON.stringify({
-                        error: true,
-                        mensaje: 'Sin conexión a internet',
-                        offline: true,
-                        timestamp: Date.now()
-                    }),
-                    {
-                        status: 503,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Offline': 'true'
+            .catch(function() {
+                return caches.match(request).then(function(cached) {
+                    if (cached) return cached;
+                    return new Response(
+                        JSON.stringify({
+                            error: true,
+                            mensaje: 'Sin conexión a internet',
+                            offline: true,
+                            timestamp: Date.now()
+                        }),
+                        {
+                            status: 503,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Offline': 'true'
+                            }
                         }
-                    }
-                );
+                    );
+                });
             })
     );
 });
@@ -671,8 +713,8 @@ self.addEventListener('fetch', (event) => {
 // ============================================
 // PUSH NOTIFICATIONS PREMIUM
 // ============================================
-self.addEventListener('push', (event) => {
-    let data = {
+self.addEventListener('push', function(event) {
+    var data = {
         titulo: 'IPUC LA FONDA',
         mensaje: 'Tienes una nueva notificación',
         url: '/',
@@ -690,14 +732,16 @@ self.addEventListener('push', (event) => {
     
     if (event.data) {
         try {
-            const pushData = event.data.json();
-            data = { ...data, ...pushData };
+            var pushData = event.data.json();
+            for (var key in pushData) {
+                data[key] = pushData[key];
+            }
         } catch {
             data.mensaje = event.data.text() || data.mensaje;
         }
     }
     
-    const options = {
+    var options = {
         body: data.mensaje,
         icon: data.icono || '/assets/icons/icon-192x192.png',
         badge: data.badge || '/assets/icons/badge-icon.png',
@@ -715,12 +759,11 @@ self.addEventListener('push', (event) => {
             { action: 'open', title: 'Ver', icon: '/assets/icons/icon-192x192.png' },
             { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
         ],
-        tag: `ipuc-notif-${data.id}`,
+        tag: 'ipuc-notif-' + data.id,
         renotify: true,
         requireInteraction: data.importante || false,
         timestamp: data.timestamp || Date.now(),
         priority: data.importante ? 'high' : 'normal',
-        data: { ...data, url: data.url },
         actions: [
             { action: 'open', title: 'Abrir', icon: '/assets/icons/icon-192x192.png' },
             { action: 'share', title: 'Compartir', icon: '/assets/icons/icon-192x192.png' },
@@ -731,28 +774,28 @@ self.addEventListener('push', (event) => {
     // Personalizar según tipo
     switch (data.tipo) {
         case 'oracion':
-            options.body = `🕯️ ${data.mensaje}`;
+            options.body = '🕯️ ' + data.mensaje;
             options.actions = [
                 { action: 'open', title: 'Orar', icon: '/assets/icons/icon-192x192.png' },
                 { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
             ];
             break;
         case 'evento':
-            options.body = `📅 ${data.mensaje}`;
+            options.body = '📅 ' + data.mensaje;
             options.actions = [
                 { action: 'open', title: 'Confirmar', icon: '/assets/icons/icon-192x192.png' },
                 { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
             ];
             break;
         case 'publicacion':
-            options.body = `📝 ${data.mensaje}`;
+            options.body = '📝 ' + data.mensaje;
             options.actions = [
                 { action: 'open', title: 'Ver', icon: '/assets/icons/icon-192x192.png' },
                 { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
             ];
             break;
         case 'musica':
-            options.body = `🎵 ${data.mensaje}`;
+            options.body = '🎵 ' + data.mensaje;
             options.actions = [
                 { action: 'open', title: 'Escuchar', icon: '/assets/icons/icon-192x192.png' },
                 { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
@@ -772,42 +815,43 @@ self.addEventListener('push', (event) => {
 // ============================================
 // CLIC EN NOTIFICACIÓN
 // ============================================
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     
     if (event.action === 'close') return;
     
     if (event.action === 'share') {
-        const shareData = {
+        var shareData = {
             title: 'IPUC LA FONDA',
             text: event.notification.body || 'Where the Holy Spirit moves',
-            url: event.notification.data?.url || 'https://ipuclafonda.netlify.app/'
+            url: event.notification.data && event.notification.data.url ? event.notification.data.url : 'https://ipuclafonda.netlify.app/'
         };
         
         if (navigator.share) {
-            navigator.share(shareData).catch(() => {});
+            navigator.share(shareData).catch(function() {});
         }
         return;
     }
     
-    const urlToOpen = event.notification.data?.url || '/';
-    const notificationId = event.notification.data?.notificationId;
-    const tipo = event.notification.data?.tipo || 'general';
+    var urlToOpen = (event.notification.data && event.notification.data.url) ? event.notification.data.url : '/';
+    var notificationId = event.notification.data ? event.notification.data.notificationId : null;
+    var tipo = event.notification.data ? event.notification.data.tipo : 'general';
     
     event.waitUntil(
         clients.matchAll({ 
             type: 'window', 
             includeUncontrolled: true 
         })
-        .then(async (windowClients) => {
-            for (const client of windowClients) {
+        .then(function(windowClients) {
+            for (var i = 0; i < windowClients.length; i++) {
+                var client = windowClients[i];
                 if (client.url.includes(urlToOpen) && 'focus' in client) {
-                    await client.focus();
+                    client.focus();
                     client.postMessage({
                         type: 'NOTIFICATION_CLICKED',
                         data: { 
-                            notificationId, 
-                            tipo, 
+                            notificationId: notificationId, 
+                            tipo: tipo, 
                             url: urlToOpen, 
                             timestamp: Date.now(),
                             action: event.action || 'open'
@@ -817,21 +861,22 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
             if (clients.openWindow) {
-                const newClient = await clients.openWindow(urlToOpen);
-                if (newClient) {
-                    setTimeout(() => {
-                        newClient.postMessage({
-                            type: 'NOTIFICATION_CLICKED',
-                            data: { 
-                                notificationId, 
-                                tipo, 
-                                url: urlToOpen, 
-                                timestamp: Date.now(),
-                                action: event.action || 'open'
-                            }
-                        });
-                    }, 500);
-                }
+                clients.openWindow(urlToOpen).then(function(newClient) {
+                    if (newClient) {
+                        setTimeout(function() {
+                            newClient.postMessage({
+                                type: 'NOTIFICATION_CLICKED',
+                                data: { 
+                                    notificationId: notificationId, 
+                                    tipo: tipo, 
+                                    url: urlToOpen, 
+                                    timestamp: Date.now(),
+                                    action: event.action || 'open'
+                                }
+                            });
+                        }, 500);
+                    }
+                });
             }
         })
     );
@@ -840,37 +885,37 @@ self.addEventListener('notificationclick', (event) => {
 // ============================================
 // SINCRONIZACIÓN EN SEGUNDO PLANO
 // ============================================
-self.addEventListener('sync', (event) => {
-    const syncHandlers = {
-        'sync-asistencia': async () => {
-            await self._syncData('asistencia');
+self.addEventListener('sync', function(event) {
+    var syncHandlers = {
+        'sync-asistencia': function() {
+            return self._syncData('asistencia');
         },
-        'sync-mensajes': async () => {
-            await self._syncData('mensajes');
+        'sync-mensajes': function() {
+            return self._syncData('mensajes');
         },
-        'sync-peticiones': async () => {
-            await self._syncData('peticiones');
+        'sync-peticiones': function() {
+            return self._syncData('peticiones');
         },
-        'sync-datos': async () => {
-            await self._syncData('datos');
+        'sync-datos': function() {
+            return self._syncData('datos');
         },
-        'sync-noticias': async () => {
-            await self._syncData('noticias');
+        'sync-noticias': function() {
+            return self._syncData('noticias');
         },
-        'sync-publicaciones': async () => {
-            await self._syncData('publicaciones');
+        'sync-publicaciones': function() {
+            return self._syncData('publicaciones');
         },
-        'sync-encuestas': async () => {
-            await self._syncData('encuestas');
+        'sync-encuestas': function() {
+            return self._syncData('encuestas');
         },
-        'sync-podcast': async () => {
-            await self._syncData('podcast');
+        'sync-podcast': function() {
+            return self._syncData('podcast');
         },
-        'sync-donaciones': async () => {
-            await self._syncData('donaciones');
+        'sync-donaciones': function() {
+            return self._syncData('donaciones');
         },
-        'sync-favoritos': async () => {
-            await self._syncData('favoritos');
+        'sync-favoritos': function() {
+            return self._syncData('favoritos');
         }
     };
     
@@ -882,16 +927,16 @@ self.addEventListener('sync', (event) => {
 // ============================================
 // MENSAJES DESDE EL CLIENTE
 // ============================================
-self.addEventListener('message', (event) => {
+self.addEventListener('message', function(event) {
     if (!event.data || !event.data.type) return;
     
-    const responsePort = event.ports && event.ports[0] ? event.ports[0] : null;
+    var responsePort = event.ports && event.ports[0] ? event.ports[0] : null;
     
     switch (event.data.type) {
         case 'SKIP_WAITING':
-            self.skipWaiting().then(() => {
-                self.clients.matchAll({ type: 'window' }).then(clients => {
-                    clients.forEach(client => {
+            self.skipWaiting().then(function() {
+                self.clients.matchAll({ type: 'window' }).then(function(clients) {
+                    clients.forEach(function(client) {
                         client.postMessage({
                             type: 'SW_UPDATED',
                             version: VERSION,
@@ -904,7 +949,7 @@ self.addEventListener('message', (event) => {
             break;
             
         case 'CHECK_FOR_UPDATE':
-            self.registration.update().catch(() => {});
+            self.registration.update().catch(function() {});
             if (responsePort) {
                 responsePort.postMessage({ 
                     success: true, 
@@ -935,9 +980,9 @@ self.addEventListener('message', (event) => {
             break;
             
         case 'CLEAR_CACHE':
-            caches.keys().then((names) => {
-                return Promise.all(names.map((name) => caches.delete(name)));
-            }).then(() => {
+            caches.keys().then(function(names) {
+                return Promise.all(names.map(function(name) { return caches.delete(name); }));
+            }).then(function() {
                 if (responsePort) {
                     responsePort.postMessage({ 
                         success: true, 
@@ -945,7 +990,7 @@ self.addEventListener('message', (event) => {
                         timestamp: Date.now() 
                     });
                 }
-            }).catch((error) => {
+            }).catch(function(error) {
                 if (responsePort) {
                     responsePort.postMessage({ 
                         success: false, 
@@ -957,14 +1002,14 @@ self.addEventListener('message', (event) => {
             
         case 'CLEAR_CACHE_BY_NAME':
             if (event.data.cacheName) {
-                caches.delete(event.data.cacheName).then((deleted) => {
+                caches.delete(event.data.cacheName).then(function(deleted) {
                     if (responsePort) {
                         responsePort.postMessage({ 
                             success: deleted, 
                             cacheName: event.data.cacheName 
                         });
                     }
-                }).catch((error) => {
+                }).catch(function(error) {
                     if (responsePort) {
                         responsePort.postMessage({ 
                             success: false, 
@@ -977,35 +1022,36 @@ self.addEventListener('message', (event) => {
             
         case 'GET_CACHE_STATS':
             Promise.all([
-                caches.open(CACHE_NAME).then((cache) => cache.keys()),
-                caches.open(RUNTIME_CACHE).then((cache) => cache.keys()),
-                caches.open(IMAGE_CACHE).then((cache) => cache.keys()),
-                caches.open(AUDIO_CACHE).then((cache) => cache.keys()),
-                caches.open(VIDEO_CACHE).then((cache) => cache.keys()),
-                caches.open(FONT_CACHE).then((cache) => cache.keys()),
-                caches.open(API_CACHE).then((cache) => cache.keys()),
-                caches.open(OFFLINE_CACHE).then((cache) => cache.keys())
-            ]).then(([precache, runtime, images, audio, video, fonts, api, offline]) => {
+                caches.open(CACHE_NAME).then(function(cache) { return cache.keys(); }),
+                caches.open(RUNTIME_CACHE).then(function(cache) { return cache.keys(); }),
+                caches.open(IMAGE_CACHE).then(function(cache) { return cache.keys(); }),
+                caches.open(AUDIO_CACHE).then(function(cache) { return cache.keys(); }),
+                caches.open(VIDEO_CACHE).then(function(cache) { return cache.keys(); }),
+                caches.open(FONT_CACHE).then(function(cache) { return cache.keys(); }),
+                caches.open(API_CACHE).then(function(cache) { return cache.keys(); }),
+                caches.open(OFFLINE_CACHE).then(function(cache) { return cache.keys(); })
+            ]).then(function(results) {
                 if (responsePort) {
                     responsePort.postMessage({
                         cacheName: CACHE_NAME,
                         version: VERSION,
                         stats: {
-                            precache: { total: precache.length },
-                            runtime: { total: runtime.length },
-                            images: { total: images.length },
-                            audio: { total: audio.length },
-                            video: { total: video.length },
-                            fonts: { total: fonts.length },
-                            api: { total: api.length },
-                            offline: { total: offline.length }
+                            precache: { total: results[0].length },
+                            runtime: { total: results[1].length },
+                            images: { total: results[2].length },
+                            audio: { total: results[3].length },
+                            video: { total: results[4].length },
+                            fonts: { total: results[5].length },
+                            api: { total: results[6].length },
+                            offline: { total: results[7].length }
                         },
-                        total: precache.length + runtime.length + images.length + 
-                                audio.length + video.length + fonts.length + api.length + offline.length,
+                        total: results[0].length + results[1].length + results[2].length + 
+                                results[3].length + results[4].length + results[5].length + 
+                                results[6].length + results[7].length,
                         timestamp: Date.now()
                     });
                 }
-            }).catch(() => {
+            }).catch(function() {
                 if (responsePort) {
                     responsePort.postMessage({ success: false, error: 'Error obteniendo estadísticas' });
                 }
@@ -1041,7 +1087,7 @@ self.addEventListener('message', (event) => {
             break;
             
         case 'GET_OFFLINE_STATUS':
-            const isOnline = navigator.onLine;
+            var isOnline = navigator.onLine;
             if (responsePort) {
                 responsePort.postMessage({
                     online: isOnline,
@@ -1054,9 +1100,9 @@ self.addEventListener('message', (event) => {
         case 'PREFETCH_URL':
             if (event.data.url) {
                 fetch(event.data.url, { cache: 'force-cache' })
-                    .then((response) => {
+                    .then(function(response) {
                         if (response && response.ok) {
-                            caches.open(RUNTIME_CACHE).then((cache) => {
+                            caches.open(RUNTIME_CACHE).then(function(cache) {
                                 cache.put(event.data.url, response);
                             });
                         }
@@ -1067,7 +1113,7 @@ self.addEventListener('message', (event) => {
                             });
                         }
                     })
-                    .catch((error) => {
+                    .catch(function(error) {
                         if (responsePort) {
                             responsePort.postMessage({ 
                                 success: false, 
@@ -1084,9 +1130,9 @@ self.addEventListener('message', (event) => {
 // ============================================
 // DETECCIÓN DE CONECTIVIDAD
 // ============================================
-self.addEventListener('online', () => {
-    self.clients.matchAll({ type: 'window' }).then((clients) => {
-        clients.forEach((client) => {
+self.addEventListener('online', function() {
+    self.clients.matchAll({ type: 'window' }).then(function(clients) {
+        clients.forEach(function(client) {
             try {
                 client.postMessage({
                     type: 'CONNECTIVITY_CHANGE',
@@ -1098,9 +1144,9 @@ self.addEventListener('online', () => {
     });
 });
 
-self.addEventListener('offline', () => {
-    self.clients.matchAll({ type: 'window' }).then((clients) => {
-        clients.forEach((client) => {
+self.addEventListener('offline', function() {
+    self.clients.matchAll({ type: 'window' }).then(function(clients) {
+        clients.forEach(function(client) {
             try {
                 client.postMessage({
                     type: 'CONNECTIVITY_CHANGE',
@@ -1115,12 +1161,12 @@ self.addEventListener('offline', () => {
 // ============================================
 // MANEJO DE ERRORES
 // ============================================
-self.addEventListener('error', (event) => {
+self.addEventListener('error', function(event) {
     // Silenciar errores del service worker
     event.preventDefault();
 });
 
-self.addEventListener('unhandledrejection', (event) => {
+self.addEventListener('unhandledrejection', function(event) {
     // Silenciar promesas rechazadas no manejadas
     event.preventDefault();
 });
@@ -1128,79 +1174,82 @@ self.addEventListener('unhandledrejection', (event) => {
 // ============================================
 // FUNCIONES DE SINCRONIZACIÓN
 // ============================================
-self._syncData = async (tipo) => {
+self._syncData = function(tipo) {
     try {
-        // Obtener datos pendientes de localStorage
-        const key = `ipuc15_sync_${tipo}`;
-        const pending = await self._getPendingData(key);
-        
-        if (pending && pending.length > 0) {
-            // Intentar sincronizar cada elemento
-            for (const item of pending) {
-                try {
-                    const response = await fetch(item.url, {
-                        method: item.method || 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(item.data)
-                    });
-                    
-                    if (response && response.ok) {
-                        // Eliminar de pendientes
-                        await self._removePendingData(key, item.id);
-                    }
-                } catch {}
+        var key = 'ipuc15_sync_' + tipo;
+        return self._getPendingData(key).then(function(pending) {
+            if (pending && pending.length > 0) {
+                for (var i = 0; i < pending.length; i++) {
+                    var item = pending[i];
+                    try {
+                        fetch(item.url, {
+                            method: item.method || 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(item.data)
+                        }).then(function(response) {
+                            if (response && response.ok) {
+                                self._removePendingData(key, item.id);
+                            }
+                        }).catch(function() {});
+                    } catch {}
+                }
             }
-        }
+        }).catch(function() {});
     } catch {}
 };
 
-self._getPendingData = async (key) => {
+self._getPendingData = function(key) {
     try {
-        const data = await self._getFromCache('sync_data', key);
-        return data || [];
+        return self._getFromCache('sync_data', key).then(function(data) {
+            return data || [];
+        }).catch(function() { return []; });
     } catch {
-        return [];
+        return Promise.resolve([]);
     }
 };
 
-self._removePendingData = async (key, id) => {
+self._removePendingData = function(key, id) {
     try {
-        const data = await self._getPendingData(key);
-        const filtered = data.filter(item => item.id !== id);
-        await self._saveToCache('sync_data', key, filtered);
+        return self._getPendingData(key).then(function(data) {
+            var filtered = data.filter(function(item) { return item.id !== id; });
+            return self._saveToCache('sync_data', key, filtered);
+        }).catch(function() {});
     } catch {}
 };
 
-self._getFromCache = async (cacheName, key) => {
+self._getFromCache = function(cacheName, key) {
     try {
-        const cache = await caches.open(cacheName);
-        const response = await cache.match(key);
-        if (response) {
-            return await response.json();
-        }
-        return null;
+        return caches.open(cacheName).then(function(cache) {
+            return cache.match(key).then(function(response) {
+                if (response) {
+                    return response.json();
+                }
+                return null;
+            }).catch(function() { return null; });
+        }).catch(function() { return null; });
     } catch {
-        return null;
+        return Promise.resolve(null);
     }
 };
 
-self._saveToCache = async (cacheName, key, data) => {
+self._saveToCache = function(cacheName, key, data) {
     try {
-        const cache = await caches.open(cacheName);
-        const response = new Response(JSON.stringify(data), {
-            headers: { 'Content-Type': 'application/json' }
-        });
-        await cache.put(key, response);
+        return caches.open(cacheName).then(function(cache) {
+            var response = new Response(JSON.stringify(data), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            return cache.put(key, response);
+        }).catch(function() {});
     } catch {}
 };
 
 // ============================================
 // REGISTRO DE SW
 // ============================================
-console.log(`✅ IPUC LA FONDA Service Worker v${VERSION} cargado`);
-console.log(`📦 ${PRECACHE_ASSETS.length} assets pre-cacheados`);
-console.log(`🔄 Estrategias de caché avanzadas activas`);
-console.log(`📢 Push notifications configuradas`);
-console.log(`🔄 Sincronización en segundo plano activa`);
+console.log('✅ IPUC LA FONDA Service Worker v' + VERSION + ' cargado');
+console.log('📦 ' + PRECACHE_ASSETS.length + ' assets pre-cacheados');
+console.log('🔄 Estrategias de caché avanzadas activas');
+console.log('📢 Push notifications configuradas');
+console.log('🔄 Sincronización en segundo plano activa');
