@@ -755,10 +755,6 @@ self.addEventListener('push', function(event) {
         },
         vibrate: data.importante ? [200, 100, 200, 100, 200] : [100, 50, 100],
         silent: !(data.sonido !== false),
-        actions: data.acciones || [
-            { action: 'open', title: 'Ver', icon: '/assets/icons/icon-192x192.png' },
-            { action: 'close', title: 'Cerrar', icon: '/assets/icons/icon-192x192.png' }
-        ],
         tag: 'ipuc-notif-' + data.id,
         renotify: true,
         requireInteraction: data.importante || false,
