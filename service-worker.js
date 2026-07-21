@@ -32,7 +32,6 @@ var PRECACHE_ASSETS = [
     '/app.js',
     '/script.js',
     '/manifest.json',
-    '/service-worker.js',
     '/ipuclafonda.png',
     '/favicon.ico',
     '/assets/avatars/default.png',
@@ -90,6 +89,7 @@ function getCacheForRequest(url) {
 // INSTALACION
 // ============================================
 self.addEventListener('install', function(event) {
+    console.log('SW v' + VERSION + ': Instalando...');
     event.waitUntil(
         caches.open(CACHE_NAME).then(function(cache) {
             var promises = [];
@@ -107,6 +107,7 @@ self.addEventListener('install', function(event) {
                 })(PRECACHE_ASSETS[i]);
             }
             return Promise.all(promises).then(function() {
+                console.log('SW: Instalacion completada');
                 return self.skipWaiting();
             });
         })
@@ -123,16 +124,20 @@ self.addEventListener('activate', function(event) {
         VIDEO_CACHE, FONT_CACHE, REPORTS_CACHE, SYNC_CACHE
     ];
 
+    console.log('SW v' + VERSION + ': Activando...');
+
     event.waitUntil(
         caches.keys().then(function(cacheNames) {
             return Promise.all(
                 cacheNames.map(function(cacheName) {
                     if (CURRENT_CACHES.indexOf(cacheName) === -1) {
+                        console.log('SW: Eliminando cache antiguo:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
         }).then(function() {
+            console.log('SW: Activacion completada');
             return self.clients.claim();
         })
     );
@@ -147,6 +152,7 @@ self.addEventListener('fetch', function(event) {
     var pathname = url.pathname;
     var origin = url.origin;
 
+    // Permitir CDNs necesarios
     if (origin !== self.location.origin &&
         url.href.indexOf('unpkg.com') === -1 &&
         url.href.indexOf('fonts.googleapis.com') === -1 &&
@@ -155,11 +161,12 @@ self.addEventListener('fetch', function(event) {
         return;
     }
 
-    // IMAGENES: Cache First
+    // IMAGENES: Cache First + Stale-While-Revalidate
     if (matchPattern(pathname, CACHE_PATTERNS.images)) {
         event.respondWith(
             caches.match(request).then(function(cached) {
                 if (cached) {
+                    // Actualizar en segundo plano
                     fetch(request).then(function(response) {
                         if (response && response.ok) {
                             caches.open(IMAGE_CACHE).then(function(cache) {
@@ -177,16 +184,16 @@ self.addEventListener('fetch', function(event) {
                         });
                         return response;
                     }
-                    return cached || new Response('', { status: 404 });
+                    return new Response('', { status: 404 });
                 }).catch(function() {
-                    return cached || new Response('', { status: 404 });
+                    return new Response('', { status: 404 });
                 });
             })
         );
         return;
     }
 
-    // JS/CSS: Cache First + Update
+    // JS/CSS: Cache First + Network Update
     if (matchPattern(pathname, CACHE_PATTERNS.js) || matchPattern(pathname, CACHE_PATTERNS.css)) {
         event.respondWith(
             caches.match(request).then(function(cached) {
@@ -197,7 +204,9 @@ self.addEventListener('fetch', function(event) {
                         });
                     }
                     return response;
-                }).catch(function() { return cached; });
+                }).catch(function() {
+                    return cached;
+                });
                 return cached || fetchPromise;
             })
         );
@@ -220,9 +229,34 @@ self.addEventListener('fetch', function(event) {
                     if (cached) return cached;
                     return caches.match('/').then(function(index) {
                         if (index) return index;
+                        // Pagina offline
                         return new Response(
-                            '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#1a237e"><title>IPUC LA FONDA - Offline</title><style>body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a237e;color:#fff;text-align:center;padding:20px;margin:0}.offline-box{max-width:400px;padding:30px;background:rgba(255,255,255,0.1);border-radius:20px}h1{font-size:1.5rem;margin-bottom:10px}p{margin-bottom:20px;opacity:0.8}button{background:#ffd700;color:#1a237e;border:none;padding:12px 24px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer}button:hover{opacity:0.9}</style></head><body><div class="offline-box"><h1>Sin conexion</h1><p>IPUC LA FONDA esta en modo offline</p><button onclick="location.reload()">Reintentar</button><p style="font-size:0.7rem;margin-top:15px;opacity:0.5">v' + VERSION + ' &copy; 2026</p></div></body></html>',
-                            { status: 503, headers: { 'Content-Type': 'text/html', 'X-Offline': 'true' } }
+                            '<!DOCTYPE html>' +
+                            '<html lang="es">' +
+                            '<head>' +
+                            '<meta charset="UTF-8">' +
+                            '<meta name="viewport" content="width=device-width,initial-scale=1.0">' +
+                            '<meta name="theme-color" content="#1a237e">' +
+                            '<title>IPUC LA FONDA - Offline</title>' +
+                            '<style>' +
+                            'body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a237e;color:#fff;text-align:center;padding:20px;margin:0}' +
+                            '.box{max-width:400px;padding:30px;background:rgba(255,255,255,0.1);border-radius:20px}' +
+                            'h1{font-size:1.5rem;margin-bottom:10px}' +
+                            'p{margin-bottom:20px;opacity:0.8}' +
+                            'button{background:#ffd700;color:#1a237e;border:none;padding:12px 24px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer}' +
+                            'button:hover{opacity:0.9}' +
+                            '</style>' +
+                            '</head>' +
+                            '<body>' +
+                            '<div class="box">' +
+                            '<h1>Sin conexion</h1>' +
+                            '<p>IPUC LA FONDA esta en modo offline</p>' +
+                            '<button onclick="location.reload()">Reintentar</button>' +
+                            '<p style="font-size:0.7rem;margin-top:15px;opacity:0.5">v' + VERSION + ' &copy; 2026</p>' +
+                            '</div>' +
+                            '</body>' +
+                            '</html>',
+                            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8', 'X-Offline': 'true' } }
                         );
                     });
                 });
@@ -243,7 +277,8 @@ self.addEventListener('fetch', function(event) {
             return response;
         }).catch(function() {
             return caches.match(request).then(function(cached) {
-                return cached || new Response(
+                if (cached) return cached;
+                return new Response(
                     JSON.stringify({ error: true, mensaje: 'Sin conexion', offline: true }),
                     { status: 503, headers: { 'Content-Type': 'application/json', 'X-Offline': 'true' } }
                 );
@@ -279,8 +314,15 @@ self.addEventListener('push', function(event) {
         }
     }
 
-    if (data.tipo === 'reporte') {
+    // Personalizar segun tipo
+    if (data.tipo === 'reporte' || data.tipo === 'reporte_urgente') {
         data.mensaje = '📋 ' + data.mensaje;
+    } else if (data.tipo === 'oracion') {
+        data.mensaje = '🕯️ ' + data.mensaje;
+    } else if (data.tipo === 'evento') {
+        data.mensaje = '📅 ' + data.mensaje;
+    } else if (data.tipo === 'publicacion') {
+        data.mensaje = '📝 ' + data.mensaje;
     }
 
     var options = {
@@ -293,10 +335,10 @@ self.addEventListener('push', function(event) {
             tipo: data.tipo,
             fecha: new Date().toISOString()
         },
-        vibrate: [100, 50, 100],
+        vibrate: data.tipo === 'reporte_urgente' ? [200, 100, 200, 100, 200] : [100, 50, 100],
         tag: 'ipuc-notif-' + data.id,
         renotify: true,
-        requireInteraction: data.tipo === 'reporte' || data.tipo === 'importante',
+        requireInteraction: data.tipo === 'reporte' || data.tipo === 'reporte_urgente' || data.tipo === 'importante',
         actions: [
             { action: 'open', title: 'Abrir' },
             { action: 'close', title: 'Cerrar' }
@@ -315,7 +357,10 @@ self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     if (event.action === 'close') return;
 
-    var urlToOpen = (event.notification.data && event.notification.data.url) ? event.notification.data.url : '/';
+    var urlToOpen = '/';
+    if (event.notification.data && event.notification.data.url) {
+        urlToOpen = event.notification.data.url;
+    }
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
@@ -323,7 +368,9 @@ self.addEventListener('notificationclick', function(event) {
                 var client = windowClients[i];
                 if (client.url.indexOf(self.location.origin) !== -1 && 'focus' in client) {
                     client.focus();
-                    if (urlToOpen !== '/') client.navigate(urlToOpen);
+                    if (urlToOpen !== '/') {
+                        client.navigate(urlToOpen);
+                    }
                     return;
                 }
             }
@@ -338,10 +385,11 @@ self.addEventListener('notificationclick', function(event) {
 // SINCRONIZACION
 // ============================================
 self.addEventListener('sync', function(event) {
-    if (event.tag === 'sync-datos' || event.tag === 'sync-reportes') {
+    var tags = ['sync-datos', 'sync-reportes', 'sync-asistencia', 'sync-mensajes', 'sync-peticiones'];
+    if (tags.indexOf(event.tag) !== -1) {
         event.waitUntil(
             Promise.resolve().then(function() {
-                // Intentar sincronizar datos pendientes
+                console.log('SW: Sincronizando ' + event.tag);
                 return true;
             })
         );
@@ -358,26 +406,82 @@ self.addEventListener('message', function(event) {
         case 'SKIP_WAITING':
             self.skipWaiting();
             break;
+
         case 'GET_VERSION':
             var port = event.ports && event.ports[0];
             if (port) {
                 port.postMessage({
                     version: VERSION,
                     cache: CACHE_NAME,
-                    assets: PRECACHE_ASSETS.length
+                    assets: PRECACHE_ASSETS.length,
+                    caches: {
+                        runtime: RUNTIME_CACHE,
+                        image: IMAGE_CACHE,
+                        audio: AUDIO_CACHE,
+                        video: VIDEO_CACHE,
+                        font: FONT_CACHE,
+                        api: API_CACHE,
+                        offline: OFFLINE_CACHE,
+                        reports: REPORTS_CACHE
+                    }
                 });
             }
             break;
+
         case 'CLEAR_CACHE':
             caches.keys().then(function(names) {
-                return Promise.all(names.map(function(name) { return caches.delete(name); }));
+                return Promise.all(names.map(function(name) {
+                    return caches.delete(name);
+                }));
+            }).then(function() {
+                console.log('SW: Cache limpiado');
             });
             break;
+
+        case 'CLEAR_REPORTS_CACHE':
+            caches.delete(REPORTS_CACHE).then(function(deleted) {
+                console.log('SW: Cache de reportes ' + (deleted ? 'limpiado' : 'no encontrado'));
+            });
+            break;
+
         case 'REGISTER_SYNC':
             if ('sync' in self.registration) {
                 try {
                     self.registration.sync.register(event.data.tag || 'sync-datos');
-                } catch (e) {}
+                    console.log('SW: Sync registrado:', event.data.tag);
+                } catch (e) {
+                    console.log('SW: Error al registrar sync:', e);
+                }
+            }
+            break;
+
+        case 'GET_OFFLINE_STATUS':
+            var port2 = event.ports && event.ports[0];
+            if (port2) {
+                port2.postMessage({
+                    online: navigator.onLine,
+                    offline: !navigator.onLine,
+                    timestamp: Date.now()
+                });
+            }
+            break;
+
+        case 'SAVE_REPORT_OFFLINE':
+            if (event.data.reporte) {
+                var reportKey = 'report_' + Date.now();
+                var reportData = JSON.stringify(event.data.reporte);
+                var blob = new Blob([reportData], { type: 'application/json' });
+                var response = new Response(blob, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-cache-time': Date.now().toString(),
+                        'x-version': VERSION
+                    }
+                });
+                caches.open(REPORTS_CACHE).then(function(cache) {
+                    cache.put(reportKey, response);
+                    console.log('SW: Reporte guardado offline');
+                });
             }
             break;
     }
@@ -387,20 +491,29 @@ self.addEventListener('message', function(event) {
 // DETECCION DE CONECTIVIDAD
 // ============================================
 self.addEventListener('online', function() {
+    console.log('SW: Conexion restaurada');
     self.clients.matchAll({ type: 'window' }).then(function(clients) {
         for (var i = 0; i < clients.length; i++) {
             try {
-                clients[i].postMessage({ type: 'CONNECTIVITY_CHANGE', online: true });
+                clients[i].postMessage({ type: 'CONNECTIVITY_CHANGE', online: true, timestamp: Date.now() });
             } catch (e) {}
         }
     });
+    // Intentar sincronizar al reconectar
+    if ('sync' in self.registration) {
+        try {
+            self.registration.sync.register('sync-datos');
+            self.registration.sync.register('sync-reportes');
+        } catch (e) {}
+    }
 });
 
 self.addEventListener('offline', function() {
+    console.log('SW: Sin conexion');
     self.clients.matchAll({ type: 'window' }).then(function(clients) {
         for (var i = 0; i < clients.length; i++) {
             try {
-                clients[i].postMessage({ type: 'CONNECTIVITY_CHANGE', online: false });
+                clients[i].postMessage({ type: 'CONNECTIVITY_CHANGE', online: false, timestamp: Date.now() });
             } catch (e) {}
         }
     });
@@ -416,3 +529,8 @@ self.addEventListener('error', function(event) {
 self.addEventListener('unhandledrejection', function(event) {
     event.preventDefault();
 });
+
+console.log('✅ IPUC LA FONDA Service Worker v' + VERSION + ' PRO ULTIMATE cargado');
+console.log('📦 ' + PRECACHE_ASSETS.length + ' assets pre-cacheados');
+console.log('📋 Sistema de Reportes integrado');
+console.log('📡 Soporte offline completo');
