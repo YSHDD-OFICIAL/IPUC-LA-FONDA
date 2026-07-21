@@ -1,16 +1,17 @@
 // ============================================
-// IPUC LA FONDA - app.js v15.0 PRO ULTIMATE
+// IPUC LA FONDA - app.js v18.0 PRO ULTIMATE
 // Funciones helper para la aplicación
+// Incluye: Sistema de Reportes completo
 // Sistema completo de gestión de datos
 // VERSIÓN INTERNACIONAL - 100% OPERATIVA
 // Usa la instancia global "db" de database.js
-// "Where the Holy Spirit moves"
+// "Donde el Espíritu Santo se mueve"
 // ============================================
 
 // ============================================
-// CONFIGURACIÓN GLOBAL
+// CONFIGURACIÓN GLOBAL v18.0
 // ============================================
-const VERSION = "15.0";
+const VERSION = "18.0";
 const MAX_INTENTOS = 5;
 const TIEMPO_BLOQUEO = 15; // minutos
 const DURACION_TOKEN = 24; // horas
@@ -35,10 +36,10 @@ function logApp(accion, detalle = '', nivel = 'info') {
     };
     
     try {
-        const logs = JSON.parse(localStorage.getItem('ipuc15_app_logs') || '[]');
+        const logs = JSON.parse(localStorage.getItem('ipuc18_app_logs') || '[]');
         logs.push(entry);
         if (logs.length > 1000) logs.shift();
-        localStorage.setItem('ipuc15_app_logs', JSON.stringify(logs));
+        localStorage.setItem('ipuc18_app_logs', JSON.stringify(logs));
     } catch (e) {}
 }
 
@@ -64,8 +65,13 @@ function cacheSet(key, data) {
 
 function cacheClear(key = null) {
     if (key) {
-        delete CACHE[key];
-        delete CACHE_TIMESTAMP[key];
+        // Limpiar todas las claves que empiecen con el prefijo
+        Object.keys(CACHE).forEach(k => {
+            if (k.startsWith(key)) {
+                delete CACHE[k];
+                delete CACHE_TIMESTAMP[k];
+            }
+        });
     } else {
         Object.keys(CACHE).forEach(k => {
             delete CACHE[k];
@@ -78,7 +84,7 @@ function cacheClear(key = null) {
 // SISTEMA DE SEGURIDAD
 // ============================================
 function generarToken() {
-    return 't15_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return 't18_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 function verificarToken(token) {
@@ -198,10 +204,10 @@ function login(usuario, password, recordar = false) {
             creado: new Date().toISOString()
         };
 
-        localStorage.setItem('ipuc15_token', token);
-        localStorage.setItem('ipuc15_usuario', JSON.stringify(resultado.usuario));
-        localStorage.setItem('ipuc15_rol', resultado.rol);
-        localStorage.setItem('ipuc15_token_expira', expira.toISOString());
+        localStorage.setItem('ipuc18_token', token);
+        localStorage.setItem('ipuc18_usuario', JSON.stringify(resultado.usuario));
+        localStorage.setItem('ipuc18_rol', resultado.rol);
+        localStorage.setItem('ipuc18_token_expira', expira.toISOString());
 
         delete INTENTOS_FALLIDOS[usuario];
         delete BLOQUEOS_TEMPORALES[usuario];
@@ -209,7 +215,6 @@ function login(usuario, password, recordar = false) {
         registrarActividad(resultado.usuario.id, 'Inicio de sesión', `Rol: ${resultado.rol}`);
         logApp('Login exitoso', `Usuario: ${resultado.usuario.usuario}`, 'success');
 
-        // Limpiar caché de datos sensibles
         cacheClear();
 
         return {
@@ -263,12 +268,12 @@ function registro(datos) {
 
 function logout() {
     try {
-        const token = localStorage.getItem('ipuc15_token');
+        const token = localStorage.getItem('ipuc18_token');
         if (token && TOKENS[token]) {
             registrarActividad(TOKENS[token].usuario.id, 'Cierre de sesión');
             delete TOKENS[token];
         }
-        ['ipuc15_token', 'ipuc15_usuario', 'ipuc15_rol', 'ipuc15_token_expira'].forEach(k => {
+        ['ipuc18_token', 'ipuc18_usuario', 'ipuc18_rol', 'ipuc18_token_expira'].forEach(k => {
             localStorage.removeItem(k);
         });
         cacheClear();
@@ -287,9 +292,9 @@ function verificarSesion() {
             return { success: false, message: 'Base de datos no disponible' };
         }
 
-        const token = localStorage.getItem('ipuc15_token');
-        const usuarioData = localStorage.getItem('ipuc15_usuario');
-        const rol = localStorage.getItem('ipuc15_rol');
+        const token = localStorage.getItem('ipuc18_token');
+        const usuarioData = localStorage.getItem('ipuc18_usuario');
+        const rol = localStorage.getItem('ipuc18_rol');
 
         if (!token || !usuarioData) {
             return { success: false, message: 'No hay sesión activa' };
@@ -297,7 +302,7 @@ function verificarSesion() {
 
         const tokenValido = verificarToken(token);
         if (!tokenValido) {
-            localStorage.removeItem('ipuc15_token');
+            localStorage.removeItem('ipuc18_token');
             return { success: false, message: 'Sesión expirada' };
         }
 
@@ -307,8 +312,8 @@ function verificarSesion() {
         if (!userExists) {
             const adminExists = db.cargar('administradores')?.administradores?.find(a => a.id === usuario.id);
             if (!adminExists) {
-                localStorage.removeItem('ipuc15_token');
-                localStorage.removeItem('ipuc15_usuario');
+                localStorage.removeItem('ipuc18_token');
+                localStorage.removeItem('ipuc18_usuario');
                 return { success: false, message: 'Usuario no encontrado' };
             }
         }
@@ -452,7 +457,7 @@ function actualizarUsuario(id, datos) {
         });
 
         db.guardar('usuarios', u);
-        cacheClear(`usuario_${id}`);
+        cacheClear('usuario_');
         cacheClear('usuarios_list');
         logApp('Usuario actualizado', `ID: ${id}`, 'info');
         return { success: true, mensaje: 'Usuario actualizado correctamente' };
@@ -478,7 +483,7 @@ function verificarUsuario(id) {
         }
 
         db.guardar('usuarios', u);
-        cacheClear(`usuario_${id}`);
+        cacheClear('usuario_');
         cacheClear('usuarios_list');
         logApp('Usuario verificado', `ID: ${id}`, 'success');
         return { success: true, mensaje: 'Usuario verificado correctamente' };
@@ -507,7 +512,7 @@ function cambiarPassword(id, pwActual, pwNueva) {
 
         u.usuarios[idx].password = db.hashPassword(pwNueva);
         db.guardar('usuarios', u);
-        cacheClear(`usuario_${id}`);
+        cacheClear('usuario_');
         logApp('Contraseña cambiada', `ID: ${id}`, 'info');
         return { success: true, mensaje: 'Contraseña actualizada correctamente' };
     } catch (error) {
@@ -1908,6 +1913,215 @@ function asignarInsignia(usuarioId, insigniaId) {
 }
 
 // ============================================
+// FUNCIONES DE REPORTES v18.0 (NUEVO)
+// ============================================
+
+/**
+ * Obtiene todos los reportes con filtros opcionales
+ */
+function obtenerReportes(filtros = {}) {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        
+        const cacheKey = `reportes_list_${JSON.stringify(filtros)}`;
+        const cached = cacheGet(cacheKey);
+        if (cached) return cached;
+        
+        const result = db.getReportes(filtros);
+        cacheSet(cacheKey, result);
+        return result;
+    } catch (error) {
+        logApp('Error obteniendo reportes', error.message, 'error');
+        return [];
+    }
+}
+
+/**
+ * Obtiene un reporte por ID
+ */
+function obtenerReporte(id) {
+    try {
+        const db = getDB();
+        if (!db) return null;
+        
+        const cacheKey = `reporte_${id}`;
+        const cached = cacheGet(cacheKey);
+        if (cached) return cached;
+        
+        const result = db.getReporte(id);
+        cacheSet(cacheKey, result);
+        return result;
+    } catch (error) {
+        logApp('Error obteniendo reporte', error.message, 'error');
+        return null;
+    }
+}
+
+/**
+ * Obtiene reportes pendientes
+ */
+function obtenerReportesPendientes() {
+    try {
+        const db = getDB();
+        if (!db) return [];
+        
+        const cacheKey = 'reportes_pendientes';
+        const cached = cacheGet(cacheKey);
+        if (cached) return cached;
+        
+        const result = db.getReportesPendientes();
+        cacheSet(cacheKey, result);
+        return result;
+    } catch (error) {
+        logApp('Error obteniendo reportes pendientes', error.message, 'error');
+        return [];
+    }
+}
+
+/**
+ * Crea un nuevo reporte
+ */
+function crearReporte(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        if (!datos.tipo || !datos.reportado_por || !datos.descripcion) {
+            return { success: false, error: 'Datos incompletos para el reporte' };
+        }
+
+        const resultado = db.addReporte(datos);
+        if (resultado.success) {
+            cacheClear('reportes_');
+            cacheClear('reporte_');
+            logApp('Reporte creado', `Tipo: ${datos.tipo}, Urgencia: ${datos.urgencia}`, 'success');
+        }
+        return resultado;
+    } catch (error) {
+        logApp('Error creando reporte', error.message, 'error');
+        return { success: false, error: 'Error al crear reporte' };
+    }
+}
+
+/**
+ * Cambia el estado de un reporte
+ */
+function cambiarEstadoReporte(id, nuevoEstado, usuarioAdmin = 'Admin', comentario = '') {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const resultado = db.cambiarEstadoReporte(id, nuevoEstado, usuarioAdmin, comentario);
+        if (resultado.success) {
+            cacheClear('reportes_');
+            cacheClear(`reporte_${id}`);
+            logApp('Estado de reporte cambiado', `ID: ${id}, Estado: ${nuevoEstado}`, 'info');
+        }
+        return resultado;
+    } catch (error) {
+        logApp('Error cambiando estado de reporte', error.message, 'error');
+        return { success: false, error: 'Error al cambiar estado de reporte' };
+    }
+}
+
+/**
+ * Agrega notas administrativas a un reporte
+ */
+function agregarNotaReporte(id, nota, usuarioAdmin = 'Admin') {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const resultado = db.agregarNotaReporte(id, nota, usuarioAdmin);
+        if (resultado.success) {
+            cacheClear(`reporte_${id}`);
+            logApp('Nota agregada a reporte', `ID: ${id}`, 'info');
+        }
+        return resultado;
+    } catch (error) {
+        logApp('Error agregando nota a reporte', error.message, 'error');
+        return { success: false, error: 'Error al agregar nota' };
+    }
+}
+
+/**
+ * Elimina un reporte
+ */
+function eliminarReporte(id) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const resultado = db.deleteReporte(id);
+        if (resultado.success) {
+            cacheClear('reportes_');
+            cacheClear(`reporte_${id}`);
+            logApp('Reporte eliminado', `ID: ${id}`, 'info');
+        }
+        return resultado;
+    } catch (error) {
+        logApp('Error eliminando reporte', error.message, 'error');
+        return { success: false, error: 'Error al eliminar reporte' };
+    }
+}
+
+/**
+ * Obtiene estadísticas de reportes
+ */
+function obtenerEstadisticasReportes() {
+    try {
+        const db = getDB();
+        if (!db) return {};
+        
+        const cacheKey = 'estadisticas_reportes';
+        const cached = cacheGet(cacheKey);
+        if (cached) return cached;
+        
+        const result = db.getEstadisticasReportes();
+        cacheSet(cacheKey, result);
+        return result;
+    } catch (error) {
+        logApp('Error obteniendo estadísticas de reportes', error.message, 'error');
+        return {};
+    }
+}
+
+/**
+ * Obtiene la configuración de reportes
+ */
+function obtenerConfiguracionReportes() {
+    try {
+        const db = getDB();
+        if (!db) return null;
+        return db.getConfiguracionReportes();
+    } catch (error) {
+        logApp('Error obteniendo configuración de reportes', error.message, 'error');
+        return null;
+    }
+}
+
+/**
+ * Actualiza la configuración de reportes
+ */
+function actualizarConfiguracionReportes(config) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+
+        const resultado = db.updateConfiguracionReportes(config);
+        if (resultado.success) {
+            cacheClear('estadisticas_reportes');
+            logApp('Configuración de reportes actualizada', '', 'success');
+        }
+        return resultado;
+    } catch (error) {
+        logApp('Error actualizando configuración de reportes', error.message, 'error');
+        return { success: false, error: 'Error al actualizar configuración' };
+    }
+}
+
+// ============================================
 // FUNCIONES DE ESTADÍSTICAS Y SISTEMA
 // ============================================
 function obtenerEstadisticas() {
@@ -2073,7 +2287,7 @@ function obtenerLogs(limit = 100) {
 }
 
 // ============================================
-// FUNCIÓN DE INICIALIZACIÓN
+// FUNCIÓN DE INICIALIZACIÓN v18.0
 // ============================================
 function iniciarApp() {
     try {
@@ -2092,10 +2306,11 @@ function iniciarApp() {
             logApp('Sesión activa', `Usuario: ${sesion.usuario.usuario}`, 'info');
         }
         
+        // Limpiar logs antiguos
         try {
-            const logs = JSON.parse(localStorage.getItem('ipuc15_app_logs') || '[]');
+            const logs = JSON.parse(localStorage.getItem('ipuc18_app_logs') || '[]');
             if (logs.length > 1000) {
-                localStorage.setItem('ipuc15_app_logs', JSON.stringify(logs.slice(-500)));
+                localStorage.setItem('ipuc18_app_logs', JSON.stringify(logs.slice(-500)));
             }
         } catch (e) {}
         
@@ -2112,8 +2327,9 @@ function iniciarApp() {
 }
 
 // ============================================
-// EXPORTAR FUNCIONES GLOBALES
+// EXPORTAR FUNCIONES GLOBALES v18.0
 // ============================================
+
 // Autenticación
 window.login = login;
 window.registro = registro;
@@ -2248,6 +2464,18 @@ window.obtenerInsignias = obtenerInsignias;
 window.obtenerInsigniasUsuario = obtenerInsigniasUsuario;
 window.asignarInsignia = asignarInsignia;
 
+// NUEVO v18: Reportes
+window.obtenerReportes = obtenerReportes;
+window.obtenerReporte = obtenerReporte;
+window.obtenerReportesPendientes = obtenerReportesPendientes;
+window.crearReporte = crearReporte;
+window.cambiarEstadoReporte = cambiarEstadoReporte;
+window.agregarNotaReporte = agregarNotaReporte;
+window.eliminarReporte = eliminarReporte;
+window.obtenerEstadisticasReportes = obtenerEstadisticasReportes;
+window.obtenerConfiguracionReportes = obtenerConfiguracionReportes;
+window.actualizarConfiguracionReportes = actualizarConfiguracionReportes;
+
 // Estadísticas y Sistema
 window.obtenerEstadisticas = obtenerEstadisticas;
 window.obtenerConfiguracion = obtenerConfiguracion;
@@ -2260,13 +2488,11 @@ window.limpiarDatos = limpiarDatos;
 window.obtenerLogs = obtenerLogs;
 window.iniciarApp = iniciarApp;
 
-// Log
+// Log y Caché
 window.logApp = logApp;
-
-// Caché
 window.cacheClear = cacheClear;
 
 // ============================================
-// INICIALIZAR (SIN CONSOLE.LOG)
+// INICIALIZAR APLICACIÓN v18.0
 // ============================================
 iniciarApp();
