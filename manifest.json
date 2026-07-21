@@ -1,53 +1,26 @@
 {
-    "name": "IPUC LA FONDA - International Pentecostal Church v15.0",
+    "name": "IPUC LA FONDA - Iglesia Pentecostal Unida de Colombia v18.0",
     "short_name": "IPUC LA FONDA",
-    "description": "Plataforma oficial de IPUC LA FONDA. Where the Holy Spirit moves. Accede a cultos, eventos, noticias, devocionales, música, podcast y comunidad cristiana a nivel mundial.",
+    "description": "Plataforma oficial de IPUC LA FONDA. Donde el Espiritu Santo se mueve. Accede a cultos, eventos, noticias, devocionales, musica, podcast y comunidad cristiana.",
     "start_url": "/",
     "scope": "/",
-    "id": "ipuc-la-fonda-v15.0-pro",
+    "id": "ipuc-la-fonda-v18.0-pro",
 
     "display": "standalone",
-    "display_override": [
-        "window-controls-overlay",
-        "standalone",
-        "minimal-ui",
-        "browser"
-    ],
+    "display_override": ["standalone", "minimal-ui", "browser"],
     "orientation": "any",
 
     "background_color": "#1a237e",
     "theme_color": "#1a237e",
-    "dark_background_color": "#0a0a1a",
-    "dark_theme_color": "#0a1628",
 
     "lang": "es-CO",
     "dir": "ltr",
 
-    "categories": [
-        "social",
-        "lifestyle",
-        "utilities",
-        "education",
-        "books",
-        "religion",
-        "music",
-        "news"
-    ],
-    "iarc_rating_id": "e10+",
+    "categories": ["social", "lifestyle", "utilities", "education", "religion", "music", "news"],
 
     "launch_handler": {
-        "client_mode": [
-            "navigate-existing",
-            "auto"
-        ]
+        "client_mode": ["navigate-existing", "auto"]
     },
-
-    "edge_side_panel": {
-        "preferred_width": 400
-    },
-
-    "handle_links": "preferred",
-    "capture_links": "existing-client-event",
 
     "icons": [
         {
@@ -127,12 +100,6 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
-        },
-        {
-            "src": "/assets/icons/monochrome-icon.svg",
-            "sizes": "any",
-            "type": "image/svg+xml",
-            "purpose": "monochrome"
         }
     ],
 
@@ -142,84 +109,14 @@
             "sizes": "1280x720",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "Pantalla principal de IPUC LA FONDA en escritorio"
-        },
-        {
-            "src": "/assets/screenshots/desktop-music.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Reproductor de música en escritorio"
-        },
-        {
-            "src": "/assets/screenshots/desktop-events.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Calendario de eventos en escritorio"
-        },
-        {
-            "src": "/assets/screenshots/desktop-chat.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Chat y mensajería en escritorio"
-        },
-        {
-            "src": "/assets/screenshots/desktop-admin.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Panel de administración en escritorio"
+            "label": "Pantalla principal en escritorio"
         },
         {
             "src": "/assets/screenshots/mobile-home.png",
             "sizes": "360x640",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "IPUC LA FONDA - Vista móvil principal"
-        },
-        {
-            "src": "/assets/screenshots/mobile-publications.png",
-            "sizes": "360x640",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Muro de publicaciones en móvil"
-        },
-        {
-            "src": "/assets/screenshots/mobile-events.png",
-            "sizes": "360x640",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Eventos y calendario en móvil"
-        },
-        {
-            "src": "/assets/screenshots/mobile-chat.png",
-            "sizes": "360x640",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Chat y mensajes en móvil"
-        },
-        {
-            "src": "/assets/screenshots/mobile-podcast.png",
-            "sizes": "360x640",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Podcast y música en móvil"
-        },
-        {
-            "src": "/assets/screenshots/mobile-profile.png",
-            "sizes": "360x640",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Perfil de usuario en móvil"
-        },
-        {
-            "src": "/assets/screenshots/mobile-store.png",
-            "sizes": "360x640",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Tienda cristiana en móvil"
+            "label": "Pantalla principal en movil"
         }
     ],
 
@@ -227,249 +124,100 @@
         {
             "name": "Inicio",
             "short_name": "Inicio",
-            "description": "Ir a la página principal de IPUC LA FONDA",
+            "description": "Ir a la pagina principal",
             "url": "/#inicio",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        },
-        {
-            "name": "Cultos en Vivo",
-            "short_name": "Cultos",
-            "description": "Ver transmisiones en vivo de cultos",
-            "url": "/#cultos",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        },
-        {
-            "name": "Música",
-            "short_name": "Música",
-            "description": "Escuchar música de adoración",
-            "url": "/#musica",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Asistencia",
             "short_name": "Asistencia",
-            "description": "Confirmar tu asistencia al próximo culto",
+            "description": "Confirmar asistencia al culto",
             "url": "/#asistencia",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Horarios",
             "short_name": "Horarios",
-            "description": "Ver los horarios de cultos semanales",
+            "description": "Ver horarios de cultos",
             "url": "/#horarios",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Devocional",
             "short_name": "Devocional",
-            "description": "Leer el devocional y versículo del día",
+            "description": "Leer el devocional del dia",
             "url": "/#devocional",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Noticias",
             "short_name": "Noticias",
-            "description": "Últimas noticias de la iglesia",
+            "description": "Ultimas noticias",
             "url": "/#noticias",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Eventos",
             "short_name": "Eventos",
-            "description": "Calendario de eventos de la iglesia",
+            "description": "Calendario de eventos",
             "url": "/#eventos",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Peticiones",
             "short_name": "Peticiones",
-            "description": "Compartir peticiones de oración",
+            "description": "Peticiones de oracion",
             "url": "/#peticiones",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        },
-        {
-            "name": "Chat",
-            "short_name": "Chat",
-            "description": "Chat y mensajes de la comunidad",
-            "url": "/#chat",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        },
-        {
-            "name": "Podcast",
-            "short_name": "Podcast",
-            "description": "Escuchar episodios de podcast",
-            "url": "/#podcast",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        },
-        {
-            "name": "Directorio",
-            "short_name": "Directorio",
-            "description": "Buscar miembros de la comunidad",
-            "url": "/#directorio",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Biblioteca",
             "short_name": "Biblioteca",
-            "description": "Acceder a recursos y libros",
+            "description": "Recursos y libros",
             "url": "/#biblioteca",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
-            "name": "Encuestas",
-            "short_name": "Encuestas",
-            "description": "Participar en encuestas de la iglesia",
-            "url": "/#encuestas",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        },
-        {
-            "name": "Tienda",
-            "short_name": "Tienda",
-            "description": "Tienda cristiana y recursos",
-            "url": "/#tienda",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "name": "Podcast",
+            "short_name": "Podcast",
+            "description": "Episodios de podcast",
+            "url": "/#podcast",
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Donaciones",
             "short_name": "Donar",
-            "description": "Hacer donaciones a la iglesia",
+            "description": "Hacer donaciones",
             "url": "/#donaciones",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Perfil",
             "short_name": "Perfil",
-            "description": "Ver y editar tu perfil",
+            "description": "Ver tu perfil",
             "url": "/#perfil",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
-            "name": "Configuración",
+            "name": "Configuracion",
             "short_name": "Config",
-            "description": "Configuración de la aplicación",
+            "description": "Configurar la aplicacion",
             "url": "/#configuracion",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Reportes",
+            "short_name": "Reportes",
+            "description": "Gestion de reportes",
+            "url": "/#gestion-reportes",
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         },
         {
             "name": "Admin",
             "short_name": "Admin",
-            "description": "Panel de administración",
+            "description": "Panel de administracion",
             "url": "/#dashboard",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
+            "icons": [{ "src": "/assets/icons/icon-192x192.png", "sizes": "192x192" }]
         }
     ],
 
@@ -479,34 +227,6 @@
         {
             "protocol": "web+ipuc",
             "url": "/?action=%s"
-        },
-        {
-            "protocol": "web+ipuc-prayer",
-            "url": "/#peticiones?prayer=%s"
-        },
-        {
-            "protocol": "web+ipuc-event",
-            "url": "/#eventos?event=%s"
-        },
-        {
-            "protocol": "web+ipuc-music",
-            "url": "/#musica?track=%s"
-        },
-        {
-            "protocol": "web+ipuc-podcast",
-            "url": "/#podcast?episode=%s"
-        },
-        {
-            "protocol": "web+ipuc-notice",
-            "url": "/#noticias?notice=%s"
-        },
-        {
-            "protocol": "web+ipuc-user",
-            "url": "/#directorio?user=%s"
-        },
-        {
-            "protocol": "web+ipuc-group",
-            "url": "/#grupos?group=%s"
         }
     ],
 
@@ -517,114 +237,9 @@
         "params": {
             "title": "title",
             "text": "text",
-            "url": "url",
-            "files": [
-                {
-                    "name": "image",
-                    "accept": ["image/*"]
-                },
-                {
-                    "name": "audio",
-                    "accept": ["audio/*"]
-                },
-                {
-                    "name": "video",
-                    "accept": ["video/*"]
-                }
-            ]
-        }
-    },
-
-    "file_handlers": [
-        {
-            "action": "/#biblioteca?upload=true",
-            "accept": {
-                "application/pdf": [".pdf"],
-                "text/plain": [".txt", ".md"],
-                "application/msword": [".doc", ".docx"],
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-                "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"],
-                "audio/*": [".mp3", ".wav", ".ogg", ".m4a"],
-                "video/*": [".mp4", ".webm", ".ogg"],
-                "application/epub+zip": [".epub"],
-                "application/x-mobipocket-ebook": [".mobi"]
-            }
-        }
-    ],
-
-    "note_taking": {
-        "new_note_url": "/#publicaciones?action=new"
-    },
-
-    "prefer_related_applications": false,
-
-    "serviceworker": {
-        "src": "/service-worker.js",
-        "scope": "/",
-        "use_cache": true,
-        "update_via_cache": "all"
-    },
-
-    "splash_pages": {
-        "dark": {
-            "background_color": "#0a0a1a",
-            "image": "/assets/splash/dark-splash.png"
-        },
-        "light": {
-            "background_color": "#1a237e",
-            "image": "/assets/splash/light-splash.png"
-        }
-    },
-
-    "tabstrip": {
-        "home_tab": {
-            "scope": "/",
-            "start_url": "/#inicio",
-            "icons": [
-                {
-                    "src": "/assets/icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                }
-            ]
-        }
-    },
-
-    "isolated_storage": true,
-
-    "share_auto": {
-        "action": "/#publicaciones",
-        "method": "POST",
-        "enctype": "multipart/form-data",
-        "params": {
-            "title": "title",
-            "text": "text",
             "url": "url"
         }
     },
 
-    "window_controls_overlay": {
-        "show": true,
-        "title": "IPUC LA FONDA"
-    },
-
-    "notifications": {
-        "enabled": true,
-        "vibrate": [100, 50, 100],
-        "sound": "/assets/sounds/notification.mp3",
-        "icon": "/assets/icons/icon-192x192.png",
-        "badge": "/assets/icons/badge-icon.png"
-    },
-
-    "background_sync": {
-        "enabled": true,
-        "network_timeout": 30000
-    },
-
-    "web_share": {
-        "enabled": true,
-        "title": "IPUC LA FONDA",
-        "text": "Where the Holy Spirit moves",
-        "url": "https://ipuclafonda.netlify.app/"
-    }
+    "prefer_related_applications": false
 }
