@@ -2,7 +2,7 @@
 // IPUC LA FONDA - SCRIPT.JS v18.0 PRO ULTIMATE
 // Web App Profesional - Sistema Completo
 // Incluye: Reportes, Administración, Comunidad
-// VERSIÓN ESTABLE - OPTIMIZADA
+// VERSIÓN ESTABLE - SIN ERRORES
 // ============================================
 
 // ============================================
@@ -16,6 +16,7 @@ const CONFIG = {
         USUARIO: 'ipuc18_usuario',
         ROL: 'ipuc18_rol',
         TEMA: 'ipuc18_tema',
+        IDIOMA: 'ipuc18_idioma',
         PUBLICACIONES: 'ipuc18_publicaciones',
         COMENTARIOS: 'ipuc18_comentarios',
         REACCIONES: 'ipuc18_reacciones',
@@ -30,12 +31,8 @@ const CONFIG = {
         PODCAST: 'ipuc18_podcast',
         CHAT: 'ipuc18_chat',
         DIRECTORIO: 'ipuc18_directorio',
-        // NUEVO v18: Sistema de Reportes
-        REPORTES: 'ipuc18_reportes',
-        REPORTES_PENDIENTES: 'ipuc18_reportes_pendientes',
-        REPORTES_CONFIG: 'ipuc18_reportes_config'
+        REPORTES: 'ipuc18_reportes'
     },
-    DIAS_SEMANA: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
     TITULOS_PAGINAS: {
         'inicio': 'Inicio',
         'horarios': 'Horarios de Cultos',
@@ -58,20 +55,13 @@ const CONFIG = {
         'gestion-usuarios': 'Gestión de Usuarios',
         'gestion-noticias': 'Gestión de Noticias',
         'gestion-eventos': 'Gestión de Eventos',
+        'gestion-reportes': 'Gestión de Reportes',
+        'mis-reportes': 'Mis Reportes',
         'versiculos': 'Versículos Diarios',
         'sistema': 'Configuración del Sistema',
         'seguridad': 'Seguridad',
-        'grupos': 'Grupos',
-        'videos': 'Videos',
-        'logs': 'Logs',
-        // NUEVO v18: Páginas de Reportes
-        'gestion-reportes': 'Gestión de Reportes',
-        'mis-reportes': 'Mis Reportes',
-        'reporte-asistencia': 'Reporte de Asistencia',
-        'reporte-financiero': 'Reporte Financiero',
-        'reporte-ministerios': 'Reporte de Ministerios',
-        'reporte-crecimiento': 'Reporte de Crecimiento',
-        'reporte-moderacion': 'Reporte de Moderación'
+        'radio': 'Radio 24/7',
+        'donaciones': 'Donaciones'
     },
     REACCIONES_TIPOS: [
         { icono: 'bx bxs-hands', nombre: 'Amén', clave: 'amen' },
@@ -79,15 +69,7 @@ const CONFIG = {
         { icono: 'bx bxs-fire', nombre: 'Fuego', clave: 'fuego' },
         { icono: 'bx bxs-pray', nombre: 'Orando', clave: 'orando' },
         { icono: 'bx bxs-star', nombre: 'Bendición', clave: 'bendicion' }
-    ],
-    // NUEVO v18: Configuración de Reportes
-    REPORTES_CONFIG: {
-        MAX_REPORTES_PENDIENTES: 50,
-        TIEMPO_RESOLUCION_HORAS: 72,
-        NIVELES_URGENCIA: ['baja', 'media', 'alta', 'critica'],
-        ESTADOS_REPORTE: ['pendiente', 'en_revision', 'resuelto', 'desestimado'],
-        TIPOS_REPORTE: ['usuario', 'contenido', 'asistencia', 'financiero', 'ministerio']
-    }
+    ]
 };
 
 // ============================================
@@ -127,13 +109,66 @@ const APP_STATE = {
     chat: [],
     directorio: [],
     reportes: [],
-    isOnline: navigator.onLine,
+    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
     idioma: 'es'
 };
 
 // ============================================
 // FUNCIONES DE UTILIDAD
 // ============================================
+
+function cargarArray(key) {
+    try {
+        if (!key || typeof key !== 'string') return [];
+        const data = localStorage.getItem(key);
+        if (!data || data === 'null' || data === 'undefined' || data === '') return [];
+        const parsed = JSON.parse(data);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            for (const val of Object.values(parsed)) {
+                if (Array.isArray(val)) return val;
+            }
+            return [];
+        }
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function cargarObjeto(key) {
+    try {
+        if (!key || typeof key !== 'string') return {};
+        const data = localStorage.getItem(key);
+        if (!data || data === 'null' || data === 'undefined' || data === '') return {};
+        const parsed = JSON.parse(data);
+        return (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) ? parsed : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function getDB() {
+    try {
+        if (typeof window !== 'undefined' && window.db && typeof window.db.cargar === 'function') {
+            return window.db;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function generarId() {
+    return 'rpt_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function escapeHtml(texto) {
+    if (!texto || typeof texto !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
 function formatearFecha(f) {
     try {
         const d = new Date(f);
@@ -144,77 +179,20 @@ function formatearFecha(f) {
         if (diff < 3600000) return 'Hace ' + Math.floor(diff / 60000) + ' min';
         if (diff < 86400000) return 'Hace ' + Math.floor(diff / 3600000) + ' h';
         if (diff < 604800000) return 'Hace ' + Math.floor(diff / 86400000) + ' d';
-        return d.toLocaleDateString('es-CO', { 
-            day: 'numeric', 
-            month: 'short', 
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
     } catch {
         return 'Fecha inválida';
     }
 }
 
-function formatearFechaCorta(f) {
-    try {
-        const d = new Date(f);
-        if (isNaN(d.getTime())) return '--';
-        return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
-    } catch {
-        return '--';
-    }
-}
-
-function generarId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-function escapeHtml(texto) {
-    const div = document.createElement('div');
-    div.textContent = texto;
-    return div.innerHTML;
-}
-
 // ============================================
-// FUNCIONES DE IDIOMA
+// FUNCIONES DE UI
 // ============================================
-function cambiarIdioma(lang) {
-    const idiomas = {
-        es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', de: 'DE', it: 'IT'
-    };
-    if (!idiomas[lang]) return;
-    APP_STATE.idioma = lang;
-    localStorage.setItem('ipuc18_idioma', lang);
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-    });
-    showToast('🌐 Idioma: ' + idiomas[lang], 'info');
-}
 
-// ============================================
-// FUNCIONES DE TEMA
-// ============================================
-function toggleTema() {
-    APP_STATE.tema = APP_STATE.tema === 'light' ? 'dark' : 'light';
-    aplicarTema(APP_STATE.tema);
-    localStorage.setItem(CONFIG.STORAGE_KEYS.TEMA, APP_STATE.tema);
-}
-
-function aplicarTema(t) {
-    document.documentElement.setAttribute('data-theme', t);
-    const icon = document.querySelector('#theme-toggle i');
-    if (icon) icon.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = t === 'dark' ? '#1a1a2e' : '#1a237e';
-}
-
-// ============================================
-// FUNCIONES DE TOAST
-// ============================================
 function showToast(mensaje, tipo, duracion) {
     tipo = tipo || 'info';
     duracion = duracion || 3500;
+    
     const container = document.getElementById('toast-container');
     if (!container) return;
     
@@ -228,48 +206,69 @@ function showToast(mensaje, tipo, duracion) {
     const toast = document.createElement('div');
     toast.className = 'toast ' + tipo;
     toast.setAttribute('role', 'alert');
-    toast.innerHTML = `
-        <i class="${iconos[tipo] || 'bx bxs-info-circle'}"></i>
-        <span>${mensaje}</span>
-    `;
+    toast.innerHTML = '<i class="' + (iconos[tipo] || 'bx bxs-info-circle') + '"></i><span>' + (mensaje || '') + '</span>';
     container.appendChild(toast);
     
-    setTimeout(() => {
-        toast.classList.add('toast-hide');
-        setTimeout(() => toast.remove(), 300);
+    setTimeout(function() {
+        if (toast && toast.parentNode) {
+            toast.classList.add('toast-hide');
+            setTimeout(function() { 
+                if (toast && toast.parentNode) toast.remove(); 
+            }, 300);
+        }
     }, duracion);
 }
 
-// ============================================
-// FUNCIONES DE MODAL
-// ============================================
-function cerrarModal() {
-    const modal = document.getElementById('modal');
-    if (modal) modal.classList.add('hidden');
-    const footer = document.getElementById('modal-footer');
-    if (footer) footer.classList.add('hidden');
+function toggleTema() {
+    APP_STATE.tema = APP_STATE.tema === 'light' ? 'dark' : 'light';
+    aplicarTema(APP_STATE.tema);
+    try { localStorage.setItem('ipuc18_tema', APP_STATE.tema); } catch (e) {}
 }
 
-function confirmarAccion(titulo, mensaje, callback, tipo) {
-    tipo = tipo || 'warning';
-    const titleEl = document.getElementById('confirm-title');
-    const msgEl = document.getElementById('confirm-message');
-    const modal = document.getElementById('confirm-modal');
-    if (!modal) return;
-    
-    if (titleEl) titleEl.textContent = titulo;
-    if (msgEl) msgEl.textContent = mensaje;
-    
-    const acceptBtn = document.getElementById('confirm-accept');
-    if (acceptBtn) acceptBtn.className = tipo === 'danger' ? 'btn-danger' : 'btn-primary';
-    
-    APP_STATE.pendingConfirmation = callback;
-    modal.classList.remove('hidden');
+function aplicarTema(t) {
+    try {
+        document.documentElement.setAttribute('data-theme', t);
+        const icon = document.querySelector('#theme-toggle i');
+        if (icon) icon.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = t === 'dark' ? '#1a1a2e' : '#1a237e';
+    } catch (e) {}
+}
+
+function cambiarIdioma(lang) {
+    const idiomas = { es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', de: 'DE', it: 'IT' };
+    if (!idiomas[lang]) return;
+    APP_STATE.idioma = lang;
+    try { localStorage.setItem('ipuc18_idioma', lang); } catch (e) {}
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
 }
 
 // ============================================
 // FUNCIONES DE NAVEGACIÓN
 // ============================================
+
+function navegarA(page) {
+    if (!page || APP_STATE.isLoading) return;
+    APP_STATE.currentPage = page;
+    APP_STATE.isLoading = true;
+    
+    document.querySelectorAll('.nav-item[data-page]').forEach(function(el) {
+        el.classList.toggle('active', el.getAttribute('data-page') === page);
+    });
+    
+    const titulo = (CONFIG.TITULOS_PAGINAS && CONFIG.TITULOS_PAGINAS[page]) || page;
+    const titleEl = document.getElementById('page-title');
+    const breadcrumb = document.getElementById('breadcrumb-current');
+    if (titleEl) titleEl.textContent = titulo;
+    if (breadcrumb) breadcrumb.textContent = titulo;
+    
+    cargarPagina(page);
+    if (window.innerWidth < 1024) cerrarSidebar();
+    APP_STATE.isLoading = false;
+}
+
 function mostrarApp() {
     const welcome = document.getElementById('welcome-screen');
     const app = document.getElementById('app');
@@ -330,137 +329,32 @@ function manejarResponsiveSidebar() {
     }
 }
 
-function navegarA(page) {
-    if (!page || APP_STATE.isLoading) return;
-    APP_STATE.currentPage = page;
-    APP_STATE.isLoading = true;
-    
-    document.querySelectorAll('.nav-item[data-page]').forEach(el => {
-        el.classList.toggle('active', el.getAttribute('data-page') === page);
-    });
-    
-    const titulo = CONFIG.TITULOS_PAGINAS[page] || page;
-    const titleEl = document.getElementById('page-title');
-    const breadcrumb = document.getElementById('breadcrumb-current');
-    if (titleEl) titleEl.textContent = titulo;
-    if (breadcrumb) breadcrumb.textContent = titulo;
-    
-    cargarPagina(page);
-    if (window.innerWidth < 1024) cerrarSidebar();
-    APP_STATE.isLoading = false;
-}
-
 function actualizarSidebarUsuario() {
     if (!APP_STATE.usuario) return;
     const mini = document.getElementById('user-mini');
-    if (mini) {
-        const img = mini.querySelector('img');
-        const name = mini.querySelector('.user-name');
-        const role = mini.querySelector('.user-role');
-        const status = mini.querySelector('.user-status');
-        if (img) img.src = APP_STATE.usuario.foto || 'assets/avatars/default.png';
-        if (name) name.textContent = APP_STATE.usuario.nombre || 'Usuario';
-        if (role) {
-            const roles = { admin: 'Administrador', invitado: 'Invitado', usuario: 'Miembro' };
-            role.textContent = roles[APP_STATE.rol] || 'Miembro';
-        }
-        if (status) status.className = 'user-status ' + (APP_STATE.isOnline ? 'online' : 'offline');
+    if (!mini) return;
+    
+    const img = mini.querySelector('img');
+    const name = mini.querySelector('.user-name');
+    const role = mini.querySelector('.user-role');
+    const status = mini.querySelector('.user-status');
+    
+    if (img) img.src = (APP_STATE.usuario.foto) || 'assets/avatars/default.png';
+    if (name) name.textContent = (APP_STATE.usuario.nombre) || 'Usuario';
+    if (role) {
+        const roles = { admin: 'Administrador', invitado: 'Invitado', usuario: 'Miembro' };
+        role.textContent = roles[APP_STATE.rol] || 'Miembro';
     }
+    if (status) status.className = 'user-status ' + (APP_STATE.isOnline ? 'online' : 'offline');
+    
     const adminMenu = document.getElementById('admin-menu');
     if (adminMenu) adminMenu.classList.toggle('hidden', APP_STATE.rol !== 'admin');
 }
 
 // ============================================
-// CONTADOR, FECHA, VERSÍCULO
+// TOGGLES DE PANELES
 // ============================================
-function iniciarContadorRegresivo() {
-    if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
-    actualizarContador();
-    APP_STATE.contadorInterval = setInterval(actualizarContador, 1000);
-}
 
-function actualizarContador() {
-    const d = document.getElementById('contador-dias');
-    const h = document.getElementById('contador-horas');
-    const m = document.getElementById('contador-minutos');
-    const s = document.getElementById('contador-segundos');
-    const t = document.getElementById('contador-titulo');
-    const e = document.getElementById('contador-estado');
-    if (!d && !t) return;
-    
-    try {
-        const ahora = new Date();
-        const domingo = new Date(ahora);
-        domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
-        domingo.setHours(10, 0, 0, 0);
-        if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
-        
-        const diff = Math.max(0, (domingo - ahora) / 1000);
-        const dias = Math.floor(diff / 86400);
-        const horas = Math.floor((diff % 86400) / 3600);
-        const minutos = Math.floor((diff % 3600) / 60);
-        const segundos = Math.floor(diff % 60);
-        
-        if (t) t.textContent = 'Culto Dominical - Domingo';
-        if (d) d.textContent = String(dias).padStart(2, '0');
-        if (h) h.textContent = String(horas).padStart(2, '0');
-        if (m) m.textContent = String(minutos).padStart(2, '0');
-        if (s) s.textContent = String(segundos).padStart(2, '0');
-        if (e) {
-            e.textContent = diff > 0 ? 'PRÓXIMO CULTO' : '¡CULTO EN CURSO!';
-            e.className = 'contador-estado ' + (diff > 0 ? 'estado-proximo' : 'estado-activo');
-        }
-    } catch (_) {}
-}
-
-function iniciarActualizacionFecha() {
-    if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
-    actualizarFechaHora();
-    APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000);
-}
-
-function actualizarFechaHora() {
-    try {
-        const a = new Date();
-        const fe = document.getElementById('fecha-actual');
-        const ho = document.getElementById('hora-actual');
-        if (fe) {
-            fe.textContent = a.toLocaleDateString('es-CO', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-        }
-        if (ho) {
-            ho.textContent = a.toLocaleTimeString('es-CO', {
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-        }
-    } catch (_) {}
-}
-
-function cargarVersiculoDiario() {
-    const container = document.getElementById('versiculo-content');
-    if (!container) return;
-    
-    const versiculos = [
-        { texto: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", referencia: "Juan 3:16" },
-        { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
-        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" },
-        { texto: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", referencia: "Mateo 6:33" },
-        { texto: "Jehová te bendiga, y te guarde.", referencia: "Números 6:24-25" },
-        { texto: "El Señor es mi luz y mi salvación; ¿de quién temeré?", referencia: "Salmos 27:1" },
-        { texto: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal.", referencia: "Jeremías 29:11" }
-    ];
-    
-    const v = versiculos[new Date().getDay() % versiculos.length];
-    container.innerHTML = `
-        <p style="font-style:italic;font-size:1.1rem;line-height:1.8;">"${v.texto}"</p>
-        <p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">${v.referencia}</p>
-    `;
-}
-
-// ============================================
-// FUNCIONES UI
-// ============================================
 function toggleSearchBar() {
     APP_STATE.searchBarOpen = !APP_STATE.searchBarOpen;
     const bar = document.getElementById('search-bar');
@@ -468,7 +362,7 @@ function toggleSearchBar() {
         bar.classList.toggle('hidden', !APP_STATE.searchBarOpen);
         if (APP_STATE.searchBarOpen) {
             const input = document.getElementById('global-search-input');
-            if (input) setTimeout(() => input.focus(), 100);
+            if (input) setTimeout(function() { input.focus(); }, 100);
         }
     }
 }
@@ -491,1145 +385,47 @@ function toggleNotificaciones() {
     if (panel) panel.classList.toggle('hidden', !APP_STATE.notificationsOpen);
 }
 
-// ============================================
-// SISTEMA DE REPORTES v18.0
-// ============================================
-
-/**
- * Abre el panel de reportes rápidos
- */
 function togglePanelReportes() {
     APP_STATE.reportsPanelOpen = !APP_STATE.reportsPanelOpen;
     const panel = document.getElementById('reports-quick-panel');
     if (panel) {
         panel.classList.toggle('hidden', !APP_STATE.reportsPanelOpen);
-        if (APP_STATE.reportsPanelOpen) {
-            cargarReportesRecientes();
-        }
+        if (APP_STATE.reportsPanelOpen) cargarReportesRecientes();
     }
 }
 
-/**
- * Abre el modal para generar un nuevo reporte
- */
-function abrirModalReporte() {
-    const modal = document.getElementById('report-modal');
-    if (!modal) return;
-    
-    document.getElementById('report-modal-title').innerHTML = '<i class="bx bx-file"></i> Generar Nuevo Reporte';
-    
-    // Resetear formulario
-    const form = document.getElementById('report-form');
-    if (form) form.reset();
-    
-    // Mostrar campos por defecto (reporte de usuario)
-    cambiarTipoReporte('usuario');
-    
-    modal.classList.remove('hidden');
-}
+// ============================================
+// FUNCIONES DE MODAL
+// ============================================
 
-/**
- * Cierra el modal de reportes
- */
-function cerrarModalReporte() {
-    const modal = document.getElementById('report-modal');
+function cerrarModal() {
+    const modal = document.getElementById('modal');
     if (modal) modal.classList.add('hidden');
+    const footer = document.getElementById('modal-footer');
+    if (footer) footer.classList.add('hidden');
 }
 
-/**
- * Cambia dinámicamente los campos según el tipo de reporte
- */
-function cambiarTipoReporte(tipo) {
-    const userGroup = document.getElementById('report-user-group');
-    const dateRange = document.getElementById('report-date-range');
-    const ministerioGroup = document.getElementById('report-ministerio-group');
-    const motivoGroup = document.getElementById('report-motivo').parentElement;
+function confirmarAccion(titulo, mensaje, callback, tipo) {
+    tipo = tipo || 'warning';
+    const titleEl = document.getElementById('confirm-title');
+    const msgEl = document.getElementById('confirm-message');
+    const modal = document.getElementById('confirm-modal');
     
-    // Resetear visibilidad
-    if (userGroup) userGroup.style.display = 'none';
-    if (dateRange) dateRange.style.display = 'none';
-    if (ministerioGroup) ministerioGroup.style.display = 'none';
-    if (motivoGroup) motivoGroup.style.display = 'block';
+    if (!modal) return;
+    if (titleEl) titleEl.textContent = titulo || '¿Estás seguro?';
+    if (msgEl) msgEl.textContent = mensaje || '';
     
-    switch(tipo) {
-        case 'usuario':
-            if (userGroup) userGroup.style.display = 'block';
-            if (motivoGroup) motivoGroup.style.display = 'block';
-            break;
-        case 'contenido':
-            if (userGroup) userGroup.style.display = 'block';
-            if (motivoGroup) motivoGroup.style.display = 'block';
-            break;
-        case 'asistencia':
-            if (dateRange) dateRange.style.display = 'grid';
-            if (motivoGroup) motivoGroup.style.display = 'none';
-            break;
-        case 'financiero':
-            if (dateRange) dateRange.style.display = 'grid';
-            if (motivoGroup) motivoGroup.style.display = 'none';
-            break;
-        case 'ministerio':
-            if (ministerioGroup) ministerioGroup.style.display = 'block';
-            if (dateRange) dateRange.style.display = 'grid';
-            if (motivoGroup) motivoGroup.style.display = 'none';
-            break;
-    }
-}
-
-/**
- * Busca usuarios para reportar
- */
-function buscarUsuarioReporte(query) {
-    const resultsContainer = document.getElementById('report-user-results');
-    if (!resultsContainer) return;
+    const acceptBtn = document.getElementById('confirm-accept');
+    if (acceptBtn) acceptBtn.className = tipo === 'danger' ? 'btn-danger' : 'btn-primary';
     
-    if (!query || query.length < 2) {
-        resultsContainer.classList.add('hidden');
-        return;
-    }
-    
-    // Simular búsqueda de usuarios
-    const usuarios = [
-        { id: 1, nombre: 'Luis Esteban Potosi', email: 'esteban@ipuc.com' },
-        { id: 2, nombre: 'Maria Gonzalez', email: 'maria@ipuc.com' },
-        { id: 3, nombre: 'Carlos Rodriguez', email: 'carlos@ipuc.com' }
-    ];
-    
-    const resultados = usuarios.filter(u => 
-        u.nombre.toLowerCase().includes(query.toLowerCase()) ||
-        u.email.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    if (resultados.length === 0) {
-        resultsContainer.innerHTML = '<p class="no-results">No se encontraron usuarios</p>';
-    } else {
-        resultsContainer.innerHTML = resultados.map(u => `
-            <div class="search-result-item" onclick="seleccionarUsuarioReporte(${u.id}, '${u.nombre}', '${u.email}')">
-                <i class="bx bx-user"></i>
-                <div>
-                    <strong>${u.nombre}</strong>
-                    <small>${u.email}</small>
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    resultsContainer.classList.remove('hidden');
-}
-
-/**
- * Selecciona un usuario para el reporte
- */
-function seleccionarUsuarioReporte(id, nombre, email) {
-    const input = document.getElementById('report-user');
-    const resultsContainer = document.getElementById('report-user-results');
-    
-    if (input) {
-        input.value = nombre;
-        input.setAttribute('data-user-id', id);
-        input.setAttribute('data-user-email', email);
-    }
-    if (resultsContainer) resultsContainer.classList.add('hidden');
-}
-
-/**
- * Genera y guarda un nuevo reporte
- */
-function generarReporte(e) {
-    e.preventDefault();
-    
-    if (!APP_STATE.usuario) {
-        showToast('Debes iniciar sesión para generar reportes', 'warning');
-        return;
-    }
-    
-    const tipo = document.querySelector('input[name="report-type"]:checked')?.value || 'usuario';
-    const descripcion = document.getElementById('report-descripcion')?.value;
-    const urgencia = document.querySelector('input[name="report-urgencia"]:checked')?.value || 'baja';
-    
-    if (!descripcion || !descripcion.trim()) {
-        showToast('La descripción es obligatoria', 'warning');
-        return;
-    }
-    
-    // Construir objeto de reporte
-    const reporte = {
-        id: generarId(),
-        tipo: tipo,
-        reportado_por: {
-            id: APP_STATE.usuario.id,
-            nombre: APP_STATE.usuario.nombre,
-            email: APP_STATE.usuario.correo
-        },
-        descripcion: descripcion.trim(),
-        urgencia: urgencia,
-        estado: 'pendiente',
-        fecha: new Date().toISOString(),
-        fecha_resolucion: null,
-        notas_admin: '',
-        historial: [{
-            estado: 'pendiente',
-            fecha: new Date().toISOString(),
-            usuario: APP_STATE.usuario.nombre,
-            comentario: 'Reporte creado'
-        }]
-    };
-    
-    // Agregar datos específicos según tipo
-    switch(tipo) {
-        case 'usuario':
-        case 'contenido':
-            const userInput = document.getElementById('report-user');
-            reporte.usuario_reportado = {
-                id: userInput?.getAttribute('data-user-id'),
-                nombre: userInput?.value,
-                email: userInput?.getAttribute('data-user-email')
-            };
-            reporte.motivo = document.getElementById('report-motivo')?.value;
-            break;
-        case 'asistencia':
-        case 'financiero':
-            reporte.fecha_desde = document.getElementById('report-date-from')?.value;
-            reporte.fecha_hasta = document.getElementById('report-date-to')?.value;
-            break;
-        case 'ministerio':
-            reporte.ministerio = document.getElementById('report-ministerio')?.value;
-            reporte.fecha_desde = document.getElementById('report-date-from')?.value;
-            reporte.fecha_hasta = document.getElementById('report-date-to')?.value;
-            break;
-    }
-    
-    // Guardar reporte
-    APP_STATE.reportes.unshift(reporte);
-    localStorage.setItem(CONFIG.STORAGE_KEYS.REPORTES, JSON.stringify(APP_STATE.reportes));
-    
-    // Actualizar contadores
-    actualizarBadgeReportes();
-    
-    // Agregar notificación
-    agregarNotificacion(
-        'reporte_creado',
-        'Reporte generado exitosamente',
-        `Tu reporte #${reporte.id.substring(0, 8)} ha sido registrado.`
-    );
-    
-    // Cerrar modal y mostrar confirmación
-    cerrarModalReporte();
-    showToast('✅ Reporte generado exitosamente', 'success');
-    
-    // Recargar página actual si es gestión de reportes
-    if (APP_STATE.currentPage === 'gestion-reportes') {
-        navegarA('gestion-reportes');
-    }
-}
-
-/**
- * Carga la página de gestión de reportes (admin)
- */
-function cargarGestionReportes(container) {
-    if (!container) container = document.getElementById('page-content');
-    if (!container) return;
-    
-    APP_STATE.reportes = cargarArray(CONFIG.STORAGE_KEYS.REPORTES);
-    
-    // Filtros
-    const filtroEstado = '<select id="filtro-estado-reportes" onchange="filtrarReportes()">' +
-        '<option value="todos">Todos los estados</option>' +
-        '<option value="pendiente">Pendientes</option>' +
-        '<option value="en_revision">En Revisión</option>' +
-        '<option value="resuelto">Resueltos</option>' +
-        '<option value="desestimado">Desestimados</option>' +
-        '</select>';
-    
-    const filtroTipo = '<select id="filtro-tipo-reportes" onchange="filtrarReportes()">' +
-        '<option value="todos">Todos los tipos</option>' +
-        '<option value="usuario">Usuarios</option>' +
-        '<option value="contenido">Contenido</option>' +
-        '<option value="asistencia">Asistencia</option>' +
-        '<option value="financiero">Financiero</option>' +
-        '<option value="ministerio">Ministerios</option>' +
-        '</select>';
-    
-    container.innerHTML = `
-        <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-                <h2><i class="bx bx-file"></i> Gestión de Reportes</h2>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn-primary btn-sm" onclick="abrirModalReporte()">
-                        <i class="bx bx-plus"></i> Nuevo Reporte
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Filtros -->
-            <div class="card" style="margin-bottom:16px;">
-                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-                    <div>
-                        <label style="font-size:0.8rem;">Estado:</label>
-                        ${filtroEstado}
-                    </div>
-                    <div>
-                        <label style="font-size:0.8rem;">Tipo:</label>
-                        ${filtroTipo}
-                    </div>
-                    <div>
-                        <label style="font-size:0.8rem;">Urgencia:</label>
-                        <select id="filtro-urgencia-reportes" onchange="filtrarReportes()">
-                            <option value="todos">Todas</option>
-                            <option value="critica">Crítica</option>
-                            <option value="alta">Alta</option>
-                            <option value="media">Media</option>
-                            <option value="baja">Baja</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Estadísticas rápidas -->
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px;">
-                ${crearStatCard('Pendientes', APP_STATE.reportes.filter(r => r.estado === 'pendiente').length, 'warning')}
-                ${crearStatCard('En Revisión', APP_STATE.reportes.filter(r => r.estado === 'en_revision').length, 'info')}
-                ${crearStatCard('Resueltos', APP_STATE.reportes.filter(r => r.estado === 'resuelto').length, 'success')}
-                ${crearStatCard('Total', APP_STATE.reportes.length, 'primary')}
-            </div>
-            
-            <!-- Lista de reportes -->
-            <div id="lista-reportes-admin">
-                ${renderizarListaReportes(APP_STATE.reportes)}
-            </div>
-        </div>
-    `;
-}
-
-/**
- * Crea una tarjeta de estadística
- */
-function crearStatCard(titulo, valor, tipo) {
-    const colores = {
-        primary: 'var(--azul-primario)',
-        success: 'var(--exito)',
-        warning: 'var(--advertencia)',
-        info: 'var(--info)',
-        danger: 'var(--error)'
-    };
-    return `
-        <div class="card" style="text-align:center;border-left:4px solid ${colores[tipo] || colores.primary};">
-            <p style="font-size:1.5rem;font-weight:700;color:${colores[tipo] || colores.primary};">${valor}</p>
-            <p style="font-size:0.75rem;color:var(--gris-texto);">${titulo}</p>
-        </div>
-    `;
-}
-
-/**
- * Renderiza la lista de reportes con filtros
- */
-function renderizarListaReportes(reportes) {
-    if (!reportes || reportes.length === 0) {
-        return `
-            <div class="card" style="text-align:center;padding:40px;">
-                <i class="bx bx-file-blank" style="font-size:3rem;color:var(--gris-medio);"></i>
-                <p style="margin-top:12px;color:var(--gris-texto);">No hay reportes registrados</p>
-            </div>
-        `;
-    }
-    
-    return reportes.map(reporte => {
-        const urgenciaClass = `urgencia-${reporte.urgencia || 'baja'}`;
-        const estadoClass = `estado-${reporte.estado || 'pendiente'}`;
-        
-        return `
-            <div class="card reporte-card" style="margin-bottom:12px;border-left:4px solid ${getColorUrgencia(reporte.urgencia)};">
-                <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
-                    <div style="flex:1;">
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                            <span class="badge ${urgenciaClass}">${(reporte.urgencia || 'baja').toUpperCase()}</span>
-                            <span class="badge ${estadoClass}">${(reporte.estado || 'pendiente').replace('_', ' ').toUpperCase()}</span>
-                            <span class="badge tipo-${reporte.tipo}">${reporte.tipo.toUpperCase()}</span>
-                        </div>
-                        <p style="font-size:0.9rem;margin:4px 0;">${escapeHtml(reporte.descripcion?.substring(0, 150) || 'Sin descripción')}${(reporte.descripcion?.length > 150) ? '...' : ''}</p>
-                        <div style="display:flex;gap:12px;font-size:0.75rem;color:var(--gris-texto);">
-                            <span><i class="bx bx-user"></i> Reportado por: ${reporte.reportado_por?.nombre || 'Anónimo'}</span>
-                            <span><i class="bx bx-calendar"></i> ${formatearFecha(reporte.fecha)}</span>
-                            ${reporte.usuario_reportado ? `<span><i class="bx bx-user-voice"></i> Reportado: ${reporte.usuario_reportado.nombre}</span>` : ''}
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:4px;">
-                        <button class="btn-primary btn-sm" onclick="verDetalleReporte('${reporte.id}')" title="Ver detalle">
-                            <i class="bx bx-show"></i>
-                        </button>
-                        ${reporte.estado === 'pendiente' ? `
-                            <button class="btn-success btn-sm" onclick="cambiarEstadoReporte('${reporte.id}', 'en_revision')" title="Revisar">
-                                <i class="bx bx-check"></i>
-                            </button>
-                        ` : ''}
-                        ${reporte.estado === 'en_revision' ? `
-                            <button class="btn-success btn-sm" onclick="cambiarEstadoReporte('${reporte.id}', 'resuelto')" title="Resolver">
-                                <i class="bx bx-check-double"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-/**
- * Obtiene el color según la urgencia
- */
-function getColorUrgencia(urgencia) {
-    const colores = {
-        critica: 'var(--error)',
-        alta: 'var(--advertencia)',
-        media: 'var(--info)',
-        baja: 'var(--exito)'
-    };
-    return colores[urgencia] || 'var(--gris-medio)';
-}
-
-/**
- * Filtra los reportes según los criterios seleccionados
- */
-function filtrarReportes() {
-    const estado = document.getElementById('filtro-estado-reportes')?.value || 'todos';
-    const tipo = document.getElementById('filtro-tipo-reportes')?.value || 'todos';
-    const urgencia = document.getElementById('filtro-urgencia-reportes')?.value || 'todos';
-    
-    let reportesFiltrados = [...APP_STATE.reportes];
-    
-    if (estado !== 'todos') {
-        reportesFiltrados = reportesFiltrados.filter(r => r.estado === estado);
-    }
-    if (tipo !== 'todos') {
-        reportesFiltrados = reportesFiltrados.filter(r => r.tipo === tipo);
-    }
-    if (urgencia !== 'todos') {
-        reportesFiltrados = reportesFiltrados.filter(r => r.urgencia === urgencia);
-    }
-    
-    const container = document.getElementById('lista-reportes-admin');
-    if (container) {
-        container.innerHTML = renderizarListaReportes(reportesFiltrados);
-    }
-}
-
-/**
- * Muestra el detalle completo de un reporte
- */
-function verDetalleReporte(id) {
-    const reporte = APP_STATE.reportes.find(r => r.id === id);
-    if (!reporte) {
-        showToast('Reporte no encontrado', 'error');
-        return;
-    }
-    
-    const modal = document.getElementById('view-report-modal');
-    const body = document.getElementById('view-report-body');
-    const footer = document.getElementById('view-report-footer');
-    const title = document.getElementById('view-report-title');
-    
-    if (!modal || !body) return;
-    
-    title.innerHTML = `<i class="bx bx-file"></i> Reporte #${id.substring(0, 8)}`;
-    
-    body.innerHTML = `
-        <div class="reporte-detalle">
-            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-                <span class="badge urgencia-${reporte.urgencia || 'baja'}">${(reporte.urgencia || 'baja').toUpperCase()}</span>
-                <span class="badge estado-${reporte.estado || 'pendiente'}">${(reporte.estado || 'pendiente').replace('_', ' ').toUpperCase()}</span>
-                <span class="badge tipo-${reporte.tipo}">${reporte.tipo.toUpperCase()}</span>
-            </div>
-            
-            <div class="form-section">
-                <h4><i class="bx bx-info-circle"></i> Información General</h4>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div>
-                        <strong>Reportado por:</strong>
-                        <p>${reporte.reportado_por?.nombre || 'Anónimo'}</p>
-                        <small>${reporte.reportado_por?.email || ''}</small>
-                    </div>
-                    <div>
-                        <strong>Fecha:</strong>
-                        <p>${formatearFecha(reporte.fecha)}</p>
-                    </div>
-                </div>
-                ${reporte.usuario_reportado ? `
-                    <div style="margin-top:12px;">
-                        <strong>Usuario Reportado:</strong>
-                        <p>${reporte.usuario_reportado.nombre} (${reporte.usuario_reportado.email})</p>
-                    </div>
-                ` : ''}
-                ${reporte.motivo ? `
-                    <div style="margin-top:12px;">
-                        <strong>Motivo:</strong>
-                        <p>${reporte.motivo}</p>
-                    </div>
-                ` : ''}
-            </div>
-            
-            <div class="form-section">
-                <h4><i class="bx bx-detail"></i> Descripción</h4>
-                <p style="white-space:pre-wrap;">${escapeHtml(reporte.descripcion || 'Sin descripción')}</p>
-            </div>
-            
-            ${reporte.fecha_desde ? `
-                <div class="form-section">
-                    <h4><i class="bx bx-calendar"></i> Período</h4>
-                    <p>Desde: ${reporte.fecha_desde} Hasta: ${reporte.fecha_hasta || 'Actual'}</p>
-                </div>
-            ` : ''}
-            
-            <div class="form-section">
-                <h4><i class="bx bx-history"></i> Historial de Cambios</h4>
-                <div class="historial-cambios">
-                    ${(reporte.historial || []).map(h => `
-                        <div style="padding:8px;border-bottom:1px solid var(--gris-medio);">
-                            <strong>${h.estado.replace('_', ' ')}</strong>
-                            <small style="color:var(--gris-texto);">por ${h.usuario} - ${formatearFecha(h.fecha)}</small>
-                            ${h.comentario ? `<p style="font-size:0.85rem;">${h.comentario}</p>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Footer con acciones
-    footer.innerHTML = `
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${reporte.estado === 'pendiente' ? `
-                <button class="btn-primary btn-sm" onclick="cambiarEstadoReporte('${reporte.id}', 'en_revision')">
-                    <i class="bx bx-check"></i> Marcar en Revisión
-                </button>
-            ` : ''}
-            ${reporte.estado === 'en_revision' ? `
-                <button class="btn-success btn-sm" onclick="cambiarEstadoReporte('${reporte.id}', 'resuelto')">
-                    <i class="bx bx-check-double"></i> Marcar Resuelto
-                </button>
-            ` : ''}
-            ${reporte.estado !== 'desestimado' ? `
-                <button class="btn-danger btn-sm" onclick="cambiarEstadoReporte('${reporte.id}', 'desestimado')">
-                    <i class="bx bx-x"></i> Desestimar
-                </button>
-            ` : ''}
-            <button class="btn-secondary btn-sm" onclick="document.getElementById('view-report-modal').classList.add('hidden')">
-                <i class="bx bx-x"></i> Cerrar
-            </button>
-        </div>
-    `;
-    
+    APP_STATE.pendingConfirmation = callback;
     modal.classList.remove('hidden');
-}
-
-/**
- * Cambia el estado de un reporte
- */
-function cambiarEstadoReporte(id, nuevoEstado) {
-    const reporte = APP_STATE.reportes.find(r => r.id === id);
-    if (!reporte) return;
-    
-    const estadoAnterior = reporte.estado;
-    reporte.estado = nuevoEstado;
-    
-    if (nuevoEstado === 'resuelto' || nuevoEstado === 'desestimado') {
-        reporte.fecha_resolucion = new Date().toISOString();
-    }
-    
-    // Agregar al historial
-    if (!reporte.historial) reporte.historial = [];
-    reporte.historial.push({
-        estado: nuevoEstado,
-        fecha: new Date().toISOString(),
-        usuario: APP_STATE.usuario?.nombre || 'Admin',
-        comentario: `Cambio de estado: ${estadoAnterior} → ${nuevoEstado}`
-    });
-    
-    // Guardar cambios
-    localStorage.setItem(CONFIG.STORAGE_KEYS.REPORTES, JSON.stringify(APP_STATE.reportes));
-    actualizarBadgeReportes();
-    
-    showToast(`Reporte ${nuevoEstado.replace('_', ' ')}`, 'success');
-    
-    // Actualizar vista
-    verDetalleReporte(id);
-    if (APP_STATE.currentPage === 'gestion-reportes') {
-        cargarGestionReportes();
-    }
-}
-
-/**
- * Actualiza el badge de reportes pendientes
- */
-function actualizarBadgeReportes() {
-    APP_STATE.reportes = cargarArray(CONFIG.STORAGE_KEYS.REPORTES);
-    APP_STATE.reportsPendientes = APP_STATE.reportes.filter(r => r.estado === 'pendiente').length;
-    
-    // Actualizar badge en cabecera
-    const badgeHeader = document.getElementById('reports-badge');
-    if (badgeHeader) {
-        badgeHeader.textContent = APP_STATE.reportsPendientes;
-        badgeHeader.classList.toggle('hidden', APP_STATE.reportsPendientes === 0);
-    }
-    
-    // Actualizar contador en sidebar
-    const pendingReports = document.getElementById('pending-reports');
-    if (pendingReports) {
-        pendingReports.textContent = APP_STATE.reportsPendientes;
-        pendingReports.classList.toggle('hidden', APP_STATE.reportsPendientes === 0);
-    }
-}
-
-/**
- * Carga los reportes recientes en el panel rápido
- */
-function cargarReportesRecientes() {
-    const container = document.getElementById('recent-reports-list');
-    if (!container) return;
-    
-    const recientes = APP_STATE.reportes.slice(0, 5);
-    
-    if (recientes.length === 0) {
-        container.innerHTML = `
-            <div class="report-empty">
-                <i class="bx bx-file-blank"></i>
-                <p>No hay reportes recientes</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = recientes.map(r => `
-        <div class="reporte-mini" onclick="verDetalleReporte('${r.id}')" style="cursor:pointer;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span class="badge tipo-${r.tipo}">${r.tipo}</span>
-                <span class="badge estado-${r.estado}">${r.estado}</span>
-            </div>
-            <p style="font-size:0.8rem;margin:4px 0;">${r.descripcion?.substring(0, 60) || 'Sin descripción'}...</p>
-            <small style="color:var(--gris-texto);">${formatearFechaCorta(r.fecha)}</small>
-        </div>
-    `).join('');
-}
-
-/**
- * Agrega una notificación al sistema
- */
-function agregarNotificacion(tipo, titulo, mensaje) {
-    if (!Array.isArray(APP_STATE.notificaciones)) APP_STATE.notificaciones = [];
-    
-    const notificacion = {
-        id: generarId(),
-        tipo: tipo,
-        titulo: titulo,
-        mensaje: mensaje,
-        fecha: new Date().toISOString(),
-        leida: false
-    };
-    
-    APP_STATE.notificaciones.unshift(notificacion);
-    APP_STATE.notificacionesNoLeidas = APP_STATE.notificaciones.filter(n => !n.leida).length;
-    
-    localStorage.setItem(CONFIG.STORAGE_KEYS.NOTIFICACIONES, JSON.stringify(APP_STATE.notificaciones));
-    
-    // Actualizar badge de notificaciones
-    const badge = document.querySelector('.badge-notifications');
-    if (badge) {
-        badge.textContent = APP_STATE.notificacionesNoLeidas;
-        badge.classList.toggle('hidden', APP_STATE.notificacionesNoLeidas === 0);
-    }
-}
-
-// ============================================
-// CARGA DE PÁGINAS PRINCIPALES
-// ============================================
-
-/**
- * Carga la página según la ruta
- */
-function cargarPagina(page) {
-    const container = document.getElementById('page-content');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="page-loader">
-            <div class="spinner"></div>
-            <p>Cargando ${CONFIG.TITULOS_PAGINAS[page] || page}...</p>
-        </div>
-    `;
-    
-    setTimeout(() => {
-        try {
-            switch (page) {
-                case 'inicio': cargarInicio(container); break;
-                case 'horarios': cargarHorarios(container); break;
-                case 'asistencia': cargarAsistencia(container); break;
-                case 'noticias': cargarNoticias(container); break;
-                case 'eventos': cargarEventos(container); break;
-                case 'chat': cargarChat(container); break;
-                case 'directorio': cargarDirectorio(container); break;
-                case 'peticiones': cargarPeticiones(container); break;
-                case 'encuestas': cargarEncuestas(container); break;
-                case 'biblioteca': cargarBiblioteca(container); break;
-                case 'galeria': cargarGaleria(container); break;
-                case 'devocional': cargarDevocional(container); break;
-                case 'perfil': cargarPerfil(container); break;
-                case 'configuracion': cargarConfiguracion(container); break;
-                case 'publicaciones': cargarPublicaciones(container); break;
-                case 'podcast': cargarPodcast(container); break;
-                case 'analytics': cargarAnalytics(container); break;
-                case 'dashboard': cargarDashboard(container); break;
-                case 'gestion-usuarios': cargarGestionUsuarios(container); break;
-                case 'gestion-noticias': cargarGestionNoticias(container); break;
-                case 'gestion-eventos': cargarGestionEventos(container); break;
-                case 'versiculos': cargarVersiculos(container); break;
-                case 'sistema': cargarSistema(container); break;
-                case 'seguridad': cargarSeguridad(container); break;
-                // NUEVO v18: Páginas de reportes
-                case 'gestion-reportes': cargarGestionReportes(container); break;
-                case 'mis-reportes': cargarMisReportes(container); break;
-                case 'reporte-asistencia': abrirModalReporte(); navegarA('inicio'); break;
-                case 'reporte-financiero': abrirModalReporte(); navegarA('inicio'); break;
-                case 'reporte-ministerios': abrirModalReporte(); navegarA('inicio'); break;
-                case 'reporte-crecimiento': cargarReporteCrecimiento(container); break;
-                case 'reporte-moderacion': cargarReporteModeracion(container); break;
-                default:
-                    container.innerHTML = `
-                        <div class="card fade-in">
-                            <h2>${CONFIG.TITULOS_PAGINAS[page] || page}</h2>
-                            <p style="text-align:center;padding:40px;color:var(--gris-texto);">
-                                <i class="bx bx-construction" style="font-size:3rem;display:block;margin-bottom:16px;"></i>
-                                Sección en desarrollo
-                            </p>
-                        </div>
-                    `;
-            }
-        } catch (e) {
-            console.error('Error cargando página:', e);
-            container.innerHTML = `
-                <div class="card fade-in" style="border-left:4px solid var(--error);">
-                    <h2>Error al cargar</h2>
-                    <p style="text-align:center;padding:20px;color:var(--error);">
-                        <i class="bx bx-error-circle" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
-                        ${e.message || 'Error desconocido'}
-                    </p>
-                </div>
-            `;
-        }
-    }, 150);
-}
-
-/**
- * Página: Mis Reportes
- */
-function cargarMisReportes(container) {
-    if (!APP_STATE.usuario) {
-        container.innerHTML = `
-            <div class="fade-in">
-                <div class="card" style="text-align:center;padding:40px;">
-                    <i class="bx bx-user-circle" style="font-size:4rem;color:var(--gris-medio);"></i>
-                    <h3>Inicia sesión para ver tus reportes</h3>
-                </div>
-            </div>
-        `;
-        return;
-    }
-    
-    const misReportes = APP_STATE.reportes.filter(r => 
-        r.reportado_por?.id === APP_STATE.usuario.id
-    );
-    
-    container.innerHTML = `
-        <div class="fade-in">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-                <h2><i class="bx bx-file"></i> Mis Reportes</h2>
-                <button class="btn-primary btn-sm" onclick="abrirModalReporte()">
-                    <i class="bx bx-plus"></i> Nuevo Reporte
-                </button>
-            </div>
-            
-            ${misReportes.length === 0 ? `
-                <div class="card" style="text-align:center;padding:40px;">
-                    <i class="bx bx-file-blank" style="font-size:3rem;color:var(--gris-medio);"></i>
-                    <p style="margin-top:12px;color:var(--gris-texto);">No has generado ningún reporte</p>
-                </div>
-            ` : renderizarListaReportes(misReportes)}
-        </div>
-    `;
-}
-
-/**
- * Página: Reporte de Crecimiento
- */
-function cargarReporteCrecimiento(container) {
-    container.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-trending-up"></i> Reporte de Crecimiento</h2>
-            <div class="card">
-                <h3>Estadísticas de Crecimiento Espiritual</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px;">
-                    ${crearStatCard('Bautismos', 0, 'info')}
-                    ${crearStatCard('Nuevos Miembros', 0, 'success')}
-                    ${crearStatCard('Cursos Completados', 0, 'warning')}
-                    ${crearStatCard('Mentorías Activas', 0, 'primary')}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-/**
- * Página: Reporte de Moderación
- */
-function cargarReporteModeracion(container) {
-    container.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-shield"></i> Reporte de Moderación</h2>
-            <div class="card">
-                <h3>Actividad de Moderación</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px;">
-                    ${crearStatCard('Contenido Revisado', 0, 'info')}
-                    ${crearStatCard('Advertencias', 0, 'warning')}
-                    ${crearStatCard('Suspensiones', 0, 'danger')}
-                    ${crearStatCard('Apelaciones', 0, 'primary')}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// ============================================
-// FUNCIONES DE ALMACENAMIENTO
-// ============================================
-function cargarArray(key) {
-    try {
-        const data = localStorage.getItem(key);
-        if (!data) return [];
-        const parsed = JSON.parse(data);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
-}
-
-function cargarObjeto(key) {
-    try {
-        const data = localStorage.getItem(key);
-        if (!data) return {};
-        const parsed = JSON.parse(data);
-        return typeof parsed === 'object' && parsed !== null ? parsed : {};
-    } catch {
-        return {};
-    }
-}
-
-// ============================================
-// INICIALIZACIÓN PRINCIPAL
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 IPUC LA FONDA v' + CONFIG.VERSION + ' - Inicializando...');
-    
-    // Cargar tema
-    const temaGuardado = localStorage.getItem(CONFIG.STORAGE_KEYS.TEMA) || 'light';
-    APP_STATE.tema = temaGuardado;
-    aplicarTema(temaGuardado);
-
-    // Cargar idioma
-    const idiomaGuardado = localStorage.getItem('ipuc18_idioma') || 'es';
-    APP_STATE.idioma = idiomaGuardado;
-    cambiarIdioma(idiomaGuardado);
-
-    // Cargar datos con validación
-    APP_STATE.publicaciones = cargarArray(CONFIG.STORAGE_KEYS.PUBLICACIONES);
-    APP_STATE.comentarios = cargarArray(CONFIG.STORAGE_KEYS.COMENTARIOS);
-    APP_STATE.reacciones = cargarObjeto(CONFIG.STORAGE_KEYS.REACCIONES);
-    APP_STATE.asistencias = cargarArray(CONFIG.STORAGE_KEYS.ASISTENCIAS);
-    APP_STATE.eventos = cargarArray(CONFIG.STORAGE_KEYS.EVENTOS);
-    APP_STATE.noticias = cargarArray(CONFIG.STORAGE_KEYS.NOTICIAS);
-    APP_STATE.peticiones = cargarArray(CONFIG.STORAGE_KEYS.PETICIONES);
-    APP_STATE.encuestas = cargarArray(CONFIG.STORAGE_KEYS.ENCUESTAS);
-    APP_STATE.biblioteca = cargarArray(CONFIG.STORAGE_KEYS.BIBLIOTECA);
-    APP_STATE.galeria = cargarArray(CONFIG.STORAGE_KEYS.GALERIA);
-    APP_STATE.podcast = cargarArray(CONFIG.STORAGE_KEYS.PODCAST);
-    APP_STATE.chat = cargarArray(CONFIG.STORAGE_KEYS.CHAT);
-    APP_STATE.directorio = cargarArray(CONFIG.STORAGE_KEYS.DIRECTORIO);
-    
-    // NUEVO v18: Cargar reportes
-    APP_STATE.reportes = cargarArray(CONFIG.STORAGE_KEYS.REPORTES);
-    APP_STATE.reportsPendientes = APP_STATE.reportes.filter(r => r.estado === 'pendiente').length;
-
-    // Verificar sesión
-    const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
-    const usuarioData = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
-    const rol = localStorage.getItem(CONFIG.STORAGE_KEYS.ROL);
-
-    // Mostrar splash y luego la app
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) {
-            splash.style.opacity = '0';
-            splash.style.transition = 'opacity 0.5s ease';
-            setTimeout(() => {
-                splash.style.display = 'none';
-            }, 500);
-        }
-        
-        if (token && usuarioData) {
-            try {
-                APP_STATE.token = token;
-                APP_STATE.usuario = JSON.parse(usuarioData);
-                APP_STATE.rol = rol || 'usuario';
-                mostrarApp();
-                actualizarBadgeReportes();
-            } catch (e) {
-                console.error('Error al restaurar sesión:', e);
-                mostrarBienvenida();
-            }
-        } else {
-            mostrarBienvenida();
-        }
-    }, 2000);
-
-    // Inicializar event listeners
-    inicializarEventListeners();
-    manejarResponsiveSidebar();
-    
-    // Eventos de conexión
-    window.addEventListener('resize', manejarResponsiveSidebar);
-    window.addEventListener('online', () => {
-        APP_STATE.isOnline = true;
-        actualizarSidebarUsuario();
-        showToast('✅ Conexión restaurada', 'success');
-    });
-    window.addEventListener('offline', () => {
-        APP_STATE.isOnline = false;
-        actualizarSidebarUsuario();
-        showToast('⚠️ Sin conexión a internet', 'warning');
-    });
-    
-    console.log('✅ IPUC LA FONDA v' + CONFIG.VERSION + ' - Inicialización completa');
-    console.log('📊 Sistema de Reportes activo');
-    console.log('👤 Usuario:', APP_STATE.usuario?.nombre || 'No autenticado');
-    console.log('🔒 Rol:', APP_STATE.rol || 'Ninguno');
-});
-
-// ============================================
-// INICIALIZACIÓN DE EVENT LISTENERS
-// ============================================
-function inicializarEventListeners() {
-    // Sidebar
-    document.getElementById('menu-toggle')?.addEventListener('click', toggleSidebar);
-    document.getElementById('close-sidebar')?.addEventListener('click', cerrarSidebar);
-    document.getElementById('sidebar-overlay')?.addEventListener('click', cerrarSidebar);
-
-    // Navegación
-    document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            navegarA(this.getAttribute('data-page'));
-        });
-    });
-
-    // Tema
-    document.getElementById('theme-toggle')?.addEventListener('click', toggleTema);
-    
-    // Notificaciones
-    document.getElementById('notifications-toggle')?.addEventListener('click', toggleNotificaciones);
-    document.getElementById('close-notifications')?.addEventListener('click', () => {
-        document.getElementById('notification-panel')?.classList.add('hidden');
-        APP_STATE.notificationsOpen = false;
-    });
-
-    // NUEVO v18: Panel de reportes
-    document.getElementById('reports-quick-toggle')?.addEventListener('click', togglePanelReportes);
-    document.getElementById('close-reports-quick')?.addEventListener('click', () => {
-        document.getElementById('reports-quick-panel')?.classList.add('hidden');
-        APP_STATE.reportsPanelOpen = false;
-    });
-
-    // Búsqueda
-    document.getElementById('search-toggle')?.addEventListener('click', toggleSearchBar);
-    document.getElementById('search-close')?.addEventListener('click', () => {
-        document.getElementById('search-bar')?.classList.add('hidden');
-        APP_STATE.searchBarOpen = false;
-    });
-
-    // Búsqueda de usuarios en reportes
-    document.getElementById('report-user')?.addEventListener('input', function() {
-        buscarUsuarioReporte(this.value);
-    });
-
-    // Cambio de tipo de reporte
-    document.querySelectorAll('input[name="report-type"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            cambiarTipoReporte(this.value);
-        });
-    });
-
-    // Formulario de reporte
-    document.getElementById('report-form')?.addEventListener('submit', generarReporte);
-    document.getElementById('btn-cancel-report')?.addEventListener('click', cerrarModalReporte);
-
-    // Acciones rápidas de reportes
-    document.querySelectorAll('.report-action-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const action = this.getAttribute('data-report');
-            switch(action) {
-                case 'usuario':
-                case 'contenido':
-                    abrirModalReporte();
-                    document.querySelector(`input[value="${action}"]`).checked = true;
-                    cambiarTipoReporte(action);
-                    break;
-                case 'asistencia':
-                    navegarA('reporte-asistencia');
-                    break;
-                case 'financiero':
-                    navegarA('reporte-financiero');
-                    break;
-            }
-            togglePanelReportes();
-        });
-    });
-
-    // User dropdown
-    document.getElementById('user-mini')?.addEventListener('click', toggleUserDropdown);
-    
-    // FAB
-    document.getElementById('fab-main')?.addEventListener('click', toggleFabMenu);
-    document.querySelectorAll('.fab-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const action = this.getAttribute('data-action');
-            switch (action) {
-                case 'reporte': abrirModalReporte(); break;
-                case 'oracion': navegarA('peticiones'); break;
-                case 'musica': navegarA('radio'); break;
-                case 'evento': navegarA('eventos'); break;
-                case 'donacion': navegarA('donaciones'); break;
-                case 'compartir': compartirVersiculo(); break;
-            }
-            toggleFabMenu();
-        });
-    });
-
-    // Logout
-    document.getElementById('btn-logout')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        confirmarAccion('¿Cerrar sesión?', 'Serás redirigido al inicio.', cerrarSesion, 'danger');
-    });
-
-    // Modal
-    document.getElementById('modal')?.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) cerrarModal();
-    });
-    document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
-
-    // Confirm modal
-    document.getElementById('confirm-cancel')?.addEventListener('click', () => {
-        document.getElementById('confirm-modal')?.classList.add('hidden');
-        APP_STATE.pendingConfirmation = null;
-    });
-    document.getElementById('confirm-accept')?.addEventListener('click', () => {
-        if (APP_STATE.pendingConfirmation) {
-            APP_STATE.pendingConfirmation();
-            APP_STATE.pendingConfirmation = null;
-        }
-        document.getElementById('confirm-modal')?.classList.add('hidden');
-    });
-
-    // Cerrar modales con backdrop
-    document.getElementById('confirm-modal')?.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) {
-            this.classList.add('hidden');
-            APP_STATE.pendingConfirmation = null;
-        }
-    });
-    document.getElementById('report-modal')?.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) cerrarModalReporte();
-    });
-    document.getElementById('view-report-modal')?.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) {
-            this.classList.add('hidden');
-        }
-    });
-
-    // Teclado
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (APP_STATE.notificationsOpen) {
-                document.getElementById('notification-panel')?.classList.add('hidden');
-                APP_STATE.notificationsOpen = false;
-            }
-            if (APP_STATE.reportsPanelOpen) {
-                document.getElementById('reports-quick-panel')?.classList.add('hidden');
-                APP_STATE.reportsPanelOpen = false;
-            }
-            if (APP_STATE.searchBarOpen) {
-                document.getElementById('search-bar')?.classList.add('hidden');
-                APP_STATE.searchBarOpen = false;
-            }
-            if (!document.getElementById('modal')?.classList.contains('hidden')) {
-                cerrarModal();
-            }
-            if (!document.getElementById('report-modal')?.classList.contains('hidden')) {
-                cerrarModalReporte();
-            }
-        }
-        if (e.ctrlKey && e.key === 'k') {
-            e.preventDefault();
-            toggleSearchBar();
-        }
-    });
-
-    // Cerrar dropdowns al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (APP_STATE.userDropdownOpen &&
-            !e.target.closest('#user-mini') &&
-            !e.target.closest('#user-dropdown')) {
-            document.getElementById('user-dropdown')?.classList.add('hidden');
-            APP_STATE.userDropdownOpen = false;
-        }
-        if (APP_STATE.fabMenuOpen &&
-            !e.target.closest('#fab-main') &&
-            !e.target.closest('#fab-menu')) {
-            document.getElementById('fab-menu')?.classList.add('hidden');
-            APP_STATE.fabMenuOpen = false;
-        }
-    });
-
-    // Idioma
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const lang = this.getAttribute('data-lang');
-            if (lang) cambiarIdioma(lang);
-        });
-    });
-
-    // Welcome screen
-    document.getElementById('btn-guest')?.addEventListener('click', continuarComoInvitado);
-    document.getElementById('btn-login')?.addEventListener('click', mostrarLogin);
-    document.getElementById('btn-register')?.addEventListener('click', mostrarRegistro);
-    document.getElementById('show-register')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('login-form-container').classList.add('hidden');
-        document.getElementById('register-form-container').classList.remove('hidden');
-    });
-    document.getElementById('show-login')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('register-form-container').classList.add('hidden');
-        document.getElementById('login-form-container').classList.remove('hidden');
-    });
-
-    // Filtros de notificaciones
-    document.querySelectorAll('.notification-filters .filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.notification-filters .filter-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
 }
 
 // ============================================
 // FUNCIONES DE AUTENTICACIÓN
 // ============================================
+
 function continuarComoInvitado() {
     APP_STATE.rol = 'invitado';
     APP_STATE.token = 'guest_' + Date.now();
@@ -1648,40 +444,1013 @@ function continuarComoInvitado() {
 }
 
 function cerrarSesion() {
-    localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
-    localStorage.removeItem(CONFIG.STORAGE_KEYS.ROL);
+    try {
+        localStorage.removeItem('ipuc18_token');
+        localStorage.removeItem('ipuc18_usuario');
+        localStorage.removeItem('ipuc18_rol');
+    } catch (e) {}
+    
     APP_STATE.token = null;
     APP_STATE.usuario = null;
     APP_STATE.rol = null;
+    
     if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
     if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
-    document.getElementById('user-dropdown')?.classList.add('hidden');
+    
+    const dropdown = document.getElementById('user-dropdown');
+    if (dropdown) dropdown.classList.add('hidden');
     APP_STATE.userDropdownOpen = false;
+    
     mostrarBienvenida();
     showToast('👋 Sesión cerrada', 'info');
 }
 
 // ============================================
-// FUNCIONES DE UTILIDAD ADICIONALES
+// CONTADOR Y FECHA
 // ============================================
-function compartirVersiculo() {
-    const versiculos = [
-        { texto: "Porque de tal manera amó Dios al mundo...", referencia: "Juan 3:16" },
-        { texto: "Jehová es mi pastor; nada me faltará.", referencia: "Salmos 23:1" },
-        { texto: "Todo lo puedo en Cristo que me fortalece.", referencia: "Filipenses 4:13" }
-    ];
-    const v = versiculos[new Date().getDay() % versiculos.length];
-    const texto = `"${v.texto}" - ${v.referencia}`;
+
+function iniciarContadorRegresivo() {
+    if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
+    actualizarContador();
+    APP_STATE.contadorInterval = setInterval(actualizarContador, 1000);
+}
+
+function actualizarContador() {
+    const d = document.getElementById('contador-dias');
+    const h = document.getElementById('contador-horas');
+    const m = document.getElementById('contador-minutos');
+    const s = document.getElementById('contador-segundos');
+    const e = document.getElementById('contador-estado');
+    if (!d && !h) return;
     
-    if (navigator.share) {
-        navigator.share({ title: 'IPUC LA FONDA - Versículo', text: texto })
-            .catch(() => {});
-    } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(texto)
-            .then(() => showToast('📋 Versículo copiado', 'success'))
-            .catch(() => showToast('No se pudo copiar', 'error'));
+    try {
+        const ahora = new Date();
+        const domingo = new Date(ahora);
+        domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
+        domingo.setHours(10, 0, 0, 0);
+        if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
+        
+        const diff = Math.max(0, (domingo - ahora) / 1000);
+        const dias = Math.floor(diff / 86400);
+        const horas = Math.floor((diff % 86400) / 3600);
+        const minutos = Math.floor((diff % 3600) / 60);
+        const segundos = Math.floor(diff % 60);
+        
+        if (d) d.textContent = String(dias).padStart(2, '0');
+        if (h) h.textContent = String(horas).padStart(2, '0');
+        if (m) m.textContent = String(minutos).padStart(2, '0');
+        if (s) s.textContent = String(segundos).padStart(2, '0');
+        if (e) {
+            e.textContent = diff > 0 ? 'PRÓXIMO CULTO' : '¡CULTO EN CURSO!';
+            e.className = 'contador-estado ' + (diff > 0 ? 'estado-proximo' : 'estado-activo');
+        }
+    } catch (_) {}
+}
+
+function iniciarActualizacionFecha() {
+    if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
+    actualizarFechaHora();
+    APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000);
+}
+
+function actualizarFechaHora() {
+    try {
+        const a = new Date();
+        const fe = document.getElementById('fecha-actual');
+        const ho = document.getElementById('hora-actual');
+        if (fe) fe.textContent = a.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        if (ho) ho.textContent = a.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch (_) {}
+}
+
+// ============================================
+// FUNCIONES DE REPORTES
+// ============================================
+
+function abrirModalReporte() {
+    const modal = document.getElementById('report-modal');
+    if (!modal) return;
+    
+    const title = document.getElementById('report-modal-title');
+    if (title) title.innerHTML = '<i class="bx bx-file"></i> Generar Nuevo Reporte';
+    
+    const form = document.getElementById('report-form');
+    if (form) form.reset();
+    
+    cambiarTipoReporte('usuario');
+    modal.classList.remove('hidden');
+}
+
+function cerrarModalReporte() {
+    const modal = document.getElementById('report-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function cambiarTipoReporte(tipo) {
+    const userGroup = document.getElementById('report-user-group');
+    const dateRange = document.getElementById('report-date-range');
+    const ministerioGroup = document.getElementById('report-ministerio-group');
+    
+    if (userGroup) userGroup.style.display = 'none';
+    if (dateRange) dateRange.style.display = 'none';
+    if (ministerioGroup) ministerioGroup.style.display = 'none';
+    
+    switch(tipo) {
+        case 'usuario':
+        case 'contenido':
+            if (userGroup) userGroup.style.display = 'block';
+            break;
+        case 'asistencia':
+        case 'financiero':
+            if (dateRange) dateRange.style.display = 'grid';
+            break;
+        case 'ministerio':
+            if (ministerioGroup) ministerioGroup.style.display = 'block';
+            if (dateRange) dateRange.style.display = 'grid';
+            break;
     }
+}
+
+function buscarUsuarioReporte(query) {
+    const resultsContainer = document.getElementById('report-user-results');
+    if (!resultsContainer) return;
+    
+    if (!query || query.length < 2) {
+        resultsContainer.classList.add('hidden');
+        return;
+    }
+    
+    const db = getDB();
+    let usuarios = [];
+    if (db) {
+        const data = db.cargar('usuarios');
+        usuarios = (data && data.usuarios) ? data.usuarios : [];
+    }
+    
+    const resultados = usuarios.filter(u => 
+        (u.nombre && u.nombre.toLowerCase().includes(query.toLowerCase())) ||
+        (u.correo && u.correo.toLowerCase().includes(query.toLowerCase()))
+    );
+    
+    if (resultados.length === 0) {
+        resultsContainer.innerHTML = '<p style="padding:12px;text-align:center;color:var(--gris-texto);">No se encontraron usuarios</p>';
+    } else {
+        resultsContainer.innerHTML = resultados.slice(0, 5).map(u => `
+            <div onclick="seleccionarUsuarioReporte('${u.id}', '${escapeHtml(u.nombre || '')}', '${escapeHtml(u.correo || '')}')" style="padding:10px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--gris-medio);">
+                <i class="bx bx-user"></i>
+                <div>
+                    <strong>${escapeHtml(u.nombre || 'Sin nombre')}</strong>
+                    <small style="display:block;color:var(--gris-texto);">${escapeHtml(u.correo || '')}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    resultsContainer.classList.remove('hidden');
+}
+
+function seleccionarUsuarioReporte(id, nombre, correo) {
+    const input = document.getElementById('report-user');
+    const resultsContainer = document.getElementById('report-user-results');
+    
+    if (input) {
+        input.value = nombre;
+        input.setAttribute('data-user-id', id);
+        input.setAttribute('data-user-email', correo);
+    }
+    if (resultsContainer) resultsContainer.classList.add('hidden');
+}
+
+function generarReporte(e) {
+    if (e) e.preventDefault();
+    
+    if (!APP_STATE.usuario) {
+        showToast('Debes iniciar sesión para generar reportes', 'warning');
+        return;
+    }
+    
+    const tipo = document.querySelector('input[name="report-type"]:checked')?.value || 'usuario';
+    const descripcion = document.getElementById('report-descripcion')?.value;
+    const urgencia = document.querySelector('input[name="report-urgencia"]:checked')?.value || 'baja';
+    const motivo = document.getElementById('report-motivo')?.value || '';
+    
+    if (!descripcion || !descripcion.trim()) {
+        showToast('La descripción es obligatoria', 'warning');
+        return;
+    }
+    
+    const reporte = {
+        id: generarId(),
+        tipo: tipo,
+        reportado_por: {
+            id: APP_STATE.usuario.id || 0,
+            nombre: APP_STATE.usuario.nombre || 'Anónimo',
+            email: APP_STATE.usuario.correo || ''
+        },
+        descripcion: descripcion.trim(),
+        motivo: motivo,
+        urgencia: urgencia,
+        estado: 'pendiente',
+        fecha: new Date().toISOString(),
+        fecha_resolucion: null,
+        notas_admin: '',
+        historial: [{
+            estado: 'pendiente',
+            fecha: new Date().toISOString(),
+            usuario: APP_STATE.usuario.nombre || 'Usuario',
+            comentario: 'Reporte creado'
+        }]
+    };
+    
+    if (tipo === 'usuario' || tipo === 'contenido') {
+        const userInput = document.getElementById('report-user');
+        reporte.usuario_reportado = {
+            id: userInput?.getAttribute('data-user-id') || '',
+            nombre: userInput?.value || '',
+            email: userInput?.getAttribute('data-user-email') || ''
+        };
+    }
+    
+    if (tipo === 'asistencia' || tipo === 'financiero' || tipo === 'ministerio') {
+        reporte.fecha_desde = document.getElementById('report-date-from')?.value || '';
+        reporte.fecha_hasta = document.getElementById('report-date-to')?.value || '';
+    }
+    
+    if (tipo === 'ministerio') {
+        reporte.ministerio = document.getElementById('report-ministerio')?.value || '';
+    }
+    
+    APP_STATE.reportes.unshift(reporte);
+    
+    try {
+        const db = getDB();
+        if (db) {
+            db.addReporte(reporte);
+        } else {
+            const reportesGuardados = cargarArray('ipuc18_reportes');
+            reportesGuardados.unshift(reporte);
+            try {
+                localStorage.setItem('ipuc18_reportes', JSON.stringify({ reportes: reportesGuardados.slice(0, 100), ultimo_id: reportesGuardados.length }));
+            } catch (e) {}
+        }
+    } catch (err) {}
+    
+    actualizarBadgeReportes();
+    cerrarModalReporte();
+    showToast('✅ Reporte generado exitosamente', 'success');
+    
+    if (APP_STATE.currentPage === 'gestion-reportes') {
+        navegarA('gestion-reportes');
+    }
+}
+
+function actualizarBadgeReportes() {
+    APP_STATE.reportsPendientes = APP_STATE.reportes.filter(function(r) { 
+        return r && r.estado === 'pendiente'; 
+    }).length;
+    
+    const badgeHeader = document.getElementById('reports-badge');
+    if (badgeHeader) {
+        badgeHeader.textContent = APP_STATE.reportsPendientes;
+        badgeHeader.classList.toggle('hidden', APP_STATE.reportsPendientes === 0);
+    }
+    
+    const pendingReports = document.getElementById('pending-reports');
+    if (pendingReports) {
+        pendingReports.textContent = APP_STATE.reportsPendientes;
+        pendingReports.classList.toggle('hidden', APP_STATE.reportsPendientes === 0);
+    }
+}
+
+function verDetalleReporte(id) {
+    const reporte = APP_STATE.reportes.find(function(r) { return r.id === id; });
+    if (!reporte) {
+        showToast('Reporte no encontrado', 'error');
+        return;
+    }
+    showToast('Viendo reporte #' + id.substring(0, 8), 'info');
+}
+
+function cambiarEstadoReporte(id, nuevoEstado) {
+    const reporte = APP_STATE.reportes.find(function(r) { return r.id === id; });
+    if (!reporte) return;
+    
+    reporte.estado = nuevoEstado;
+    if (nuevoEstado === 'resuelto' || nuevoEstado === 'desestimado') {
+        reporte.fecha_resolucion = new Date().toISOString();
+    }
+    if (!reporte.historial) reporte.historial = [];
+    reporte.historial.push({
+        estado: nuevoEstado,
+        fecha: new Date().toISOString(),
+        usuario: APP_STATE.usuario?.nombre || 'Admin',
+        comentario: 'Estado actualizado'
+    });
+    
+    try {
+        const db = getDB();
+        if (db) db.cambiarEstadoReporte(id, nuevoEstado);
+    } catch (e) {}
+    
+    actualizarBadgeReportes();
+    showToast('✅ Estado actualizado', 'success');
+}
+
+function filtrarReportes() {
+    if (APP_STATE.currentPage === 'gestion-reportes') {
+        navegarA('gestion-reportes');
+    }
+}
+
+function cargarReportesRecientes() {
+    const container = document.getElementById('recent-reports-list');
+    if (!container) return;
+    
+    const recientes = APP_STATE.reportes.slice(0, 5);
+    
+    if (recientes.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gris-texto);"><i class="bx bx-file-blank" style="font-size:2rem;"></i><p>No hay reportes recientes</p></div>';
+        return;
+    }
+    
+    container.innerHTML = recientes.map(function(r) {
+        const tipoLabel = r.tipo || 'general';
+        const estadoLabel = r.estado || 'pendiente';
+        return '<div style="padding:8px;border:1px solid var(--gris-medio);border-radius:8px;margin-bottom:6px;cursor:pointer;" onclick="verDetalleReporte(\'' + r.id + '\')">' +
+            '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+                '<span class="badge tipo-' + tipoLabel + '">' + tipoLabel + '</span>' +
+                '<span class="badge estado-' + estadoLabel + '">' + estadoLabel + '</span>' +
+            '</div>' +
+            '<p style="font-size:0.8rem;">' + escapeHtml((r.descripcion || '').substring(0, 60)) + '...</p>' +
+            '<small style="color:var(--gris-texto);">' + formatearFecha(r.fecha) + '</small>' +
+        '</div>';
+    }).join('');
+}
+
+// ============================================
+// CARGA DE PÁGINAS
+// ============================================
+
+function cargarPagina(page) {
+    const container = document.getElementById('page-content');
+    if (!container) return;
+    
+    container.innerHTML = '<div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>';
+    
+    setTimeout(function() {
+        try {
+            switch (page) {
+                case 'inicio': cargarInicio(container); break;
+                case 'horarios': cargarHorarios(container); break;
+                case 'asistencia': cargarAsistencia(container); break;
+                case 'noticias': cargarNoticias(container); break;
+                case 'eventos': cargarEventos(container); break;
+                case 'publicaciones': cargarPublicaciones(container); break;
+                case 'perfil': cargarPerfil(container); break;
+                case 'configuracion': cargarConfiguracion(container); break;
+                case 'gestion-reportes': cargarGestionReportes(container); break;
+                case 'mis-reportes': cargarMisReportes(container); break;
+                default:
+                    container.innerHTML = '<div class="card fade-in"><h2>' + (CONFIG.TITULOS_PAGINAS[page] || page) + '</h2><p style="text-align:center;padding:40px;color:var(--gris-texto);"><i class="bx bx-construction" style="font-size:3rem;display:block;margin-bottom:16px;"></i>Sección en desarrollo</p></div>';
+            }
+        } catch (e) {
+            container.innerHTML = '<div class="card fade-in" style="border-left:4px solid var(--error);"><h2>Error</h2><p style="text-align:center;padding:20px;color:var(--error);">' + (e.message || 'Error desconocido') + '</p></div>';
+        }
+    }, 150);
+}
+
+function cargarInicio(c) {
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<div class="contador-container">' +
+                '<div class="contador-titulo" id="contador-titulo">Culto Dominical</div>' +
+                '<div class="contador-tiempo">' +
+                    '<div class="contador-item"><span class="contador-numero" id="contador-dias">00</span><span class="contador-etiqueta">Días</span></div>' +
+                    '<div class="contador-item"><span class="contador-numero" id="contador-horas">00</span><span class="contador-etiqueta">Horas</span></div>' +
+                    '<div class="contador-item"><span class="contador-numero" id="contador-minutos">00</span><span class="contador-etiqueta">Minutos</span></div>' +
+                    '<div class="contador-item"><span class="contador-numero" id="contador-segundos">00</span><span class="contador-etiqueta">Segundos</span></div>' +
+                '</div>' +
+                '<div class="contador-estado estado-proximo" id="contador-estado">PRÓXIMO CULTO</div>' +
+            '</div>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">' +
+                '<div class="card card-glass"><div style="display:flex;align-items:center;gap:10px;"><div style="width:44px;height:44px;border-radius:50%;background:var(--azul-primario);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;"><i class="bx bx-calendar"></i></div><div><div style="font-size:0.7rem;opacity:0.7;">Fecha</div><div style="font-weight:700;" id="fecha-actual"></div></div></div></div>' +
+                '<div class="card card-glass"><div style="display:flex;align-items:center;gap:10px;"><div style="width:44px;height:44px;border-radius:50%;background:var(--dorado);display:flex;align-items:center;justify-content:center;color:var(--azul-primario);font-size:1.3rem;"><i class="bx bx-time"></i></div><div><div style="font-size:0.7rem;opacity:0.7;">Hora</div><div style="font-weight:700;" id="hora-actual"></div></div></div></div>' +
+                '<div class="card card-glass"><div style="display:flex;align-items:center;gap:10px;"><div style="width:44px;height:44px;border-radius:50%;background:var(--exito);display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;"><i class="bx bx-wifi"></i></div><div><div style="font-size:0.7rem;opacity:0.7;">Estado</div><div style="font-weight:700;">' + (APP_STATE.isOnline ? 'Conectado' : 'Desconectado') + '</div></div></div></div>' +
+            '</div>' +
+            '<div class="card" style="border-left:4px solid var(--dorado);"><h3><i class="bx bx-bible" style="color:var(--dorado);"></i> Versículo del Día</h3><div id="versiculo-content" style="font-style:italic;font-size:1rem;line-height:1.8;margin-top:8px;"><p>"Jehová es mi pastor; nada me faltará."</p><p style="font-weight:700;color:var(--azul-primario);margin-top:8px;">Salmos 23:1</p></div></div>' +
+            '<div class="card" style="margin-top:12px;"><h3>Accesos Rápidos</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-top:8px;">' +
+                '<button class="btn-outline btn-sm" onclick="navegarA(\'asistencia\')"><i class="bx bx-check-shield"></i> Asistencia</button>' +
+                '<button class="btn-outline btn-sm" onclick="navegarA(\'peticiones\')"><i class="bx bx-pray"></i> Oración</button>' +
+                '<button class="btn-outline btn-sm" onclick="navegarA(\'publicaciones\')"><i class="bx bx-news"></i> Publicar</button>' +
+                '<button class="btn-outline btn-sm" onclick="navegarA(\'devocional\')"><i class="bx bx-bible"></i> Devocional</button>' +
+                '<button class="btn-outline btn-sm" onclick="navegarA(\'eventos\')"><i class="bx bx-calendar-star"></i> Eventos</button>' +
+                '<button class="btn-outline btn-sm" onclick="navegarA(\'podcast\')"><i class="bx bx-microphone"></i> Podcast</button>' +
+            '</div></div>' +
+        '</div>';
+    
+    actualizarFechaHora();
+    if (!APP_STATE.fechaInterval) {
+        APP_STATE.fechaInterval = setInterval(actualizarFechaHora, 1000);
+    }
+    iniciarContadorRegresivo();
+}
+
+function cargarHorarios(c) {
+    const horarios = [
+        { dia: 'Lunes', cultos: [] },
+        { dia: 'Martes', cultos: [{ nombre: 'Culto de Oración', hora: '6:00 PM - 8:30 PM' }] },
+        { dia: 'Miércoles', cultos: [{ nombre: 'Culto Campal', hora: '4:00 PM - 7:00 PM' }] },
+        { dia: 'Jueves', cultos: [{ nombre: 'Culto de Refrán', hora: '4:00 PM - 7:00 PM' }] },
+        { dia: 'Viernes', cultos: [{ nombre: 'Culto de Jóvenes', hora: '6:00 PM - 8:30 PM' }] },
+        { dia: 'Sábado', cultos: [] },
+        { dia: 'Domingo', cultos: [{ nombre: 'Culto Dominical', hora: '10:00 AM - 12:00 PM' }] }
+    ];
+    const diaActual = new Date().getDay();
+    const idx = diaActual === 0 ? 6 : diaActual - 1;
+
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-time-five"></i> Horarios de Cultos</h2>' +
+            '<div style="display:grid;gap:10px;margin-top:16px;">' +
+                horarios.map(function(d, i) {
+                    return '<div class="card" style="border-left:4px solid ' + (i === idx ? 'var(--azul-primario)' : 'var(--gris-medio)') + ';">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">' +
+                            '<div>' +
+                                '<h3>' + d.dia + (i === idx ? ' <span style="background:var(--azul-primario);color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;">HOY</span>' : '') + '</h3>' +
+                                (d.cultos.length ? d.cultos.map(function(x) {
+                                    return '<div style="display:flex;align-items:center;gap:8px;color:var(--gris-texto);"><i class="bx bx-time" style="color:var(--azul-primario);"></i><span>' + x.nombre + ' - ' + x.hora + '</span></div>';
+                                }).join('') : '<p style="color:var(--gris-texto);">No hay culto programado</p>') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('') +
+            '</div>' +
+        '</div>';
+}
+
+function cargarAsistencia(c) {
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-check-shield"></i> Confirmar Asistencia</h2>' +
+            '<div class="card" style="text-align:center;padding:30px;">' +
+                '<i class="bx bx-calendar-check" style="font-size:3rem;color:var(--azul-primario);"></i>' +
+                '<h3 style="margin:12px 0;">Próximo Culto</h3>' +
+                '<div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">' +
+                    '<button class="btn-primary btn-sm" onclick="showToast(\'✅ Asistencia confirmada\', \'success\')"><i class="bx bx-check"></i> Voy</button>' +
+                    '<button class="btn-secondary btn-sm" onclick="showToast(\'🤔 Quizás asista\', \'info\')"><i class="bx bx-question-mark"></i> Tal vez</button>' +
+                    '<button class="btn-outline btn-sm" onclick="showToast(\'❌ No asistiré\', \'warning\')"><i class="bx bx-x"></i> No</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+}
+
+function cargarNoticias(c) {
+    const noticias = APP_STATE.noticias.length ? APP_STATE.noticias : [];
+    
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-news"></i> Noticias</h2>' +
+            (noticias.length === 0 ? 
+                '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay noticias publicadas</p></div>' :
+                noticias.map(function(n) {
+                    return '<div class="card" style="margin-bottom:12px;border-left:4px solid var(--azul-primario);">' +
+                        '<h3>' + (n.titulo || 'Sin título') + '</h3>' +
+                        '<p style="font-size:0.85rem;color:var(--gris-texto);">' + (n.resumen || n.contenido || '') + '</p>' +
+                        '<small style="color:var(--gris-medio);">' + formatearFecha(n.fecha_publicacion || n.fecha) + '</small>' +
+                    '</div>';
+                }).join('')
+            ) +
+        '</div>';
+}
+
+function cargarEventos(c) {
+    const eventos = APP_STATE.eventos.length ? APP_STATE.eventos : [];
+    
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-calendar-star"></i> Eventos</h2>' +
+            (eventos.length === 0 ? 
+                '<div class="card"><p style="text-align:center;padding:30px;color:var(--gris-texto);">No hay eventos programados</p></div>' :
+                eventos.map(function(e) {
+                    return '<div class="card" style="margin-bottom:12px;border-left:4px solid var(--dorado);">' +
+                        '<h3>' + (e.titulo || 'Evento') + '</h3>' +
+                        '<p style="color:var(--gris-texto);">' + (e.descripcion || '') + '</p>' +
+                        '<small style="color:var(--gris-medio);">' + (e.fecha || '') + ' ' + (e.hora_inicio || '') + '</small>' +
+                    '</div>';
+                }).join('')
+            ) +
+        '</div>';
+}
+
+function cargarPublicaciones(c) {
+    const pub = APP_STATE.publicaciones.length ? APP_STATE.publicaciones : [];
+    
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-news"></i> Publicaciones</h2>' +
+            (APP_STATE.usuario ? 
+                '<div class="card" style="margin-bottom:16px;">' +
+                    '<textarea class="form-input" id="contenido-publicacion" placeholder="¿Qué quieres compartir?" rows="3" maxlength="2000"></textarea>' +
+                    '<button class="btn-primary btn-sm" onclick="crearPublicacionLocal()" style="margin-top:8px;"><i class="bx bx-send"></i> Publicar</button>' +
+                '</div>' : ''
+            ) +
+            (pub.length === 0 ? 
+                '<div class="card" style="text-align:center;padding:40px;"><i class="bx bx-news" style="font-size:3rem;color:var(--gris-medio);"></i><p style="margin-top:12px;color:var(--gris-texto);">No hay publicaciones aún</p></div>' :
+                pub.map(function(p) {
+                    return '<div class="card" style="margin-bottom:12px;">' +
+                        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+                            '<img src="' + (p.foto_autor || 'assets/avatars/default.png') + '" style="width:40px;height:40px;border-radius:50%;">' +
+                            '<div><strong>' + (p.autor || 'Anónimo') + '</strong><small style="display:block;color:var(--gris-texto);">' + formatearFecha(p.fecha) + '</small></div>' +
+                        '</div>' +
+                        '<p style="white-space:pre-wrap;">' + escapeHtml(p.contenido || '') + '</p>' +
+                    '</div>';
+                }).join('')
+            ) +
+        '</div>';
+}
+
+function crearPublicacionLocal() {
+    const contenido = document.getElementById('contenido-publicacion')?.value;
+    if (!contenido || !contenido.trim()) {
+        showToast('Escribe algo para publicar', 'warning');
+        return;
+    }
+    if (!APP_STATE.usuario) {
+        showToast('Debes iniciar sesión', 'warning');
+        return;
+    }
+    
+    const publicacion = {
+        id: 'pub_' + Date.now(),
+        usuario_id: APP_STATE.usuario.id,
+        autor: APP_STATE.usuario.nombre,
+        usuario: APP_STATE.usuario.usuario,
+        foto_autor: APP_STATE.usuario.foto || 'assets/avatars/default.png',
+        contenido: contenido.trim(),
+        fecha: new Date().toISOString(),
+        reacciones: { amen: 0, me_gusta: 0, fuego: 0, orando: 0, bendicion: 0 },
+        comentarios_count: 0
+    };
+    
+    APP_STATE.publicaciones.unshift(publicacion);
+    try {
+        const db = getDB();
+        if (db) {
+            db.addPublicacion(publicacion);
+        }
+    } catch (e) {}
+    
+    showToast('✅ Publicación creada', 'success');
+    navegarA('publicaciones');
+}
+
+function cargarPerfil(c) {
+    if (!APP_STATE.usuario) {
+        c.innerHTML = '<div class="fade-in"><div class="card" style="text-align:center;padding:40px;"><i class="bx bx-user-circle" style="font-size:4rem;color:var(--gris-medio);"></i><h3>Inicia sesión para ver tu perfil</h3></div></div>';
+        return;
+    }
+    const u = APP_STATE.usuario;
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<div style="text-align:center;padding:30px;background:linear-gradient(135deg,var(--azul-primario),var(--azul-claro));color:white;border-radius:var(--borde-radius);margin-bottom:16px;">' +
+                '<img src="' + (u.foto || 'assets/avatars/default.png') + '" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--dorado);">' +
+                '<h2>' + (u.nombre || '') + '</h2>' +
+                '<p>@' + (u.usuario || '') + '</p>' +
+                '<span style="background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:20px;font-size:0.8rem;">' + (u.ministerio || 'General') + '</span>' +
+            '</div>' +
+            '<div class="card"><h3>Información</h3><p><strong>Correo:</strong> ' + (u.correo || 'No registrado') + '</p><p><strong>Celular:</strong> ' + (u.celular || 'No registrado') + '</p></div>' +
+            '<div class="card" style="margin-top:12px;border-left:4px solid var(--error);"><button class="btn-danger btn-sm" onclick="confirmarAccion(\'¿Cerrar sesión?\',\'Serás redirigido al inicio.\',cerrarSesion,\'danger\')"><i class="bx bx-log-out"></i> Cerrar Sesión</button></div>' +
+        '</div>';
+}
+
+function cargarConfiguracion(c) {
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-cog"></i> Configuración</h2>' +
+            '<div class="card"><h3>Apariencia</h3><button class="btn-secondary btn-sm" onclick="toggleTema()"><i class="bx ' + (APP_STATE.tema === 'dark' ? 'bx-sun' : 'bx-moon') + '"></i> ' + (APP_STATE.tema === 'dark' ? 'Modo Claro' : 'Modo Oscuro') + '</button></div>' +
+            '<div class="card" style="margin-top:12px;"><h3>Idioma</h3><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">' +
+                ['es','en','pt','fr'].map(function(l) {
+                    return '<button class="btn-outline btn-sm ' + (APP_STATE.idioma === l ? 'active' : '') + '" onclick="cambiarIdioma(\'' + l + '\')"><i class="bx bx-flag-alt"></i> ' + l.toUpperCase() + '</button>';
+                }).join('') +
+            '</div></div>' +
+            '<div class="card" style="margin-top:12px;"><h3>Acerca de</h3><p><strong>IPUC LA FONDA</strong> v' + CONFIG.VERSION + '</p><p style="font-size:0.8rem;color:var(--gris-texto);">&copy; 2026 IPUC LA FONDA International</p></div>' +
+            (APP_STATE.usuario ? '<div class="card" style="margin-top:12px;border-left:4px solid var(--error);"><button class="btn-danger btn-sm" onclick="confirmarAccion(\'¿Cerrar sesión?\',\'Serás redirigido al inicio.\',cerrarSesion,\'danger\')"><i class="bx bx-log-out"></i> Cerrar Sesión</button></div>' : '') +
+        '</div>';
+}
+
+function cargarGestionReportes(c) {
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+                '<h2><i class="bx bx-file"></i> Gestión de Reportes</h2>' +
+                '<button class="btn-primary btn-sm" onclick="abrirModalReporte()"><i class="bx bx-plus"></i> Nuevo</button>' +
+            '</div>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px;">' +
+                '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;color:var(--advertencia);">' + APP_STATE.reportes.filter(function(r){return r.estado==='pendiente';}).length + '</p><p style="font-size:0.75rem;">Pendientes</p></div>' +
+                '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;color:var(--info);">' + APP_STATE.reportes.filter(function(r){return r.estado==='en_revision';}).length + '</p><p style="font-size:0.75rem;">En Revisión</p></div>' +
+                '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;color:var(--exito);">' + APP_STATE.reportes.filter(function(r){return r.estado==='resuelto';}).length + '</p><p style="font-size:0.75rem;">Resueltos</p></div>' +
+                '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;color:var(--azul-primario);">' + APP_STATE.reportes.length + '</p><p style="font-size:0.75rem;">Total</p></div>' +
+            '</div>' +
+            (APP_STATE.reportes.length === 0 ? 
+                '<div class="card" style="text-align:center;padding:40px;"><i class="bx bx-file-blank" style="font-size:3rem;color:var(--gris-medio);"></i><p>No hay reportes</p></div>' :
+                APP_STATE.reportes.map(function(r) {
+                    return '<div class="card" style="margin-bottom:12px;border-left:4px solid ' + (r.urgencia === 'critica' ? 'var(--error)' : r.urgencia === 'alta' ? 'var(--advertencia)' : 'var(--info)') + ';">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:start;">' +
+                            '<div style="flex:1;">' +
+                                '<span class="badge estado-' + (r.estado || 'pendiente') + '" style="margin-right:6px;">' + (r.estado || 'pendiente') + '</span>' +
+                                '<span class="badge tipo-' + (r.tipo || 'general') + '">' + (r.tipo || 'general') + '</span>' +
+                                '<p style="font-size:0.9rem;margin:4px 0;">' + escapeHtml((r.descripcion || '').substring(0, 100)) + '...</p>' +
+                                '<small style="color:var(--gris-texto);">' + formatearFecha(r.fecha) + '</small>' +
+                            '</div>' +
+                            '<div style="display:flex;gap:4px;">' +
+                                '<button class="btn-primary btn-sm" onclick="verDetalleReporte(\'' + r.id + '\')"><i class="bx bx-show"></i></button>' +
+                                (r.estado === 'pendiente' ? '<button class="btn-success btn-sm" onclick="cambiarEstadoReporte(\'' + r.id + '\',\'en_revision\')"><i class="bx bx-check"></i></button>' : '') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('')
+            ) +
+        '</div>';
+}
+
+function cargarMisReportes(c) {
+    if (!APP_STATE.usuario) {
+        c.innerHTML = '<div class="fade-in"><div class="card" style="text-align:center;padding:40px;"><i class="bx bx-user-circle" style="font-size:4rem;color:var(--gris-medio);"></i><h3>Inicia sesión para ver tus reportes</h3></div></div>';
+        return;
+    }
+    
+    const misReportes = APP_STATE.reportes.filter(function(r) {
+        return r.reportado_por && r.reportado_por.id === APP_STATE.usuario.id;
+    });
+    
+    c.innerHTML = 
+        '<div class="fade-in">' +
+            '<h2><i class="bx bx-file"></i> Mis Reportes</h2>' +
+            '<button class="btn-primary btn-sm" onclick="abrirModalReporte()" style="margin-bottom:16px;"><i class="bx bx-plus"></i> Nuevo Reporte</button>' +
+            (misReportes.length === 0 ? 
+                '<div class="card" style="text-align:center;padding:40px;"><i class="bx bx-file-blank" style="font-size:3rem;color:var(--gris-medio);"></i><p>No has generado ningún reporte</p></div>' :
+                misReportes.map(function(r) {
+                    return '<div class="card" style="margin-bottom:12px;">' +
+                        '<span class="badge estado-' + (r.estado || 'pendiente') + '">' + (r.estado || 'pendiente') + '</span>' +
+                        '<span class="badge tipo-' + (r.tipo || 'general') + '" style="margin-left:4px;">' + (r.tipo || 'general') + '</span>' +
+                        '<p style="font-size:0.9rem;margin:4px 0;">' + escapeHtml((r.descripcion || '').substring(0, 100)) + '...</p>' +
+                        '<small style="color:var(--gris-texto);">' + formatearFecha(r.fecha) + '</small>' +
+                    '</div>';
+                }).join('')
+            ) +
+        '</div>';
+}
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 IPUC LA FONDA v18.0 - Inicializando...');
+    
+    try {
+        const temaGuardado = localStorage.getItem('ipuc18_tema') || 'light';
+        APP_STATE.tema = temaGuardado;
+        aplicarTema(temaGuardado);
+    } catch (e) {}
+
+    try {
+        const idiomaGuardado = localStorage.getItem('ipuc18_idioma') || 'es';
+        APP_STATE.idioma = idiomaGuardado;
+    } catch (e) {}
+
+    APP_STATE.publicaciones = cargarArray('ipuc18_publicaciones');
+    APP_STATE.comentarios = cargarArray('ipuc18_comentarios');
+    APP_STATE.reacciones = cargarObjeto('ipuc18_reacciones');
+    APP_STATE.asistencias = cargarArray('ipuc18_asistencias');
+    APP_STATE.eventos = cargarArray('ipuc18_eventos');
+    APP_STATE.noticias = cargarArray('ipuc18_noticias');
+    APP_STATE.peticiones = cargarArray('ipuc18_peticiones');
+    APP_STATE.encuestas = cargarArray('ipuc18_encuestas');
+    APP_STATE.biblioteca = cargarArray('ipuc18_biblioteca');
+    APP_STATE.galeria = cargarArray('ipuc18_galeria');
+    APP_STATE.podcast = cargarArray('ipuc18_podcast');
+    APP_STATE.chat = cargarArray('ipuc18_chat');
+    APP_STATE.directorio = cargarArray('ipuc18_directorio');
+    
+    try {
+        const db = getDB();
+        if (db) {
+            const reportesData = db.cargar('reportes');
+            APP_STATE.reportes = (reportesData && reportesData.reportes) ? reportesData.reportes : [];
+        } else {
+            APP_STATE.reportes = cargarArray('ipuc18_reportes');
+        }
+        APP_STATE.reportsPendientes = APP_STATE.reportes.filter(function(r) { 
+            return r && r.estado === 'pendiente'; 
+        }).length;
+    } catch (e) {
+        APP_STATE.reportes = [];
+        APP_STATE.reportsPendientes = 0;
+    }
+
+    const token = localStorage.getItem('ipuc18_token');
+    const usuarioData = localStorage.getItem('ipuc18_usuario');
+    const rol = localStorage.getItem('ipuc18_rol');
+
+    setTimeout(function() {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.style.opacity = '0';
+            splash.style.transition = 'opacity 0.5s ease';
+            setTimeout(function() {
+                if (splash) splash.style.display = 'none';
+            }, 500);
+        }
+        
+        if (token && usuarioData) {
+            try {
+                APP_STATE.token = token;
+                APP_STATE.usuario = JSON.parse(usuarioData);
+                APP_STATE.rol = rol || 'usuario';
+                mostrarApp();
+                actualizarBadgeReportes();
+            } catch (e) {
+                mostrarBienvenida();
+            }
+        } else {
+            mostrarBienvenida();
+        }
+    }, 2000);
+
+    inicializarEventListeners();
+    manejarResponsiveSidebar();
+    
+    window.addEventListener('resize', manejarResponsiveSidebar);
+    window.addEventListener('online', function() {
+        APP_STATE.isOnline = true;
+        actualizarSidebarUsuario();
+    });
+    window.addEventListener('offline', function() {
+        APP_STATE.isOnline = false;
+        actualizarSidebarUsuario();
+    });
+    
+    console.log('✅ IPUC LA FONDA v18.0 - Inicialización completa');
+});
+
+// ============================================
+// INICIALIZAR EVENT LISTENERS
+// ============================================
+function inicializarEventListeners() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    
+    if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', cerrarSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', cerrarSidebar);
+
+    document.querySelectorAll('.nav-item[data-page]').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.getAttribute('data-page');
+            if (page) navegarA(page);
+        });
+    });
+
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) themeToggle.addEventListener('click', toggleTema);
+    
+    const notifToggle = document.getElementById('notifications-toggle');
+    if (notifToggle) notifToggle.addEventListener('click', toggleNotificaciones);
+    
+    const closeNotif = document.getElementById('close-notifications');
+    if (closeNotif) {
+        closeNotif.addEventListener('click', function() {
+            const panel = document.getElementById('notification-panel');
+            if (panel) panel.classList.add('hidden');
+            APP_STATE.notificationsOpen = false;
+        });
+    }
+
+    const reportsToggle = document.getElementById('reports-quick-toggle');
+    if (reportsToggle) reportsToggle.addEventListener('click', togglePanelReportes);
+    
+    const closeReports = document.getElementById('close-reports-quick');
+    if (closeReports) {
+        closeReports.addEventListener('click', function() {
+            const panel = document.getElementById('reports-quick-panel');
+            if (panel) panel.classList.add('hidden');
+            APP_STATE.reportsPanelOpen = false;
+        });
+    }
+
+    const searchToggle = document.getElementById('search-toggle');
+    if (searchToggle) searchToggle.addEventListener('click', toggleSearchBar);
+    
+    const searchClose = document.getElementById('search-close');
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            const bar = document.getElementById('search-bar');
+            if (bar) bar.classList.add('hidden');
+            APP_STATE.searchBarOpen = false;
+        });
+    }
+
+    const fabMain = document.getElementById('fab-main');
+    if (fabMain) fabMain.addEventListener('click', toggleFabMenu);
+    
+    document.querySelectorAll('.fab-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            switch (action) {
+                case 'reporte': abrirModalReporte(); break;
+                case 'oracion': navegarA('peticiones'); break;
+                case 'musica': navegarA('radio'); break;
+                case 'evento': navegarA('eventos'); break;
+                case 'donacion': navegarA('donaciones'); break;
+                case 'compartir': 
+                    const texto = '"Jehová es mi pastor; nada me faltará." - Salmos 23:1';
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(texto).then(function() { showToast('📋 Versículo copiado', 'success'); }).catch(function() {});
+                    }
+                    break;
+            }
+            toggleFabMenu();
+        });
+    });
+
+    const userMini = document.getElementById('user-mini');
+    if (userMini) userMini.addEventListener('click', toggleUserDropdown);
+    
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+            confirmarAccion('¿Cerrar sesión?', 'Serás redirigido al inicio.', cerrarSesion, 'danger');
+        });
+    }
+
+    const btnGuest = document.getElementById('btn-guest');
+    if (btnGuest) btnGuest.addEventListener('click', continuarComoInvitado);
+    
+    const showRegister = document.getElementById('show-register');
+    if (showRegister) {
+        showRegister.addEventListener('click', function(e) {
+            e.preventDefault();
+            const loginForm = document.getElementById('login-form-container');
+            const registerForm = document.getElementById('register-form-container');
+            if (loginForm) loginForm.classList.add('hidden');
+            if (registerForm) registerForm.classList.remove('hidden');
+        });
+    }
+    
+    const showLogin = document.getElementById('show-login');
+    if (showLogin) {
+        showLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            const loginForm = document.getElementById('login-form-container');
+            const registerForm = document.getElementById('register-form-container');
+            if (registerForm) registerForm.classList.add('hidden');
+            if (loginForm) loginForm.classList.remove('hidden');
+        });
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            if (lang) cambiarIdioma(lang);
+        });
+    });
+
+    const reportUser = document.getElementById('report-user');
+    if (reportUser) {
+        reportUser.addEventListener('input', function() {
+            buscarUsuarioReporte(this.value);
+        });
+    }
+
+    document.querySelectorAll('input[name="report-type"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            cambiarTipoReporte(this.value);
+        });
+    });
+
+    const reportForm = document.getElementById('report-form');
+    if (reportForm) reportForm.addEventListener('submit', generarReporte);
+    
+    const cancelReport = document.getElementById('btn-cancel-report');
+    if (cancelReport) cancelReport.addEventListener('click', cerrarModalReporte);
+
+    document.querySelectorAll('.report-action-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-report');
+            switch(action) {
+                case 'usuario':
+                case 'contenido':
+                    abrirModalReporte();
+                    const radio = document.querySelector('input[value="' + action + '"]');
+                    if (radio) radio.checked = true;
+                    cambiarTipoReporte(action);
+                    break;
+                case 'asistencia': navegarA('asistencia'); break;
+                case 'financiero': navegarA('donaciones'); break;
+            }
+            togglePanelReportes();
+        });
+    });
+
+    const modal = document.getElementById('modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) cerrarModal();
+        });
+    }
+    
+    const modalClose = document.querySelector('.modal-close');
+    if (modalClose) modalClose.addEventListener('click', cerrarModal);
+
+    const confirmCancel = document.getElementById('confirm-cancel');
+    if (confirmCancel) {
+        confirmCancel.addEventListener('click', function() {
+            const confirmModal = document.getElementById('confirm-modal');
+            if (confirmModal) confirmModal.classList.add('hidden');
+            APP_STATE.pendingConfirmation = null;
+        });
+    }
+    
+    const confirmAccept = document.getElementById('confirm-accept');
+    if (confirmAccept) {
+        confirmAccept.addEventListener('click', function() {
+            if (APP_STATE.pendingConfirmation) {
+                APP_STATE.pendingConfirmation();
+                APP_STATE.pendingConfirmation = null;
+            }
+            const confirmModal = document.getElementById('confirm-modal');
+            if (confirmModal) confirmModal.classList.add('hidden');
+        });
+    }
+
+    const confirmModal = document.getElementById('confirm-modal');
+    if (confirmModal) {
+        confirmModal.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) {
+                confirmModal.classList.add('hidden');
+                APP_STATE.pendingConfirmation = null;
+            }
+        });
+    }
+    
+    const reportModal = document.getElementById('report-modal');
+    if (reportModal) {
+        reportModal.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) cerrarModalReporte();
+        });
+    }
+    
+    const viewReportModal = document.getElementById('view-report-modal');
+    if (viewReportModal) {
+        viewReportModal.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) viewReportModal.classList.add('hidden');
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (APP_STATE.notificationsOpen) {
+                const panel = document.getElementById('notification-panel');
+                if (panel) panel.classList.add('hidden');
+                APP_STATE.notificationsOpen = false;
+            }
+            if (APP_STATE.reportsPanelOpen) {
+                const panel = document.getElementById('reports-quick-panel');
+                if (panel) panel.classList.add('hidden');
+                APP_STATE.reportsPanelOpen = false;
+            }
+            if (APP_STATE.searchBarOpen) {
+                const bar = document.getElementById('search-bar');
+                if (bar) bar.classList.add('hidden');
+                APP_STATE.searchBarOpen = false;
+            }
+            const modal = document.getElementById('modal');
+            if (modal && !modal.classList.contains('hidden')) cerrarModal();
+            const rModal = document.getElementById('report-modal');
+            if (rModal && !rModal.classList.contains('hidden')) cerrarModalReporte();
+        }
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            toggleSearchBar();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (APP_STATE.userDropdownOpen && !e.target.closest('#user-mini') && !e.target.closest('#user-dropdown')) {
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+            APP_STATE.userDropdownOpen = false;
+        }
+        if (APP_STATE.fabMenuOpen && !e.target.closest('#fab-main') && !e.target.closest('#fab-menu')) {
+            const menu = document.getElementById('fab-menu');
+            if (menu) menu.classList.add('hidden');
+            APP_STATE.fabMenuOpen = false;
+        }
+    });
 }
 
 // ============================================
@@ -1689,168 +1458,38 @@ function compartirVersiculo() {
 // ============================================
 window.CONFIG = CONFIG;
 window.APP_STATE = APP_STATE;
-window.showToast = showToast;
 window.navegarA = navegarA;
 window.toggleTema = toggleTema;
-window.cambiarIdioma = cambiarIdioma;
-window.cerrarSesion = cerrarSesion;
-window.continuarComoInvitado = continuarComoInvitado;
+window.aplicarTema = aplicarTema;
+window.showToast = showToast;
+window.cerrarModal = cerrarModal;
 window.confirmarAccion = confirmarAccion;
-window.compartirVersiculo = compartirVersiculo;
+window.toggleSidebar = toggleSidebar;
+window.cerrarSidebar = cerrarSidebar;
+window.toggleSearchBar = toggleSearchBar;
+window.toggleFabMenu = toggleFabMenu;
+window.toggleUserDropdown = toggleUserDropdown;
+window.toggleNotificaciones = toggleNotificaciones;
+window.togglePanelReportes = togglePanelReportes;
+window.continuarComoInvitado = continuarComoInvitado;
+window.cerrarSesion = cerrarSesion;
+window.cambiarIdioma = cambiarIdioma;
+window.mostrarApp = mostrarApp;
+window.mostrarBienvenida = mostrarBienvenida;
 window.formatearFecha = formatearFecha;
+window.escapeHtml = escapeHtml;
+window.generarId = generarId;
+window.crearPublicacionLocal = crearPublicacionLocal;
 
-// NUEVO v18: Exportar funciones de reportes
 window.abrirModalReporte = abrirModalReporte;
 window.cerrarModalReporte = cerrarModalReporte;
 window.cambiarTipoReporte = cambiarTipoReporte;
 window.buscarUsuarioReporte = buscarUsuarioReporte;
 window.seleccionarUsuarioReporte = seleccionarUsuarioReporte;
 window.generarReporte = generarReporte;
-window.cargarGestionReportes = cargarGestionReportes;
+window.actualizarBadgeReportes = actualizarBadgeReportes;
 window.verDetalleReporte = verDetalleReporte;
 window.cambiarEstadoReporte = cambiarEstadoReporte;
-window.actualizarBadgeReportes = actualizarBadgeReportes;
-window.togglePanelReportes = togglePanelReportes;
 window.filtrarReportes = filtrarReportes;
 
-// ============================================
-// ESTILOS ADICIONALES PARA REPORTES
-// ============================================
-const reportStyles = document.createElement('style');
-reportStyles.textContent = `
-    /* Badges de urgencia */
-    .urgencia-critica { background: #ff4444; color: white; }
-    .urgencia-alta { background: #ff8800; color: white; }
-    .urgencia-media { background: #ffbb33; color: #333; }
-    .urgencia-baja { background: #00C851; color: white; }
-    
-    /* Badges de estado */
-    .estado-pendiente { background: #ffbb33; color: #333; }
-    .estado-en_revision { background: #33b5e5; color: white; }
-    .estado-resuelto { background: #00C851; color: white; }
-    .estado-desestimado { background: #999; color: white; }
-    
-    /* Badges de tipo */
-    .tipo-usuario { background: #4285f4; color: white; }
-    .tipo-contenido { background: #ea4335; color: white; }
-    .tipo-asistencia { background: #34a853; color: white; }
-    .tipo-financiero { background: #fbbc05; color: #333; }
-    .tipo-ministerio { background: #9c27b0; color: white; }
-    
-    /* Animaciones */
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    @keyframes fadeInUp {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-    
-    .toast { animation: slideInRight 0.3s ease; }
-    .toast-hide { animation: slideOutRight 0.3s ease; }
-    .fab-menu { animation: fadeInUp 0.3s ease; }
-    
-    /* Tarjetas de reporte */
-    .reporte-card {
-        transition: all 0.3s ease;
-    }
-    .reporte-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    /* Resultados de búsqueda */
-    .search-results-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--fondo-card);
-        border: 1px solid var(--gris-medio);
-        border-radius: 8px;
-        max-height: 200px;
-        overflow-y: auto;
-        z-index: 1000;
-    }
-    .search-result-item {
-        padding: 10px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: background 0.2s;
-    }
-    .search-result-item:hover {
-        background: var(--gris-claro);
-    }
-    
-    /* Panel de reportes rápidos */
-    .reports-quick-panel {
-        position: fixed;
-        top: 60px;
-        right: 20px;
-        width: 350px;
-        max-width: 90vw;
-        background: var(--fondo-card);
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        z-index: 1001;
-        animation: fadeInUp 0.3s ease;
-    }
-    
-    /* Modal de reporte */
-    .report-type-selector {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 8px;
-    }
-    .report-type-option {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px;
-        border: 2px solid var(--gris-medio);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    .report-type-option:hover {
-        border-color: var(--azul-primario);
-        background: var(--azul-surface);
-    }
-    .report-type-option input[type="radio"]:checked + i + span {
-        color: var(--azul-primario);
-        font-weight: 600;
-    }
-    
-    /* Selector de urgencia */
-    .urgency-selector {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-    .urgency-option {
-        cursor: pointer;
-    }
-    .urgency-badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    .urgency-option input[type="radio"]:checked + .urgency-badge {
-        transform: scale(1.1);
-        font-weight: 600;
-    }
-`;
-document.head.appendChild(reportStyles);
-
-console.log('✅ IPUC LA FONDA v18.0 PRO ULTIMATE - Cargado completamente');
-console.log('📊 Sistema de Reportes integrado y funcional');
-console.log('🔒 Sistema de autenticación activo');
+console.log('✅ SCRIPT.JS v18.0 PRO ULTIMATE - Cargado correctamente');
