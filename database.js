@@ -1,18 +1,19 @@
 // ============================================
-// IPUC LA FONDA - DATABASE v15.0 PRO ULTIMATE
+// IPUC LA FONDA - DATABASE v18.0 PRO ULTIMATE
 // Sistema de Base de Datos en localStorage
-// Gestión completa - Caché inteligente - Compresión
+// Incluye: Sistema de Reportes, Moderación
+// Gestión completa - Caché inteligente
 // Sincronización - Backup automático - Seguridad
 // VERSIÓN INTERNACIONAL - COMPLETO
 // ============================================
 
 class Database {
     constructor() {
-        this.prefix = 'ipuc15_';
+        this.prefix = 'ipuc18_';
         this.cache = {};
         this.cacheTimeout = 600; // 10 minutos
         this.lastCacheUpdate = {};
-        this.version = '15.0';
+        this.version = '18.0';
         this.initialized = false;
         this.compressionEnabled = true;
         this.backupInterval = 300000; // 5 minutos
@@ -66,10 +67,7 @@ class Database {
         if (!this.compressionEnabled) return data;
         try {
             const json = JSON.stringify(data);
-            // Si el string es corto, no comprimir
             if (json.length < 500) return data;
-            // Compresión simple: eliminar espacios en blanco y reducir
-            const compressed = JSON.stringify(data);
             return data;
         } catch {
             return data;
@@ -113,7 +111,6 @@ class Database {
             this.lastCacheUpdate[clave] = Date.now();
             return parsed;
         } catch {
-            // Intentar recuperar respaldo
             const backup = this._recuperarRespaldo(nombreArchivo);
             if (backup) {
                 this.cache[clave] = this._cloneDeep(backup);
@@ -129,21 +126,17 @@ class Database {
         const clave = this._getKey(nombreArchivo);
         
         try {
-            // Crear respaldo antes de guardar
             const datosAnteriores = localStorage.getItem(clave);
             if (datosAnteriores) {
                 this._crearRespaldo(nombreArchivo, datosAnteriores);
             }
             
-            // Guardar datos
             const datosCompress = this._compressData(datos);
             localStorage.setItem(clave, JSON.stringify(datos, null, 2));
             
-            // Actualizar caché
             this.cache[clave] = this._cloneDeep(datos);
             this.lastCacheUpdate[clave] = Date.now();
             
-            // Registrar operación
             this._registrarLog('guardar', nombreArchivo);
             
             return true;
@@ -159,7 +152,6 @@ class Database {
         const coleccion = this.cargar(nombreArchivo);
         if (!coleccion) return false;
         
-        // Encontrar el elemento por ID
         let encontrado = false;
         for (const [key, value] of Object.entries(coleccion)) {
             if (Array.isArray(value)) {
@@ -187,7 +179,6 @@ class Database {
         const coleccion = this.cargar(nombreArchivo);
         if (!coleccion) return false;
         
-        // Encontrar y eliminar el elemento por ID
         let encontrado = false;
         for (const [key, value] of Object.entries(coleccion)) {
             if (Array.isArray(value)) {
@@ -319,7 +310,6 @@ class Database {
             logs.logs.unshift(nuevoLog);
             logs.ultimo_id = nuevoLog.id;
             
-            // Limitar logs a 1000
             if (logs.logs.length > 1000) {
                 logs.logs = logs.logs.slice(0, 1000);
             }
@@ -334,7 +324,7 @@ class Database {
     }
 
     // ============================================
-    // 6. ARCHIVOS POR DEFECTO
+    // 6. ARCHIVOS POR DEFECTO v18.0
     // ============================================
     
     _crearArchivoPorDefecto(nombreArchivo) {
@@ -372,7 +362,16 @@ class Database {
             'cursos': { cursos: [], ultimo_id: 0 },
             'tienda': { productos: [], ultimo_id: 0 },
             'donaciones': { donaciones: [], ultimo_id: 0 },
-            'transmisiones': { transmisiones: [], ultimo_id: 0 }
+            'transmisiones': { transmisiones: [], ultimo_id: 0 },
+            // NUEVO v18: Reportes
+            'reportes': { reportes: [], ultimo_id: 0 },
+            'reportes_config': { 
+                max_pendientes: 50,
+                tiempo_resolucion: 72,
+                niveles_urgencia: ['baja', 'media', 'alta', 'critica'],
+                estados: ['pendiente', 'en_revision', 'resuelto', 'desestimado'],
+                tipos: ['usuario', 'contenido', 'asistencia', 'financiero', 'ministerio']
+            }
         };
         if (datosPorDefecto[nombreArchivo]) {
             this.guardar(nombreArchivo, datosPorDefecto[nombreArchivo]);
@@ -404,7 +403,7 @@ class Database {
             throw new Error('Contraseña inválida');
         }
         let hash = 0;
-        const salt = 'ipuc15_salt_2026_secure';
+        const salt = 'ipuc18_salt_2026_secure_v18';
         const str = password + salt;
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
@@ -541,7 +540,7 @@ class Database {
                 }
                 
                 const { password: _, ...adminSeguro } = admin;
-                const token = 't15_' + Date.now() + '_' + this._generateId();
+                const token = 't18_' + Date.now() + '_' + this._generateId();
                 
                 if (recordar) {
                     this._guardarSesion(token, adminSeguro, 'admin');
@@ -569,7 +568,7 @@ class Database {
                 }
                 
                 const { password: _, ...userSeguro } = user;
-                const token = 't15_' + Date.now() + '_' + this._generateId();
+                const token = 't18_' + Date.now() + '_' + this._generateId();
                 
                 if (recordar) {
                     this._guardarSesion(token, userSeguro, 'usuario');
@@ -795,7 +794,6 @@ class Database {
             publicaciones.publicaciones = publicaciones.publicaciones.filter(p => p.id !== id);
             this.guardar('publicaciones', publicaciones);
             
-            // Eliminar comentarios asociados
             const comentarios = this.cargar('comentarios');
             comentarios.comentarios = (comentarios.comentarios || [])
                 .filter(c => c.publicacion_id !== id);
@@ -847,7 +845,6 @@ class Database {
             comentarios.ultimo_id = nuevo.id;
             this.guardar('comentarios', comentarios);
 
-            // Actualizar contador en publicación
             const publicaciones = this.cargar('publicaciones');
             const pub = (publicaciones?.publicaciones || [])
                 .find(p => p.id === datos.publicacion_id);
@@ -873,7 +870,6 @@ class Database {
             comentarios.comentarios = comentarios.comentarios.filter(c => c.id !== id);
             this.guardar('comentarios', comentarios);
             
-            // Actualizar contador en publicación
             const publicaciones = this.cargar('publicaciones');
             const pub = (publicaciones?.publicaciones || [])
                 .find(p => p.id === comentario.publicacion_id);
@@ -917,12 +913,10 @@ class Database {
             }
 
             if (actual === tipo) {
-                // Quitar reacción
                 delete reacciones.reacciones[clave];
                 if (pub.reacciones[tipo] > 0) pub.reacciones[tipo]--;
                 this._registrarLog('remove_reaccion', 'reacciones', { publicacionId, usuarioId, tipo });
             } else {
-                // Cambiar o agregar reacción
                 if (actual) {
                     if (pub.reacciones[actual] > 0) pub.reacciones[actual]--;
                 }
@@ -1036,7 +1030,6 @@ class Database {
             eventos = eventos.filter(e => e.fecha <= filtros.fecha_hasta);
         }
         
-        // Ordenar por fecha
         eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
         return eventos;
     }
@@ -1552,7 +1545,6 @@ class Database {
             chat.mensajes.push(nuevo);
             chat.ultimo_id = nuevo.id;
 
-            // Limitar mensajes a 1000
             if (chat.mensajes.length > 1000) {
                 chat.mensajes = chat.mensajes.slice(-1000);
             }
@@ -1672,7 +1664,6 @@ class Database {
             notificaciones.notificaciones.unshift(nueva);
             notificaciones.ultimo_id = nueva.id;
 
-            // Limitar a 500 notificaciones
             if (notificaciones.notificaciones.length > 500) {
                 notificaciones.notificaciones = notificaciones.notificaciones.slice(0, 500);
             }
@@ -1788,6 +1779,7 @@ class Database {
                 episodios: this.getPodcast().length,
                 mensajes: this.getMensajes().length,
                 notificaciones_no_leidas: this.getNoLeidas(),
+                reportes_pendientes: this.getReportesPendientes().length,
                 ultima_actualizacion: new Date().toISOString()
             };
         } catch {
@@ -1848,7 +1840,271 @@ class Database {
     }
 
     // ============================================
-    // 28. INSIGNIAS
+    // 28. SISTEMA DE REPORTES v18.0 (NUEVO)
+    // ============================================
+
+    /**
+     * Obtiene todos los reportes con filtros opcionales
+     */
+    getReportes(filtros = {}) {
+        let reportes = this.cargar('reportes')?.reportes || [];
+        
+        if (filtros.estado) {
+            reportes = reportes.filter(r => r.estado === filtros.estado);
+        }
+        if (filtros.tipo) {
+            reportes = reportes.filter(r => r.tipo === filtros.tipo);
+        }
+        if (filtros.urgencia) {
+            reportes = reportes.filter(r => r.urgencia === filtros.urgencia);
+        }
+        if (filtros.usuario_id) {
+            reportes = reportes.filter(r => r.reportado_por?.id === filtros.usuario_id);
+        }
+        if (filtros.fecha_desde) {
+            reportes = reportes.filter(r => r.fecha >= filtros.fecha_desde);
+        }
+        if (filtros.fecha_hasta) {
+            reportes = reportes.filter(r => r.fecha <= filtros.fecha_hasta);
+        }
+        
+        // Ordenar por fecha descendente
+        return reportes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    }
+
+    /**
+     * Obtiene un reporte por ID
+     */
+    getReporte(id) {
+        const reportes = this.cargar('reportes');
+        return (reportes?.reportes || []).find(r => r.id === id) || null;
+    }
+
+    /**
+     * Obtiene reportes pendientes
+     */
+    getReportesPendientes() {
+        return this.getReportes({ estado: 'pendiente' });
+    }
+
+    /**
+     * Crea un nuevo reporte
+     */
+    addReporte(datos) {
+        try {
+            if (!datos.tipo || !datos.reportado_por || !datos.descripcion) {
+                return { success: false, error: 'Datos incompletos para el reporte' };
+            }
+
+            const tiposValidos = ['usuario', 'contenido', 'asistencia', 'financiero', 'ministerio'];
+            if (!tiposValidos.includes(datos.tipo)) {
+                return { success: false, error: 'Tipo de reporte inválido' };
+            }
+
+            const reportes = this.cargar('reportes');
+            const nuevo = {
+                id: this._generateId(),
+                tipo: datos.tipo,
+                reportado_por: {
+                    id: datos.reportado_por.id,
+                    nombre: datos.reportado_por.nombre,
+                    email: datos.reportado_por.email || ''
+                },
+                usuario_reportado: datos.usuario_reportado || null,
+                descripcion: datos.descripcion.trim(),
+                motivo: datos.motivo || '',
+                urgencia: datos.urgencia || 'baja',
+                estado: 'pendiente',
+                fecha: new Date().toISOString(),
+                fecha_resolucion: null,
+                notas_admin: '',
+                historial: [{
+                    estado: 'pendiente',
+                    fecha: new Date().toISOString(),
+                    usuario: datos.reportado_por.nombre,
+                    comentario: 'Reporte creado'
+                }],
+                fecha_desde: datos.fecha_desde || null,
+                fecha_hasta: datos.fecha_hasta || null,
+                ministerio: datos.ministerio || null
+            };
+
+            if (!reportes.reportes) reportes.reportes = [];
+            reportes.reportes.unshift(nuevo);
+            reportes.ultimo_id = nuevo.id;
+
+            // Limitar reportes a 1000
+            if (reportes.reportes.length > 1000) {
+                reportes.reportes = reportes.reportes.slice(0, 1000);
+            }
+
+            if (this.guardar('reportes', reportes)) {
+                this._agregarNotificacion({
+                    titulo: 'Nuevo reporte',
+                    mensaje: `Reporte #${nuevo.id.substring(0, 8)} - ${nuevo.tipo}`,
+                    tipo: 'reporte'
+                });
+                this._registrarLog('add_reporte', 'reportes', { 
+                    tipo: nuevo.tipo, 
+                    urgencia: nuevo.urgencia 
+                });
+                return { success: true, data: nuevo };
+            }
+            return { success: false, error: 'Error al guardar reporte' };
+        } catch (error) {
+            return { success: false, error: 'Error al crear reporte: ' + error.message };
+        }
+    }
+
+    /**
+     * Actualiza el estado de un reporte
+     */
+    cambiarEstadoReporte(id, nuevoEstado, usuarioAdmin = 'Admin', comentario = '') {
+        try {
+            const estadosValidos = ['pendiente', 'en_revision', 'resuelto', 'desestimado'];
+            if (!estadosValidos.includes(nuevoEstado)) {
+                return { success: false, error: 'Estado inválido' };
+            }
+
+            const reportes = this.cargar('reportes');
+            const reporte = (reportes?.reportes || []).find(r => r.id === id);
+            if (!reporte) {
+                return { success: false, error: 'Reporte no encontrado' };
+            }
+
+            const estadoAnterior = reporte.estado;
+            reporte.estado = nuevoEstado;
+            
+            if (nuevoEstado === 'resuelto' || nuevoEstado === 'desestimado') {
+                reporte.fecha_resolucion = new Date().toISOString();
+            }
+
+            if (!reporte.historial) reporte.historial = [];
+            reporte.historial.push({
+                estado: nuevoEstado,
+                fecha: new Date().toISOString(),
+                usuario: usuarioAdmin,
+                comentario: comentario || `Cambio de estado: ${estadoAnterior} → ${nuevoEstado}`
+            });
+
+            if (this.guardar('reportes', reportes)) {
+                this._agregarNotificacion({
+                    titulo: 'Reporte actualizado',
+                    mensaje: `Reporte #${id.substring(0, 8)} - ${nuevoEstado}`,
+                    tipo: 'reporte'
+                });
+                this._registrarLog('cambiar_estado_reporte', 'reportes', { 
+                    id, 
+                    estado_anterior: estadoAnterior, 
+                    estado_nuevo: nuevoEstado 
+                });
+                return { success: true, data: reporte };
+            }
+            return { success: false, error: 'Error al actualizar reporte' };
+        } catch (error) {
+            return { success: false, error: 'Error al cambiar estado: ' + error.message };
+        }
+    }
+
+    /**
+     * Agrega notas administrativas a un reporte
+     */
+    agregarNotaReporte(id, nota, usuarioAdmin = 'Admin') {
+        try {
+            const reportes = this.cargar('reportes');
+            const reporte = (reportes?.reportes || []).find(r => r.id === id);
+            if (!reporte) {
+                return { success: false, error: 'Reporte no encontrado' };
+            }
+
+            reporte.notas_admin = nota;
+            
+            if (!reporte.historial) reporte.historial = [];
+            reporte.historial.push({
+                estado: reporte.estado,
+                fecha: new Date().toISOString(),
+                usuario: usuarioAdmin,
+                comentario: 'Nota administrativa agregada'
+            });
+
+            this.guardar('reportes', reportes);
+            this._registrarLog('agregar_nota_reporte', 'reportes', { id });
+            return { success: true, data: reporte };
+        } catch (error) {
+            return { success: false, error: 'Error al agregar nota: ' + error.message };
+        }
+    }
+
+    /**
+     * Elimina un reporte
+     */
+    deleteReporte(id) {
+        try {
+            const reportes = this.cargar('reportes');
+            const reporte = (reportes?.reportes || []).find(r => r.id === id);
+            if (!reporte) {
+                return { success: false, error: 'Reporte no encontrado' };
+            }
+            reportes.reportes = reportes.reportes.filter(r => r.id !== id);
+            this.guardar('reportes', reportes);
+            this._registrarLog('delete_reporte', 'reportes', { id });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: 'Error al eliminar reporte: ' + error.message };
+        }
+    }
+
+    /**
+     * Obtiene estadísticas de reportes
+     */
+    getEstadisticasReportes() {
+        const reportes = this.cargar('reportes')?.reportes || [];
+        return {
+            total: reportes.length,
+            pendientes: reportes.filter(r => r.estado === 'pendiente').length,
+            en_revision: reportes.filter(r => r.estado === 'en_revision').length,
+            resueltos: reportes.filter(r => r.estado === 'resuelto').length,
+            desestimados: reportes.filter(r => r.estado === 'desestimado').length,
+            por_tipo: {
+                usuario: reportes.filter(r => r.tipo === 'usuario').length,
+                contenido: reportes.filter(r => r.tipo === 'contenido').length,
+                asistencia: reportes.filter(r => r.tipo === 'asistencia').length,
+                financiero: reportes.filter(r => r.tipo === 'financiero').length,
+                ministerio: reportes.filter(r => r.tipo === 'ministerio').length
+            },
+            por_urgencia: {
+                critica: reportes.filter(r => r.urgencia === 'critica').length,
+                alta: reportes.filter(r => r.urgencia === 'alta').length,
+                media: reportes.filter(r => r.urgencia === 'media').length,
+                baja: reportes.filter(r => r.urgencia === 'baja').length
+            }
+        };
+    }
+
+    /**
+     * Obtiene la configuración de reportes
+     */
+    getConfiguracionReportes() {
+        return this.cargar('reportes_config');
+    }
+
+    /**
+     * Actualiza la configuración de reportes
+     */
+    updateConfiguracionReportes(config) {
+        try {
+            const cfg = this.cargar('reportes_config');
+            const nuevaCfg = { ...cfg, ...config };
+            this.guardar('reportes_config', nuevaCfg);
+            this._registrarLog('update_config_reportes', 'reportes_config');
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: 'Error al actualizar configuración: ' + error.message };
+        }
+    }
+
+    // ============================================
+    // 29. INSIGNIAS
     // ============================================
     
     getInsignias() {
@@ -1891,7 +2147,7 @@ class Database {
     }
 
     // ============================================
-    // 29. HORARIOS
+    // 30. HORARIOS
     // ============================================
     
     getHorarios() {
@@ -1916,7 +2172,7 @@ class Database {
     }
 
     // ============================================
-    // 30. CONFIGURACIÓN
+    // 31. CONFIGURACIÓN
     // ============================================
     
     getConfiguracion() {
@@ -1950,7 +2206,7 @@ class Database {
     }
 
     // ============================================
-    // 31. FAVORITOS
+    // 32. FAVORITOS
     // ============================================
     
     getFavoritos(usuarioId) {
@@ -1961,7 +2217,6 @@ class Database {
     toggleFavorito(usuarioId, itemId, tipo) {
         try {
             const favoritos = this.cargar('favoritos');
-            const clave = `${usuarioId}_${itemId}_${tipo}`;
             const existe = (favoritos?.favoritos || []).some(f => 
                 f.usuario_id === usuarioId && f.item_id === itemId && f.tipo === tipo
             );
@@ -1982,7 +2237,6 @@ class Database {
             }
 
             this.guardar('favoritos', favoritos);
-            this._registrarLog('toggle_favorito', 'favoritos', { usuarioId, itemId, tipo });
             return { success: true, favorito: !existe };
         } catch (error) {
             return { success: false, error: 'Error al gestionar favorito: ' + error.message };
@@ -1990,7 +2244,7 @@ class Database {
     }
 
     // ============================================
-    // 32. METAS
+    // 33. METAS
     // ============================================
     
     getMetas(usuarioId) {
@@ -2022,7 +2276,6 @@ class Database {
             metas.ultimo_id = nueva.id;
 
             this.guardar('metas', metas);
-            this._registrarLog('add_meta', 'metas', { usuario_id: datos.usuario_id });
             return { success: true, data: nueva };
         } catch (error) {
             return { success: false, error: 'Error al crear meta: ' + error.message };
@@ -2042,7 +2295,6 @@ class Database {
                 meta.fecha_completada = new Date().toISOString();
             }
             this.guardar('metas', metas);
-            this._registrarLog('update_meta_progreso', 'metas', { id, progreso });
             return { success: true, data: meta };
         } catch (error) {
             return { success: false, error: 'Error al actualizar meta: ' + error.message };
@@ -2050,7 +2302,7 @@ class Database {
     }
 
     // ============================================
-    // 33. MISIONES
+    // 34. MISIONES
     // ============================================
     
     getMisiones() {
@@ -2082,7 +2334,6 @@ class Database {
             misiones.ultimo_id = nueva.id;
 
             this.guardar('misiones', misiones);
-            this._registrarLog('add_mision', 'misiones', { titulo: nueva.titulo });
             return { success: true, data: nueva };
         } catch (error) {
             return { success: false, error: 'Error al crear misión: ' + error.message };
@@ -2105,7 +2356,6 @@ class Database {
                 fecha: new Date().toISOString()
             });
             this.guardar('misiones', misiones);
-            this._registrarLog('donar_mision', 'misiones', { id, monto });
             return { success: true, data: mision };
         } catch (error) {
             return { success: false, error: 'Error al donar a misión: ' + error.message };
@@ -2113,7 +2363,7 @@ class Database {
     }
 
     // ============================================
-    // 34. TESTIMONIOS
+    // 35. TESTIMONIOS
     // ============================================
     
     getTestimonios() {
@@ -2142,7 +2392,6 @@ class Database {
             testimonios.ultimo_id = nuevo.id;
 
             this.guardar('testimonios', testimonios);
-            this._registrarLog('add_testimonio', 'testimonios', { autor: datos.autor });
             return { success: true, data: nuevo };
         } catch (error) {
             return { success: false, error: 'Error al agregar testimonio: ' + error.message };
@@ -2150,7 +2399,7 @@ class Database {
     }
 
     // ============================================
-    // 35. GRUPOS
+    // 36. GRUPOS
     // ============================================
     
     getGrupos() {
@@ -2181,7 +2430,6 @@ class Database {
             grupos.ultimo_id = nuevo.id;
 
             this.guardar('grupos', grupos);
-            this._registrarLog('add_grupo', 'grupos', { nombre: nuevo.nombre });
             return { success: true, data: nuevo };
         } catch (error) {
             return { success: false, error: 'Error al crear grupo: ' + error.message };
@@ -2201,7 +2449,6 @@ class Database {
             }
             grupo.miembros.push(usuarioId);
             this.guardar('grupos', grupos);
-            this._registrarLog('unirse_grupo', 'grupos', { grupoId, usuarioId });
             return { success: true, data: grupo };
         } catch (error) {
             return { success: false, error: 'Error al unirse al grupo: ' + error.message };
@@ -2209,7 +2456,7 @@ class Database {
     }
 
     // ============================================
-    // 36. DONACIONES
+    // 37. DONACIONES
     // ============================================
     
     getDonaciones() {
@@ -2240,7 +2487,6 @@ class Database {
             donaciones.ultimo_id = nueva.id;
 
             this.guardar('donaciones', donaciones);
-            this._registrarLog('add_donacion', 'donaciones', { usuario_id: datos.usuario_id, monto: datos.monto });
             return { success: true, data: nueva };
         } catch (error) {
             return { success: false, error: 'Error al registrar donación: ' + error.message };
@@ -2248,7 +2494,7 @@ class Database {
     }
 
     // ============================================
-    // 37. UTILIDADES DE EXPORTACIÓN
+    // 38. UTILIDADES DE EXPORTACIÓN
     // ============================================
     
     exportarTodo() {
@@ -2308,7 +2554,7 @@ class Database {
     }
 
     // ============================================
-    // 38. INICIALIZACIÓN
+    // 39. INICIALIZACIÓN v18.0
     // ============================================
     
     inicializarDatos() {
@@ -2319,7 +2565,9 @@ class Database {
             'galeria', 'encuestas', 'podcast', 'chat', 'directorio',
             'estadisticas', 'configuracion', 'logs', 'favoritos', 'metas',
             'mentorias', 'misiones', 'voluntariado', 'testimonios', 'grupos',
-            'sermones', 'cursos', 'tienda', 'donaciones', 'transmisiones'
+            'sermones', 'cursos', 'tienda', 'donaciones', 'transmisiones',
+            // NUEVO v18: Reportes
+            'reportes', 'reportes_config'
         ];
         for (const archivo of archivos) {
             if (!localStorage.getItem(this._getKey(archivo))) {
@@ -2401,13 +2649,12 @@ class Database {
             config.iglesia = {
                 nombre: "IPUC LA FONDA",
                 lema: "Where the Holy Spirit moves",
-                direccion: "",
-                telefono: "",
-                correo: "",
+                direccion: "Cali, Valle del Cauca, Colombia",
+                telefono: "+57 312 881 3818",
+                correo: "ipuclafonda@gmail.com",
                 facebook: "",
                 instagram: "",
                 youtube: "",
-                tiktok: "",
                 twitter: "",
                 idioma: "es",
                 zona_horaria: "America/Bogota"
@@ -2431,7 +2678,7 @@ class Database {
 }
 
 // ============================================
-// CREAR INSTANCIA GLOBAL
+// CREAR INSTANCIA GLOBAL v18.0
 // ============================================
 if (typeof window.db === 'undefined') {
     const db = new Database();
@@ -2445,7 +2692,5 @@ if (typeof window.db === 'undefined') {
 
 window.Database = Database;
 
-console.log('✅ IPUC LA FONDA Database v15.0 PRO ULTIMATE cargada');
+console.log('✅ IPUC LA FONDA Database v18.0 PRO ULTIMATE cargada');
 console.log('📊 Sistema de datos inicializado correctamente');
-console.log('🔄 Backup automático activo');
-console.log('🔒 Seguridad y hash implementados');
