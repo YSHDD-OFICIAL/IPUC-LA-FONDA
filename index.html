@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <!-- ============================================
-IPUC LA FONDA v18.0 PRO ULTIMATE - 2026
+IPUC LA FONDA v20.0 PRO ULTIMATE - 2026
 Iglesia Pentecostal Unida de Colombia
-"Donde el Espiritu Santo se mueve"
-SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
+"Donde el Espíritu Santo se mueve"
+SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
 ============================================ -->
 <html lang="es-CO">
 <head>
@@ -25,28 +25,22 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
     <meta name="application-name" content="IPUC LA FONDA International">
     <meta name="msapplication-TileColor" content="#1a237e">
 
-    <meta name="title" content="IPUC LA FONDA v18.0 PRO">
-    <meta name="description" content="IPUC LA FONDA - Plataforma integral con sistema de reportes, radio en vivo, tienda cristiana, escuela biblica, mentoria espiritual y comunidad global.">
-    <meta name="keywords" content="IPUC, LA FONDA, reportes, administracion, iglesia, Radio Cristiana, Tienda Cristiana, Colombia">
+    <meta name="title" content="IPUC LA FONDA v20.0 PRO ULTIMATE">
+    <meta name="description" content="IPUC LA FONDA - Plataforma integral con IA, streaming en vivo, gamificación, tienda, y comunidad global.">
+    <meta name="keywords" content="IPUC, LA FONDA, iglesia, radio, eventos, comunidad, gamificación, IA, streaming">
     <meta name="author" content="IPUC LA FONDA">
     <meta name="robots" content="index, follow">
-    <meta name="rating" content="General">
     
-    <meta name="geo.region" content="CO">
-    <meta name="geo.placename" content="Colombia">
-
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
-    <meta property="og:title" content="IPUC LA FONDA v18.0 PRO">
-    <meta property="og:description" content="Plataforma integral con reportes, radio, tienda y comunidad cristiana global.">
+    <meta property="og:title" content="IPUC LA FONDA v20.0 PRO ULTIMATE">
+    <meta property="og:description" content="Plataforma integral con IA, streaming, gamificación y comunidad.">
     <meta property="og:image" content="ipuclafonda.png">
     <meta property="og:locale" content="es_CO">
     <meta property="og:site_name" content="IPUC LA FONDA">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="IPUC LA FONDA v18.0 PRO">
-    <meta name="twitter:description" content="Sistema de Reportes y Administracion de Iglesia.">
-    <meta name="twitter:image" content="https://ipuclafonda.netlify.app/ipuclafonda.png">
+    <meta name="twitter:title" content="IPUC LA FONDA v20.0 PRO ULTIMATE">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
@@ -61,20 +55,22 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preload" href="ipuclafonda.png" as="image">
-    <link rel="preload" href="styles.css" as="style">
 
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-
-    <title>IPUC LA FONDA v18.0 PRO | Reportes · Comunidad Global</title>
+    <!-- AOS - Animaciones -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    
+    <!-- Leaflet - Mapas -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    
+    <title>IPUC LA FONDA v20.0 PRO | IA · Streaming · Gamificación</title>
 </head>
 <body>
 
-    <!-- SPLASH SCREEN -->
+    <!-- SPLASH SCREEN MEJORADO -->
     <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive">
         <div class="splash-background">
             <div class="splash-particles"></div>
@@ -82,33 +78,42 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
             <div class="splash-aurora"></div>
             <div class="splash-cross-glow"></div>
             <div class="splash-dove"></div>
+            <div class="splash-fire"></div>
+            <div class="splash-stars"></div>
         </div>
         <div class="splash-content">
             <div class="splash-logo-container">
                 <div class="splash-logo-ring"></div>
                 <div class="splash-logo-ring-2"></div>
                 <div class="splash-logo-ring-3"></div>
+                <div class="splash-logo-ring-4"></div>
                 <img src="ipuclafonda.png" alt="Logo IPUC LA FONDA" class="splash-logo-img" width="140" height="140" loading="eager" draggable="false">
             </div>
             <div class="splash-text">
                 <h1 class="splash-title">IPUC LA FONDA</h1>
                 <p class="splash-subtitle">Iglesia Pentecostal Unida de Colombia</p>
-                <p class="splash-motto">"Donde el Espiritu Santo se mueve"</p>
+                <p class="splash-motto">"Donde el Espíritu Santo se mueve"</p>
                 <div class="splash-verses">
-                    <span class="verse-rotating" id="rotating-verse">Cantad al Senor - Salmo 96:1</span>
+                    <span class="verse-rotating" id="rotating-verse">Cantad al Señor - Salmo 96:1</span>
+                </div>
+                <div class="splash-features">
+                    <span><i class="bx bx-radio"></i> Radio</span>
+                    <span><i class="bx bx-video"></i> Streaming</span>
+                    <span><i class="bx bx-game"></i> Gamificación</span>
+                    <span><i class="bx bx-brain"></i> IA</span>
                 </div>
             </div>
             <div class="splash-loader">
                 <div class="loader-ring"></div>
                 <p class="loader-text" id="splash-loader-text">Cargando sistema...</p>
+                <div class="splash-progress">
+                    <div class="progress-bar" id="splash-progress-bar"></div>
+                </div>
             </div>
             <div class="splash-footer">
                 <div class="splash-flags">
                     <span>ES · EN · PT · FR</span>
-                    <span class="splash-version">v18.0 PRO</span>
-                </div>
-                <div class="splash-progress">
-                    <div class="progress-bar" id="splash-progress-bar"></div>
+                    <span class="splash-version">v20.0 PRO ULTIMATE</span>
                 </div>
             </div>
         </div>
@@ -118,15 +123,16 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
     <div id="app" class="app hidden" role="main">
         <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
 
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR ULTRA MEJORADA -->
         <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menu principal">
             <div class="sidebar-header">
                 <div class="logo-mini">
                     <img src="ipuclafonda.png" alt="Logo IPUC" width="40" height="40">
+                    <span class="logo-badge">PRO</span>
                 </div>
                 <div class="sidebar-brand">
                     <h2>IPUC LA FONDA</h2>
-                    <span class="sidebar-slogan">Adoracion Global</span>
+                    <span class="sidebar-slogan">Adoración Global</span>
                 </div>
                 <button id="close-sidebar" class="btn-icon" aria-label="Cerrar menu">
                     <i class="bx bx-x"></i>
@@ -139,19 +145,73 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                 <span class="search-shortcut">Ctrl+K</span>
             </div>
 
-            <div class="sidebar-languages">
-                <button class="lang-btn active" data-lang="es" aria-label="Espanol">ES</button>
-                <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
-                <button class="lang-btn" data-lang="pt" aria-label="Portugues">PT</button>
-                <button class="lang-btn" data-lang="fr" aria-label="Frances">FR</button>
+            <!-- ESTADÍSTICAS EN SIDEBAR -->
+            <div class="sidebar-stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="online-users">0</span>
+                    <span class="stat-label">En Línea</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-members">0</span>
+                    <span class="stat-label">Miembros</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="prayers-count">0</span>
+                    <span class="stat-label">Oraciones</span>
+                </div>
             </div>
 
-            <nav class="sidebar-nav" aria-label="Navegacion principal">
-                
+            <div class="sidebar-languages">
+                <button class="lang-btn active" data-lang="es" aria-label="Español">ES</button>
+                <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+                <button class="lang-btn" data-lang="pt" aria-label="Portugués">PT</button>
+                <button class="lang-btn" data-lang="fr" aria-label="Francés">FR</button>
+                <button class="lang-btn" data-lang="de" aria-label="Deutsch">DE</button>
+            </div>
+
+            <!-- RADIO PLAYER EN SIDEBAR MEJORADO -->
+            <div class="sidebar-radio">
+                <div class="radio-mini-player" id="radio-mini">
+                    <div class="radio-info">
+                        <i class="bx bx-radio"></i>
+                        <span class="radio-station">Radio IPUC</span>
+                        <span class="radio-status" id="radio-status">🔴 En Vivo</span>
+                    </div>
+                    <div class="radio-controls">
+                        <button class="btn-icon" id="radio-play-toggle" aria-label="Play/Pause Radio">
+                            <i class="bx bx-play-circle"></i>
+                        </button>
+                        <div class="radio-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Navegación principal">
                 <div class="nav-section">
-                    <span class="nav-section-title">Principal</span>
+                    <span class="nav-section-title">🌟 Principal</span>
                     <a href="#inicio" class="nav-item active" data-page="inicio">
                         <i class="bx bx-home-alt-2"></i><span>Inicio</span>
+                        <span class="nav-badge new">Nuevo</span>
+                    </a>
+                    <a href="#dashboard" class="nav-item" data-page="dashboard">
+                        <i class="bx bx-line-chart"></i><span>Panel de Control</span>
+                    </a>
+                    <a href="#streaming" class="nav-item" data-page="streaming">
+                        <i class="bx bx-video-recording"></i><span>En Vivo</span>
+                        <span class="nav-badge live">LIVE</span>
+                    </a>
+                    <a href="#radio" class="nav-item" data-page="radio">
+                        <i class="bx bx-radio"></i><span>Radio</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">⛪ Iglesia</span>
+                    <a href="#eventos" class="nav-item" data-page="eventos">
+                        <i class="bx bx-calendar-event"></i><span>Eventos</span>
+                        <span class="nav-badge-count" id="eventos-badge">0</span>
                     </a>
                     <a href="#horarios" class="nav-item" data-page="horarios">
                         <i class="bx bx-time-five"></i><span>Horarios</span>
@@ -159,79 +219,147 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                     <a href="#asistencia" class="nav-item" data-page="asistencia">
                         <i class="bx bx-check-shield"></i><span>Asistencia</span>
                     </a>
+                    <a href="#mapa" class="nav-item" data-page="mapa">
+                        <i class="bx bx-map"></i><span>Ubicación</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">Comunidad</span>
+                    <span class="nav-section-title">🤝 Comunidad</span>
                     <a href="#chat" class="nav-item" data-page="chat">
                         <i class="bx bx-chat"></i><span>Chat Global</span>
+                        <span class="nav-badge-count" id="chat-badge">0</span>
+                    </a>
+                    <a href="#oracion" class="nav-item" data-page="oracion">
+                        <i class="bx bx-pray"></i><span>Cadena de Oración</span>
                     </a>
                     <a href="#peticiones" class="nav-item" data-page="peticiones">
-                        <i class="bx bx-pray"></i><span>Peticiones</span>
+                        <i class="bx bx-heart"></i><span>Peticiones</span>
                     </a>
                     <a href="#testimonios" class="nav-item" data-page="testimonios">
-                        <i class="bx bx-heart"></i><span>Testimonios</span>
+                        <i class="bx bx-message-dots"></i><span>Testimonios</span>
+                    </a>
+                    <a href="#muro-bendiciones" class="nav-item" data-page="muro-bendiciones">
+                        <i class="bx bx-star"></i><span>Muro de Bendiciones</span>
+                    </a>
+                    <a href="#grupos" class="nav-item" data-page="grupos">
+                        <i class="bx bx-group"></i><span>Grupos y Células</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">Recursos</span>
-                    <a href="#biblioteca" class="nav-item" data-page="biblioteca">
-                        <i class="bx bx-book-open"></i><span>Biblioteca</span>
-                    </a>
-                    <a href="#podcast" class="nav-item" data-page="podcast">
-                        <i class="bx bx-microphone"></i><span>Podcast</span>
-                    </a>
+                    <span class="nav-section-title">📖 Espiritual</span>
                     <a href="#devocional" class="nav-item" data-page="devocional">
-                        <i class="bx bx-bible"></i><span>Devocional</span>
+                        <i class="bx bx-bible"></i><span>Devocional Diario</span>
+                    </a>
+                    <a href="#lectura-biblica" class="nav-item" data-page="lectura-biblica">
+                        <i class="bx bx-book"></i><span>Plan de Lectura</span>
+                        <span class="nav-badge-count" id="lecture-progress">0%</span>
+                    </a>
+                    <a href="#concordancia" class="nav-item" data-page="concordancia">
+                        <i class="bx bx-search-alt"></i><span>Concordancia</span>
+                    </a>
+                    <a href="#himnario" class="nav-item" data-page="himnario">
+                        <i class="bx bx-music"></i><span>Himnario</span>
+                    </a>
+                    <a href="#diario-espiritual" class="nav-item" data-page="diario-espiritual">
+                        <i class="bx bx-notepad"></i><span>Diario Espiritual</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">Multimedia</span>
+                    <span class="nav-section-title">🎮 Gamificación</span>
+                    <a href="#logros" class="nav-item" data-page="logros">
+                        <i class="bx bx-trophy"></i><span>Logros</span>
+                        <span class="nav-badge-count" id="achievements-count">0</span>
+                    </a>
+                    <a href="#trivia" class="nav-item" data-page="trivia">
+                        <i class="bx bx-brain"></i><span>Trivia Bíblica</span>
+                    </a>
+                    <a href="#juegos" class="nav-item" data-page="juegos">
+                        <i class="bx bx-game"></i><span>Juegos</span>
+                    </a>
+                    <a href="#ranking" class="nav-item" data-page="ranking">
+                        <i class="bx bx-medal"></i><span>Ranking</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">🎵 Multimedia</span>
                     <a href="#galeria" class="nav-item" data-page="galeria">
-                        <i class="bx bx-images"></i><span>Galeria</span>
+                        <i class="bx bx-images"></i><span>Galería</span>
                     </a>
                     <a href="#videos" class="nav-item" data-page="videos">
                         <i class="bx bx-video"></i><span>Videos</span>
                     </a>
+                    <a href="#playlist" class="nav-item" data-page="playlist">
+                        <i class="bx bx-playlist"></i><span>Playlist de Adoración</span>
+                    </a>
+                    <a href="#podcast" class="nav-item" data-page="podcast">
+                        <i class="bx bx-microphone"></i><span>Podcast</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">Tienda</span>
+                    <span class="nav-section-title">📚 Recursos</span>
+                    <a href="#biblioteca" class="nav-item" data-page="biblioteca">
+                        <i class="bx bx-book-open"></i><span>Biblioteca Digital</span>
+                    </a>
+                    <a href="#blog" class="nav-item" data-page="blog">
+                        <i class="bx bx-news"></i><span>Blog/Noticias</span>
+                    </a>
+                    <a href="#recursos" class="nav-item" data-page="recursos">
+                        <i class="bx bx-folder"></i><span>Recursos</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">🛒 Tienda</span>
                     <a href="#tienda" class="nav-item" data-page="tienda">
                         <i class="bx bx-store-alt"></i><span>Tienda Cristiana</span>
+                        <span class="nav-badge-count" id="cart-badge">0</span>
                     </a>
                     <a href="#donaciones" class="nav-item" data-page="donaciones">
                         <i class="bx bx-donate-heart"></i><span>Donaciones</span>
                     </a>
+                    <a href="#ofrendas" class="nav-item" data-page="ofrendas">
+                        <i class="bx bx-money"></i><span>Ofrendas</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">Reportes</span>
+                    <span class="nav-section-title">📊 Reportes</span>
                     <a href="#mis-reportes" class="nav-item" data-page="mis-reportes">
                         <i class="bx bx-file"></i><span>Mis Reportes</span>
+                    </a>
+                    <a href="#informes" class="nav-item" data-page="informes">
+                        <i class="bx bx-file-pdf"></i><span>Informes PDF</span>
                     </a>
                 </div>
 
                 <div id="admin-menu" class="nav-section hidden">
                     <hr class="divider">
-                    <span class="nav-section-title admin-label">Administracion</span>
-                    <a href="#dashboard" class="nav-item" data-page="dashboard">
-                        <i class="bx bx-line-chart"></i><span>Dashboard</span>
+                    <span class="nav-section-title admin-label">
+                        <i class="bx bx-shield"></i> Administración
+                    </span>
+                    <a href="#admin-dashboard" class="nav-item" data-page="admin-dashboard">
+                        <i class="bx bx-line-chart"></i><span>Dashboard Admin</span>
                     </a>
                     <a href="#gestion-usuarios" class="nav-item" data-page="gestion-usuarios">
                         <i class="bx bx-user-voice"></i><span>Usuarios</span>
                     </a>
                     <a href="#gestion-reportes" class="nav-item" data-page="gestion-reportes">
-                        <i class="bx bx-file"></i><span>Gestion Reportes</span>
+                        <i class="bx bx-file"></i><span>Gestión Reportes</span>
                         <span class="nav-badge-count" id="pending-reports">0</span>
+                    </a>
+                    <a href="#gestion-eventos" class="nav-item" data-page="gestion-eventos">
+                        <i class="bx bx-calendar-edit"></i><span>Gestión Eventos</span>
                     </a>
                     <a href="#gestion-noticias" class="nav-item" data-page="gestion-noticias">
                         <i class="bx bx-edit-alt"></i><span>Noticias</span>
                     </a>
-                    <a href="#gestion-eventos" class="nav-item" data-page="gestion-eventos">
-                        <i class="bx bx-calendar-edit"></i><span>Eventos</span>
+                    <a href="#analiticas" class="nav-item" data-page="analiticas">
+                        <i class="bx bx-stats"></i><span>Analíticas</span>
                     </a>
                     <a href="#sistema" class="nav-item" data-page="sistema">
                         <i class="bx bx-server"></i><span>Sistema</span>
@@ -244,19 +372,26 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                     <div class="user-mini-avatar">
                         <img src="assets/avatars/default.png" alt="Avatar" width="42" height="42" id="user-avatar">
                         <span class="user-status offline" id="user-status"></span>
+                        <span class="user-level" id="user-level">Lv.1</span>
                     </div>
                     <div class="user-info">
                         <span class="user-name" id="user-name">Visitante</span>
-                        <span class="user-role" id="user-role">Sin sesion</span>
+                        <span class="user-role" id="user-role">Sin sesión</span>
+                        <div class="user-xp-bar">
+                            <div class="xp-bar" id="user-xp-bar" style="width:0%"></div>
+                        </div>
                     </div>
                     <i class="bx bx-chevron-up"></i>
                 </div>
                 <div id="user-dropdown" class="user-dropdown hidden" role="menu">
                     <a href="#perfil" role="menuitem"><i class="bx bx-user"></i> Mi Perfil</a>
                     <a href="#mis-reportes" role="menuitem"><i class="bx bx-file"></i> Mis Reportes</a>
-                    <a href="#configuracion" role="menuitem"><i class="bx bx-cog"></i> Configuracion</a>
+                    <a href="#diario-espiritual" role="menuitem"><i class="bx bx-notepad"></i> Diario Espiritual</a>
+                    <a href="#logros" role="menuitem"><i class="bx bx-trophy"></i> Mis Logros</a>
+                    <a href="#configuracion" role="menuitem"><i class="bx bx-cog"></i> Configuración</a>
+                    <a href="#tema" role="menuitem"><i class="bx bx-palette"></i> Temas</a>
                     <hr>
-                    <a href="#" id="btn-logout" role="menuitem"><i class="bx bx-log-out"></i> Cerrar Sesion</a>
+                    <a href="#" id="btn-logout" role="menuitem"><i class="bx bx-log-out"></i> Cerrar Sesión</a>
                 </div>
             </div>
         </aside>
@@ -268,7 +403,7 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                     <button id="menu-toggle" class="btn-icon" aria-label="Abrir menu">
                         <i class="bx bx-menu-alt-left"></i>
                     </button>
-                    <nav class="breadcrumb" aria-label="Ruta de navegacion">
+                    <nav class="breadcrumb" aria-label="Ruta de navegación">
                         <ol>
                             <li><a href="#inicio"><i class="bx bx-home"></i></a></li>
                             <li class="separator"><i class="bx bx-chevron-right"></i></li>
@@ -278,12 +413,19 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                 </div>
                 <div class="header-center">
                     <h1 id="page-title">Inicio</h1>
+                    <span class="header-date" id="header-date"></span>
                 </div>
                 <div class="header-right">
+                    <button id="qr-toggle" class="btn-icon" aria-label="QR Code">
+                        <i class="bx bx-qr"></i>
+                    </button>
                     <button id="search-toggle" class="btn-icon" aria-label="Buscar">
                         <i class="bx bx-search"></i>
                     </button>
-                    <button id="reports-quick-toggle" class="btn-icon" aria-label="Reportes rapidos">
+                    <button id="radio-toggle" class="btn-icon" aria-label="Radio">
+                        <i class="bx bx-radio"></i>
+                    </button>
+                    <button id="reports-quick-toggle" class="btn-icon" aria-label="Reportes rápidos">
                         <i class="bx bx-file"></i>
                         <span class="badge badge-reports hidden" id="reports-badge">0</span>
                     </button>
@@ -297,10 +439,101 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                 </div>
             </header>
 
+            <!-- PANEL DE STREAMING -->
+            <div id="streaming-panel" class="streaming-panel hidden" role="dialog" aria-label="Panel de streaming">
+                <div class="streaming-header">
+                    <h3><i class="bx bx-video-recording"></i> Transmisión en Vivo</h3>
+                    <button class="btn-icon" id="close-streaming" aria-label="Cerrar">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="streaming-container">
+                    <div class="streaming-player">
+                        <div class="streaming-placeholder">
+                            <i class="bx bx-video-recording"></i>
+                            <p>Transmisión en vivo próximamente</p>
+                            <span class="streaming-badge">🔴 EN VIVO</span>
+                        </div>
+                    </div>
+                    <div class="streaming-info">
+                        <h4 id="streaming-title">Culto de Adoración</h4>
+                        <p id="streaming-desc">Únete a nuestra transmisión en vivo</p>
+                        <div class="streaming-stats">
+                            <span><i class="bx bx-user"></i> <span id="viewers-count">0</span> espectadores</span>
+                            <span><i class="bx bx-heart"></i> <span id="streaming-likes">0</span></span>
+                            <span><i class="bx bx-chat"></i> <span id="streaming-chat">0</span></span>
+                        </div>
+                        <div class="streaming-actions">
+                            <button class="btn-primary btn-sm"><i class="bx bx-share"></i> Compartir</button>
+                            <button class="btn-primary btn-sm"><i class="bx bx-bell"></i> Recordar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DE RADIO RÁPIDO -->
+            <div id="radio-quick-panel" class="radio-quick-panel hidden" role="dialog" aria-label="Panel de radio">
+                <div class="radio-quick-header">
+                    <h3><i class="bx bx-radio"></i> Radio IPUC</h3>
+                    <button class="btn-icon" id="close-radio-quick" aria-label="Cerrar">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="radio-player-full">
+                    <div class="radio-art">
+                        <img src="radio-art.jpg" alt="Radio IPUC" id="radio-art-img">
+                        <div class="radio-playing" id="radio-playing">Alabanzas de Adoración</div>
+                        <div class="radio-artist" id="radio-artist">IPUC LA FONDA</div>
+                    </div>
+                    <div class="radio-controls-full">
+                        <button class="btn-radio" id="radio-prev"><i class="bx bx-rewind"></i></button>
+                        <button class="btn-radio btn-radio-main" id="radio-play-main">
+                            <i class="bx bx-play-circle"></i>
+                        </button>
+                        <button class="btn-radio" id="radio-next"><i class="bx bx-fast-forward"></i></button>
+                    </div>
+                    <div class="radio-progress">
+                        <input type="range" min="0" max="100" value="0" id="radio-progress-bar">
+                    </div>
+                    <div class="radio-volume">
+                        <i class="bx bx-volume-low"></i>
+                        <input type="range" min="0" max="100" value="70" id="radio-volume-bar">
+                        <i class="bx bx-volume-full"></i>
+                    </div>
+                    <div class="radio-playlist">
+                        <h4>Lista de Reproducción</h4>
+                        <ul id="playlist-songs">
+                            <li class="active"><i class="bx bx-play-circle"></i> Santo Espíritu</li>
+                            <li><i class="bx bx-play-circle"></i> Alabanzas al Rey</li>
+                            <li><i class="bx bx-play-circle"></i> Adoración Profunda</li>
+                            <li><i class="bx bx-play-circle"></i> Glorioso Día</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DE QR CODE -->
+            <div id="qr-panel" class="qr-panel hidden" role="dialog" aria-label="QR Code">
+                <div class="qr-header">
+                    <h3><i class="bx bx-qr"></i> Compartir Iglesia</h3>
+                    <button class="btn-icon" id="close-qr" aria-label="Cerrar">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+                <div class="qr-container">
+                    <div id="qr-code"></div>
+                    <p>Escanea para compartir</p>
+                    <div class="qr-actions">
+                        <button class="btn-primary btn-sm"><i class="bx bx-download"></i> Descargar</button>
+                        <button class="btn-primary btn-sm"><i class="bx bx-share"></i> Compartir</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- PANEL DE REPORTES RAPIDOS -->
-            <div id="reports-quick-panel" class="reports-quick-panel hidden" role="dialog" aria-label="Panel de reportes rapidos">
+            <div id="reports-quick-panel" class="reports-quick-panel hidden" role="dialog" aria-label="Panel de reportes rápidos">
                 <div class="reports-quick-header">
-                    <h3>Reportes Rapidos</h3>
+                    <h3>Reportes Rápidos</h3>
                     <button class="btn-icon" id="close-reports-quick" aria-label="Cerrar">
                         <i class="bx bx-x"></i>
                     </button>
@@ -334,14 +567,14 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                 <div class="search-bar-content">
                     <i class="bx bx-search"></i>
                     <input type="search" id="global-search-input" placeholder="Buscar..." autocomplete="off">
-                    <button class="btn-icon" id="search-close" aria-label="Cerrar busqueda">
+                    <button class="btn-icon" id="search-close" aria-label="Cerrar búsqueda">
                         <i class="bx bx-x"></i>
                     </button>
                 </div>
                 <div class="search-results" id="search-results"></div>
             </div>
 
-            <!-- CONTENEDOR DE PAGINAS -->
+            <!-- CONTENEDOR DE PÁGINAS -->
             <div id="page-content" class="page-content">
                 <div class="page-loader">
                     <div class="spinner"></div>
@@ -351,50 +584,86 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
         </main>
     </div>
 
-    <!-- WELCOME SCREEN -->
+    <!-- WELCOME SCREEN MEJORADA -->
     <div id="welcome-screen" class="welcome-screen" role="main" aria-label="Pantalla de bienvenida">
         <div class="welcome-background">
             <div class="welcome-overlay"></div>
             <div class="welcome-particles"></div>
             <div class="welcome-aurora"></div>
             <div class="welcome-cross"></div>
+            <div class="welcome-dove"></div>
+            <div class="welcome-fire"></div>
         </div>
         <div class="welcome-container">
-            <div class="welcome-card">
+            <div class="welcome-card" data-aos="fade-up" data-aos-duration="1000">
                 <div class="welcome-header">
                     <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="welcome-logo" width="100" height="100" loading="eager">
                     <h1 class="welcome-title">IPUC LA FONDA</h1>
                     <p class="welcome-subtitle">Iglesia Pentecostal Unida de Colombia</p>
-                    <p class="welcome-verse">"Donde el Espiritu Santo se mueve"</p>
+                    <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
+                </div>
+                
+                <!-- VERSÍCULO DEL DÍA MEJORADO -->
+                <div class="welcome-verse-day" id="verse-day">
+                    <i class="bx bx-bible"></i>
+                    <div class="verse-content">
+                        <span id="daily-verse">"Porque de tal manera amó Dios al mundo..."</span>
+                        <span id="daily-verse-ref">Juan 3:16</span>
+                    </div>
                 </div>
                 
                 <div class="welcome-languages">
-                    <button class="lang-btn active" data-lang="es">Espanol</button>
-                    <button class="lang-btn" data-lang="en">English</button>
-                    <button class="lang-btn" data-lang="pt">Portugues</button>
-                    <button class="lang-btn" data-lang="fr">Francais</button>
+                    <button class="lang-btn active" data-lang="es">🇪🇸 Español</button>
+                    <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+                    <button class="lang-btn" data-lang="pt">🇵🇹 Português</button>
+                    <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+                    <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
                 </div>
 
+                <div id="system-status" class="system-status">
+                    <span id="status-icon" class="status-icon">🔄</span>
+                    <span id="status-text">Verificando sistema...</span>
+                </div>
+
+                <!-- LOGIN CON 2FA -->
                 <div id="login-form-container" class="auth-form-container">
                     <form id="login-form" class="auth-form" autocomplete="off">
                         <div class="form-group">
-                            <label for="login-email">Correo Electronico</label>
+                            <label for="login-email">Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-envelope"></i>
                                 <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="login-password">Contrasena</label>
+                            <label for="login-password">Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
                                 <input type="password" id="login-password" class="form-input" placeholder="********" required>
+                                <button type="button" class="btn-toggle-password" id="toggle-password">
+                                    <i class="bx bx-show"></i>
+                                </button>
                             </div>
                         </div>
+                        <div class="form-group" id="2fa-group" style="display:none;">
+                            <label for="login-2fa">Código de Verificación</label>
+                            <div class="input-wrapper">
+                                <i class="bx bx-shield"></i>
+                                <input type="text" id="login-2fa" class="form-input" placeholder="Código de 6 dígitos" maxlength="6" pattern="[0-9]{6}">
+                            </div>
+                            <small class="form-hint">Ingresa el código enviado a tu correo</small>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="remember-me">
+                                <span>Recordarme</span>
+                            </label>
+                            <a href="#" id="forgot-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        </div>
                         <button type="submit" class="btn-primary btn-lg btn-block">
-                            Iniciar Sesion
+                            <i class="bx bx-log-in"></i> Iniciar Sesión
                         </button>
-                        <p class="auth-switch">No tienes cuenta? <a href="#" id="show-register">Registrate aqui</a></p>
+                        <p class="auth-switch">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
                     </form>
                 </div>
 
@@ -408,57 +677,92 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="reg-email">Correo Electronico</label>
+                            <label for="reg-email">Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-envelope"></i>
                                 <input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="reg-password">Contrasena</label>
+                            <label for="reg-password">Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="reg-password" class="form-input" placeholder="Minimo 8 caracteres" required minlength="8">
+                                <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-role">Tipo de Usuario</label>
+                            <select id="reg-role" class="form-input">
+                                <option value="user">Usuario Normal</option>
+                                <option value="admin">Administrador (requiere clave)</option>
+                            </select>
+                        </div>
+                        <div id="admin-key-group" class="form-group hidden">
+                            <label for="reg-admin-key">Clave de Administrador</label>
+                            <div class="input-wrapper">
+                                <i class="bx bx-key"></i>
+                                <input type="password" id="reg-admin-key" class="form-input" placeholder="Clave de administrador">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="captcha-container">
+                                <span id="captcha-text" class="captcha-text">A1B2C3</span>
+                                <button type="button" id="captcha-refresh" class="btn-icon"><i class="bx bx-refresh"></i></button>
+                                <input type="text" id="captcha-input" class="form-input" placeholder="Ingresa el código" required>
                             </div>
                         </div>
                         <button type="submit" class="btn-primary btn-lg btn-block">
-                            Crear Cuenta
+                            <i class="bx bx-user-plus"></i> Crear Cuenta
                         </button>
-                        <p class="auth-switch">Ya tienes cuenta? <a href="#" id="show-login">Inicia Sesion</a></p>
+                        <p class="auth-switch">¿Ya tienes cuenta? <a href="#" id="show-login">Inicia Sesión</a></p>
                     </form>
                 </div>
 
                 <div class="welcome-actions">
                     <button id="btn-guest" class="btn-outline btn-lg btn-block">
-                        Explorar como Invitado
+                        <i class="bx bx-user"></i> Explorar como Invitado
                     </button>
-                    <button id="btn-create-admin" class="btn-outline btn-lg btn-block" style="display:none;">
-                        Configurar Administrador
+                    <button id="btn-create-admin" class="btn-outline btn-lg btn-block hidden">
+                        <i class="bx bx-crown"></i> Crear Primer Administrador
                     </button>
                 </div>
 
+                <div class="welcome-social">
+                    <span>Síguenos en:</span>
+                    <a href="#" class="social-link"><i class="bx bxl-youtube"></i></a>
+                    <a href="#" class="social-link"><i class="bx bxl-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="bx bxl-facebook"></i></a>
+                    <a href="#" class="social-link"><i class="bx bxl-whatsapp"></i></a>
+                    <a href="#" class="social-link"><i class="bx bxl-tiktok"></i></a>
+                    <a href="#" class="social-link"><i class="bx bxl-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="bx bxl-telegram"></i></a>
+                </div>
+
                 <div class="welcome-footer">
-                    <p class="welcome-version">v18.0 PRO &copy; 2026 IPUC LA FONDA</p>
+                    <p class="welcome-version">v20.0 PRO ULTIMATE &copy; 2026 IPUC LA FONDA</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SECCION CREAR ADMINISTRADOR -->
+    <!-- SECCIÓN CREAR ADMINISTRADOR MEJORADA -->
     <div id="create-admin-section" class="create-admin-section hidden">
-        <div class="create-admin-card">
+        <div class="create-admin-card" data-aos="zoom-in" data-aos-duration="800">
             <button class="create-admin-back" id="btn-back-to-welcome" aria-label="Volver">
-                Volver
+                <i class="bx bx-arrow-back"></i> Volver
             </button>
             <div class="header">
                 <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="logo-img" width="80" height="80">
                 <h2>IPUC LA FONDA</h2>
-                <p class="subtitle">Configuracion Global de Administrador</p>
+                <p class="subtitle">Configuración del Primer Administrador</p>
+                <p class="subtitle-info">Este será el administrador principal del sistema</p>
             </div>
 
             <form id="formAdmin" autocomplete="off" novalidate>
                 <div class="form-section">
-                    <div class="form-section-title">Informacion Personal</div>
+                    <div class="form-section-title">
+                        <i class="bx bx-user-detail"></i> Información Personal
+                    </div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="admin-nombre">Nombre *</label>
@@ -470,7 +774,7 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="admin-correo">Correo Electronico *</label>
+                        <label for="admin-correo">Correo Electrónico *</label>
                         <input type="email" class="form-input" id="admin-correo" name="correo" placeholder="correo@ejemplo.com" required>
                     </div>
                     <div class="form-group">
@@ -480,35 +784,45 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                 </div>
 
                 <div class="form-section">
-                    <div class="form-section-title">Credenciales</div>
+                    <div class="form-section-title">
+                        <i class="bx bx-lock"></i> Credenciales
+                    </div>
                     <div class="form-group">
                         <label for="admin-usuario">Usuario *</label>
                         <input type="text" class="form-input" id="admin-usuario" name="usuario" placeholder="admin" required>
                     </div>
                     <div class="form-group">
-                        <label for="admin-password">Contrasena *</label>
-                        <input type="password" class="form-input" id="admin-password" name="password" placeholder="Minimo 8 caracteres" required minlength="8">
+                        <label for="admin-password">Contraseña *</label>
+                        <input type="password" class="form-input" id="admin-password" name="password" placeholder="Mínimo 8 caracteres" required minlength="8">
+                        <div class="password-strength" id="password-strength">
+                            <span class="strength-bar"></span>
+                            <span class="strength-bar"></span>
+                            <span class="strength-bar"></span>
+                            <span class="strength-bar"></span>
+                            <span class="strength-text">Débil</span>
+                        </div>
+                        <small class="form-hint">Mínimo 8 caracteres, incluir mayúsculas, minúsculas y números</small>
                     </div>
                     <div class="form-group">
-                        <label for="admin-confirmar-password">Confirmar Contrasena *</label>
-                        <input type="password" class="form-input" id="admin-confirmar-password" name="confirmarPassword" placeholder="Repite la contrasena" required minlength="8">
+                        <label for="admin-confirmar-password">Confirmar Contraseña *</label>
+                        <input type="password" class="form-input" id="admin-confirmar-password" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="8">
                     </div>
                 </div>
 
                 <button type="submit" class="btn-submit" id="admin-btn-submit">
-                    Crear Administrador Global
+                    <i class="bx bx-crown"></i> Crear Administrador Global
                 </button>
             </form>
             <div class="resultado" id="admin-resultado"></div>
         </div>
     </div>
 
-    <!-- MODAL DE REPORTES -->
+    <!-- MODAL DE REPORTES MEJORADO -->
     <div id="report-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
-        <div class="modal-container">
+        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
             <div class="modal-header">
-                <h2 id="report-modal-title">Generar Reporte</h2>
+                <h2 id="report-modal-title"><i class="bx bx-file"></i> Generar Reporte</h2>
                 <button class="modal-close btn-icon" aria-label="Cerrar">
                     <i class="bx bx-x"></i>
                 </button>
@@ -537,6 +851,10 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                             <label class="report-type-option">
                                 <input type="radio" name="report-type" value="ministerio">
                                 <i class="bx bx-building-house"></i><span>Ministerio</span>
+                            </label>
+                            <label class="report-type-option">
+                                <input type="radio" name="report-type" value="abuso">
+                                <i class="bx bx-shield"></i><span>Abuso</span>
                             </label>
                         </div>
                     </div>
@@ -568,12 +886,14 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                             <label for="report-ministerio">Ministerio</label>
                             <select id="report-ministerio" class="form-input">
                                 <option value="">Seleccionar...</option>
-                                <option value="jovenes">Jovenes</option>
-                                <option value="ninos">Ninos</option>
+                                <option value="jovenes">Jóvenes</option>
+                                <option value="ninos">Niños</option>
                                 <option value="alabanza">Alabanza</option>
                                 <option value="misiones">Misiones</option>
                                 <option value="damas">Damas</option>
                                 <option value="caballeros">Caballeros</option>
+                                <option value="intercesion">Intercesión</option>
+                                <option value="predicacion">Predicación</option>
                             </select>
                         </div>
 
@@ -584,13 +904,15 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                                 <option value="comportamiento">Comportamiento Inapropiado</option>
                                 <option value="contenido">Contenido Ofensivo</option>
                                 <option value="spam">Spam</option>
-                                <option value="suplantacion">Suplantacion de Identidad</option>
+                                <option value="suplantacion">Suplantación de Identidad</option>
+                                <option value="abuso">Abuso o Acoso</option>
+                                <option value="discriminacion">Discriminación</option>
                                 <option value="otro">Otro</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="report-descripcion">Descripcion Detallada *</label>
+                            <label for="report-descripcion">Descripción Detallada *</label>
                             <textarea id="report-descripcion" class="form-input" rows="4" placeholder="Describe el motivo del reporte..." required></textarea>
                         </div>
 
@@ -611,57 +933,191 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
                                 </label>
                                 <label class="urgency-option">
                                     <input type="radio" name="report-urgencia" value="critica">
-                                    <span class="urgency-badge critica">Critica</span>
+                                    <span class="urgency-badge critica">Crítica</span>
                                 </label>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="report-attachment">Adjuntar Evidencia</label>
+                            <div class="file-drop-zone" id="file-drop-zone">
+                                <i class="bx bx-cloud-upload"></i>
+                                <p>Arrastra o haz clic para subir archivos</p>
+                                <input type="file" id="report-attachment" class="file-input" accept="image/*,video/*,.pdf,.doc,.docx" multiple>
+                            </div>
+                            <small class="form-hint">Formatos: JPG, PNG, PDF, DOC, MP4 (máx 10MB)</small>
                         </div>
                     </div>
 
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" id="btn-cancel-report">Cancelar</button>
-                        <button type="submit" class="btn-primary">Enviar Reporte</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="bx bx-send"></i> Enviar Reporte
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- PANEL DE NOTIFICACIONES -->
+    <!-- PANEL DE NOTIFICACIONES MEJORADO -->
     <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-label="Panel de notificaciones">
         <div class="notification-header">
-            <h3>Notificaciones</h3>
-            <button class="btn-icon" id="close-notifications" aria-label="Cerrar">
-                <i class="bx bx-x"></i>
-            </button>
+            <h3><i class="bx bx-bell"></i> Notificaciones</h3>
+            <div class="notification-actions">
+                <button class="btn-icon" id="mark-all-read" aria-label="Marcar todas como leídas">
+                    <i class="bx bx-check-double"></i>
+                </button>
+                <button class="btn-icon" id="close-notifications" aria-label="Cerrar">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        </div>
+        <div class="notification-filters">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            <button class="filter-btn" data-filter="evento">Eventos</button>
+            <button class="filter-btn" data-filter="oracion">Oraciones</button>
+            <button class="filter-btn" data-filter="sistema">Sistema</button>
         </div>
         <div id="notification-list">
             <div class="notification-empty">
+                <i class="bx bx-bell-off"></i>
                 <p>No tienes notificaciones nuevas</p>
             </div>
         </div>
     </div>
 
-    <!-- MODALES GENERALES -->
-    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <!-- MODAL DE EVENTOS MEJORADO -->
+    <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
-        <div class="modal-container">
+        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
             <div class="modal-header">
-                <h2 id="modal-title"></h2>
+                <h2 id="event-modal-title"><i class="bx bx-calendar-plus"></i> Crear Evento</h2>
                 <button class="modal-close btn-icon" aria-label="Cerrar">
                     <i class="bx bx-x"></i>
                 </button>
             </div>
-            <div class="modal-body" id="modal-body"></div>
-            <div class="modal-footer hidden" id="modal-footer"></div>
+            <div class="modal-body">
+                <form id="event-form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="event-title">Título del Evento *</label>
+                        <input type="text" id="event-title" class="form-input" placeholder="Ej: Culto de Adoración" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-desc">Descripción</label>
+                        <textarea id="event-desc" class="form-input" rows="3" placeholder="Detalles del evento..."></textarea>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="event-date">Fecha *</label>
+                            <input type="date" id="event-date" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Hora *</label>
+                            <input type="time" id="event-time" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="event-location">Lugar</label>
+                            <input type="text" id="event-location" class="form-input" placeholder="Dirección del evento">
+                        </div>
+                        <div class="form-group">
+                            <label for="event-type">Tipo de Evento</label>
+                            <select id="event-type" class="form-input">
+                                <option value="culto">Culto</option>
+                                <option value="estudio">Estudio Bíblico</option>
+                                <option value="conferencia">Conferencia</option>
+                                <option value="retiro">Retiro</option>
+                                <option value="social">Actividad Social</option>
+                                <option value="misiones">Misiones</option>
+                                <option value="concierto">Concierto</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="event-reminder"> 
+                            Activar recordatorio (24h antes)
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btn-cancel-event">Cancelar</button>
+                        <button type="submit" class="btn-primary">Crear Evento</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
+    <!-- MODAL DE ORACIÓN MEJORADO -->
+    <div id="prayer-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-sm" data-aos="fade-up" data-aos-duration="500">
+            <div class="modal-header">
+                <h2><i class="bx bx-pray"></i> Cadena de Oración</h2>
+                <button class="modal-close btn-icon" aria-label="Cerrar">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="prayer-form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="prayer-name">Tu Nombre</label>
+                        <input type="text" id="prayer-name" class="form-input" placeholder="Anónimo o tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="prayer-category">Categoría</label>
+                        <select id="prayer-category" class="form-input">
+                            <option value="salud">Salud</option>
+                            <option value="familia">Familia</option>
+                            <option value="trabajo">Trabajo</option>
+                            <option value="espiritual">Crecimiento Espiritual</option>
+                            <option value="iglesia">Iglesia</option>
+                            <option value="misiones">Misiones</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prayer-request">Petición de Oración *</label>
+                        <textarea id="prayer-request" class="form-input" rows="4" placeholder="Comparte tu petición..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Nivel de Privacidad</label>
+                        <div class="privacy-selector">
+                            <label class="privacy-option">
+                                <input type="radio" name="prayer-privacy" value="public" checked>
+                                <i class="bx bx-globe"></i> Pública
+                            </label>
+                            <label class="privacy-option">
+                                <input type="radio" name="prayer-privacy" value="anonymous">
+                                <i class="bx bx-user-x"></i> Anónima
+                            </label>
+                            <label class="privacy-option">
+                                <input type="radio" name="prayer-privacy" value="private">
+                                <i class="bx bx-lock"></i> Privada
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btn-cancel-prayer">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="bx bx-send"></i> Enviar Oración
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
     <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
-        <div class="modal-container modal-sm">
+        <div class="modal-container modal-sm" data-aos="fade-up" data-aos-duration="400">
             <div class="modal-body text-center">
                 <div class="confirm-icon"><i class="bx bx-question-mark"></i></div>
-                <h3 id="confirm-title">Estas seguro?</h3>
+                <h3 id="confirm-title">¿Estás seguro?</h3>
                 <p id="confirm-message"></p>
             </div>
             <div class="modal-footer">
@@ -671,10 +1127,105 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
         </div>
     </div>
 
+    <!-- MODAL DE JUEGOS BÍBLICOS MEJORADO -->
+    <div id="game-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
+            <div class="modal-header">
+                <h2 id="game-modal-title"><i class="bx bx-game"></i> Juego Bíblico</h2>
+                <button class="modal-close btn-icon" aria-label="Cerrar">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="game-body">
+                <!-- El contenido del juego se carga dinámicamente -->
+                <div class="game-container">
+                    <div class="game-score">
+                        <span>Puntuación: <strong id="game-score">0</strong></span>
+                        <span>Nivel: <strong id="game-level">1</strong></span>
+                    </div>
+                    <div class="game-question" id="game-question">
+                        ¿Quién construyó el arca?
+                    </div>
+                    <div class="game-options" id="game-options">
+                        <button class="game-option" data-answer="a">Moisés</button>
+                        <button class="game-option" data-answer="b">Noé</button>
+                        <button class="game-option" data-answer="c">Abraham</button>
+                        <button class="game-option" data-answer="d">David</button>
+                    </div>
+                    <div class="game-result" id="game-result"></div>
+                    <button class="btn-primary btn-next hidden" id="game-next">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGROS -->
+    <div id="achievement-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
+            <div class="modal-header">
+                <h2><i class="bx bx-trophy"></i> Logros Desbloqueados</h2>
+                <button class="modal-close btn-icon" aria-label="Cerrar">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="achievement-body">
+                <div class="achievement-grid">
+                    <div class="achievement-item locked">
+                        <i class="bx bx-lock-alt"></i>
+                        <span>Primera Oración</span>
+                    </div>
+                    <div class="achievement-item locked">
+                        <i class="bx bx-lock-alt"></i>
+                        <span>Leer la Biblia</span>
+                    </div>
+                    <div class="achievement-item locked">
+                        <i class="bx bx-lock-alt"></i>
+                        <span>Compartir Testimonio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASISTENTE VIRTUAL (CHATBOT) -->
+    <div id="assistant" class="assistant hidden" role="dialog" aria-label="Asistente virtual">
+        <div class="assistant-header">
+            <div class="assistant-info">
+                <i class="bx bx-bot"></i>
+                <span>Asistente IPUC</span>
+                <span class="assistant-status">🟢 En línea</span>
+            </div>
+            <button class="btn-icon" id="close-assistant" aria-label="Cerrar asistente">
+                <i class="bx bx-x"></i>
+            </button>
+        </div>
+        <div class="assistant-messages" id="assistant-messages">
+            <div class="assistant-msg bot">
+                <i class="bx bx-bot"></i>
+                <div class="msg-content">
+                    <p>¡Hola! Soy tu asistente virtual de IPUC LA FONDA. ¿En qué puedo ayudarte hoy?</p>
+                </div>
+            </div>
+        </div>
+        <div class="assistant-input">
+            <input type="text" id="assistant-input" placeholder="Escribe tu pregunta..." autocomplete="off">
+            <button class="btn-icon" id="assistant-send"><i class="bx bx-send"></i></button>
+        </div>
+        <div class="assistant-suggestions">
+            <button class="suggestion-btn">📖 Versículo del día</button>
+            <button class="suggestion-btn">🙏 Oración</button>
+            <button class="suggestion-btn">📅 Eventos</button>
+            <button class="suggestion-btn">🎵 Música</button>
+        </div>
+    </div>
+
     <!-- COMPONENTES FLOTANTES -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <button id="fab-main" class="fab hidden" aria-label="Acciones rapidas">
+    <!-- FAB MEJORADO -->
+    <button id="fab-main" class="fab hidden" aria-label="Acciones rápidas">
         <i class="bx bx-plus"></i>
     </button>
     <div id="fab-menu" class="fab-menu hidden" role="menu">
@@ -682,10 +1233,10 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
             <i class="bx bx-file"></i><span>Reporte</span>
         </button>
         <button class="fab-item" data-action="oracion" role="menuitem">
-            <i class="bx bx-pray"></i><span>Oracion</span>
+            <i class="bx bx-pray"></i><span>Oración</span>
         </button>
         <button class="fab-item" data-action="musica" role="menuitem">
-            <i class="bx bx-music"></i><span>Musica</span>
+            <i class="bx bx-music"></i><span>Música</span>
         </button>
         <button class="fab-item" data-action="evento" role="menuitem">
             <i class="bx bx-calendar-plus"></i><span>Evento</span>
@@ -693,9 +1244,40 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
         <button class="fab-item" data-action="donacion" role="menuitem">
             <i class="bx bx-donate-heart"></i><span>Donar</span>
         </button>
+        <button class="fab-item" data-action="juego" role="menuitem">
+            <i class="bx bx-game"></i><span>Juego</span>
+        </button>
+        <button class="fab-item" data-action="asistente" role="menuitem">
+            <i class="bx bx-bot"></i><span>Asistente</span>
+        </button>
     </div>
 
     <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        AOS.init({
+            once: true,
+            offset: 50,
+            duration: 800
+        });
+        
+        // QR Code
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrContainer = document.getElementById('qr-code');
+            if (qrContainer) {
+                new QRCode(qrContainer, {
+                    text: 'https://ipuclafonda.netlify.app/',
+                    width: 150,
+                    height: 150,
+                    colorDark: '#1a237e',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        });
+    </script>
     <script src="database.js"></script>
     <script src="app.js"></script>
     <script src="script.js"></script>
@@ -706,16 +1288,41 @@ SISTEMA COMPLETO DE REPORTES Y ADMINISTRACION
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function(reg) {
-                        console.log('SW registrado');
+                        console.log('✅ SW registrado');
                     })
                     .catch(function(err) {
-                        console.log('SW error:', err);
+                        console.log('❌ SW error:', err);
                     });
             });
         }
         if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
             document.body.classList.add('pwa-mode');
         }
+        
+        // Fecha actual en el header
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateElement = document.getElementById('header-date');
+            if (dateElement) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const today = new Date().toLocaleDateString('es-CO', options);
+                dateElement.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+            }
+            
+            // Toggle password
+            const togglePassword = document.getElementById('toggle-password');
+            if (togglePassword) {
+                togglePassword.addEventListener('click', function() {
+                    const passwordInput = document.getElementById('login-password');
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        this.querySelector('i').className = 'bx bx-hide';
+                    } else {
+                        passwordInput.type = 'password';
+                        this.querySelector('i').className = 'bx bx-show';
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
