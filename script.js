@@ -1,80 +1,75 @@
 /* ============================================
    IPUC LA FONDA - SCRIPT.JS v20.0 PRO ULTIMATE
    Web App Profesional - Sistema Completo
-   Incluye: Radio, Streaming, Gamificación, IA, Logros, QR, Asistente
+   Incluye: Radio, Streaming, Gamificación, IA, Logros
    VERSION CORREGIDA - SIN ERRORES
    ============================================ */
 
+// ============================================
+// CONFIGURACIÓN GLOBAL
+// ============================================
 var CONFIG = {
     VERSION: '20.0',
     VERSION_NAME: 'PRO ULTIMATE',
     TITULOS_PAGINAS: {
-        'inicio': 'Inicio', 'horarios': 'Horarios', 'asistencia': 'Asistencia',
-        'noticias': 'Noticias', 'eventos': 'Eventos', 'publicaciones': 'Publicaciones',
-        'perfil': 'Mi Perfil', 'configuracion': 'Configuración',
-        'gestion-reportes': 'Gestión de Reportes', 'mis-reportes': 'Mis Reportes',
-        'dashboard': 'Dashboard', 'sistema': 'Sistema', 'peticiones': 'Peticiones',
-        'biblioteca': 'Biblioteca', 'podcast': 'Podcast', 'galeria': 'Galería',
-        'chat': 'Chat', 'directorio': 'Directorio', 'donaciones': 'Donaciones',
-        'devocional': 'Devocional', 'encuestas': 'Encuestas',
-        'radio': 'Radio en Vivo', 'streaming': 'Transmisión en Vivo',
-        'mapa': 'Ubicación', 'oracion': 'Cadena de Oración',
-        'grupos': 'Grupos y Células', 'lectura-biblica': 'Plan de Lectura',
-        'concordancia': 'Concordancia Bíblica', 'himnario': 'Himnario',
-        'diario-espiritual': 'Diario Espiritual', 'logros': 'Logros',
-        'trivia': 'Trivia Bíblica', 'juegos': 'Juegos', 'ranking': 'Ranking',
-        'playlist': 'Playlist de Adoración', 'blog': 'Blog/Noticias',
-        'muro-bendiciones': 'Muro de Bendiciones', 'recursos': 'Recursos',
-        'ofrendas': 'Ofrendas', 'informes': 'Informes PDF',
-        'admin-dashboard': 'Dashboard Admin', 'analiticas': 'Analíticas',
-        'gestion-usuarios': 'Gestión de Usuarios', 'gestion-eventos': 'Gestión de Eventos',
+        'inicio': 'Inicio',
+        'horarios': 'Horarios',
+        'asistencia': 'Asistencia',
+        'noticias': 'Noticias',
+        'eventos': 'Eventos',
+        'publicaciones': 'Publicaciones',
+        'perfil': 'Mi Perfil',
+        'configuracion': 'Configuración',
+        'gestion-reportes': 'Gestión de Reportes',
+        'mis-reportes': 'Mis Reportes',
+        'dashboard': 'Dashboard',
+        'sistema': 'Sistema',
+        'peticiones': 'Peticiones',
+        'biblioteca': 'Biblioteca',
+        'podcast': 'Podcast',
+        'galeria': 'Galería',
+        'chat': 'Chat',
+        'directorio': 'Directorio',
+        'donaciones': 'Donaciones',
+        'devocional': 'Devocional',
+        'encuestas': 'Encuestas',
+        'radio': 'Radio en Vivo',
+        'streaming': 'Transmisión en Vivo',
+        'mapa': 'Ubicación',
+        'oracion': 'Cadena de Oración',
+        'grupos': 'Grupos y Células',
+        'lectura-biblica': 'Plan de Lectura',
+        'concordancia': 'Concordancia Bíblica',
+        'himnario': 'Himnario',
+        'diario-espiritual': 'Diario Espiritual',
+        'logros': 'Logros',
+        'trivia': 'Trivia Bíblica',
+        'juegos': 'Juegos',
+        'ranking': 'Ranking',
+        'playlist': 'Playlist de Adoración',
+        'blog': 'Blog/Noticias',
+        'muro-bendiciones': 'Muro de Bendiciones',
+        'recursos': 'Recursos',
+        'ofrendas': 'Ofrendas',
+        'informes': 'Informes PDF',
+        'admin-dashboard': 'Dashboard Admin',
+        'analiticas': 'Analíticas',
+        'gestion-usuarios': 'Gestión de Usuarios',
+        'gestion-eventos': 'Gestión de Eventos',
         'gestion-noticias': 'Gestión de Noticias'
     },
-    RADIO_STATIONS: [
-        { name: 'Radio IPUC', url: 'https://radio.ipuc.com/stream', genre: 'Cristiana' },
-        { name: 'Alabanza Global', url: 'https://alabanza.com/stream', genre: 'Alabanza' },
-        { name: 'Adoración Profunda', url: 'https://adoracion.com/stream', genre: 'Adoración' }
-    ],
-    PLAYLIST_SONGS: [
-        { title: 'Santo Espíritu', artist: 'IPUC LA FONDA', duration: '4:32' },
-        { title: 'Alabanzas al Rey', artist: 'IPUC LA FONDA', duration: '5:15' },
-        { title: 'Adoración Profunda', artist: 'IPUC LA FONDA', duration: '6:08' },
-        { title: 'Glorioso Día', artist: 'IPUC LA FONDA', duration: '4:45' },
-        { title: 'Cordero de Dios', artist: 'IPUC LA FONDA', duration: '5:20' },
-        { title: 'Grande es el Señor', artist: 'IPUC LA FONDA', duration: '4:55' }
-    ],
-    BIBLE_VERSES: [
+    VERSES: [
         { verse: 'Porque de tal manera amó Dios al mundo...', ref: 'Juan 3:16' },
         { verse: 'Jehová es mi pastor; nada me faltará.', ref: 'Salmo 23:1' },
         { verse: 'Todo lo puedo en Cristo que me fortalece.', ref: 'Filipenses 4:13' },
         { verse: 'El Señor es mi luz y mi salvación; ¿de quién temeré?', ref: 'Salmo 27:1' },
-        { verse: 'No temas, porque yo estoy contigo...', ref: 'Isaías 41:10' },
-        { verse: 'Porque de Jehová es la tierra y su plenitud.', ref: 'Salmo 24:1' },
-        { verse: 'Buscad a Jehová mientras pueda ser hallado...', ref: 'Isaías 55:6' },
-        { verse: 'Jehová es bueno, fortaleza en el día de la angustia...', ref: 'Nahúm 1:7' }
-    ],
-    TRIVIA_QUESTIONS: [
-        { question: '¿Quién construyó el arca?', options: ['Moisés', 'Noé', 'Abraham', 'David'], answer: 1 },
-        { question: '¿Cuántos libros tiene la Biblia?', options: ['66', '73', '39', '27'], answer: 0 },
-        { question: '¿Quién fue el primer rey de Israel?', options: ['David', 'Salomón', 'Saúl', 'Josué'], answer: 2 },
-        { question: '¿En qué ciudad nació Jesús?', options: ['Jerusalén', 'Belén', 'Nazaret', 'Cafarnaúm'], answer: 1 },
-        { question: '¿Quién dividió el Mar Rojo?', options: ['Josué', 'Moisés', 'Abraham', 'Elías'], answer: 1 },
-        { question: '¿Cuántos discípulos tuvo Jesús?', options: ['7', '10', '12', '14'], answer: 2 },
-        { question: '¿Qué animal habló en la Biblia?', options: ['Burro', 'Serpiente', 'Paloma', 'León'], answer: 0 },
-        { question: '¿Quién escribió el libro de Apocalipsis?', options: ['Pedro', 'Juan', 'Pablo', 'Mateo'], answer: 1 }
-    ],
-    ACHIEVEMENTS: [
-        { id: 'first_prayer', name: 'Primera Oración', icon: '🙏', description: 'Realiza tu primera petición de oración' },
-        { id: 'bible_reader', name: 'Lector de la Biblia', icon: '📖', description: 'Lee 10 capítulos de la Biblia' },
-        { id: 'testimony', name: 'Comparte Testimonio', icon: '💬', description: 'Comparte tu testimonio en el muro' },
-        { id: 'event_creator', name: 'Creador de Eventos', icon: '📅', description: 'Crea tu primer evento' },
-        { id: 'radio_listener', name: 'Radio Oyente', icon: '🎵', description: 'Escucha la radio por 1 hora' },
-        { id: 'trivia_master', name: 'Maestro de Trivia', icon: '🧠', description: 'Responde 20 preguntas correctamente' },
-        { id: 'prayer_warrior', name: 'Guerrero de Oración', icon: '⚔️', description: 'Ora por 10 peticiones' },
-        { id: 'community_leader', name: 'Líder Comunitario', icon: '👑', description: 'Inicia un grupo de célula' }
+        { verse: 'No temas, porque yo estoy contigo...', ref: 'Isaías 41:10' }
     ]
 };
 
+// ============================================
+// ESTADO DE LA APLICACIÓN
+// ============================================
 var APP_STATE = {
     currentPage: 'inicio',
     usuario: null,
@@ -121,16 +116,15 @@ var APP_STATE = {
     streamingActive: false,
     viewersCount: 0,
     chatMessages: [],
-    usuariosActivos: 0,
-    totalMiembros: 0,
-    totalOraciones: 0,
+    usuariosActivos: 5,
+    totalMiembros: 100,
+    totalOraciones: 50,
     playlistCurrent: 0,
-    playlistShuffle: false,
     lecturasCompletadas: 0,
     lecturasTotal: 365,
-    planLecturaProgreso: 0,
     diaryEntries: [],
-    qrGenerated: false
+    qrGenerated: false,
+    isAdmin: false
 };
 
 // ============================================
@@ -144,7 +138,7 @@ function showToast(mensaje, tipo, duracion) {
     var t = document.createElement('div');
     t.className = 'toast ' + tipo;
     var iconos = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    t.innerHTML = iconos[tipo] || '📌' + ' ' + (mensaje || '');
+    t.innerHTML = (iconos[tipo] || '📌') + ' ' + (mensaje || '');
     c.appendChild(t);
     setTimeout(function() {
         if (t.parentNode) {
@@ -169,10 +163,6 @@ function aplicarTema(t) {
         document.documentElement.setAttribute('data-theme', t);
         var icon = document.querySelector('#theme-toggle i');
         if (icon) icon.className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
-        var metaTheme = document.querySelector('meta[name="theme-color"]');
-        if (metaTheme) {
-            metaTheme.setAttribute('content', t === 'dark' ? '#0a1628' : '#1a237e');
-        }
     } catch (e) {}
 }
 
@@ -198,23 +188,21 @@ function navegarA(page) {
     if (!page || APP_STATE.isLoading) return;
     APP_STATE.currentPage = page;
     APP_STATE.isLoading = true;
-    
+
     var items = document.querySelectorAll('.nav-item[data-page]');
     for (var i = 0; i < items.length; i++) {
         items[i].classList.toggle('active', items[i].getAttribute('data-page') === page);
     }
-    
+
     var titleEl = document.getElementById('page-title');
     if (titleEl) titleEl.textContent = CONFIG.TITULOS_PAGINAS[page] || page;
-    
+
     var bc = document.getElementById('breadcrumb-current');
     if (bc) bc.textContent = CONFIG.TITULOS_PAGINAS[page] || page;
-    
+
     cargarPagina(page);
     if (window.innerWidth < 1024) cerrarSidebar();
     APP_STATE.isLoading = false;
-    
-    // Cerrar paneles abiertos
     cerrarPaneles();
 }
 
@@ -249,7 +237,6 @@ function mostrarApp() {
     cargarVersiculoDelDia();
     cargarPlaylist();
     iniciarRadio();
-    iniciarAsistenteVirtual();
 }
 
 function mostrarBienvenida() {
@@ -306,7 +293,7 @@ function actualizarSidebarUsuario() {
     var rl = m.querySelector('.user-role');
     var lvl = document.getElementById('user-level');
     var xpBar = document.getElementById('user-xp-bar');
-    
+
     if (img) img.src = APP_STATE.usuario.foto || 'assets/avatars/default.png';
     if (nm) nm.textContent = APP_STATE.usuario.nombre || 'Usuario';
     if (rl) {
@@ -318,7 +305,7 @@ function actualizarSidebarUsuario() {
         var porcentaje = Math.min((APP_STATE.xp / APP_STATE.xpSiguiente) * 100, 100);
         xpBar.style.width = porcentaje + '%';
     }
-    
+
     var am = document.getElementById('admin-menu');
     if (am) am.classList.toggle('hidden', APP_STATE.rol !== 'admin');
 }
@@ -327,43 +314,31 @@ function actualizarSidebarUsuario() {
 // RADIO EN VIVO
 // ============================================
 function iniciarRadio() {
-    // Inicializar radio mini
     var radioToggle = document.getElementById('radio-toggle');
     if (radioToggle) {
-        radioToggle.addEventListener('click', function() {
-            toggleRadioPanel();
-        });
+        radioToggle.addEventListener('click', function() { toggleRadioPanel(); });
     }
-    
+
     var radioPlay = document.getElementById('radio-play-toggle');
     if (radioPlay) {
-        radioPlay.addEventListener('click', function() {
-            toggleRadio();
-        });
+        radioPlay.addEventListener('click', function() { toggleRadio(); });
     }
-    
+
     var radioPlayMain = document.getElementById('radio-play-main');
     if (radioPlayMain) {
-        radioPlayMain.addEventListener('click', function() {
-            toggleRadio();
-        });
+        radioPlayMain.addEventListener('click', function() { toggleRadio(); });
     }
-    
+
     var radioPrev = document.getElementById('radio-prev');
     if (radioPrev) {
-        radioPrev.addEventListener('click', function() {
-            cambiarEstacionRadio(-1);
-        });
+        radioPrev.addEventListener('click', function() { cambiarEstacionRadio(-1); });
     }
-    
+
     var radioNext = document.getElementById('radio-next');
     if (radioNext) {
-        radioNext.addEventListener('click', function() {
-            cambiarEstacionRadio(1);
-        });
+        radioNext.addEventListener('click', function() { cambiarEstacionRadio(1); });
     }
-    
-    // Cargar playlist
+
     cargarPlaylist();
 }
 
@@ -381,7 +356,7 @@ function toggleRadio() {
     var icon1 = document.querySelector('#radio-play-toggle i');
     var icon2 = document.querySelector('#radio-play-main i');
     var status = document.getElementById('radio-status');
-    
+
     if (APP_STATE.radioPlaying) {
         if (icon1) icon1.className = 'bx bx-pause-circle';
         if (icon2) icon2.className = 'bx bx-pause-circle';
@@ -397,7 +372,11 @@ function toggleRadio() {
 }
 
 function cambiarEstacionRadio(direccion) {
-    var stations = CONFIG.RADIO_STATIONS;
+    var stations = [
+        { name: 'Radio IPUC', url: 'https://radio.ipuc.com/stream', genre: 'Cristiana' },
+        { name: 'Alabanza Global', url: 'https://alabanza.com/stream', genre: 'Alabanza' },
+        { name: 'Adoración Profunda', url: 'https://adoracion.com/stream', genre: 'Adoración' }
+    ];
     APP_STATE.radioCurrentStation = (APP_STATE.radioCurrentStation + direccion + stations.length) % stations.length;
     var stationName = document.querySelector('.radio-station');
     if (stationName) stationName.textContent = stations[APP_STATE.radioCurrentStation].name;
@@ -410,18 +389,21 @@ function cambiarEstacionRadio(direccion) {
 function iniciarAnimacionRadio(active) {
     var waves = document.querySelectorAll('.radio-wave span');
     for (var i = 0; i < waves.length; i++) {
-        if (active) {
-            waves[i].style.animationPlayState = 'running';
-        } else {
-            waves[i].style.animationPlayState = 'paused';
-        }
+        waves[i].style.animationPlayState = active ? 'running' : 'paused';
     }
 }
 
 function cargarPlaylist() {
     var list = document.querySelector('#playlist-songs');
     if (!list) return;
-    var songs = CONFIG.PLAYLIST_SONGS;
+    var songs = [
+        { title: 'Santo Espíritu', artist: 'IPUC LA FONDA', duration: '4:32' },
+        { title: 'Alabanzas al Rey', artist: 'IPUC LA FONDA', duration: '5:15' },
+        { title: 'Adoración Profunda', artist: 'IPUC LA FONDA', duration: '6:08' },
+        { title: 'Glorioso Día', artist: 'IPUC LA FONDA', duration: '4:45' },
+        { title: 'Cordero de Dios', artist: 'IPUC LA FONDA', duration: '5:20' },
+        { title: 'Grande es el Señor', artist: 'IPUC LA FONDA', duration: '4:55' }
+    ];
     var html = '';
     for (var i = 0; i < songs.length; i++) {
         html += '<li data-index="' + i + '" onclick="reproducirCancion(' + i + ')">' +
@@ -437,13 +419,36 @@ function reproducirCancion(index) {
     for (var i = 0; i < items.length; i++) {
         items[i].classList.toggle('active', i === index);
     }
-    var song = CONFIG.PLAYLIST_SONGS[index];
+    var songs = [
+        { title: 'Santo Espíritu', artist: 'IPUC LA FONDA' },
+        { title: 'Alabanzas al Rey', artist: 'IPUC LA FONDA' },
+        { title: 'Adoración Profunda', artist: 'IPUC LA FONDA' },
+        { title: 'Glorioso Día', artist: 'IPUC LA FONDA' },
+        { title: 'Cordero de Dios', artist: 'IPUC LA FONDA' },
+        { title: 'Grande es el Señor', artist: 'IPUC LA FONDA' }
+    ];
+    var song = songs[index];
     var playing = document.getElementById('radio-playing');
     var artist = document.getElementById('radio-artist');
     if (playing) playing.textContent = song.title;
     if (artist) artist.textContent = song.artist;
     showToast('Reproduciendo: ' + song.title, 'info');
     if (!APP_STATE.radioPlaying) toggleRadio();
+}
+
+function cerrarOtrosPaneles(excepto) {
+    var paneles = {
+        'radio': 'radio-quick-panel',
+        'streaming': 'streaming-panel',
+        'qr': 'qr-panel',
+        'reports': 'reports-quick-panel'
+    };
+    for (var key in paneles) {
+        if (key !== excepto) {
+            var p = document.getElementById(paneles[key]);
+            if (p && !p.classList.contains('hidden')) p.classList.add('hidden');
+        }
+    }
 }
 
 // ============================================
@@ -460,25 +465,9 @@ function toggleStreamingPanel() {
 }
 
 function actualizarStreaming() {
-    // Simular actualización de streaming
     APP_STATE.viewersCount = Math.floor(Math.random() * 100) + 20;
     var viewers = document.getElementById('viewers-count');
     if (viewers) viewers.textContent = APP_STATE.viewersCount;
-}
-
-function cerrarOtrosPaneles(excepto) {
-    var paneles = {
-        'radio': 'radio-quick-panel',
-        'streaming': 'streaming-panel',
-        'qr': 'qr-panel',
-        'reports': 'reports-quick-panel'
-    };
-    for (var key in paneles) {
-        if (key !== excepto) {
-            var p = document.getElementById(paneles[key]);
-            if (p && !p.classList.contains('hidden')) p.classList.add('hidden');
-        }
-    }
 }
 
 // ============================================
@@ -518,13 +507,13 @@ function generarQR() {
 // VERSÍCULO DEL DÍA
 // ============================================
 function cargarVersiculoDelDia() {
-    var verses = CONFIG.BIBLE_VERSES;
+    var verses = CONFIG.VERSES;
     var index = new Date().getDate() % verses.length;
     var verse = verses[index];
-    
+
     var verseText = document.getElementById('daily-verse');
     var verseRef = document.getElementById('daily-verse-ref');
-    
+
     if (verseText) verseText.textContent = '"' + verse.verse + '"';
     if (verseRef) verseRef.textContent = verse.ref;
 }
@@ -538,10 +527,20 @@ function iniciarTrivia() {
     APP_STATE.gameLevel = 1;
     APP_STATE.gameCorrect = 0;
     APP_STATE.gameCurrentQuestion = 0;
-    APP_STATE.currentGameQuestions = CONFIG.TRIVIA_QUESTIONS.sort(function() {
+
+    var questions = [
+        { question: '¿Quién construyó el arca?', options: ['Moisés', 'Noé', 'Abraham', 'David'], answer: 1 },
+        { question: '¿Cuántos libros tiene la Biblia?', options: ['66', '73', '39', '27'], answer: 0 },
+        { question: '¿Quién fue el primer rey de Israel?', options: ['David', 'Salomón', 'Saúl', 'Josué'], answer: 2 },
+        { question: '¿En qué ciudad nació Jesús?', options: ['Jerusalén', 'Belén', 'Nazaret', 'Cafarnaúm'], answer: 1 },
+        { question: '¿Quién dividió el Mar Rojo?', options: ['Josué', 'Moisés', 'Abraham', 'Elías'], answer: 1 },
+        { question: '¿Cuántos discípulos tuvo Jesús?', options: ['7', '10', '12', '14'], answer: 2 }
+    ];
+
+    APP_STATE.currentGameQuestions = questions.sort(function() {
         return Math.random() - 0.5;
-    }).slice(0, 10);
-    
+    }).slice(0, 6);
+
     mostrarPreguntaTrivia();
 }
 
@@ -551,11 +550,16 @@ function mostrarPreguntaTrivia() {
         finalizarTrivia();
         return;
     }
-    
+
     var q = questions[APP_STATE.gameCurrentQuestion];
     var container = document.getElementById('game-body');
-    if (!container) return;
-    
+    if (!container) {
+        var modal = document.getElementById('game-modal');
+        if (modal) modal.classList.remove('hidden');
+        container = document.getElementById('game-body');
+        if (!container) return;
+    }
+
     var html = '<div class="game-container">' +
         '<div class="game-score">' +
         '<span>Puntuación: <strong>' + APP_STATE.gameScore + '</strong></span>' +
@@ -563,17 +567,16 @@ function mostrarPreguntaTrivia() {
         '</div>' +
         '<div class="game-question">' + q.question + '</div>' +
         '<div class="game-options">';
-    
+
     for (var i = 0; i < q.options.length; i++) {
         var letter = String.fromCharCode(65 + i);
         html += '<button class="game-option" data-index="' + i + '" onclick="responderTrivia(' + i + ')">' +
             letter + '. ' + q.options[i] + '</button>';
     }
-    
+
     html += '</div><div class="game-result" id="game-result"></div></div>';
     container.innerHTML = html;
-    
-    // Actualizar modal
+
     var modal = document.getElementById('game-modal');
     if (modal) modal.classList.remove('hidden');
 }
@@ -583,14 +586,13 @@ function responderTrivia(index) {
     var q = questions[APP_STATE.gameCurrentQuestion];
     var result = document.getElementById('game-result');
     var options = document.querySelectorAll('.game-option');
-    
-    // Deshabilitar opciones
+
     for (var i = 0; i < options.length; i++) {
         options[i].style.pointerEvents = 'none';
         if (i === q.answer) options[i].classList.add('correct');
         if (i === index && index !== q.answer) options[i].classList.add('incorrect');
     }
-    
+
     if (index === q.answer) {
         APP_STATE.gameScore += 10 + (APP_STATE.gameLevel * 2);
         APP_STATE.gameCorrect++;
@@ -600,10 +602,9 @@ function responderTrivia(index) {
         if (result) result.textContent = '❌ Incorrecto. La respuesta era: ' + q.options[q.answer];
         showToast('❌ Incorrecto', 'error');
     }
-    
+
     APP_STATE.gameCurrentQuestion++;
-    
-    // Siguiente pregunta después de 2 segundos
+
     setTimeout(function() {
         if (APP_STATE.gameCurrentQuestion < questions.length) {
             mostrarPreguntaTrivia();
@@ -616,24 +617,22 @@ function responderTrivia(index) {
 function finalizarTrivia() {
     var container = document.getElementById('game-body');
     if (!container) return;
-    
+
     var porcentaje = Math.round((APP_STATE.gameCorrect / APP_STATE.currentGameQuestions.length) * 100);
     var mensaje = porcentaje >= 80 ? '🏆 ¡Excelente!' : porcentaje >= 60 ? '👍 ¡Bien hecho!' : '📚 ¡Sigue practicando!';
-    
+
     container.innerHTML = '<div class="game-container" style="text-align:center;padding:20px;">' +
         '<h3>' + mensaje + '</h3>' +
         '<p>Puntuación: <strong>' + APP_STATE.gameScore + '</strong></p>' +
         '<p>Correctas: ' + APP_STATE.gameCorrect + '/' + APP_STATE.currentGameQuestions.length + ' (' + porcentaje + '%)</p>' +
         '<button class="btn-primary" onclick="iniciarTrivia()" style="margin-top:16px;">🔄 Jugar de nuevo</button>' +
         '</div>';
-    
-    // Desbloquear logros
-    if (APP_STATE.gameCorrect >= 20) desbloquearLogro('trivia_master');
+
     if (APP_STATE.gameScore > 0) {
         var xpGanada = APP_STATE.gameScore;
         agregarXP(xpGanada);
     }
-    
+
     APP_STATE.gameInProgress = false;
 }
 
@@ -642,41 +641,31 @@ function finalizarTrivia() {
 // ============================================
 function desbloquearLogro(id) {
     if (APP_STATE.logrosDesbloqueados.includes(id)) return;
-    
-    var achievement = CONFIG.ACHIEVEMENTS.find(function(a) { return a.id === id; });
+
+    var achievements = [
+        { id: 'first_prayer', name: 'Primera Oración', icon: '🙏' },
+        { id: 'bible_reader', name: 'Lector de la Biblia', icon: '📖' },
+        { id: 'testimony', name: 'Comparte Testimonio', icon: '💬' },
+        { id: 'event_creator', name: 'Creador de Eventos', icon: '📅' },
+        { id: 'radio_listener', name: 'Radio Oyente', icon: '🎵' },
+        { id: 'trivia_master', name: 'Maestro de Trivia', icon: '🧠' }
+    ];
+
+    var achievement = achievements.find(function(a) { return a.id === id; });
     if (!achievement) return;
-    
+
     APP_STATE.logrosDesbloqueados.push(id);
     showToast('🏆 ¡Logro desbloqueado! ' + achievement.icon + ' ' + achievement.name, 'success', 4000);
     actualizarLogros();
 }
 
 function actualizarLogros() {
-    var badges = document.querySelectorAll('.nav-badge-count');
     var count = APP_STATE.logrosDesbloqueados.length;
     var badge = document.getElementById('achievements-count');
     if (badge) {
         badge.textContent = count;
         badge.classList.toggle('hidden', count === 0);
     }
-}
-
-function mostrarLogros() {
-    var container = document.getElementById('achievement-body');
-    if (!container) return;
-    
-    var html = '<div class="achievement-grid">';
-    for (var i = 0; i < CONFIG.ACHIEVEMENTS.length; i++) {
-        var a = CONFIG.ACHIEVEMENTS[i];
-        var unlocked = APP_STATE.logrosDesbloqueados.includes(a.id);
-        html += '<div class="achievement-item ' + (unlocked ? 'unlocked' : 'locked') + '">' +
-            '<i class="bx ' + (unlocked ? 'bx-check-circle' : 'bx-lock-alt') + '"></i>' +
-            '<span>' + a.icon + ' ' + a.name + '</span>' +
-            '<small>' + a.description + '</small>' +
-            '</div>';
-    }
-    html += '</div>';
-    container.innerHTML = html;
 }
 
 function agregarXP(cantidad) {
@@ -686,8 +675,6 @@ function agregarXP(cantidad) {
         APP_STATE.nivel++;
         APP_STATE.xpSiguiente = Math.floor(APP_STATE.xpSiguiente * 1.5);
         showToast('🎉 ¡Subiste al nivel ' + APP_STATE.nivel + '!', 'success');
-        // Desbloquear logro por nivel
-        if (APP_STATE.nivel >= 5) desbloquearLogro('community_leader');
     }
     actualizarSidebarUsuario();
 }
@@ -695,48 +682,11 @@ function agregarXP(cantidad) {
 // ============================================
 // ASISTENTE VIRTUAL
 // ============================================
-function iniciarAsistenteVirtual() {
-    var assistantBtn = document.querySelector('.fab-item[data-action="asistente"]');
-    if (assistantBtn) {
-        assistantBtn.addEventListener('click', function() {
-            toggleAsistente();
-        });
-    }
-    
-    var sendBtn = document.getElementById('assistant-send');
-    if (sendBtn) {
-        sendBtn.addEventListener('click', function() {
-            enviarMensajeAsistente();
-        });
-    }
-    
-    var input = document.getElementById('assistant-input');
-    if (input) {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') enviarMensajeAsistente();
-        });
-    }
-    
-    // Sugerencias
-    var suggestions = document.querySelectorAll('.suggestion-btn');
-    for (var i = 0; i < suggestions.length; i++) {
-        suggestions[i].addEventListener('click', function() {
-            var text = this.textContent.trim();
-            var inputField = document.getElementById('assistant-input');
-            if (inputField) {
-                inputField.value = text;
-                enviarMensajeAsistente();
-            }
-        });
-    }
-}
-
 function toggleAsistente() {
     APP_STATE.assistantOpen = !APP_STATE.assistantOpen;
     var a = document.getElementById('assistant');
     if (a) a.classList.toggle('hidden', !APP_STATE.assistantOpen);
     if (APP_STATE.assistantOpen) {
-        // Cerrar FAB si está abierto
         if (APP_STATE.fabMenuOpen) toggleFabMenu();
     }
 }
@@ -744,14 +694,12 @@ function toggleAsistente() {
 function enviarMensajeAsistente() {
     var input = document.getElementById('assistant-input');
     if (!input || !input.value.trim()) return;
-    
+
     var mensaje = input.value.trim();
     input.value = '';
-    
-    // Agregar mensaje del usuario
+
     agregarMensajeAsistente('user', mensaje);
-    
-    // Procesar respuesta
+
     setTimeout(function() {
         var respuesta = procesarPreguntaAsistente(mensaje);
         agregarMensajeAsistente('bot', respuesta);
@@ -761,7 +709,7 @@ function enviarMensajeAsistente() {
 function agregarMensajeAsistente(tipo, mensaje) {
     var container = document.getElementById('assistant-messages');
     if (!container) return;
-    
+
     var div = document.createElement('div');
     div.className = 'assistant-msg ' + tipo;
     var icon = tipo === 'bot' ? 'bx bx-bot' : 'bx bx-user';
@@ -772,72 +720,52 @@ function agregarMensajeAsistente(tipo, mensaje) {
 
 function procesarPreguntaAsistente(pregunta) {
     var p = pregunta.toLowerCase();
-    
+
     if (p.includes('versículo') || p.includes('versiculo') || p.includes('biblia')) {
-        var verses = CONFIG.BIBLE_VERSES;
+        var verses = CONFIG.VERSES;
         var v = verses[Math.floor(Math.random() * verses.length)];
         return '📖 "' + v.verse + '" - ' + v.ref;
     }
-    
+
     if (p.includes('oración') || p.includes('oracion') || p.includes('rezar')) {
         return '🙏 "Señor, te pedimos que bendigas a todos los que están orando. Que tu Espíritu Santo nos guíe y nos dé paz. Amén."';
     }
-    
+
     if (p.includes('evento') || p.includes('culto') || p.includes('horario')) {
         return '📅 Nuestros cultos son: Domingo 10:00 AM, Martes 6:00 PM y Viernes 6:00 PM. ¡Te esperamos!';
     }
-    
-    if (p.includes('música') || p.includes('musica') || p.includes('radio') || p.includes('alabanza')) {
+
+    if (p.includes('música') || p.includes('musica') || p.includes('radio')) {
         return '🎵 Puedes escuchar nuestra radio en vivo desde la sección "Radio" del menú. ¡Alabanzas para el Señor!';
     }
-    
+
     if (p.includes('donación') || p.includes('donar') || p.includes('ofrenda')) {
         return '💝 Puedes hacer tus donaciones desde la sección "Donaciones" en el menú principal. ¡Dios bendiga tu generosidad!';
     }
-    
-    if (p.includes('reporte') || p.includes('reportar') || p.includes('queja')) {
-        return '📋 Puedes generar un reporte desde el panel de "Reportes Rápidos" o desde la sección "Mis Reportes".';
-    }
-    
+
     if (p.includes('hola') || p.includes('buenos dias') || p.includes('buenas')) {
         return '¡Hola! Soy tu asistente virtual de IPUC LA FONDA. ¿Cómo puedo ayudarte hoy? 🙏';
     }
-    
+
     if (p.includes('gracias')) {
         return '¡De nada! Estoy aquí para ayudarte. ¡Dios te bendiga! 🙏✨';
     }
-    
-    if (p.includes('testimonio')) {
-        return '💬 Puedes compartir tu testimonio en el "Muro de Bendiciones" en la sección Comunidad. ¡Tu historia puede bendecir a otros!';
-    }
-    
-    if (p.includes('grupo') || p.includes('célula') || p.includes('celula')) {
-        return '👥 Tenemos varios grupos de células. Puedes unirte desde la sección "Grupos y Células" en el menú.';
-    }
-    
-    if (p.includes('juego') || p.includes('trivia') || p.includes('pregunta')) {
-        return '🎮 ¡Tenemos juegos bíblicos! Ve a la sección "Trivia Bíblica" en Gamificación para poner a prueba tu conocimiento.';
-    }
-    
-    // Respuesta genérica
-    return '🤔 No estoy seguro de entender tu pregunta. Puedes preguntarme sobre: versículos, oración, eventos, música, donaciones, reportes, testimonios, grupos o juegos. ¿En qué puedo ayudarte?';
+
+    return '🤔 No estoy seguro de entender tu pregunta. Puedes preguntarme sobre: versículos, oración, eventos, música, donaciones, testimonios, grupos o juegos. ¿En qué puedo ayudarte?';
 }
 
 // ============================================
 // ESTADÍSTICAS EN TIEMPO REAL
 // ============================================
 function actualizarEstadisticas() {
-    // Usuarios activos (simulado)
     APP_STATE.usuariosActivos = Math.floor(Math.random() * 20) + 5;
     var online = document.getElementById('online-users');
     if (online) online.textContent = APP_STATE.usuariosActivos;
-    
-    // Total miembros (simulado)
+
     APP_STATE.totalMiembros = Math.floor(Math.random() * 500) + 100;
     var members = document.getElementById('total-members');
     if (members) members.textContent = APP_STATE.totalMiembros;
-    
-    // Oraciones totales (simulado)
+
     APP_STATE.totalOraciones = Math.floor(Math.random() * 200) + 50;
     var prayers = document.getElementById('prayers-count');
     if (prayers) prayers.textContent = APP_STATE.totalOraciones;
@@ -864,11 +792,11 @@ function cambiarTipoReporte(tipo) {
     var u = document.getElementById('report-user-group');
     var d = document.getElementById('report-date-range');
     var m = document.getElementById('report-ministerio-group');
-    
+
     if (u) u.style.display = 'none';
     if (d) d.style.display = 'none';
     if (m) m.style.display = 'none';
-    
+
     if (tipo === 'usuario' || tipo === 'contenido' || tipo === 'abuso') {
         if (u) u.style.display = 'block';
     }
@@ -887,18 +815,18 @@ function generarReporte(e) {
         showToast('Inicia sesión para generar un reporte', 'warning');
         return;
     }
-    
+
     var d = document.getElementById('report-descripcion');
     if (!d || !d.value.trim()) {
         showToast('La descripción es obligatoria', 'warning');
         return;
     }
-    
+
     var tipo = document.querySelector('input[name="report-type"]:checked');
     var urg = document.querySelector('input[name="report-urgencia"]:checked');
     var mot = document.getElementById('report-motivo');
     var fileInput = document.getElementById('report-attachment');
-    
+
     var reporte = {
         id: generarId(),
         tipo: tipo ? tipo.value : 'usuario',
@@ -912,30 +840,19 @@ function generarReporte(e) {
         urgencia: urg ? urg.value : 'baja',
         estado: 'pendiente',
         fecha: new Date().toISOString(),
-        historial: [{
-            estado: 'pendiente',
-            fecha: new Date().toISOString(),
-            usuario: APP_STATE.usuario.nombre || 'Usuario',
-            comentario: 'Reporte creado'
-        }],
         adjuntos: fileInput && fileInput.files.length > 0 ? fileInput.files.length : 0
     };
-    
+
     if (APP_STATE.reportes) {
         APP_STATE.reportes.unshift(reporte);
     } else {
         APP_STATE.reportes = [reporte];
     }
-    
+
     actualizarBadgeReportes();
     cerrarModalReporte();
     showToast('Reporte generado exitosamente', 'success');
-    
-    // Desbloquear logro
-    if (APP_STATE.reportes.length >= 1) {
-        // Logro por primer reporte
-    }
-    
+
     if (APP_STATE.currentPage === 'gestion-reportes' || APP_STATE.currentPage === 'mis-reportes') {
         navegarA(APP_STATE.currentPage);
     }
@@ -949,7 +866,7 @@ function actualizarBadgeReportes() {
         }
     }
     APP_STATE.reportsPendientes = c;
-    
+
     var b = document.getElementById('reports-badge');
     if (b) {
         b.textContent = c;
@@ -964,29 +881,20 @@ function actualizarBadgeReportes() {
 
 function cambiarEstadoReporte(id, estado) {
     if (!APP_STATE.reportes) return;
-    
+
     for (var i = 0; i < APP_STATE.reportes.length; i++) {
         if (APP_STATE.reportes[i].id === id) {
             APP_STATE.reportes[i].estado = estado;
             if (estado === 'resuelto' || estado === 'desestimado') {
                 APP_STATE.reportes[i].fecha_resolucion = new Date().toISOString();
             }
-            if (!APP_STATE.reportes[i].historial) {
-                APP_STATE.reportes[i].historial = [];
-            }
-            APP_STATE.reportes[i].historial.push({
-                estado: estado,
-                fecha: new Date().toISOString(),
-                usuario: APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Admin',
-                comentario: 'Estado: ' + estado
-            });
             break;
         }
     }
-    
+
     actualizarBadgeReportes();
     showToast('Estado actualizado a: ' + estado, 'success');
-    
+
     if (APP_STATE.currentPage === 'gestion-reportes') {
         navegarA('gestion-reportes');
     }
@@ -997,7 +905,7 @@ function verDetalleReporte(id) {
         showToast('No hay reportes', 'info');
         return;
     }
-    
+
     var reporte = null;
     for (var i = 0; i < APP_STATE.reportes.length; i++) {
         if (APP_STATE.reportes[i].id === id) {
@@ -1005,18 +913,18 @@ function verDetalleReporte(id) {
             break;
         }
     }
-    
+
     if (!reporte) {
         showToast('Reporte no encontrado', 'error');
         return;
     }
-    
+
     var modal = document.getElementById('modal');
     var title = document.getElementById('modal-title');
     var body = document.getElementById('modal-body');
-    
+
     if (!modal || !title || !body) return;
-    
+
     title.textContent = '📋 Detalle del Reporte';
     body.innerHTML = '<div style="padding:8px 0;">' +
         '<p><strong>ID:</strong> ' + reporte.id.substring(0, 12) + '</p>' +
@@ -1030,44 +938,21 @@ function verDetalleReporte(id) {
         '<p><strong>Descripción:</strong></p>' +
         '<p style="background:var(--gris-claro);padding:12px;border-radius:8px;margin:4px 0;">' + escapeHtml(reporte.descripcion) + '</p>' +
         (reporte.adjuntos ? '<p><strong>Adjuntos:</strong> ' + reporte.adjuntos + ' archivo(s)</p>' : '') +
-        (reporte.historial && reporte.historial.length > 1 ? '<hr><p><strong>Historial:</strong></p>' +
-            '<div style="max-height:120px;overflow-y:auto;font-size:0.85rem;">' +
-            reporte.historial.map(function(h) {
-                return '<p>• ' + formatearFecha(h.fecha) + ' - ' + h.usuario + ': ' + h.comentario + '</p>';
-            }).join('') +
-            '</div>' : '') +
         '</div>';
-    
+
     modal.classList.remove('hidden');
-    
-    // Acciones
-    var footer = document.getElementById('modal-footer');
-    if (footer) {
-        footer.classList.remove('hidden');
-        footer.innerHTML = '';
-        if (reporte.estado === 'pendiente') {
-            footer.innerHTML += '<button class="btn-primary btn-sm" onclick="cambiarEstadoReporte(\'' + id + '\',\'en_revision\')">📝 Revisar</button>';
-        }
-        if (reporte.estado === 'en_revision') {
-            footer.innerHTML += '<button class="btn-success btn-sm" onclick="cambiarEstadoReporte(\'' + id + '\',\'resuelto\')">✅ Resolver</button>';
-        }
-        if (reporte.estado !== 'resuelto' && reporte.estado !== 'desestimado') {
-            footer.innerHTML += '<button class="btn-danger btn-sm" onclick="cambiarEstadoReporte(\'' + id + '\',\'desestimado\')">❌ Desestimar</button>';
-        }
-        footer.innerHTML += '<button class="btn-secondary btn-sm" onclick="cerrarModal()">Cerrar</button>';
-    }
 }
 
 function cargarReportesRecientes() {
     var c = document.getElementById('recent-reports-list');
     if (!c) return;
-    
+
     var rec = APP_STATE.reportes ? APP_STATE.reportes.slice(0, 5) : [];
     if (rec.length === 0) {
         c.innerHTML = '<div class="report-empty"><p>No hay reportes recientes</p></div>';
         return;
     }
-    
+
     var h = '';
     for (var i = 0; i < rec.length; i++) {
         var r = rec[i];
@@ -1097,43 +982,35 @@ function toggleSearchBar() {
 function realizarBusqueda(query) {
     var results = document.getElementById('search-results');
     if (!results) return;
-    
+
     if (!query || query.length < 2) {
         results.innerHTML = '';
         return;
     }
-    
+
     var q = query.toLowerCase();
     var resultados = [];
-    
+
     // Buscar en páginas
     for (var page in CONFIG.TITULOS_PAGINAS) {
         if (CONFIG.TITULOS_PAGINAS[page].toLowerCase().includes(q)) {
             resultados.push({ type: 'page', id: page, name: CONFIG.TITULOS_PAGINAS[page] });
         }
     }
-    
+
     // Buscar en versículos
-    for (var i = 0; i < CONFIG.BIBLE_VERSES.length; i++) {
-        var v = CONFIG.BIBLE_VERSES[i];
+    for (var i = 0; i < CONFIG.VERSES.length; i++) {
+        var v = CONFIG.VERSES[i];
         if (v.verse.toLowerCase().includes(q) || v.ref.toLowerCase().includes(q)) {
             resultados.push({ type: 'verse', id: 'verse_' + i, name: v.verse + ' - ' + v.ref });
         }
     }
-    
-    // Buscar en canciones
-    for (var j = 0; j < CONFIG.PLAYLIST_SONGS.length; j++) {
-        var s = CONFIG.PLAYLIST_SONGS[j];
-        if (s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)) {
-            resultados.push({ type: 'song', id: 'song_' + j, name: s.title + ' - ' + s.artist });
-        }
-    }
-    
+
     if (resultados.length === 0) {
         results.innerHTML = '<p style="padding:12px;color:var(--gris-texto);">No se encontraron resultados</p>';
         return;
     }
-    
+
     var html = '';
     for (var k = 0; k < Math.min(resultados.length, 8); k++) {
         var r = resultados[k];
@@ -1152,13 +1029,11 @@ function seleccionarResultadoBusqueda(type, id) {
     var searchBar = document.getElementById('search-bar');
     if (searchBar) searchBar.classList.add('hidden');
     APP_STATE.searchBarOpen = false;
-    
+
     if (type === 'page') {
         navegarA(id);
     } else if (type === 'verse') {
-        showToast('📖 ' + CONFIG.BIBLE_VERSES[parseInt(id.split('_')[1])].verse, 'info');
-    } else if (type === 'song') {
-        reproducirCancion(parseInt(id.split('_')[1]));
+        showToast('📖 ' + CONFIG.VERSES[parseInt(id.split('_')[1])].verse, 'info');
     }
 }
 
@@ -1171,7 +1046,6 @@ function toggleNotificaciones() {
     if (p) p.classList.toggle('hidden', !APP_STATE.notificationsOpen);
     if (APP_STATE.notificationsOpen) {
         actualizarNotificaciones();
-        // Marcar como leídas
         var badge = document.querySelector('.badge-notifications');
         if (badge) {
             badge.textContent = '0';
@@ -1184,15 +1058,14 @@ function toggleNotificaciones() {
 function actualizarNotificaciones() {
     var list = document.getElementById('notification-list');
     if (!list) return;
-    
-    // Notificaciones de ejemplo
+
     var notificaciones = [
         { icon: '📅', title: 'Nuevo Evento', desc: 'Culto de Adoración este domingo', time: 'Hace 2 horas', type: 'evento' },
         { icon: '🙏', title: 'Petición de Oración', desc: 'María pide oración por su familia', time: 'Hace 4 horas', type: 'oracion' },
         { icon: '📢', title: 'Anuncio', desc: 'Retiro de Jóvenes - 15 de agosto', time: 'Hace 1 día', type: 'sistema' },
         { icon: '🎵', title: 'Nueva Canción', desc: '"Santo Espíritu" disponible en la radio', time: 'Hace 2 días', type: 'sistema' }
     ];
-    
+
     var html = '';
     for (var i = 0; i < notificaciones.length; i++) {
         var n = notificaciones[i];
@@ -1207,33 +1080,12 @@ function actualizarNotificaciones() {
             '</div>' +
             '</div>';
     }
-    
+
     if (notificaciones.length === 0) {
         html = '<div class="notification-empty"><i class="bx bx-bell-off"></i><p>No tienes notificaciones</p></div>';
     }
-    
+
     list.innerHTML = html;
-    
-    // Filtros
-    var filters = document.querySelectorAll('.filter-btn');
-    for (var j = 0; j < filters.length; j++) {
-        filters[j].addEventListener('click', function() {
-            var filter = this.getAttribute('data-filter');
-            var items = list.querySelectorAll('.card');
-            for (var k = 0; k < items.length; k++) {
-                if (filter === 'all') {
-                    items[k].style.display = 'block';
-                } else {
-                    // Simplificado - en una implementación real se filtraría por tipo
-                    items[k].style.display = 'block';
-                }
-            }
-            // Actualizar active
-            for (var l = 0; l < filters.length; l++) {
-                filters[l].classList.toggle('active', filters[l] === this);
-            }
-        });
-    }
 }
 
 // ============================================
@@ -1249,8 +1101,7 @@ function cerrarModal() {
     }
 }
 
-function confirmarAccion(titulo, mensaje, callback, tipo) {
-    tipo = tipo || 'warning';
+function confirmarAccion(titulo, mensaje, callback) {
     var t = document.getElementById('confirm-title');
     var m = document.getElementById('confirm-message');
     var modal = document.getElementById('confirm-modal');
@@ -1259,6 +1110,58 @@ function confirmarAccion(titulo, mensaje, callback, tipo) {
     if (m) m.textContent = mensaje || '';
     APP_STATE.pendingConfirmation = callback;
     modal.classList.remove('hidden');
+}
+
+// ============================================
+// PUBLICACIONES (NUEVO - FIX PARA EL ERROR)
+// ============================================
+function crearPubLocal() {
+    var txt = document.getElementById('pub-contenido');
+    if (!txt || !txt.value.trim()) {
+        showToast('Escribe algo para publicar', 'warning');
+        return;
+    }
+    if (!APP_STATE.usuario) {
+        showToast('Inicia sesión para publicar', 'warning');
+        return;
+    }
+
+    var pub = {
+        id: 'pub_' + Date.now(),
+        usuario_id: APP_STATE.usuario.id || 0,
+        autor: APP_STATE.usuario.nombre || 'Anónimo',
+        contenido: txt.value.trim(),
+        fecha: new Date().toISOString()
+    };
+
+    APP_STATE.publicaciones.unshift(pub);
+    txt.value = '';
+    showToast('📝 Publicación creada', 'success');
+    navegarA('publicaciones');
+}
+
+function crearPeticionLocal() {
+    var m = document.getElementById('pet-motivo');
+    if (!m || !m.value.trim()) {
+        showToast('Escribe un motivo', 'warning');
+        return;
+    }
+    if (!APP_STATE.usuario) {
+        showToast('Inicia sesión', 'warning');
+        return;
+    }
+
+    if (!APP_STATE.peticiones) APP_STATE.peticiones = [];
+    APP_STATE.peticiones.unshift({
+        id: 'pet_' + Date.now(),
+        nombre: APP_STATE.usuario.nombre || 'Anónimo',
+        motivo: m.value.trim(),
+        fecha: new Date().toISOString()
+    });
+    m.value = '';
+    showToast('🙏 Petición enviada', 'success');
+    desbloquearLogro('first_prayer');
+    navegarA('peticiones');
 }
 
 // ============================================
@@ -1276,7 +1179,7 @@ function actualizarContador() {
     var mm = document.getElementById('contador-minutos');
     var ss = document.getElementById('contador-segundos');
     if (!dd && !hh) return;
-    
+
     try {
         var ahora = new Date();
         var dom = new Date(ahora);
@@ -1322,10 +1225,10 @@ function generarId() {
 }
 
 function compartirVersiculo() {
-    var verses = CONFIG.BIBLE_VERSES;
+    var verses = CONFIG.VERSES;
     var v = verses[Math.floor(Math.random() * verses.length)];
     var texto = '"' + v.verse + '" - ' + v.ref;
-    
+
     if (navigator.share) {
         navigator.share({
             title: 'Versículo del Día',
@@ -1367,7 +1270,6 @@ function togglePanelReportes() {
 // AUTENTICACIÓN
 // ============================================
 function login(email, password) {
-    // Simulación de login
     if (email === 'admin@ipuc.com' && password === 'admin123') {
         return {
             success: true,
@@ -1384,7 +1286,7 @@ function login(email, password) {
             rol: 'admin'
         };
     }
-    
+
     if (email && password && password.length >= 6) {
         return {
             success: true,
@@ -1401,15 +1303,11 @@ function login(email, password) {
             rol: 'usuario'
         };
     }
-    
-    return {
-        success: false,
-        error: 'Credenciales inválidas'
-    };
+
+    return { success: false, error: 'Credenciales inválidas' };
 }
 
 function registro(datos) {
-    // Simulación de registro
     if (datos.nombre && datos.correo && datos.password && datos.password.length >= 8) {
         return {
             success: true,
@@ -1424,10 +1322,7 @@ function registro(datos) {
             }
         };
     }
-    return {
-        success: false,
-        error: 'Datos inválidos o contraseña muy corta'
-    };
+    return { success: false, error: 'Datos inválidos o contraseña muy corta' };
 }
 
 function continuarComoInvitado() {
@@ -1453,27 +1348,27 @@ function cerrarSesion() {
         localStorage.removeItem('ipuc20_usuario');
         localStorage.removeItem('ipuc20_rol');
     } catch (e) {}
-    
+
     APP_STATE.token = null;
     APP_STATE.usuario = null;
     APP_STATE.rol = null;
-    
+
     if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
     if (APP_STATE.fechaInterval) clearInterval(APP_STATE.fechaInterval);
-    
+
     mostrarBienvenida();
     showToast('Sesión cerrada', 'info');
 }
 
 // ============================================
-// CARGA DE PÁGINAS
+// CARGA DE PÁGINAS (RESUMEN)
 // ============================================
 function cargarPagina(page) {
     var c = document.getElementById('page-content');
     if (!c) return;
-    
+
     c.innerHTML = '<div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>';
-    
+
     setTimeout(function() {
         var paginas = {
             'inicio': cargarInicio,
@@ -1521,7 +1416,7 @@ function cargarPagina(page) {
             'gestion-eventos': cargarGestionEventos,
             'gestion-noticias': cargarGestionNoticias
         };
-        
+
         var fn = paginas[page];
         if (fn) fn(c);
         else c.innerHTML = '<div class="card fade-in"><h2>' + (CONFIG.TITULOS_PAGINAS[page] || page) + '</h2><p style="text-align:center;padding:40px;">Sección en desarrollo</p></div>';
@@ -1529,9 +1424,8 @@ function cargarPagina(page) {
 }
 
 // ============================================
-// PÁGINAS - IMPLEMENTACIONES
+// PÁGINAS - IMPLEMENTACIONES BÁSICAS
 // ============================================
-
 function cargarInicio(c) {
     var isAdmin = APP_STATE.rol === 'admin';
     c.innerHTML = '<div class="fade-in">' +
@@ -1542,7 +1436,7 @@ function cargarInicio(c) {
         '<div class="contador-item"><span class="contador-numero" id="contador-minutos">00</span><span class="contador-etiqueta">Minutos</span></div>' +
         '<div class="contador-item"><span class="contador-numero" id="contador-segundos">00</span><span class="contador-etiqueta">Segundos</span></div>' +
         '</div><div class="contador-estado estado-proximo" id="contador-estado">🔔 PRÓXIMO CULTO</div></div>' +
-        
+
         '<div class="card" style="text-align:center;border-left:4px solid var(--dorado);">' +
         '<h3>🎉 IPUC LA FONDA v' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + '</h3>' +
         '<p>"Donde el Espíritu Santo se mueve"</p>' +
@@ -1551,7 +1445,7 @@ function cargarInicio(c) {
         '<span class="badge">Lv.' + APP_STATE.nivel + '</span>' +
         '<span class="badge">🎯 ' + APP_STATE.logrosDesbloqueados.length + ' logros</span>' +
         '</div></div>' +
-        
+
         '<div class="card"><h3>⚡ Accesos Rápidos</h3>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:8px;">' +
         '<button class="btn-outline btn-sm" onclick="navegarA(\'asistencia\')">✅ Asistencia</button>' +
@@ -1563,7 +1457,7 @@ function cargarInicio(c) {
         '<button class="btn-outline btn-sm" onclick="navegarA(\'trivia\')">🧠 Trivia</button>' +
         (isAdmin ? '<button class="btn-outline btn-sm" onclick="navegarA(\'admin-dashboard\')">📊 Admin</button>' : '') +
         '</div></div>' +
-        
+
         '<div class="card"><h3>📊 Estadísticas</h3>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;text-align:center;">' +
         '<div><strong style="font-size:1.5rem;">' + APP_STATE.usuariosActivos + '</strong><p style="font-size:0.75rem;">En Línea</p></div>' +
@@ -1574,84 +1468,257 @@ function cargarInicio(c) {
     iniciarContador();
 }
 
+function cargarHorarios(c) {
+    c.innerHTML = '<div class="fade-in"><h2>🕐 Horarios de Cultos</h2>' +
+        '<div class="card"><h3>⛪ Domingo</h3><p>Culto Dominical - 10:00 AM</p></div>' +
+        '<div class="card"><h3>🔥 Martes</h3><p>Culto de Oración - 6:00 PM</p></div>' +
+        '<div class="card"><h3>🎵 Viernes</h3><p>Culto de Jóvenes - 6:00 PM</p></div>' +
+        '<div class="card"><h3>📖 Sábado</h3><p>Escuela Bíblica - 4:00 PM</p></div>' +
+        '</div>';
+}
+
+function cargarAsistencia(c) {
+    c.innerHTML = '<div class="fade-in"><h2>✅ Confirmar Asistencia</h2>' +
+        '<div class="card" style="text-align:center;padding:30px;">' +
+        '<h3>Próximo Culto</h3><p style="font-size:1.2rem;">Domingo 10:00 AM</p>' +
+        '<button class="btn-primary btn-sm" onclick="confirmarAsistencia()" style="margin-top:12px;">✅ Confirmar Asistencia</button>' +
+        '</div>' +
+        '<div class="card"><h3>Mi Asistencia</h3>' +
+        '<p>Has confirmado tu asistencia <strong>3</strong> veces este mes</p>' +
+        '<div style="margin-top:8px;display:flex;gap:8px;">' +
+        '<span class="badge estado-resuelto">✅ 1er Domingo</span>' +
+        '<span class="badge estado-resuelto">✅ 2do Domingo</span>' +
+        '<span class="badge estado-pendiente">⏳ Próximo</span>' +
+        '</div></div></div>';
+}
+
+function confirmarAsistencia() {
+    showToast('✅ Asistencia confirmada para el próximo culto', 'success');
+}
+
+function cargarNoticias(c) {
+    c.innerHTML = '<div class="fade-in"><h2>📰 Noticias</h2>' +
+        '<div class="card"><h3>📢 Anuncio Importante</h3><p>Nuevo horario de cultos a partir del próximo mes</p><small>' + formatearFecha(new Date()) + '</small></div>' +
+        '<div class="card"><h3>🎉 Celebración de Aniversario</h3><p>Celebraremos el aniversario de la iglesia el próximo domingo</p><small>' + formatearFecha(new Date(Date.now() - 86400000)) + '</small></div>' +
+        '</div>';
+}
+
+function cargarEventos(c) {
+    var eventos = APP_STATE.eventos || [];
+    var proximos = eventos.filter(function(e) {
+        return new Date(e.fecha) >= new Date();
+    }).sort(function(a, b) {
+        return new Date(a.fecha) - new Date(b.fecha);
+    });
+
+    c.innerHTML = '<div class="fade-in"><h2>📅 Eventos</h2>' +
+        (APP_STATE.rol === 'admin' ? '<button class="btn-primary btn-sm" onclick="abrirModalEvento()" style="margin-bottom:12px;">➕ Crear Evento</button>' : '') +
+        (proximos.length === 0 ? '<div class="card"><p>No hay eventos próximos</p></div>' :
+        proximos.map(function(e) {
+            return '<div class="card"><h3>' + escapeHtml(e.titulo) + '</h3>' +
+                '<p>' + escapeHtml(e.desc || '') + '</p>' +
+                '<small>📅 ' + formatearFecha(e.fecha) + (e.hora ? ' ⏰ ' + e.hora : '') + (e.lugar ? ' 📍 ' + e.lugar : '') + '</small>' +
+                '</div>';
+        }).join('')) +
+        '</div>';
+}
+
+function cargarPublicaciones(c) {
+    var pub = APP_STATE.publicaciones || [];
+    c.innerHTML = '<div class="fade-in"><h2>📝 Publicaciones</h2>' +
+        (APP_STATE.usuario ? '<div class="card"><textarea class="form-input" id="pub-contenido" rows="3" placeholder="¿Qué quieres compartir?"></textarea>' +
+        '<button class="btn-primary btn-sm" onclick="crearPubLocal()" style="margin-top:8px;">Publicar</button></div>' : '') +
+        (pub.length === 0 ? '<div class="card"><p>No hay publicaciones</p></div>' :
+        pub.map(function(p) {
+            return '<div class="card"><p><strong>' + escapeHtml(p.autor || 'Anónimo') + '</strong></p>' +
+                '<p>' + escapeHtml(p.contenido || '') + '</p>' +
+                '<small>' + formatearFecha(p.fecha) + '</small></div>';
+        }).join('')) +
+        '</div>';
+}
+
+function cargarPerfil(c) {
+    if (!APP_STATE.usuario) {
+        c.innerHTML = '<div class="fade-in"><h2>👤 Perfil</h2><div class="card"><p>Inicia sesión para ver tu perfil</p></div></div>';
+        return;
+    }
+    var u = APP_STATE.usuario;
+    c.innerHTML = '<div class="fade-in"><h2>👤 Mi Perfil</h2>' +
+        '<div class="card" style="text-align:center;">' +
+        '<img src="' + (u.foto || 'assets/avatars/default.png') + '" style="width:80px;height:80px;border-radius:50%;margin-bottom:12px;object-fit:cover;">' +
+        '<h3>' + (u.nombre || '') + ' ' + (u.apellidos || '') + '</h3>' +
+        '<p>@' + (u.usuario || '') + '</p>' +
+        '<p>' + (u.correo || '') + '</p>' +
+        '<p>📌 ' + (u.ministerio || 'General') + '</p>' +
+        '<div style="margin-top:8px;display:flex;gap:8px;justify-content:center;">' +
+        '<span class="badge">Lv.' + APP_STATE.nivel + '</span>' +
+        '<span class="badge">🏆 ' + APP_STATE.logrosDesbloqueados.length + ' logros</span>' +
+        '</div></div>' +
+        '<button class="btn-danger btn-sm" onclick="confirmarAccion(\'Cerrar sesión?\',\'\',cerrarSesion)">🚪 Cerrar Sesión</button>' +
+        '</div>';
+}
+
+function cargarConfiguracion(c) {
+    c.innerHTML = '<div class="fade-in"><h2>⚙️ Configuración</h2>' +
+        '<div class="card"><h3>🎨 Apariencia</h3>' +
+        '<button class="btn-secondary btn-sm" onclick="toggleTema()">' + (APP_STATE.tema === 'dark' ? '☀️ Cambiar a Claro' : '🌙 Cambiar a Oscuro') + '</button>' +
+        '</div>' +
+        '<div class="card"><h3>🌐 Idioma</h3>' +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;">' +
+        '<button class="lang-btn ' + (APP_STATE.idioma === 'es' ? 'active' : '') + '" onclick="cambiarIdioma(\'es\')">🇪🇸 ES</button>' +
+        '<button class="lang-btn ' + (APP_STATE.idioma === 'en' ? 'active' : '') + '" onclick="cambiarIdioma(\'en\')">🇬🇧 EN</button>' +
+        '<button class="lang-btn ' + (APP_STATE.idioma === 'pt' ? 'active' : '') + '" onclick="cambiarIdioma(\'pt\')">🇵🇹 PT</button>' +
+        '<button class="lang-btn ' + (APP_STATE.idioma === 'fr' ? 'active' : '') + '" onclick="cambiarIdioma(\'fr\')">🇫🇷 FR</button>' +
+        '<button class="lang-btn ' + (APP_STATE.idioma === 'de' ? 'active' : '') + '" onclick="cambiarIdioma(\'de\')">🇩🇪 DE</button>' +
+        '</div></div>' +
+        '<div class="card"><h3>📱 Aplicación</h3>' +
+        '<p><strong>Versión:</strong> ' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + '</p>' +
+        '<p><strong>Modo:</strong> ' + (APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline') + '</p>' +
+        '</div>' +
+        (APP_STATE.usuario ? '<button class="btn-danger btn-sm" onclick="confirmarAccion(\'Cerrar sesión?\',\'\',cerrarSesion)">🚪 Cerrar Sesión</button>' : '') +
+        '</div>';
+}
+
+function cargarSistema(c) {
+    c.innerHTML = '<div class="fade-in"><h2>🖥️ Sistema</h2>' +
+        '<div class="card"><p><strong>Versión:</strong> ' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + '</p>' +
+        '<p><strong>Modo:</strong> ' + (APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline') + '</p>' +
+        '<p><strong>Tema:</strong> ' + APP_STATE.tema + '</p>' +
+        '<p><strong>Idioma:</strong> ' + APP_STATE.idioma.toUpperCase() + '</p>' +
+        '<p><strong>Usuario:</strong> ' + (APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Invitado') + '</p>' +
+        '<p><strong>Nivel:</strong> ' + APP_STATE.nivel + '</p>' +
+        '<p><strong>XP:</strong> ' + APP_STATE.xp + ' / ' + APP_STATE.xpSiguiente + '</p>' +
+        '</div></div>';
+}
+
+function cargarPeticiones(c) {
+    var peticiones = APP_STATE.peticiones || [];
+    c.innerHTML = '<div class="fade-in"><h2>🙏 Peticiones de Oración</h2>' +
+        '<div class="card"><div class="form-group"><label>Motivo de Oración</label>' +
+        '<textarea class="form-input" id="pet-motivo" rows="2" placeholder="Motivo de oración..."></textarea></div>' +
+        '<button class="btn-primary btn-sm" onclick="crearPeticionLocal()">Enviar Petición</button></div>' +
+        (peticiones.length === 0 ? '<div class="card"><p>No hay peticiones</p></div>' :
+        peticiones.map(function(p) {
+            return '<div class="card"><p><strong>' + escapeHtml(p.nombre || 'Anónimo') + '</strong></p>' +
+                '<p>' + escapeHtml(p.motivo || '') + '</p>' +
+                '<small>' + formatearFecha(p.fecha) + '</small></div>';
+        }).join('')) +
+        '</div>';
+}
+
+function cargarGestionReportes(c) {
+    var h = '<div class="fade-in"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">';
+    h += '<h2>📋 Gestión de Reportes</h2>';
+    h += '<button class="btn-primary btn-sm" onclick="abrirModalReporte()">Nuevo Reporte</button></div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">';
+    h += '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;">' + (APP_STATE.reportes ? APP_STATE.reportes.length : 0) + '</p><p style="font-size:0.75rem;">Total</p></div>';
+    h += '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;">' + APP_STATE.reportsPendientes + '</p><p style="font-size:0.75rem;">Pendientes</p></div>';
+    h += '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;">' + (APP_STATE.reportes ? APP_STATE.reportes.filter(function(r){return r.estado==='resuelto';}).length : 0) + '</p><p style="font-size:0.75rem;">Resueltos</p></div>';
+    h += '<div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;">' + (APP_STATE.reportes ? APP_STATE.reportes.filter(function(r){return r.estado==='desestimado';}).length : 0) + '</p><p style="font-size:0.75rem;">Desestimados</p></div>';
+    h += '</div>';
+    if (!APP_STATE.reportes || APP_STATE.reportes.length === 0) {
+        h += '<div class="card" style="text-align:center;padding:40px;"><p>No hay reportes registrados</p></div>';
+    } else {
+        for (var i = 0; i < APP_STATE.reportes.length; i++) {
+            var r = APP_STATE.reportes[i];
+            h += '<div class="card" style="margin-bottom:8px;border-left:4px solid ' + (r.urgencia === 'critica' ? 'var(--error)' : r.urgencia === 'alta' ? 'var(--advertencia)' : 'var(--info)') + ';">';
+            h += '<div style="display:flex;justify-content:space-between;align-items:start;">';
+            h += '<div style="flex:1;">';
+            h += '<span class="badge estado-' + (r.estado || 'pendiente') + '" style="margin-right:6px;">' + (r.estado || 'pendiente') + '</span>';
+            h += '<span class="badge tipo-' + (r.tipo || 'general') + '">' + (r.tipo || 'general') + '</span>';
+            h += '<p style="font-size:0.9rem;margin:4px 0;">' + escapeHtml((r.descripcion || '').substring(0, 100)) + '...</p>';
+            h += '<small>Reportado por: ' + (r.reportado_por ? r.reportado_por.nombre : 'Anónimo') + ' - ' + formatearFecha(r.fecha) + '</small>';
+            h += '</div><div style="display:flex;gap:4px;">';
+            h += '<button class="btn-primary btn-sm" onclick="verDetalleReporte(\'' + r.id + '\')" title="Ver"><i class="bx bx-show"></i></button>';
+            if (r.estado === 'pendiente') h += '<button class="btn-success btn-sm" onclick="cambiarEstadoReporte(\'' + r.id + '\',\'en_revision\')" title="Revisar"><i class="bx bx-check"></i></button>';
+            if (r.estado === 'en_revision') h += '<button class="btn-success btn-sm" onclick="cambiarEstadoReporte(\'' + r.id + '\',\'resuelto\')" title="Resolver"><i class="bx bx-check-double"></i></button>';
+            h += '</div></div></div>';
+        }
+    }
+    h += '</div>';
+    c.innerHTML = h;
+}
+
+function cargarMisReportes(c) {
+    if (!APP_STATE.usuario) {
+        c.innerHTML = '<div class="fade-in"><h2>Mis Reportes</h2><div class="card"><p>Inicia sesión para ver tus reportes</p></div></div>';
+        return;
+    }
+    var mis = [];
+    if (APP_STATE.reportes) {
+        for (var i = 0; i < APP_STATE.reportes.length; i++) {
+            if (APP_STATE.reportes[i].reportado_por && APP_STATE.reportes[i].reportado_por.id === APP_STATE.usuario.id) {
+                mis.push(APP_STATE.reportes[i]);
+            }
+        }
+    }
+    var h = '<div class="fade-in"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">';
+    h += '<h2>Mis Reportes</h2><button class="btn-primary btn-sm" onclick="abrirModalReporte()">Nuevo Reporte</button></div>';
+    if (mis.length === 0) h += '<div class="card" style="text-align:center;padding:40px;"><p>No has generado ningún reporte</p></div>';
+    else {
+        for (var j = 0; j < mis.length; j++) {
+            var r = mis[j];
+            h += '<div class="card" style="margin-bottom:8px;">';
+            h += '<span class="badge estado-' + (r.estado || 'pendiente') + '">' + (r.estado || 'pendiente') + '</span> ';
+            h += '<span class="badge tipo-' + (r.tipo || 'general') + '">' + (r.tipo || 'general') + '</span>';
+            h += '<p style="font-size:0.9rem;">' + escapeHtml((r.descripcion || '').substring(0, 100)) + '...</p>';
+            h += '<small>' + formatearFecha(r.fecha) + '</small></div>';
+        }
+    }
+    h += '</div>';
+    c.innerHTML = h;
+}
+
+function cargarDashboard(c) {
+    c.innerHTML = '<div class="fade-in"><h2>📊 Dashboard</h2><div class="card"><p>Panel de Administración</p><p>Bienvenido al panel de control de IPUC LA FONDA</p></div></div>';
+}
+
+// Páginas adicionales (simplificadas)
 function cargarRadio(c) {
     c.innerHTML = '<div class="fade-in"><h2>🎵 Radio en Vivo</h2>' +
         '<div class="card" style="text-align:center;">' +
-        '<div style="display:flex;justify-content:center;gap:16px;margin:16px 0;">' +
-        '<button class="btn-radio btn-radio-main" onclick="toggleRadio()" style="width:64px;height:64px;font-size:2.5rem;">' +
+        '<button class="btn-radio btn-radio-main" onclick="toggleRadio()" style="width:64px;height:64px;font-size:2.5rem;border-radius:50%;background:var(--azul-primario);color:var(--blanco);">' +
         '<i class="bx ' + (APP_STATE.radioPlaying ? 'bx-pause-circle' : 'bx-play-circle') + '"></i></button>' +
-        '</div>' +
-        '<h3 id="radio-playing">' + CONFIG.PLAYLIST_SONGS[APP_STATE.playlistCurrent || 0].title + '</h3>' +
-        '<p id="radio-artist">' + CONFIG.PLAYLIST_SONGS[APP_STATE.playlistCurrent || 0].artist + '</p>' +
-        '<div class="radio-wave" style="justify-content:center;height:30px;margin:12px 0;">' +
-        '<span style="display:inline-block;width:4px;background:var(--dorado);border-radius:2px;animation:wave 0.8s ease-in-out infinite;height:10px;"></span>' +
-        '<span style="display:inline-block;width:4px;background:var(--dorado);border-radius:2px;animation:wave 0.8s ease-in-out infinite 0.1s;height:18px;"></span>' +
-        '<span style="display:inline-block;width:4px;background:var(--dorado);border-radius:2px;animation:wave 0.8s ease-in-out infinite 0.2s;height:24px;"></span>' +
-        '<span style="display:inline-block;width:4px;background:var(--dorado);border-radius:2px;animation:wave 0.8s ease-in-out infinite 0.3s;height:16px;"></span>' +
-        '<span style="display:inline-block;width:4px;background:var(--dorado);border-radius:2px;animation:wave 0.8s ease-in-out infinite 0.4s;height:8px;"></span>' +
-        '</div>' +
-        '<button class="btn-primary btn-sm" onclick="toggleRadioPanel()">📻 Abrir Reproductor</button>' +
-        '</div>' +
-        '<div class="card"><h3>📋 Lista de Reproducción</h3>' +
-        '<ul id="playlist-songs">' +
-        CONFIG.PLAYLIST_SONGS.map(function(s, i) {
-            return '<li onclick="reproducirCancion(' + i + ')" style="padding:6px 0;cursor:pointer;border-bottom:1px solid var(--gris-medio);">' +
-                '<i class="bx bx-play-circle"></i> ' + s.title + ' - ' + s.artist +
-                '</li>';
-        }).join('') +
-        '</ul></div></div>';
+        '<h3 style="margin-top:12px;">Radio IPUC LA FONDA</h3>' +
+        '<p>Alabanzas de Adoración</p>' +
+        '<button class="btn-primary btn-sm" onclick="toggleRadioPanel()" style="margin-top:12px;">📻 Abrir Reproductor</button>' +
+        '</div></div>';
 }
 
 function cargarStreaming(c) {
     c.innerHTML = '<div class="fade-in"><h2>📺 Transmisión en Vivo</h2>' +
         '<div class="card" style="text-align:center;">' +
-        '<div class="streaming-player" style="background:var(--gris-oscuro);border-radius:12px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:var(--blanco);">' +
+        '<div style="background:var(--gris-oscuro);border-radius:12px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:var(--blanco);">' +
         '<div><i class="bx bx-video-recording" style="font-size:4rem;opacity:0.3;"></i>' +
-        '<p>Próxima transmisión en vivo</p>' +
-        '<span class="streaming-badge" style="background:var(--error);padding:4px 12px;border-radius:20px;font-size:0.7rem;">🔴 EN VIVO</span></div>' +
-        '</div>' +
-        '<div style="margin-top:12px;display:flex;gap:16px;justify-content:center;">' +
-        '<span><i class="bx bx-user"></i> <span id="viewers-count">' + APP_STATE.viewersCount + '</span> espectadores</span>' +
-        '<span><i class="bx bx-heart"></i> 156</span>' +
-        '<span><i class="bx bx-chat"></i> 23</span>' +
-        '</div>' +
-        '<button class="btn-primary btn-sm" style="margin-top:12px;" onclick="toggleStreamingPanel()">📺 Abrir Transmisión</button>' +
+        '<p>Próxima transmisión en vivo</p></div></div>' +
+        '<button class="btn-primary btn-sm" onclick="toggleStreamingPanel()" style="margin-top:12px;">📺 Abrir Transmisión</button>' +
         '</div></div>';
 }
 
 function cargarMapa(c) {
     c.innerHTML = '<div class="fade-in"><h2>📍 Ubicación</h2>' +
         '<div class="card" style="height:400px;display:flex;align-items:center;justify-content:center;background:var(--gris-claro);border-radius:12px;">' +
-        '<div style="text-align:center;">' +
-        '<i class="bx bx-map" style="font-size:3rem;color:var(--gris-texto);"></i>' +
+        '<div style="text-align:center;"><i class="bx bx-map" style="font-size:3rem;color:var(--gris-texto);"></i>' +
         '<p>Mapa interactivo de la iglesia</p>' +
         '<p style="font-size:0.8rem;color:var(--gris-texto);">Dirección: Colombia</p>' +
-        '<button class="btn-primary btn-sm" style="margin-top:8px;" onclick="showToast(\'Abriendo mapa...\',\'info\')">Ver en Google Maps</button>' +
-        '</div>' +
-        '</div></div>';
+        '<button class="btn-primary btn-sm" onclick="showToast(\'Abriendo mapa...\',\'info\')">Ver en Google Maps</button></div></div></div>';
 }
 
 function cargarOracion(c) {
     var oraciones = APP_STATE.oraciones || [];
     c.innerHTML = '<div class="fade-in"><h2>🙏 Cadena de Oración</h2>' +
-        '<div class="card">' +
-        '<form id="prayer-form-local" onsubmit="enviarOracionLocal(event)">' +
-        '<div class="form-group">' +
-        '<label for="prayer-name-local">Tu Nombre</label>' +
-        '<input type="text" id="prayer-name-local" class="form-input" placeholder="Anónimo o tu nombre">' +
-        '</div>' +
-        '<div class="form-group">' +
-        '<label for="prayer-request-local">Petición de Oración *</label>' +
-        '<textarea id="prayer-request-local" class="form-input" rows="3" placeholder="Comparte tu petición..." required></textarea>' +
-        '</div>' +
+        '<div class="card"><form id="prayer-form-local" onsubmit="enviarOracionLocal(event)">' +
+        '<div class="form-group"><label>Tu Nombre</label>' +
+        '<input type="text" id="prayer-name-local" class="form-input" placeholder="Anónimo o tu nombre"></div>' +
+        '<div class="form-group"><label>Petición de Oración *</label>' +
+        '<textarea id="prayer-request-local" class="form-input" rows="3" placeholder="Comparte tu petición..." required></textarea></div>' +
         '<button type="submit" class="btn-primary btn-block"><i class="bx bx-send"></i> Enviar Oración</button>' +
         '</form></div>' +
-        '<div id="oraciones-list">' + 
         (oraciones.length === 0 ? '<div class="card"><p style="text-align:center;color:var(--gris-texto);">No hay peticiones de oración aún</p></div>' :
         oraciones.map(function(o) {
             return '<div class="card"><p><strong>' + (o.nombre || 'Anónimo') + '</strong></p><p>' + escapeHtml(o.motivo || '') + '</p><small>' + formatearFecha(o.fecha) + '</small></div>';
         }).join('')) +
-        '</div></div>';
+        '</div>';
 }
 
 function enviarOracionLocal(e) {
@@ -1682,11 +1749,7 @@ function cargarGrupos(c) {
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">' +
         '<div style="padding:12px;border:1px solid var(--gris-medio);border-radius:8px;"><strong>Jóvenes</strong><p style="font-size:0.85rem;">Líder: Juan P.</p><small>Viernes 6:00 PM</small></div>' +
         '<div style="padding:12px;border:1px solid var(--gris-medio);border-radius:8px;"><strong>Damas</strong><p style="font-size:0.85rem;">Líder: María G.</p><small>Miércoles 4:00 PM</small></div>' +
-        '<div style="padding:12px;border:1px solid var(--gris-medio);border-radius:8px;"><strong>Caballeros</strong><p style="font-size:0.85rem;">Líder: Carlos R.</p><small>Martes 6:00 PM</small></div>' +
-        '<div style="padding:12px;border:1px solid var(--gris-medio);border-radius:8px;"><strong>Niños</strong><p style="font-size:0.85rem;">Líder: Ana L.</p><small>Sábado 10:00 AM</small></div>' +
-        '</div></div>' +
-        '<button class="btn-primary btn-sm" onclick="showToast(\'Función disponible pronto\',\'info\')">➕ Crear Grupo</button>' +
-        '</div>';
+        '</div></div></div>';
 }
 
 function cargarLecturaBiblica(c) {
@@ -1697,7 +1760,6 @@ function cargarLecturaBiblica(c) {
         '<div style="height:8px;background:var(--gris-medio);border-radius:4px;margin-top:4px;overflow:hidden;">' +
         '<div style="height:100%;width:' + progreso + '%;background:linear-gradient(90deg,var(--azul-primario),var(--dorado));border-radius:4px;transition:width 0.5s;"></div>' +
         '</div></div>' +
-        '<p>Lectura de hoy: Juan 3:1-21</p>' +
         '<button class="btn-primary btn-sm" onclick="marcarLecturaCompletada()" style="margin-top:8px;">✅ Marcar como leído</button>' +
         '</div></div>';
 }
@@ -1711,8 +1773,7 @@ function marcarLecturaCompletada() {
 
 function cargarConcordancia(c) {
     c.innerHTML = '<div class="fade-in"><h2>🔍 Concordancia Bíblica</h2>' +
-        '<div class="card"><div class="form-group">' +
-        '<label>Buscar palabra en la Biblia</label>' +
+        '<div class="card"><div class="form-group"><label>Buscar palabra en la Biblia</label>' +
         '<div style="display:flex;gap:8px;">' +
         '<input type="text" id="concordancia-input" class="form-input" placeholder="Ej: amor, fe, esperanza..." onkeypress="if(event.key===\'Enter\')buscarConcordancia()">' +
         '<button class="btn-primary" onclick="buscarConcordancia()">Buscar</button>' +
@@ -1727,7 +1788,7 @@ function buscarConcordancia() {
         return;
     }
     var query = input.value.trim().toLowerCase();
-    var resultados = CONFIG.BIBLE_VERSES.filter(function(v) {
+    var resultados = CONFIG.VERSES.filter(function(v) {
         return v.verse.toLowerCase().includes(query) || v.ref.toLowerCase().includes(query);
     });
     var container = document.getElementById('concordancia-resultados');
@@ -1744,10 +1805,16 @@ function buscarConcordancia() {
 }
 
 function cargarHimnario(c) {
+    var songs = [
+        { title: 'Santo Espíritu', artist: 'IPUC LA FONDA' },
+        { title: 'Alabanzas al Rey', artist: 'IPUC LA FONDA' },
+        { title: 'Adoración Profunda', artist: 'IPUC LA FONDA' },
+        { title: 'Glorioso Día', artist: 'IPUC LA FONDA' }
+    ];
     c.innerHTML = '<div class="fade-in"><h2>🎵 Himnario</h2>' +
         '<div class="card"><h3>Canciones de alabanza</h3>' +
         '<div style="margin-top:12px;">' +
-        CONFIG.PLAYLIST_SONGS.map(function(s, i) {
+        songs.map(function(s, i) {
             return '<div style="padding:8px;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">' +
                 '<span><strong>' + s.title + '</strong> - ' + s.artist + '</span>' +
                 '<button class="btn-outline btn-sm" onclick="reproducirCancion(' + i + ')">🎵 Escuchar</button>' +
@@ -1764,12 +1831,11 @@ function cargarDiarioEspiritual(c) {
         '<div class="form-group"><label>Reflexión del día</label><textarea id="diario-contenido" class="form-input" rows="4" placeholder="Escribe tu reflexión espiritual..." required></textarea></div>' +
         '<button type="submit" class="btn-primary btn-block">Guardar Reflexión</button>' +
         '</form></div>' +
-        '<div id="diario-entradas">' +
         (entries.length === 0 ? '<div class="card"><p style="color:var(--gris-texto);">No hay entradas en tu diario</p></div>' :
         entries.map(function(e) {
             return '<div class="card"><strong>' + formatearFecha(e.fecha) + '</strong><p>' + escapeHtml(e.contenido) + '</p></div>';
         }).join('')) +
-        '</div></div>';
+        '</div>';
 }
 
 function guardarEntradaDiario(e) {
@@ -1792,16 +1858,21 @@ function guardarEntradaDiario(e) {
 
 function cargarLogros(c) {
     c.innerHTML = '<div class="fade-in"><h2>🏆 Logros Desbloqueados</h2>' +
-        '<div class="card">' +
-        '<p>Has desbloqueado <strong>' + APP_STATE.logrosDesbloqueados.length + '</strong> de ' + CONFIG.ACHIEVEMENTS.length + ' logros</p>' +
+        '<div class="card"><p>Has desbloqueado <strong>' + APP_STATE.logrosDesbloqueados.length + '</strong> logros</p>' +
         '<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">' +
-        CONFIG.ACHIEVEMENTS.map(function(a) {
+        [
+            { id: 'first_prayer', name: 'Primera Oración', icon: '🙏' },
+            { id: 'bible_reader', name: 'Lector de la Biblia', icon: '📖' },
+            { id: 'testimony', name: 'Comparte Testimonio', icon: '💬' },
+            { id: 'event_creator', name: 'Creador de Eventos', icon: '📅' },
+            { id: 'radio_listener', name: 'Radio Oyente', icon: '🎵' },
+            { id: 'trivia_master', name: 'Maestro de Trivia', icon: '🧠' }
+        ].map(function(a) {
             var unlocked = APP_STATE.logrosDesbloqueados.includes(a.id);
             return '<div style="text-align:center;padding:12px;border:2px solid ' + (unlocked ? 'var(--oro)' : 'var(--gris-medio)') + ';border-radius:8px;background:' + (unlocked ? 'var(--dorado-claro)' : 'transparent') + ';opacity:' + (unlocked ? '1' : '0.6') + ';">' +
                 '<div style="font-size:2rem;">' + a.icon + '</div>' +
                 '<strong style="font-size:0.85rem;">' + a.name + '</strong>' +
-                '<p style="font-size:0.7rem;color:var(--gris-texto);">' + a.description + '</p>' +
-                (unlocked ? '<span style="color:var(--exito);font-size:0.7rem;">✅ Desbloqueado</span>' : '<span style="color:var(--gris-texto);font-size:0.7rem;">🔒 Bloqueado</span>') +
+                (unlocked ? '<span style="color:var(--exito);font-size:0.7rem;display:block;">✅ Desbloqueado</span>' : '<span style="color:var(--gris-texto);font-size:0.7rem;display:block;">🔒 Bloqueado</span>') +
                 '</div>';
         }).join('') +
         '</div></div></div>';
@@ -1811,7 +1882,6 @@ function cargarTrivia(c) {
     c.innerHTML = '<div class="fade-in"><h2>🧠 Trivia Bíblica</h2>' +
         '<div class="card" style="text-align:center;padding:30px;">' +
         '<p style="font-size:1.2rem;">Pon a prueba tu conocimiento bíblico</p>' +
-        '<p>Responde preguntas sobre la Biblia y gana puntos</p>' +
         '<button class="btn-primary btn-lg" onclick="iniciarTrivia()" style="margin-top:16px;">🎮 Jugar Ahora</button>' +
         '</div>' +
         '<div class="card"><h3>Estadísticas</h3>' +
@@ -1826,25 +1896,9 @@ function cargarJuegos(c) {
     c.innerHTML = '<div class="fade-in"><h2>🎮 Juegos Bíblicos</h2>' +
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
         '<div class="card" style="text-align:center;cursor:pointer;" onclick="navegarA(\'trivia\')">' +
-        '<div style="font-size:3rem;">🧠</div>' +
-        '<h3>Trivia Bíblica</h3>' +
-        '<p>Preguntas y respuestas</p>' +
-        '</div>' +
+        '<div style="font-size:3rem;">🧠</div><h3>Trivia Bíblica</h3><p>Preguntas y respuestas</p></div>' +
         '<div class="card" style="text-align:center;cursor:pointer;" onclick="showToast(\'Próximamente...\',\'info\')">' +
-        '<div style="font-size:3rem;">🔍</div>' +
-        '<h3>Busca la Palabra</h3>' +
-        '<p>Encuentra versículos</p>' +
-        '</div>' +
-        '<div class="card" style="text-align:center;cursor:pointer;" onclick="showToast(\'Próximamente...\',\'info\')">' +
-        '<div style="font-size:3rem;">🧩</div>' +
-        '<h3>Memorama</h3>' +
-        '<p>Parejas bíblicas</p>' +
-        '</div>' +
-        '<div class="card" style="text-align:center;cursor:pointer;" onclick="showToast(\'Próximamente...\',\'info\')">' +
-        '<div style="font-size:3rem;">🎯</div>' +
-        '<h3>Completar Versículo</h3>' +
-        '<p>Completa la frase</p>' +
-        '</div>' +
+        '<div style="font-size:3rem;">🔍</div><h3>Busca la Palabra</h3><p>Encuentra versículos</p></div>' +
         '</div></div>';
 }
 
@@ -1852,33 +1906,30 @@ function cargarRanking(c) {
     c.innerHTML = '<div class="fade-in"><h2>🏅 Ranking</h2>' +
         '<div class="card"><h3>Top 5 - Gamificación</h3>' +
         '<div style="margin-top:12px;">' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span>🥇 1. Usuario1</span><span>1500 pts</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span>🥈 2. Usuario2</span><span>1200 pts</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span>🥉 3. Usuario3</span><span>1000 pts</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span>4. Usuario4</span><span>800 pts</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;">' +
-        '<span>5. Usuario5</span><span>600 pts</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);"><span>🥇 1. Usuario1</span><span>1500 pts</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);"><span>🥈 2. Usuario2</span><span>1200 pts</span></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);"><span>🥉 3. Usuario3</span><span>1000 pts</span></div>' +
         '</div></div>' +
-        (APP_STATE.usuario ? '<div class="card" style="border-left:4px solid var(--dorado);">' +
-            '<p><strong>Tu posición:</strong> #' + (Math.floor(Math.random() * 20) + 1) + '</p>' +
+        (APP_STATE.usuario ? '<div class="card" style="border-left:4px solid var(--dorado);"><p><strong>Tu posición:</strong> #' + (Math.floor(Math.random() * 20) + 1) + '</p>' +
             '<p><strong>Puntos:</strong> ' + APP_STATE.xp + ' XP</p>' +
             '<p><strong>Nivel:</strong> ' + APP_STATE.nivel + '</p></div>' : '') +
         '</div>';
 }
 
 function cargarPlaylistPage(c) {
+    var songs = [
+        { title: 'Santo Espíritu', artist: 'IPUC LA FONDA', duration: '4:32' },
+        { title: 'Alabanzas al Rey', artist: 'IPUC LA FONDA', duration: '5:15' },
+        { title: 'Adoración Profunda', artist: 'IPUC LA FONDA', duration: '6:08' },
+        { title: 'Glorioso Día', artist: 'IPUC LA FONDA', duration: '4:45' }
+    ];
     c.innerHTML = '<div class="fade-in"><h2>🎵 Playlist de Adoración</h2>' +
         '<div class="card"><h3>Lista de reproducción</h3>' +
-        CONFIG.PLAYLIST_SONGS.map(function(s, i) {
+        songs.map(function(s, i) {
             return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--gris-medio);">' +
                 '<div><strong>' + s.title + '</strong><br><span style="font-size:0.85rem;color:var(--gris-texto);">' + s.artist + '</span></div>' +
                 '<div><span style="font-size:0.85rem;color:var(--gris-texto);">' + s.duration + '</span> ' +
-                '<button class="btn-outline btn-sm" onclick="reproducirCancion(' + i + ')">▶️</button></div>' +
-                '</div>';
+                '<button class="btn-outline btn-sm" onclick="reproducirCancion(' + i + ')">▶️</button></div></div>';
         }).join('') +
         '</div></div>';
 }
@@ -1886,20 +1937,10 @@ function cargarPlaylistPage(c) {
 function cargarBlog(c) {
     c.innerHTML = '<div class="fade-in"><h2>📝 Blog/Noticias</h2>' +
         '<div class="card"><h3>Últimas publicaciones</h3>' +
-        '<div style="margin-top:12px;">' +
-        '<div style="padding:12px;border-bottom:1px solid var(--gris-medio);">' +
-        '<h4>Anuncio: Nuevo Horario de Cultos</h4>' +
+        '<div style="padding:12px;border-bottom:1px solid var(--gris-medio);"><h4>Anuncio: Nuevo Horario de Cultos</h4>' +
         '<p style="font-size:0.85rem;color:var(--gris-texto);">A partir del próximo domingo, los cultos serán a las 10:00 AM...</p>' +
-        '<small>' + formatearFecha(new Date()) + '</small>' +
-        '</div>' +
-        '<div style="padding:12px;border-bottom:1px solid var(--gris-medio);">' +
-        '<h4>Retiro de Jóvenes 2026</h4>' +
-        '<p style="font-size:0.85rem;color:var(--gris-texto);">Inscripciones abiertas para el retiro de jóvenes...</p>' +
-        '<small>' + formatearFecha(new Date(Date.now() - 86400000 * 2)) + '</small>' +
-        '</div>' +
-        '</div></div>' +
-        (APP_STATE.rol === 'admin' ? '<button class="btn-primary btn-sm" onclick="showToast(\'Editor de blog pronto\',\'info\')">✏️ Nueva Publicación</button>' : '') +
-        '</div>';
+        '<small>' + formatearFecha(new Date()) + '</small></div>' +
+        '</div></div>';
 }
 
 function cargarMuroBendiciones(c) {
@@ -1909,12 +1950,11 @@ function cargarMuroBendiciones(c) {
         '<div class="form-group"><textarea id="bendicion-input" class="form-input" rows="2" placeholder="Comparte tu testimonio o bendición..." required></textarea></div>' +
         '<button type="submit" class="btn-primary btn-sm">🕊️ Compartir Bendición</button>' +
         '</form></div>' +
-        '<div id="bendiciones-list">' +
         (bendiciones.length === 0 ? '<div class="card"><p style="color:var(--gris-texto);">No hay bendiciones compartidas aún</p></div>' :
         bendiciones.map(function(b) {
             return '<div class="card"><p><strong>' + (b.nombre || 'Anónimo') + '</strong></p><p>' + escapeHtml(b.mensaje) + '</p><small>' + formatearFecha(b.fecha) + '</small></div>';
         }).join('')) +
-        '</div></div>';
+        '</div>';
 }
 
 function enviarBendicion(e) {
@@ -1940,34 +1980,23 @@ function cargarRecursos(c) {
     c.innerHTML = '<div class="fade-in"><h2>📚 Recursos Cristianos</h2>' +
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
         '<div class="card" style="text-align:center;cursor:pointer;" onclick="navegarA(\'biblioteca\')">' +
-        '<div style="font-size:2.5rem;">📖</div><h3>Biblioteca Digital</h3>' +
-        '</div>' +
+        '<div style="font-size:2.5rem;">📖</div><h3>Biblioteca Digital</h3></div>' +
         '<div class="card" style="text-align:center;cursor:pointer;" onclick="navegarA(\'podcast\')">' +
-        '<div style="font-size:2.5rem;">🎙️</div><h3>Podcast</h3>' +
-        '</div>' +
+        '<div style="font-size:2.5rem;">🎙️</div><h3>Podcast</h3></div>' +
         '<div class="card" style="text-align:center;cursor:pointer;" onclick="navegarA(\'himnario\')">' +
-        '<div style="font-size:2.5rem;">🎵</div><h3>Himnario</h3>' +
-        '</div>' +
+        '<div style="font-size:2.5rem;">🎵</div><h3>Himnario</h3></div>' +
         '<div class="card" style="text-align:center;cursor:pointer;" onclick="navegarA(\'concordancia\')">' +
-        '<div style="font-size:2.5rem;">🔍</div><h3>Concordancia</h3>' +
-        '</div>' +
+        '<div style="font-size:2.5rem;">🔍</div><h3>Concordancia</h3></div>' +
         '</div></div>';
 }
 
 function cargarOfrendas(c) {
     c.innerHTML = '<div class="fade-in"><h2>💳 Ofrendas y Donaciones</h2>' +
         '<div class="card" style="text-align:center;padding:30px;">' +
-        '<div style="font-size:3rem;">💝</div>' +
-        '<h3>Ofrenda para la Iglesia</h3>' +
+        '<div style="font-size:3rem;">💝</div><h3>Ofrenda para la Iglesia</h3>' +
         '<p>"Cada uno dé como propuso en su corazón, no con tristeza ni por necesidad, porque Dios ama al dador alegre."</p>' +
         '<p style="font-size:0.9rem;color:var(--gris-texto);">2 Corintios 9:7</p>' +
-        '<div style="margin:16px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Donación de $10,000\',\'success\')">$10,000</button>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Donación de $20,000\',\'success\')">$20,000</button>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Donación de $50,000\',\'success\')">$50,000</button>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Donación personalizada\',\'info\')">Otra cantidad</button>' +
-        '</div>' +
-        '<button class="btn-primary btn-lg" onclick="showToast(\'Sistema de pagos disponible pronto\',\'info\')">💳 Donar Ahora</button>' +
+        '<button class="btn-primary btn-lg" onclick="showToast(\'Sistema de pagos disponible pronto\',\'info\')" style="margin-top:16px;">💳 Donar Ahora</button>' +
         '</div></div>';
 }
 
@@ -1977,27 +2006,14 @@ function cargarInformes(c) {
         '<div style="margin-top:12px;">' +
         '<div style="padding:8px;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">' +
         '<span>📋 Reporte de Asistencia</span>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Generando PDF...\',\'info\')">📥 Descargar</button>' +
-        '</div>' +
+        '<button class="btn-outline btn-sm" onclick="showToast(\'Generando PDF...\',\'info\')">📥 Descargar</button></div>' +
         '<div style="padding:8px;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">' +
         '<span>📊 Estadísticas de Miembros</span>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Generando PDF...\',\'info\')">📥 Descargar</button>' +
-        '</div>' +
-        '<div style="padding:8px;border-bottom:1px solid var(--gris-medio);display:flex;justify-content:space-between;align-items:center;">' +
-        '<span>📈 Reporte de Donaciones</span>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Generando PDF...\',\'info\')">📥 Descargar</button>' +
-        '</div>' +
-        '<div style="padding:8px;display:flex;justify-content:space-between;align-items:center;">' +
-        '<span>📋 Reporte de Eventos</span>' +
-        '<button class="btn-outline btn-sm" onclick="showToast(\'Generando PDF...\',\'info\')">📥 Descargar</button>' +
-        '</div>' +
+        '<button class="btn-outline btn-sm" onclick="showToast(\'Generando PDF...\',\'info\')">📥 Descargar</button></div>' +
         '</div></div></div>';
 }
 
-// ============================================
-// PÁGINAS ADMINISTRATIVAS
-// ============================================
-
+// Páginas administrativas
 function cargarAdminDashboard(c) {
     if (APP_STATE.rol !== 'admin') {
         c.innerHTML = '<div class="card"><p>⛔ Acceso restringido a administradores</p></div>';
@@ -2008,22 +2024,18 @@ function cargarAdminDashboard(c) {
         '<div class="card" style="text-align:center;border-left:4px solid var(--azul-primario);"><strong style="font-size:1.8rem;">' + APP_STATE.totalMiembros + '</strong><p>Miembros</p></div>' +
         '<div class="card" style="text-align:center;border-left:4px solid var(--exito);"><strong style="font-size:1.8rem;">' + APP_STATE.usuariosActivos + '</strong><p>En Línea</p></div>' +
         '<div class="card" style="text-align:center;border-left:4px solid var(--advertencia);"><strong style="font-size:1.8rem;">' + APP_STATE.reportsPendientes + '</strong><p>Reportes Pendientes</p></div>' +
-        '<div class="card" style="text-align:center;border-left:4px solid var(--info);"><strong style="font-size:1.8rem;">' + (APP_STATE.eventos ? APP_STATE.eventos.length : 0) + '</strong><p>Eventos</p></div>' +
         '</div>' +
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
         '<div class="card"><h4>📋 Acciones Rápidas</h4>' +
         '<button class="btn-primary btn-sm btn-block" onclick="navegarA(\'gestion-usuarios\')" style="margin:4px 0;">👥 Gestionar Usuarios</button>' +
         '<button class="btn-primary btn-sm btn-block" onclick="navegarA(\'gestion-reportes\')" style="margin:4px 0;">📋 Gestionar Reportes</button>' +
         '<button class="btn-primary btn-sm btn-block" onclick="navegarA(\'gestion-eventos\')" style="margin:4px 0;">📅 Gestionar Eventos</button>' +
-        '<button class="btn-primary btn-sm btn-block" onclick="navegarA(\'gestion-noticias\')" style="margin:4px 0;">📝 Gestionar Noticias</button>' +
         '</div>' +
         '<div class="card"><h4>📊 Estadísticas</h4>' +
         '<p><strong>Versión:</strong> ' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + '</p>' +
         '<p><strong>Reportes totales:</strong> ' + (APP_STATE.reportes ? APP_STATE.reportes.length : 0) + '</p>' +
-        '<p><strong>Usuarios registrados:</strong> ' + APP_STATE.totalMiembros + '</p>' +
-        '<p><strong>Logros desbloqueados:</strong> ' + APP_STATE.logrosDesbloqueados.length + '/' + CONFIG.ACHIEVEMENTS.length + '</p>' +
-        '</div>' +
-        '</div></div>';
+        '<p><strong>Logros desbloqueados:</strong> ' + APP_STATE.logrosDesbloqueados.length + '</p>' +
+        '</div></div></div>';
 }
 
 function cargarGestionUsuarios(c) {
@@ -2038,13 +2050,7 @@ function cargarGestionUsuarios(c) {
         '<span><strong>Administrador</strong> - admin@ipuc.com</span><span class="badge estado-resuelto">Admin</span></div>' +
         '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
         '<span><strong>Usuario1</strong> - usuario1@email.com</span><span class="badge">Usuario</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span><strong>Usuario2</strong> - usuario2@email.com</span><span class="badge">Usuario</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;">' +
-        '<span><strong>Invitado</strong> - invitado@ipuc.com</span><span class="badge">Invitado</span></div>' +
-        '</div></div>' +
-        '<button class="btn-primary btn-sm" onclick="showToast(\'Sistema de gestión avanzado pronto\',\'info\')">➕ Agregar Usuario</button>' +
-        '</div>';
+        '</div></div></div>';
 }
 
 function cargarGestionEventos(c) {
@@ -2091,9 +2097,7 @@ function cargarGestionNoticias(c) {
         '<div class="form-group"><label>Título</label><input type="text" id="noticia-titulo" class="form-input" placeholder="Título de la noticia" required></div>' +
         '<div class="form-group"><label>Contenido</label><textarea id="noticia-contenido" class="form-input" rows="4" placeholder="Contenido de la noticia..." required></textarea></div>' +
         '<button type="submit" class="btn-primary">📢 Publicar Noticia</button>' +
-        '</form></div>' +
-        '<div id="noticias-lista"></div>' +
-        '</div>';
+        '</form></div></div>';
 }
 
 function publicarNoticia(e) {
@@ -2123,200 +2127,16 @@ function cargarAnaliticas(c) {
         '</div></div>';
 }
 
-// ============================================
-// PÁGINAS EXISTENTES (MANTENIDAS)
-// ============================================
-
-function cargarHorarios(c) {
-    c.innerHTML = '<div class="fade-in"><h2>🕐 Horarios de Cultos</h2>' +
-        '<div class="card"><h3>⛪ Domingo</h3><p>Culto Dominical - 10:00 AM</p></div>' +
-        '<div class="card"><h3>🔥 Martes</h3><p>Culto de Oración - 6:00 PM</p></div>' +
-        '<div class="card"><h3>🎵 Viernes</h3><p>Culto de Jóvenes - 6:00 PM</p></div>' +
-        '<div class="card"><h3>📖 Sábado</h3><p>Escuela Bíblica - 4:00 PM</p></div>' +
-        '</div>';
-}
-
-function cargarAsistencia(c) {
-    c.innerHTML = '<div class="fade-in"><h2>✅ Confirmar Asistencia</h2>' +
-        '<div class="card" style="text-align:center;padding:30px;">' +
-        '<h3>Próximo Culto</h3><p style="font-size:1.2rem;">Domingo 10:00 AM</p>' +
-        '<button class="btn-primary btn-sm" onclick="confirmarAsistencia()" style="margin-top:12px;">✅ Confirmar Asistencia</button>' +
-        '</div>' +
-        '<div class="card"><h3>Mi Asistencia</h3>' +
-        '<p>Has confirmado tu asistencia <strong>3</strong> veces este mes</p>' +
-        '<div style="margin-top:8px;display:flex;gap:8px;">' +
-        '<span class="badge estado-resuelto">✅ 1er Domingo</span>' +
-        '<span class="badge estado-resuelto">✅ 2do Domingo</span>' +
-        '<span class="badge estado-pendiente">⏳ Próximo</span>' +
-        '</div></div></div>';
-}
-
-function confirmarAsistencia() {
-    showToast('✅ Asistencia confirmada para el próximo culto', 'success');
-}
-
-function cargarNoticias(c) {
-    c.innerHTML = '<div class="fade-in"><h2>📰 Noticias</h2>' +
-        '<div class="card"><h3>📢 Anuncio Importante</h3><p>Nuevo horario de cultos a partir del próximo mes</p><small>' + formatearFecha(new Date()) + '</small></div>' +
-        '<div class="card"><h3>🎉 Celebración de Aniversario</h3><p>Celebraremos el aniversario de la iglesia el próximo domingo</p><small>' + formatearFecha(new Date(Date.now() - 86400000)) + '</small></div>' +
-        '</div>';
-}
-
-function cargarEventos(c) {
-    var eventos = APP_STATE.eventos || [];
-    var proximos = eventos.filter(function(e) {
-        return new Date(e.fecha) >= new Date();
-    }).sort(function(a, b) {
-        return new Date(a.fecha) - new Date(b.fecha);
-    });
-    
-    c.innerHTML = '<div class="fade-in"><h2>📅 Eventos</h2>' +
-        (APP_STATE.rol === 'admin' ? '<button class="btn-primary btn-sm" onclick="abrirModalEvento()" style="margin-bottom:12px;">➕ Crear Evento</button>' : '') +
-        (proximos.length === 0 ? '<div class="card"><p>No hay eventos próximos</p></div>' :
-        proximos.map(function(e) {
-            return '<div class="card"><h3>' + escapeHtml(e.titulo) + '</h3>' +
-                '<p>' + escapeHtml(e.desc || '') + '</p>' +
-                '<small>📅 ' + formatearFecha(e.fecha) + (e.hora ? ' ⏰ ' + e.hora : '') + (e.lugar ? ' 📍 ' + e.lugar : '') + '</small>' +
-                '</div>';
-        }).join('')) +
-        '</div>';
-}
-
-function cargarPublicaciones(c) {
-    var pub = APP_STATE.publicaciones || [];
-    c.innerHTML = '<div class="fade-in"><h2>📝 Publicaciones</h2>' +
-        (APP_STATE.usuario ? '<div class="card"><textarea class="form-input" id="pub-contenido" rows="3" placeholder="¿Qué quieres compartir?"></textarea>' +
-        '<button class="btn-primary btn-sm" onclick="crearPubLocal()" style="margin-top:8px;">Publicar</button></div>' : '') +
-        (pub.length === 0 ? '<div class="card"><p>No hay publicaciones</p></div>' :
-        pub.map(function(p) {
-            return '<div class="card"><p><strong>' + escapeHtml(p.autor || 'Anónimo') + '</strong></p>' +
-                '<p>' + escapeHtml(p.contenido || '') + '</p>' +
-                '<small>' + formatearFecha(p.fecha) + '</small></div>';
-        }).join('')) +
-        '</div>';
-}
-
-function cargarPerfil(c) {
-    if (!APP_STATE.usuario) {
-        c.innerHTML = '<div class="fade-in"><h2>👤 Perfil</h2><div class="card"><p>Inicia sesión para ver tu perfil</p></div></div>';
-        return;
-    }
-    var u = APP_STATE.usuario;
-    c.innerHTML = '<div class="fade-in"><h2>👤 Mi Perfil</h2>' +
-        '<div class="card" style="text-align:center;">' +
-        '<img src="' + (u.foto || 'assets/avatars/default.png') + '" style="width:80px;height:80px;border-radius:50%;margin-bottom:12px;object-fit:cover;">' +
-        '<h3>' + (u.nombre || '') + ' ' + (u.apellidos || '') + '</h3>' +
-        '<p>@' + (u.usuario || '') + '</p>' +
-        '<p>' + (u.correo || '') + '</p>' +
-        '<p>📌 ' + (u.ministerio || 'General') + '</p>' +
-        '<div style="margin-top:8px;display:flex;gap:8px;justify-content:center;">' +
-        '<span class="badge">Lv.' + APP_STATE.nivel + '</span>' +
-        '<span class="badge">🏆 ' + APP_STATE.logrosDesbloqueados.length + ' logros</span>' +
-        '</div></div>' +
-        '<button class="btn-danger btn-sm" onclick="confirmarAccion(\'Cerrar sesión?\',\'\',cerrarSesion,\'danger\')">🚪 Cerrar Sesión</button>' +
-        '</div>';
-}
-
-function cargarConfiguracion(c) {
-    c.innerHTML = '<div class="fade-in"><h2>⚙️ Configuración</h2>' +
-        '<div class="card"><h3>🎨 Apariencia</h3>' +
-        '<button class="btn-secondary btn-sm" onclick="toggleTema()">' + (APP_STATE.tema === 'dark' ? '☀️ Cambiar a Claro' : '🌙 Cambiar a Oscuro') + '</button>' +
-        '</div>' +
-        '<div class="card"><h3>🌐 Idioma</h3>' +
-        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;">' +
-        '<button class="lang-btn ' + (APP_STATE.idioma === 'es' ? 'active' : '') + '" onclick="cambiarIdioma(\'es\')">🇪🇸 ES</button>' +
-        '<button class="lang-btn ' + (APP_STATE.idioma === 'en' ? 'active' : '') + '" onclick="cambiarIdioma(\'en\')">🇬🇧 EN</button>' +
-        '<button class="lang-btn ' + (APP_STATE.idioma === 'pt' ? 'active' : '') + '" onclick="cambiarIdioma(\'pt\')">🇵🇹 PT</button>' +
-        '<button class="lang-btn ' + (APP_STATE.idioma === 'fr' ? 'active' : '') + '" onclick="cambiarIdioma(\'fr\')">🇫🇷 FR</button>' +
-        '<button class="lang-btn ' + (APP_STATE.idioma === 'de' ? 'active' : '') + '" onclick="cambiarIdioma(\'de\')">🇩🇪 DE</button>' +
-        '</div></div>' +
-        '<div class="card"><h3>📱 Aplicación</h3>' +
-        '<p><strong>Versión:</strong> ' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + '</p>' +
-        '<p><strong>Modo:</strong> ' + (APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline') + '</p>' +
-        '</div>' +
-        (APP_STATE.usuario ? '<button class="btn-danger btn-sm" onclick="confirmarAccion(\'Cerrar sesión?\',\'\',cerrarSesion,\'danger\')">🚪 Cerrar Sesión</button>' : '') +
-        '</div>';
-}
-
-function cargarSistema(c) {
-    c.innerHTML = '<div class="fade-in"><h2>🖥️ Sistema</h2>' +
-        '<div class="card"><p><strong>Versión:</strong> ' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + '</p>' +
-        '<p><strong>Modo:</strong> ' + (APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline') + '</p>' +
-        '<p><strong>Tema:</strong> ' + APP_STATE.tema + '</p>' +
-        '<p><strong>Idioma:</strong> ' + APP_STATE.idioma.toUpperCase() + '</p>' +
-        '<p><strong>Usuario:</strong> ' + (APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Invitado') + '</p>' +
-        '<p><strong>Nivel:</strong> ' + APP_STATE.nivel + '</p>' +
-        '<p><strong>XP:</strong> ' + APP_STATE.xp + ' / ' + APP_STATE.xpSiguiente + '</p>' +
-        '</div></div>';
-}
-
-function cargarPeticiones(c) {
-    var peticiones = APP_STATE.peticiones || [];
-    c.innerHTML = '<div class="fade-in"><h2>🙏 Peticiones de Oración</h2>' +
-        '<div class="card"><div class="form-group"><label>Motivo de Oración</label>' +
-        '<textarea class="form-input" id="pet-motivo" rows="2" placeholder="Motivo de oración..."></textarea></div>' +
-        '<button class="btn-primary btn-sm" onclick="crearPeticionLocal()">Enviar Petición</button></div>' +
-        (peticiones.length === 0 ? '<div class="card"><p>No hay peticiones</p></div>' :
-        peticiones.map(function(p) {
-            return '<div class="card"><p><strong>' + escapeHtml(p.nombre || 'Anónimo') + '</strong></p>' +
-                '<p>' + escapeHtml(p.motivo || '') + '</p>' +
-                '<small>' + formatearFecha(p.fecha) + '</small></div>';
-        }).join('')) +
-        '</div>';
-}
-
-function crearPeticionLocal() {
-    var m = document.getElementById('pet-motivo');
-    if (!m || !m.value.trim()) {
-        showToast('Escribe un motivo', 'warning');
-        return;
-    }
-    if (!APP_STATE.usuario) {
-        showToast('Inicia sesión', 'warning');
-        return;
-    }
-    if (!APP_STATE.peticiones) APP_STATE.peticiones = [];
-    APP_STATE.peticiones.unshift({
-        id: 'pet_' + Date.now(),
-        nombre: APP_STATE.usuario.nombre || 'Anónimo',
-        motivo: m.value.trim(),
-        fecha: new Date().toISOString()
-    });
-    m.value = '';
-    showToast('🙏 Petición enviada', 'success');
-    desbloquearLogro('first_prayer');
-    navegarA('peticiones');
-}
-
+// Páginas placeholder
 function cargarBiblioteca(c) {
-    c.innerHTML = '<div class="fade-in"><h2>📚 Biblioteca Digital</h2>' +
-        '<div class="card"><h3>📖 Libros Cristianos</h3>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">' +
-        '<div style="padding:12px;border:1px solid var(--gris-medio);border-radius:8px;"><strong>La Biblia</strong><p style="font-size:0.85rem;">Sagradas Escrituras</p></div>' +
-        '<div style="padding:12px;border:1px solid var(--gris-medio);border-radius:8px;"><strong>Confesiones</strong><p style="font-size:0.85rem;">Agustín de Hipona</p></div>' +
-        '</div></div></div>';
+    c.innerHTML = '<div class="fade-in"><h2>📚 Biblioteca Digital</h2><div class="card"><p>Recursos cristianos disponibles próximamente</p></div></div>';
 }
-
 function cargarPodcast(c) {
-    c.innerHTML = '<div class="fade-in"><h2>🎙️ Podcast</h2>' +
-        '<div class="card"><h3>Episodios Recientes</h3>' +
-        '<div style="margin-top:12px;">' +
-        '<div style="padding:10px;border-bottom:1px solid var(--gris-medio);"><strong>🎧 El Poder de la Oración</strong><br><small>Episodio 12 - 25 min</small></div>' +
-        '<div style="padding:10px;border-bottom:1px solid var(--gris-medio);"><strong>🎧 Fe y Esperanza</strong><br><small>Episodio 11 - 30 min</small></div>' +
-        '<div style="padding:10px;"><strong>🎧 La Vida Cristiana</strong><br><small>Episodio 10 - 28 min</small></div>' +
-        '</div></div></div>';
+    c.innerHTML = '<div class="fade-in"><h2>🎙️ Podcast</h2><div class="card"><p>Episodios de podcast próximamente</p></div></div>';
 }
-
 function cargarGaleria(c) {
-    c.innerHTML = '<div class="fade-in"><h2>🖼️ Galería</h2>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">' +
-        '<div style="aspect-ratio:1;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gris-texto);">📸</div>' +
-        '<div style="aspect-ratio:1;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gris-texto);">📸</div>' +
-        '<div style="aspect-ratio:1;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gris-texto);">📸</div>' +
-        '<div style="aspect-ratio:1;background:var(--gris-claro);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gris-texto);">📸</div>' +
-        '</div></div>';
+    c.innerHTML = '<div class="fade-in"><h2>🖼️ Galería</h2><div class="card"><p>Imágenes de la iglesia próximamente</p></div></div>';
 }
-
 function cargarChat(c) {
     var msgs = APP_STATE.chatMessages || [];
     c.innerHTML = '<div class="fade-in"><h2>💬 Chat Global</h2>' +
@@ -2333,14 +2153,10 @@ function cargarChat(c) {
         '<button class="btn-primary" onclick="enviarMensajeChat()">Enviar</button>' +
         '</div></div>';
 }
-
 function enviarMensajeChat() {
     var input = document.getElementById('chat-input');
     if (!input || !input.value.trim()) return;
-    if (!APP_STATE.usuario) {
-        showToast('Inicia sesión para chatear', 'warning');
-        return;
-    }
+    if (!APP_STATE.usuario) { showToast('Inicia sesión para chatear', 'warning'); return; }
     if (!APP_STATE.chatMessages) APP_STATE.chatMessages = [];
     APP_STATE.chatMessages.push({
         autor: APP_STATE.usuario.nombre || 'Anónimo',
@@ -2350,41 +2166,20 @@ function enviarMensajeChat() {
     input.value = '';
     navegarA('chat');
 }
-
 function cargarDirectorio(c) {
-    c.innerHTML = '<div class="fade-in"><h2>📋 Directorio</h2>' +
-        '<div class="card"><h3>Miembros</h3>' +
-        '<div style="margin-top:12px;">' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span><strong>Administrador</strong> - Pastoral</span><span class="badge estado-resuelto">Admin</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">' +
-        '<span><strong>María G.</strong> - Damas</span><span class="badge">Miembro</span></div>' +
-        '<div style="display:flex;justify-content:space-between;padding:8px;">' +
-        '<span><strong>Juan P.</strong> - Jóvenes</span><span class="badge">Miembro</span></div>' +
-        '</div></div></div>';
+    c.innerHTML = '<div class="fade-in"><h2>📋 Directorio</h2><div class="card"><p>Miembros de la iglesia próximamente</p></div></div>';
 }
-
 function cargarDonaciones(c) {
-    c.innerHTML = '<div class="fade-in"><h2>💝 Donaciones</h2>' +
-        '<div class="card" style="text-align:center;padding:30px;">' +
-        '<div style="font-size:3rem;">💝</div>' +
-        '<h3>Sistema de Donaciones</h3>' +
-        '<p>"Dios ama al dador alegre"</p>' +
-        '<button class="btn-primary btn-lg" onclick="showToast(\'Sistema de donaciones disponible pronto\',\'info\')" style="margin-top:12px;">💳 Donar</button>' +
-        '</div></div>';
+    c.innerHTML = '<div class="fade-in"><h2>💝 Donaciones</h2><div class="card" style="text-align:center;padding:30px;"><div style="font-size:3rem;">💝</div><h3>Sistema de Donaciones</h3><p>"Dios ama al dador alegre"</p><button class="btn-primary btn-lg" onclick="showToast(\'Sistema de donaciones disponible pronto\',\'info\')" style="margin-top:12px;">💳 Donar</button></div></div>';
 }
-
 function cargarDevocional(c) {
-    var verses = CONFIG.BIBLE_VERSES;
+    var verses = CONFIG.VERSES;
     var v = verses[new Date().getDate() % verses.length];
     c.innerHTML = '<div class="fade-in"><h2>📖 Devocional Diario</h2>' +
         '<div class="card" style="text-align:center;padding:30px;">' +
         '<p style="font-style:italic;font-size:1.3rem;">"' + v.verse + '"</p>' +
         '<p style="font-weight:700;margin-top:12px;">— ' + v.ref + ' —</p>' +
         '<button class="btn-primary btn-sm" onclick="compartirVersiculo()" style="margin-top:16px;">📤 Compartir Versículo</button>' +
-        '</div>' +
-        '<div class="card"><h3>Reflexión del Día</h3>' +
-        '<p>Medita en la Palabra de Dios y deja que transforme tu vida. El Señor te ama y tiene un plan perfecto para ti.</p>' +
         '</div></div>';
 }
 
@@ -2398,7 +2193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         APP_STATE.tema = t;
         aplicarTema(t);
     } catch (e) {}
-    
+
     try {
         APP_STATE.idioma = localStorage.getItem('ipuc20_idioma') || 'es';
         var langBtns = document.querySelectorAll('.lang-btn');
@@ -2406,12 +2201,12 @@ document.addEventListener('DOMContentLoaded', function() {
             langBtns[i].classList.toggle('active', langBtns[i].getAttribute('data-lang') === APP_STATE.idioma);
         }
     } catch (e) {}
-    
+
     // Cargar sesión
     var token = localStorage.getItem('ipuc20_token');
     var udata = localStorage.getItem('ipuc20_usuario');
     var rol = localStorage.getItem('ipuc20_rol');
-    
+
     // Mostrar splash y luego cargar app
     setTimeout(function() {
         var splash = document.getElementById('splash-screen');
@@ -2422,7 +2217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (splash) splash.style.display = 'none';
             }, 500);
         }
-        
+
         if (token && udata) {
             try {
                 APP_STATE.token = token;
@@ -2436,10 +2231,10 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarBienvenida();
         }
     }, 1500);
-    
+
     inicializarEventos();
     manejarResponsiveSidebar();
-    
+
     window.addEventListener('resize', manejarResponsiveSidebar);
     window.addEventListener('online', function() {
         APP_STATE.isOnline = true;
@@ -2462,7 +2257,7 @@ function inicializarEventos() {
     if (cs) cs.addEventListener('click', cerrarSidebar);
     var so = document.getElementById('sidebar-overlay');
     if (so) so.addEventListener('click', cerrarSidebar);
-    
+
     // Navegación
     var items = document.querySelectorAll('.nav-item[data-page]');
     for (var i = 0; i < items.length; i++) {
@@ -2472,7 +2267,7 @@ function inicializarEventos() {
             if (p) navegarA(p);
         });
     }
-    
+
     // Botones header
     var tt = document.getElementById('theme-toggle');
     if (tt) tt.addEventListener('click', toggleTema);
@@ -2484,7 +2279,7 @@ function inicializarEventos() {
     if (st) st.addEventListener('click', toggleSearchBar);
     var qr = document.getElementById('qr-toggle');
     if (qr) qr.addEventListener('click', toggleQRPanel);
-    
+
     // Search
     var sc = document.getElementById('search-close');
     if (sc) sc.addEventListener('click', function() {
@@ -2492,18 +2287,18 @@ function inicializarEventos() {
         if (b) b.classList.add('hidden');
         APP_STATE.searchBarOpen = false;
     });
-    
+
     var searchInput = document.getElementById('global-search-input');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             realizarBusqueda(this.value);
         });
     }
-    
+
     // FAB
     var fm = document.getElementById('fab-main');
     if (fm) fm.addEventListener('click', toggleFabMenu);
-    
+
     var fabItems = document.querySelectorAll('.fab-item');
     for (var j = 0; j < fabItems.length; j++) {
         fabItems[j].addEventListener('click', function() {
@@ -2514,25 +2309,24 @@ function inicializarEventos() {
             else if (action === 'evento') {
                 if (APP_STATE.rol === 'admin') abrirModalEvento();
                 else navegarA('eventos');
-            }
-            else if (action === 'donacion') navegarA('ofrendas');
+            } else if (action === 'donacion') navegarA('ofrendas');
             else if (action === 'juego') navegarA('trivia');
             else if (action === 'asistente') toggleAsistente();
             toggleFabMenu();
         });
     }
-    
+
     // Usuario
     var um = document.getElementById('user-mini');
     if (um) um.addEventListener('click', toggleUserDropdown);
     var bl = document.getElementById('btn-logout');
     if (bl) bl.addEventListener('click', function(e) {
         e.preventDefault();
-        confirmarAccion('Cerrar sesión?', '', cerrarSesion, 'danger');
+        confirmarAccion('Cerrar sesión?', '', cerrarSesion);
     });
     var bg = document.getElementById('btn-guest');
     if (bg) bg.addEventListener('click', continuarComoInvitado);
-    
+
     // Auth forms
     var sr = document.getElementById('show-register');
     if (sr) sr.addEventListener('click', function(e) {
@@ -2550,7 +2344,7 @@ function inicializarEventos() {
         if (rf) rf.classList.add('hidden');
         if (lf) lf.classList.remove('hidden');
     });
-    
+
     // Confirm modal
     var cc = document.getElementById('confirm-cancel');
     if (cc) cc.addEventListener('click', function() {
@@ -2567,20 +2361,20 @@ function inicializarEventos() {
         var m = document.getElementById('confirm-modal');
         if (m) m.classList.add('hidden');
     });
-    
+
     // Report modal
     var rf = document.getElementById('report-form');
     if (rf) rf.addEventListener('submit', generarReporte);
     var cr = document.getElementById('btn-cancel-report');
     if (cr) cr.addEventListener('click', cerrarModalReporte);
-    
+
     var reportTypes = document.querySelectorAll('input[name="report-type"]');
     for (var k = 0; k < reportTypes.length; k++) {
         reportTypes[k].addEventListener('change', function() {
             cambiarTipoReporte(this.value);
         });
     }
-    
+
     // Report actions
     var reportActions = document.querySelectorAll('.report-action-btn');
     for (var m = 0; m < reportActions.length; m++) {
@@ -2596,7 +2390,7 @@ function inicializarEventos() {
             togglePanelReportes();
         });
     }
-    
+
     // Close panels
     var closeReports = document.getElementById('close-reports-quick');
     if (closeReports) closeReports.addEventListener('click', function() {
@@ -2634,7 +2428,7 @@ function inicializarEventos() {
         if (a) a.classList.add('hidden');
         APP_STATE.assistantOpen = false;
     });
-    
+
     // Modals
     var modal = document.getElementById('modal');
     if (modal) modal.addEventListener('click', function(e) {
@@ -2642,7 +2436,7 @@ function inicializarEventos() {
     });
     var modalClose = document.querySelector('.modal-close');
     if (modalClose) modalClose.addEventListener('click', cerrarModal);
-    
+
     var confirmModal = document.getElementById('confirm-modal');
     if (confirmModal) confirmModal.addEventListener('click', function(e) {
         if (e.target.classList.contains('modal-backdrop')) {
@@ -2650,12 +2444,12 @@ function inicializarEventos() {
             APP_STATE.pendingConfirmation = null;
         }
     });
-    
+
     var reportModal = document.getElementById('report-modal');
     if (reportModal) reportModal.addEventListener('click', function(e) {
         if (e.target.classList.contains('modal-backdrop')) cerrarModalReporte();
     });
-    
+
     var eventModal = document.getElementById('event-modal');
     if (eventModal) {
         eventModal.addEventListener('click', function(e) {
@@ -2672,7 +2466,7 @@ function inicializarEventos() {
             eventModal.classList.add('hidden');
         });
     }
-    
+
     var gameModal = document.getElementById('game-modal');
     if (gameModal) {
         gameModal.addEventListener('click', function(e) {
@@ -2687,57 +2481,11 @@ function inicializarEventos() {
             APP_STATE.gameInProgress = false;
         });
     }
-    
-    var prayerModal = document.getElementById('prayer-modal');
-    if (prayerModal) {
-        prayerModal.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal-backdrop')) {
-                prayerModal.classList.add('hidden');
-            }
-        });
-        var closePrayer = prayerModal.querySelector('.modal-close');
-        if (closePrayer) closePrayer.addEventListener('click', function() {
-            prayerModal.classList.add('hidden');
-        });
-        var cancelPrayer = document.getElementById('btn-cancel-prayer');
-        if (cancelPrayer) cancelPrayer.addEventListener('click', function() {
-            prayerModal.classList.add('hidden');
-        });
-    }
-    
+
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            if (APP_STATE.notificationsOpen) {
-                var p = document.getElementById('notification-panel');
-                if (p) p.classList.add('hidden');
-                APP_STATE.notificationsOpen = false;
-            }
-            if (APP_STATE.reportsPanelOpen) {
-                var rp = document.getElementById('reports-quick-panel');
-                if (rp) rp.classList.add('hidden');
-                APP_STATE.reportsPanelOpen = false;
-            }
-            if (APP_STATE.searchBarOpen) {
-                var b = document.getElementById('search-bar');
-                if (b) b.classList.add('hidden');
-                APP_STATE.searchBarOpen = false;
-            }
-            if (APP_STATE.radioPanelOpen) {
-                var rq = document.getElementById('radio-quick-panel');
-                if (rq) rq.classList.add('hidden');
-                APP_STATE.radioPanelOpen = false;
-            }
-            if (APP_STATE.streamingPanelOpen) {
-                var sp = document.getElementById('streaming-panel');
-                if (sp) sp.classList.add('hidden');
-                APP_STATE.streamingPanelOpen = false;
-            }
-            if (APP_STATE.qrPanelOpen) {
-                var qr = document.getElementById('qr-panel');
-                if (qr) qr.classList.add('hidden');
-                APP_STATE.qrPanelOpen = false;
-            }
+            cerrarPaneles();
             var m = document.getElementById('modal');
             if (m && !m.classList.contains('hidden')) cerrarModal();
             var rm = document.getElementById('report-modal');
@@ -2752,7 +2500,7 @@ function inicializarEventos() {
             toggleSearchBar();
         }
     });
-    
+
     // Click outside
     document.addEventListener('click', function(e) {
         if (APP_STATE.userDropdownOpen && !e.target.closest('#user-mini') && !e.target.closest('#user-dropdown')) {
@@ -2773,7 +2521,7 @@ function inicializarEventos() {
             }
         }
     });
-    
+
     // Language buttons
     var langBtns = document.querySelectorAll('.lang-btn');
     for (var n = 0; n < langBtns.length; n++) {
@@ -2782,7 +2530,7 @@ function inicializarEventos() {
             if (l) cambiarIdioma(l);
         });
     }
-    
+
     // Login form
     var loginForm = document.getElementById('login-form');
     if (loginForm) loginForm.addEventListener('submit', function(e) {
@@ -2807,7 +2555,7 @@ function inicializarEventos() {
             }
         }
     });
-    
+
     // Register form
     var registerForm = document.getElementById('register-form');
     if (registerForm) registerForm.addEventListener('submit', function(e) {
@@ -2834,28 +2582,8 @@ function inicializarEventos() {
             }
         }
     });
-    
-    // Captcha refresh
-    var captchaRefresh = document.getElementById('captcha-refresh');
-    if (captchaRefresh) {
-        captchaRefresh.addEventListener('click', function() {
-            var captcha = document.getElementById('captcha-text');
-            if (captcha) {
-                var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                var code = '';
-                for (var i = 0; i < 6; i++) {
-                    code += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                captcha.textContent = code;
-            }
-        });
-    }
-}
 
-// ============================================
-// EVENTOS DE MODAL DE EVENTOS
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
+    // Event form
     var eventForm = document.getElementById('event-form');
     if (eventForm) {
         eventForm.addEventListener('submit', function(e) {
@@ -2885,7 +2613,23 @@ document.addEventListener('DOMContentLoaded', function() {
             navegarA('eventos');
         });
     }
-});
+
+    // Captcha refresh
+    var captchaRefresh = document.getElementById('captcha-refresh');
+    if (captchaRefresh) {
+        captchaRefresh.addEventListener('click', function() {
+            var captcha = document.getElementById('captcha-text');
+            if (captcha) {
+                var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                var code = '';
+                for (var i = 0; i < 6; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                captcha.textContent = code;
+            }
+        });
+    }
+}
 
 // ============================================
 // EXPORTAR A WINDOW
@@ -2947,9 +2691,12 @@ window.realizarBusqueda = realizarBusqueda;
 window.seleccionarResultadoBusqueda = seleccionarResultadoBusqueda;
 window.login = login;
 window.registro = registro;
+window.cerrarPaneles = cerrarPaneles;
 
-console.log('✅ IPUC LA FONDA v' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + ' cargado');
-console.log('📌 Sistema listo para usar');
+console.log('✅ IPUC LA FONDA v' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + ' - Script cargado');
+console.log('📌 ' + Object.keys(window).filter(function(k) {
+    return typeof window[k] === 'function' && k.startsWith('cargar');
+}).length + ' páginas disponibles');
 
 /* ============================================
    FINAL DEL SCRIPT v20.0 PRO ULTIMATE
