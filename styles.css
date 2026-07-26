@@ -52,6 +52,31 @@
     --bronce: #cd7f32;
     --xp-color: #7c4dff;
     --nivel-color: #ff6f00;
+    --rango-bronce: #cd7f32;
+    --rango-plata: #c0c0c0;
+    --rango-oro: #ffd700;
+    --rango-diamante: #b9f2ff;
+
+    /* --- Colores Asistente --- */
+    --bot-msg: #e3f2fd;
+    --user-msg: #1a237e;
+    --bot-text: #1a237e;
+    --user-text: #ffffff;
+
+    /* --- Colores Streaming --- */
+    --live-color: #ff1744;
+    --live-glow: rgba(255, 23, 68, 0.3);
+    --viewers-color: #4caf50;
+
+    /* --- Colores Radio --- */
+    --radio-bg: #1a237e;
+    --radio-text: #ffffff;
+    --radio-wave-color: #ffd700;
+
+    /* --- Colores Juegos --- */
+    --correct-color: #4caf50;
+    --incorrect-color: #f44336;
+    --game-bg: #f5f5f5;
 
     /* --- Sombras --- */
     --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -60,6 +85,7 @@
     --sombra-azul: 0 4px 20px rgba(26, 35, 126, 0.2);
     --sombra-reporte: 0 4px 16px rgba(0, 0, 0, 0.1);
     --sombra-dorada: 0 4px 20px rgba(255, 215, 0, 0.3);
+    --sombra-live: 0 0 30px rgba(255, 23, 68, 0.2);
 
     /* --- Bordes --- */
     --borde-radius: 16px;
@@ -102,6 +128,9 @@
     --z-assistant: 850;
     --z-streaming: 910;
     --z-qr: 920;
+    --z-radio: 930;
+    --z-game: 940;
+    --z-achievement: 945;
 
     /* --- Espaciado --- */
     --spacing-xs: 4px;
@@ -127,12 +156,20 @@
     --error-claro: rgba(183, 28, 28, 0.25);
     --advertencia-claro: rgba(230, 81, 0, 0.25);
     --info-claro: rgba(13, 71, 161, 0.25);
+    --bot-msg: #2d2d44;
+    --user-msg: #3949ab;
+    --bot-text: #e0e0e0;
+    --user-text: #ffffff;
+    --game-bg: #16213e;
     --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.3);
     --sombra-media: 0 4px 16px rgba(0, 0, 0, 0.4);
     --sombra-fuerte: 0 8px 32px rgba(0, 0, 0, 0.5);
     --sombra-azul: 0 4px 20px rgba(100, 120, 255, 0.2);
     --sombra-reporte: 0 4px 16px rgba(0, 0, 0, 0.3);
     --sombra-dorada: 0 4px 20px rgba(255, 215, 0, 0.15);
+    --sombra-live: 0 0 30px rgba(255, 23, 68, 0.1);
+    --radio-bg: #0d1b5e;
+    --radio-text: #ffffff;
 }
 
 /* ============================================
@@ -1589,7 +1626,7 @@ ul, ol {
     background: var(--blanco);
     border-radius: var(--borde-radius);
     box-shadow: var(--sombra-fuerte);
-    z-index: var(--z-report-panel);
+    z-index: var(--z-radio);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1683,10 +1720,12 @@ ul, ol {
     background: var(--azul-primario);
     color: var(--blanco);
     border: none;
+    box-shadow: var(--sombra-azul);
 }
 
 .btn-radio-main:hover {
     background: var(--azul-hover);
+    transform: scale(1.05);
 }
 
 .radio-progress {
@@ -2796,13 +2835,13 @@ ul, ol {
 }
 
 .assistant-msg.bot .msg-content {
-    background: var(--azul-surface);
-    color: var(--azul-primario);
+    background: var(--bot-msg);
+    color: var(--bot-text);
 }
 
 .assistant-msg.user .msg-content {
-    background: var(--azul-primario);
-    color: var(--blanco);
+    background: var(--user-msg);
+    color: var(--user-text);
 }
 
 .assistant-msg i {
@@ -2902,15 +2941,15 @@ ul, ol {
 }
 
 .game-option.correct {
-    border-color: var(--exito);
+    border-color: var(--correct-color);
     background: var(--exito-claro);
-    color: var(--exito);
+    color: var(--correct-color);
 }
 
 .game-option.incorrect {
-    border-color: var(--error);
+    border-color: var(--incorrect-color);
     background: var(--error-claro);
-    color: var(--error);
+    color: var(--incorrect-color);
 }
 
 .game-result {
@@ -2930,14 +2969,14 @@ ul, ol {
    ============================================ */
 .achievement-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 12px;
     padding: 8px 0;
 }
 
 .achievement-item {
     text-align: center;
-    padding: 16px 8px;
+    padding: 16px 12px;
     border: 2px solid var(--gris-medio);
     border-radius: var(--borde-radius-sm);
     transition: all var(--transition-fast);
@@ -2961,6 +3000,13 @@ ul, ol {
 .achievement-item span {
     font-size: var(--font-size-xs);
     font-weight: 600;
+}
+
+.achievement-item small {
+    font-size: var(--font-size-xs);
+    color: var(--gris-texto);
+    display: block;
+    margin-top: 4px;
 }
 
 /* ============================================
@@ -3531,6 +3577,9 @@ textarea.form-input {
     }
     .radio-playlist ul {
         max-height: 80px;
+    }
+    .achievement-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }
 
