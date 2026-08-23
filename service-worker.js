@@ -6,33 +6,49 @@
    "Donde el Espíritu Santo se mueve"
    ============================================ */
 
-var CACHE_NAME = 'ipuc-la-fonda-v20.0';
-var RUNTIME_CACHE = 'ipuc-runtime-v20.0';
-var IMAGE_CACHE = 'ipuc-images-v20.0';
-var API_CACHE = 'ipuc-api-v20.0';
-var OFFLINE_CACHE = 'ipuc-offline-v20.0';
-var AUDIO_CACHE = 'ipuc-audio-v20.0';
-var VIDEO_CACHE = 'ipuc-video-v20.0';
-var FONT_CACHE = 'ipuc-fonts-v20.0';
-var REPORTS_CACHE = 'ipuc-reports-v20.0';
-var SYNC_CACHE = 'ipuc-sync-v20.0';
-var RADIO_CACHE = 'ipuc-radio-v20.0';
-var STREAMING_CACHE = 'ipuc-streaming-v20.0';
-var GAME_CACHE = 'ipuc-game-v20.0';
-var ASSISTANT_CACHE = 'ipuc-assistant-v20.0';
+// ============================================
+// CONFIGURACIÓN DE CACHÉ
+// ============================================
+const CACHE_VERSION = 'v20.0.2026';
+const CACHE_NAMES = {
+    static: `ipuc-static-${CACHE_VERSION}`,
+    runtime: `ipuc-runtime-${CACHE_VERSION}`,
+    images: `ipuc-images-${CACHE_VERSION}`,
+    audio: `ipuc-audio-${CACHE_VERSION}`,
+    video: `ipuc-video-${CACHE_VERSION}`,
+    fonts: `ipuc-fonts-${CACHE_VERSION}`,
+    api: `ipuc-api-${CACHE_VERSION}`,
+    offline: `ipuc-offline-${CACHE_VERSION}`,
+    reports: `ipuc-reports-${CACHE_VERSION}`,
+    radio: `ipuc-radio-${CACHE_VERSION}`,
+    streaming: `ipuc-streaming-${CACHE_VERSION}`,
+    games: `ipuc-games-${CACHE_VERSION}`,
+    assistant: `ipuc-assistant-${CACHE_VERSION}`,
+    sync: `ipuc-sync-${CACHE_VERSION}`
+};
 
-var VERSION = '20.0';
-var VERSION_NAME = 'PRO ULTIMATE';
-var MAX_AGE = 30 * 24 * 60 * 60;
-var MAX_IMAGE_AGE = 7 * 24 * 60 * 60;
-var MAX_AUDIO_AGE = 90 * 24 * 60 * 60;
-var MAX_VIDEO_AGE = 30 * 24 * 60 * 60;
-var MAX_REPORTS_AGE = 1 * 24 * 60 * 60;
-var MAX_RADIO_AGE = 1 * 24 * 60 * 60;
-var MAX_STREAMING_AGE = 1 * 60 * 60; // 1 hora
-var MAX_GAME_AGE = 7 * 24 * 60 * 60;
+const VERSION = '20.0';
+const VERSION_NAME = 'PRO ULTIMATE';
+const BUILD_DATE = '2026-08-22';
 
-var PRECACHE_ASSETS = [
+// Tiempos de expiración en segundos
+const MAX_AGE = {
+    static: 30 * 24 * 60 * 60,      // 30 días
+    runtime: 7 * 24 * 60 * 60,      // 7 días
+    images: 15 * 24 * 60 * 60,      // 15 días
+    audio: 90 * 24 * 60 * 60,       // 90 días
+    video: 30 * 24 * 60 * 60,       // 30 días
+    fonts: 365 * 24 * 60 * 60,      // 1 año
+    api: 1 * 24 * 60 * 60,          // 1 día
+    reports: 12 * 60 * 60,          // 12 horas
+    radio: 1 * 60 * 60,             // 1 hora
+    streaming: 30 * 60,             // 30 minutos
+    games: 7 * 24 * 60 * 60,        // 7 días
+    assistant: 1 * 60 * 60          // 1 hora
+};
+
+// Assets a pre-cachear
+const PRECACHE_ASSETS = [
     '/',
     '/index.html',
     '/styles.css',
@@ -48,7 +64,6 @@ var PRECACHE_ASSETS = [
     '/assets/icons/icon-192x192.png',
     '/assets/icons/icon-512x512.png',
     '/assets/icons/apple-touch-icon.png',
-    // NUEVOS v20 - Assets para radio y streaming
     '/assets/radio/radio-icon.png',
     '/assets/radio/playlist-default.jpg',
     '/assets/streaming/live-placeholder.jpg',
@@ -56,437 +71,501 @@ var PRECACHE_ASSETS = [
     '/assets/assistant/bot-avatar.png'
 ];
 
-var CACHE_PATTERNS = {
-    images: [/\.(png|jpg|jpeg|gif|svg|ico|webp)$/i],
-    audio: [/\.(mp3|wav|ogg|m4a)$/i],
-    video: [/\.(mp4|webm|m3u8)$/i],
-    fonts: [/\.(woff|woff2|ttf|otf)$/i],
-    api: [/\/api\//i],
-    html: [/\.html$/i],
-    js: [/\.js$/i],
-    css: [/\.css$/i],
-    reports: [/\/reports\//i, /\/reporte\//i],
-    radio: [/\/radio\//i, /\/stream\//i, /\.mp3$/i],
-    streaming: [/\/streaming\//i, /\/live\//i, /\.m3u8$/i],
-    game: [/\/game\//i, /\/trivia\//i],
-    assistant: [/\/assistant\//i, /\/chatbot\//i]
+// Patrones de caché
+const CACHE_PATTERNS = {
+    images: /\.(png|jpg|jpeg|gif|svg|ico|webp|bmp)$/i,
+    audio: /\.(mp3|wav|ogg|m4a|aac|flac)$/i,
+    video: /\.(mp4|webm|m3u8|ts)$/i,
+    fonts: /\.(woff|woff2|ttf|otf|eot)$/i,
+    api: /\/api\//i,
+    html: /\.html$/i,
+    js: /\.js$/i,
+    css: /\.css$/i,
+    reports: /\/reports\//i,
+    radio: /\/radio\//i,
+    streaming: /\/streaming\//i,
+    games: /\/game\//i,
+    assistant: /\/assistant\//i
 };
+
+// Orígenes permitidos
+const ALLOWED_ORIGINS = [
+    self.location.origin,
+    'https://unpkg.com',
+    'https://fonts.googleapis.com',
+    'https://fonts.gstatic.com',
+    'https://cdn.jsdelivr.net',
+    'https://cdnjs.cloudflare.com',
+    'https://boxicons.com'
+];
+
+// ============================================
+// UTILIDADES
+// ============================================
+
+function isAllowedUrl(url) {
+    return ALLOWED_ORIGINS.some(origin => url.startsWith(origin));
+}
 
 function shouldCache(url) {
     if (!url) return false;
-    if (url.indexOf('nocache=true') !== -1) return false;
-    if (url.indexOf('token=') !== -1) return false;
-    if (url.indexOf('auth=') !== -1) return false;
+    if (url.includes('nocache=true')) return false;
+    if (url.includes('token=')) return false;
+    if (url.includes('auth=')) return false;
+    if (url.includes('private')) return false;
     return true;
 }
 
-function matchPattern(url, patterns) {
-    for (var i = 0; i < patterns.length; i++) {
-        var pattern = patterns[i];
-        if (typeof pattern === 'string') {
-            if (url.indexOf(pattern) !== -1) return true;
-        } else if (pattern instanceof RegExp) {
-            if (pattern.test(url)) return true;
-        }
-    }
-    return false;
-}
-
-function getCacheForRequest(url) {
-    if (matchPattern(url, CACHE_PATTERNS.reports)) return REPORTS_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.radio)) return RADIO_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.streaming)) return STREAMING_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.game)) return GAME_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.assistant)) return ASSISTANT_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.images)) return IMAGE_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.audio)) return AUDIO_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.video)) return VIDEO_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.fonts)) return FONT_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.api)) return API_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.html)) return RUNTIME_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.js)) return RUNTIME_CACHE;
-    if (matchPattern(url, CACHE_PATTERNS.css)) return RUNTIME_CACHE;
-    return RUNTIME_CACHE;
+function getCacheNameForUrl(url) {
+    if (CACHE_PATTERNS.images.test(url)) return CACHE_NAMES.images;
+    if (CACHE_PATTERNS.audio.test(url)) return CACHE_NAMES.audio;
+    if (CACHE_PATTERNS.video.test(url)) return CACHE_NAMES.video;
+    if (CACHE_PATTERNS.fonts.test(url)) return CACHE_NAMES.fonts;
+    if (CACHE_PATTERNS.api.test(url)) return CACHE_NAMES.api;
+    if (CACHE_PATTERNS.reports.test(url)) return CACHE_NAMES.reports;
+    if (CACHE_PATTERNS.radio.test(url)) return CACHE_NAMES.radio;
+    if (CACHE_PATTERNS.streaming.test(url)) return CACHE_NAMES.streaming;
+    if (CACHE_PATTERNS.games.test(url)) return CACHE_NAMES.games;
+    if (CACHE_PATTERNS.assistant.test(url)) return CACHE_NAMES.assistant;
+    if (CACHE_PATTERNS.html.test(url)) return CACHE_NAMES.runtime;
+    if (CACHE_PATTERNS.js.test(url)) return CACHE_NAMES.runtime;
+    if (CACHE_PATTERNS.css.test(url)) return CACHE_NAMES.runtime;
+    return CACHE_NAMES.runtime;
 }
 
 function getMaxAgeForCache(cacheName) {
-    if (cacheName === IMAGE_CACHE) return MAX_IMAGE_AGE;
-    if (cacheName === AUDIO_CACHE) return MAX_AUDIO_AGE;
-    if (cacheName === VIDEO_CACHE) return MAX_VIDEO_AGE;
-    if (cacheName === REPORTS_CACHE) return MAX_REPORTS_AGE;
-    if (cacheName === RADIO_CACHE) return MAX_RADIO_AGE;
-    if (cacheName === STREAMING_CACHE) return MAX_STREAMING_AGE;
-    if (cacheName === GAME_CACHE) return MAX_GAME_AGE;
-    if (cacheName === API_CACHE) return MAX_AGE;
-    return MAX_AGE;
+    for (const [key, name] of Object.entries(CACHE_NAMES)) {
+        if (name === cacheName) {
+            return MAX_AGE[key] || MAX_AGE.runtime;
+        }
+    }
+    return MAX_AGE.runtime;
 }
 
 // ============================================
-// INSTALACION
+// EVENTO: INSTALL
 // ============================================
-self.addEventListener('install', function(event) {
-    console.log('SW v' + VERSION + ' ' + VERSION_NAME + ': Instalando...');
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function(cache) {
-            var promises = [];
-            for (var i = 0; i < PRECACHE_ASSETS.length; i++) {
-                (function(url) {
-                    promises.push(
-                        fetch(url, { mode: 'no-cors', cache: 'no-cache' })
-                            .then(function(response) {
-                                if (response && (response.status === 200 || response.type === 'opaque')) {
-                                    return cache.put(url, response);
-                                }
-                            })
-                            .catch(function() {
-                                console.log('SW: No se pudo cachear:', url);
-                            })
-                    );
-                })(PRECACHE_ASSETS[i]);
-            }
-            return Promise.all(promises).then(function() {
-                console.log('SW: Instalacion completada (' + PRECACHE_ASSETS.length + ' assets)');
-                return self.skipWaiting();
-            });
-        })
-    );
-});
-
-// ============================================
-// ACTIVACION
-// ============================================
-self.addEventListener('activate', function(event) {
-    var CURRENT_CACHES = [
-        CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE,
-        API_CACHE, OFFLINE_CACHE, AUDIO_CACHE,
-        VIDEO_CACHE, FONT_CACHE, REPORTS_CACHE,
-        SYNC_CACHE, RADIO_CACHE, STREAMING_CACHE,
-        GAME_CACHE, ASSISTANT_CACHE
-    ];
-
-    console.log('SW v' + VERSION + ' ' + VERSION_NAME + ': Activando...');
-
-    event.waitUntil(
-        caches.keys().then(function(cacheNames) {
-            return Promise.all(
-                cacheNames.map(function(cacheName) {
-                    if (CURRENT_CACHES.indexOf(cacheName) === -1) {
-                        console.log('SW: Eliminando cache antiguo:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(function() {
-            console.log('SW: Activacion completada');
-            console.log('📦 Caches activos: ' + CURRENT_CACHES.join(', '));
-            return self.clients.claim();
-        })
-    );
-});
-
-// ============================================
-// FETCH - ESTRATEGIAS DE CACHE MEJORADAS
-// ============================================
-self.addEventListener('fetch', function(event) {
-    var request = event.request;
-    var url = new URL(request.url);
-    var pathname = url.pathname;
-    var origin = url.origin;
-
-    // Permitir CDNs necesarios
-    var allowedOrigins = [
-        self.location.origin,
-        'unpkg.com',
-        'fonts.googleapis.com',
-        'fonts.gstatic.com',
-        'boxicons.com',
-        'cdnjs.cloudflare.com'
-    ];
+self.addEventListener('install', (event) => {
+    console.log(`📦 SW v${VERSION} ${VERSION_NAME}: Instalando...`);
     
-    var isAllowed = allowedOrigins.some(function(allowed) {
-        return url.href.indexOf(allowed) !== -1;
-    });
-    
-    if (!isAllowed) return;
-
-    // ============================================
-    // AUDIO / RADIO: Stale-While-Revalidate + Streaming
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.audio) || matchPattern(pathname, CACHE_PATTERNS.radio)) {
-        event.respondWith(
-            caches.match(request).then(function(cached) {
-                var fetchPromise = fetch(request).then(function(response) {
-                    if (response && response.ok) {
-                        var cacheName = RADIO_CACHE;
-                        caches.open(cacheName).then(function(cache) {
-                            cache.put(request, response.clone());
+    event.waitUntil(
+        caches.open(CACHE_NAMES.static)
+            .then(async (cache) => {
+                const cachePromises = PRECACHE_ASSETS.map(async (asset) => {
+                    try {
+                        const response = await fetch(asset, { 
+                            mode: 'no-cors',
+                            cache: 'no-cache',
+                            credentials: 'same-origin'
                         });
-                    }
-                    return response;
-                }).catch(function() {
-                    if (cached) return cached;
-                    return new Response('Audio no disponible offline', { status: 503 });
-                });
-                return cached || fetchPromise;
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // VIDEO / STREAMING: Network First + Cache Fallback
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.video) || matchPattern(pathname, CACHE_PATTERNS.streaming)) {
-        event.respondWith(
-            fetch(request).then(function(response) {
-                if (response && response.ok) {
-                    var cacheName = STREAMING_CACHE;
-                    caches.open(cacheName).then(function(cache) {
-                        cache.put(request, response.clone());
-                    });
-                }
-                return response;
-            }).catch(function() {
-                return caches.match(request).then(function(cached) {
-                    if (cached) return cached;
-                    return new Response('Video no disponible offline', { status: 503 });
-                });
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // IMAGENES: Cache First + Stale-While-Revalidate
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.images)) {
-        event.respondWith(
-            caches.match(request).then(function(cached) {
-                if (cached) {
-                    // Actualizar en segundo plano
-                    fetch(request).then(function(response) {
-                        if (response && response.ok) {
-                            caches.open(IMAGE_CACHE).then(function(cache) {
-                                cache.put(request, response);
-                            });
+                        
+                        if (response.ok || response.type === 'opaque') {
+                            await cache.put(asset, response);
+                            console.log(`  ✓ Cacheado: ${asset}`);
                         }
-                    }).catch(function() {});
-                    return cached;
-                }
-                return fetch(request).then(function(response) {
-                    if (response && response.ok) {
-                        var respClone = response.clone();
-                        caches.open(IMAGE_CACHE).then(function(cache) {
-                            cache.put(request, respClone);
-                        });
-                        return response;
+                    } catch (error) {
+                        console.warn(`  ✗ No cacheado: ${asset} - ${error.message}`);
                     }
-                    return new Response('', { status: 404 });
-                }).catch(function() {
-                    return new Response('', { status: 404 });
                 });
+                
+                await Promise.all(cachePromises);
+                console.log(`📦 SW: Instalación completada (${PRECACHE_ASSETS.length} assets)`);
+                await self.skipWaiting();
             })
-        );
-        return;
-    }
-
-    // ============================================
-    // JS/CSS: Cache First + Network Update
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.js) || matchPattern(pathname, CACHE_PATTERNS.css)) {
-        event.respondWith(
-            caches.match(request).then(function(cached) {
-                var fetchPromise = fetch(request).then(function(response) {
-                    if (response && response.ok) {
-                        caches.open(RUNTIME_CACHE).then(function(cache) {
-                            cache.put(request, response.clone());
-                        });
-                    }
-                    return response;
-                }).catch(function() {
-                    return cached;
-                });
-                return cached || fetchPromise;
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // REPORTES: Network First + Cache Fallback
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.reports)) {
-        event.respondWith(
-            fetch(request).then(function(response) {
-                if (response && response.ok) {
-                    caches.open(REPORTS_CACHE).then(function(cache) {
-                        cache.put(request, response.clone());
-                    });
-                }
-                return response;
-            }).catch(function() {
-                return caches.match(request).then(function(cached) {
-                    if (cached) return cached;
-                    return new Response(
-                        JSON.stringify({ error: true, mensaje: 'Reportes no disponibles offline' }),
-                        { status: 503, headers: { 'Content-Type': 'application/json' } }
-                    );
-                });
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // GAME / TRIVIA: Cache First + Network Update
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.game)) {
-        event.respondWith(
-            caches.match(request).then(function(cached) {
-                var fetchPromise = fetch(request).then(function(response) {
-                    if (response && response.ok) {
-                        caches.open(GAME_CACHE).then(function(cache) {
-                            cache.put(request, response.clone());
-                        });
-                    }
-                    return response;
-                }).catch(function() {
-                    return cached;
-                });
-                return cached || fetchPromise;
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // ASSISTANT: Network First + Cache Fallback
-    // ============================================
-    if (matchPattern(pathname, CACHE_PATTERNS.assistant)) {
-        event.respondWith(
-            fetch(request).then(function(response) {
-                if (response && response.ok) {
-                    caches.open(ASSISTANT_CACHE).then(function(cache) {
-                        cache.put(request, response.clone());
-                    });
-                }
-                return response;
-            }).catch(function() {
-                return caches.match(request).then(function(cached) {
-                    if (cached) return cached;
-                    return new Response(
-                        JSON.stringify({ 
-                            error: true, 
-                            mensaje: 'Asistente no disponible offline',
-                            offline: true,
-                            respuesta: 'Lo siento, estoy offline. Conéctate a internet para continuar la conversación.'
-                        }),
-                        { status: 503, headers: { 'Content-Type': 'application/json' } }
-                    );
-                });
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // HTML / NAVEGACION: Network First + Cache Fallback
-    // ============================================
-    if (request.mode === 'navigate' || matchPattern(pathname, CACHE_PATTERNS.html)) {
-        event.respondWith(
-            fetch(request).then(function(response) {
-                if (response && response.ok) {
-                    caches.open(RUNTIME_CACHE).then(function(cache) {
-                        cache.put(request, response.clone());
-                    });
-                    return response;
-                }
-                throw new Error('No response');
-            }).catch(function() {
-                return caches.match(request).then(function(cached) {
-                    if (cached) return cached;
-                    return caches.match('/').then(function(index) {
-                        if (index) return index;
-                        // Pagina offline mejorada
-                        return new Response(
-                            '<!DOCTYPE html>' +
-                            '<html lang="es">' +
-                            '<head>' +
-                            '<meta charset="UTF-8">' +
-                            '<meta name="viewport" content="width=device-width,initial-scale=1.0">' +
-                            '<meta name="theme-color" content="#1a237e">' +
-                            '<title>IPUC LA FONDA - Offline</title>' +
-                            '<style>' +
-                            'body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#0d1b5e,#1a237e);color:#fff;text-align:center;padding:20px;margin:0}' +
-                            '.box{max-width:420px;padding:40px;background:rgba(255,255,255,0.08);border-radius:24px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1)}' +
-                            '.icon{font-size:4rem;margin-bottom:16px}' +
-                            'h1{font-size:1.8rem;margin-bottom:8px;letter-spacing:1px}' +
-                            '.sub{opacity:0.8;margin-bottom:4px}' +
-                            'p{margin-bottom:20px;opacity:0.7;font-size:0.95rem;line-height:1.5}' +
-                            'button{background:#ffd700;color:#1a237e;border:none;padding:14px 32px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px rgba(255,215,0,0.3)}' +
-                            'button:hover{opacity:0.9;transform:translateY(-2px)}' +
-                            'button:active{transform:scale(0.95)}' +
-                            '.version{font-size:0.7rem;margin-top:20px;opacity:0.3;letter-spacing:1px}' +
-                            '.features{display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:wrap}' +
-                            '.features span{background:rgba(255,255,255,0.05);padding:4px 12px;border-radius:12px;font-size:0.7rem;opacity:0.5}' +
-                            '</style>' +
-                            '</head>' +
-                            '<body>' +
-                            '<div class="box">' +
-                            '<div class="icon">📡</div>' +
-                            '<h1>Sin conexión</h1>' +
-                            '<p class="sub">IPUC LA FONDA está en modo offline</p>' +
-                            '<div class="features">' +
-                            '<span>📖 Devocional</span>' +
-                            '<span>🙏 Oración</span>' +
-                            '<span>📅 Eventos</span>' +
-                            '</div>' +
-                            '<p>Puedes acceder a contenido guardado mientras esperas reconectar</p>' +
-                            '<button onclick="location.reload()">🔄 Reintentar</button>' +
-                            '<p class="version">v' + VERSION + ' ' + VERSION_NAME + ' &copy; 2026</p>' +
-                            '</div>' +
-                            '</body>' +
-                            '</html>',
-                            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8', 'X-Offline': 'true' } }
-                        );
-                    });
-                });
-            })
-        );
-        return;
-    }
-
-    // ============================================
-    // RESTO: Network First + Cache Fallback
-    // ============================================
-    event.respondWith(
-        fetch(request).then(function(response) {
-            if (response && response.ok && shouldCache(pathname)) {
-                var cacheName = getCacheForRequest(pathname);
-                caches.open(cacheName).then(function(cache) {
-                    cache.put(request, response.clone());
-                });
-            }
-            return response;
-        }).catch(function() {
-            return caches.match(request).then(function(cached) {
-                if (cached) return cached;
-                return new Response(
-                    JSON.stringify({ error: true, mensaje: 'Sin conexion', offline: true }),
-                    { status: 503, headers: { 'Content-Type': 'application/json', 'X-Offline': 'true' } }
-                );
-            });
-        })
     );
 });
 
 // ============================================
-// PUSH NOTIFICATIONS MEJORADAS
+// EVENTO: ACTIVATE
 // ============================================
-self.addEventListener('push', function(event) {
-    var data = {
+self.addEventListener('activate', (event) => {
+    console.log(`🔄 SW v${VERSION} ${VERSION_NAME}: Activando...`);
+    
+    const validCaches = Object.values(CACHE_NAMES);
+    
+    event.waitUntil(
+        caches.keys()
+            .then((cacheNames) => {
+                return Promise.all(
+                    cacheNames.map((cacheName) => {
+                        if (!validCaches.includes(cacheName) && cacheName.includes('ipuc-')) {
+                            console.log(`  🗑️ Eliminando caché antigua: ${cacheName}`);
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+            .then(() => {
+                console.log('✅ SW: Activación completada');
+                console.log(`📊 Cachés activas: ${validCaches.length}`);
+                return self.clients.claim();
+            })
+    );
+});
+
+// ============================================
+// EVENTO: FETCH - ESTRATEGIAS DE CACHÉ
+// ============================================
+self.addEventListener('fetch', (event) => {
+    const { request } = event;
+    
+    // Solo manejar GET
+    if (request.method !== 'GET') return;
+    
+    const url = new URL(request.url);
+    
+    // Verificar origen permitido
+    if (!isAllowedUrl(url.origin)) return;
+    
+    // No cachear URLs con parámetros sensibles
+    if (!shouldCache(url.href)) {
+        event.respondWith(fetch(request));
+        return;
+    }
+    
+    // Estrategia: Navegación - Network First con fallback offline
+    if (request.mode === 'navigate') {
+        event.respondWith(handleNavigation(request));
+        return;
+    }
+    
+    // Estrategia: Audio/Radio - Stale-While-Revalidate
+    if (CACHE_PATTERNS.audio.test(url.pathname) || CACHE_PATTERNS.radio.test(url.pathname)) {
+        event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.radio || CACHE_NAMES.audio));
+        return;
+    }
+    
+    // Estrategia: Video/Streaming - Network First con fallback
+    if (CACHE_PATTERNS.video.test(url.pathname) || CACHE_PATTERNS.streaming.test(url.pathname)) {
+        event.respondWith(networkFirst(request, CACHE_NAMES.streaming || CACHE_NAMES.video));
+        return;
+    }
+    
+    // Estrategia: Imágenes - Cache First con actualización
+    if (CACHE_PATTERNS.images.test(url.pathname)) {
+        event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.images));
+        return;
+    }
+    
+    // Estrategia: JS/CSS - Cache First con Network Update
+    if (CACHE_PATTERNS.js.test(url.pathname) || CACHE_PATTERNS.css.test(url.pathname)) {
+        event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.runtime));
+        return;
+    }
+    
+    // Estrategia: API - Network First con Cache Fallback
+    if (CACHE_PATTERNS.api.test(url.pathname)) {
+        event.respondWith(networkFirst(request, CACHE_NAMES.api));
+        return;
+    }
+    
+    // Estrategia: Reportes - Network First
+    if (CACHE_PATTERNS.reports.test(url.pathname)) {
+        event.respondWith(networkFirst(request, CACHE_NAMES.reports));
+        return;
+    }
+    
+    // Estrategia: Juegos - Cache First
+    if (CACHE_PATTERNS.games.test(url.pathname)) {
+        event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.games));
+        return;
+    }
+    
+    // Estrategia: Asistente - Network First
+    if (CACHE_PATTERNS.assistant.test(url.pathname)) {
+        event.respondWith(networkFirst(request, CACHE_NAMES.assistant));
+        return;
+    }
+    
+    // Estrategia por defecto: Stale-While-Revalidate
+    event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.runtime));
+});
+
+// ============================================
+// ESTRATEGIAS DE CACHÉ
+// ============================================
+
+// Stale-While-Revalidate: Sirve de caché, actualiza en background
+async function staleWhileRevalidate(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(request);
+    
+    const fetchPromise = fetch(request)
+        .then(async (networkResponse) => {
+            if (networkResponse && networkResponse.ok) {
+                await cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+        })
+        .catch(() => cachedResponse);
+    
+    return cachedResponse || fetchPromise;
+}
+
+// Network First: Intenta red, fallback a caché
+async function networkFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    
+    try {
+        const networkResponse = await fetch(request);
+        
+        if (networkResponse && networkResponse.ok) {
+            await cache.put(request, networkResponse.clone());
+        }
+        
+        return networkResponse;
+    } catch (error) {
+        const cachedResponse = await cache.match(request);
+        
+        if (cachedResponse) return cachedResponse;
+        
+        // Fallback específico según tipo
+        return createOfflineResponse(request);
+    }
+}
+
+// Cache First con actualización en background
+async function cacheFirstWithUpdate(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(request);
+    
+    if (cachedResponse) {
+        // Actualizar en background
+        fetch(request)
+            .then((networkResponse) => {
+                if (networkResponse && networkResponse.ok) {
+                    cache.put(request, networkResponse);
+                }
+            })
+            .catch(() => {});
+        
+        return cachedResponse;
+    }
+    
+    try {
+        const networkResponse = await fetch(request);
+        
+        if (networkResponse && networkResponse.ok) {
+            await cache.put(request, networkResponse.clone());
+        }
+        
+        return networkResponse;
+    } catch (error) {
+        return createOfflineResponse(request);
+    }
+}
+
+// Manejo de navegación
+async function handleNavigation(request) {
+    try {
+        const networkResponse = await fetch(request);
+        
+        if (networkResponse && networkResponse.ok) {
+            const cache = await caches.open(CACHE_NAMES.runtime);
+            await cache.put(request, networkResponse.clone());
+            return networkResponse;
+        }
+        
+        throw new Error('Network response not ok');
+    } catch (error) {
+        const cache = await caches.open(CACHE_NAMES.runtime);
+        const cachedResponse = await cache.match(request);
+        
+        if (cachedResponse) return cachedResponse;
+        
+        // Fallback a index
+        const indexResponse = await cache.match('/');
+        if (indexResponse) return indexResponse;
+        
+        return createOfflinePage();
+    }
+}
+
+// Crear respuesta offline
+function createOfflineResponse(request) {
+    const url = new URL(request.url);
+    
+    if (CACHE_PATTERNS.images.test(url.pathname)) {
+        return new Response(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+                <rect width="200" height="200" fill="#f0f0f0"/>
+                <text x="100" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">Imagen offline</text>
+            </svg>`,
+            { status: 200, headers: { 'Content-Type': 'image/svg+xml' } }
+        );
+    }
+    
+    if (request.headers.get('Accept')?.includes('application/json')) {
+        return new Response(
+            JSON.stringify({ 
+                error: true, 
+                offline: true, 
+                mensaje: 'Sin conexión a internet' 
+            }),
+            { 
+                status: 503, 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Offline': 'true'
+                } 
+            }
+        );
+    }
+    
+    return createOfflinePage();
+}
+
+// Página offline mejorada
+function createOfflinePage() {
+    return new Response(
+        `<!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="theme-color" content="#1a237e">
+            <title>IPUC LA FONDA - Offline</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Segoe UI', system-ui, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background: linear-gradient(135deg, #0d1b5e, #1a237e, #283593);
+                    color: #fff;
+                    text-align: center;
+                    padding: 20px;
+                    overflow: hidden;
+                }
+                .container {
+                    max-width: 420px;
+                    padding: 40px 30px;
+                    background: rgba(255,255,255,0.08);
+                    border-radius: 24px;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    animation: fadeIn 0.5s ease;
+                }
+                .icon {
+                    font-size: 4rem;
+                    margin-bottom: 16px;
+                    animation: float 3s ease-in-out infinite;
+                }
+                h1 {
+                    font-size: 1.8rem;
+                    margin-bottom: 8px;
+                    letter-spacing: 1px;
+                    font-weight: 800;
+                }
+                .subtitle {
+                    opacity: 0.8;
+                    margin-bottom: 4px;
+                    font-size: 0.9rem;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                }
+                p {
+                    margin-bottom: 20px;
+                    opacity: 0.7;
+                    font-size: 0.95rem;
+                    line-height: 1.5;
+                }
+                .features {
+                    display: flex;
+                    gap: 8px;
+                    justify-content: center;
+                    margin: 16px 0;
+                    flex-wrap: wrap;
+                }
+                .features span {
+                    background: rgba(255,255,255,0.05);
+                    padding: 6px 14px;
+                    border-radius: 12px;
+                    font-size: 0.7rem;
+                    opacity: 0.6;
+                    letter-spacing: 0.5px;
+                }
+                button {
+                    background: #ffd700;
+                    color: #1a237e;
+                    border: none;
+                    padding: 14px 32px;
+                    border-radius: 12px;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+                    letter-spacing: 0.5px;
+                }
+                button:hover {
+                    opacity: 0.9;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 30px rgba(255,215,0,0.4);
+                }
+                button:active {
+                    transform: scale(0.95);
+                }
+                .version {
+                    font-size: 0.65rem;
+                    margin-top: 20px;
+                    opacity: 0.3;
+                    letter-spacing: 1px;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
+                }
+                @media (max-width: 480px) {
+                    .container { padding: 30px 20px; }
+                    h1 { font-size: 1.5rem; }
+                    .icon { font-size: 3rem; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="icon">📡</div>
+                <h1>Sin conexión</h1>
+                <p class="subtitle">IPUC LA FONDA</p>
+                <div class="features">
+                    <span>📖 Devocional</span>
+                    <span>🙏 Oración</span>
+                    <span>📅 Eventos</span>
+                    <span>🎵 Radio</span>
+                </div>
+                <p>Puedes acceder a contenido guardado mientras esperas reconectar</p>
+                <button onclick="location.reload()">🔄 Reintentar</button>
+                <p class="version">v${VERSION} ${VERSION_NAME} &copy; ${new Date().getFullYear()}</p>
+            </div>
+        </body>
+        </html>`,
+        { 
+            status: 503, 
+            headers: { 
+                'Content-Type': 'text/html; charset=utf-8',
+                'X-Offline': 'true',
+                'Cache-Control': 'no-cache'
+            } 
+        }
+    );
+}
+
+// ============================================
+// EVENTO: PUSH NOTIFICATIONS
+// ============================================
+self.addEventListener('push', (event) => {
+    console.log('🔔 SW: Push recibida');
+    
+    let data = {
         titulo: 'IPUC LA FONDA',
-        mensaje: 'Tienes una notificación',
+        mensaje: 'Tienes una nueva notificación',
         url: '/',
         icono: '/assets/icons/icon-192x192.png',
         badge: '/assets/icons/badge-icon.png',
@@ -494,24 +573,17 @@ self.addEventListener('push', function(event) {
         id: Date.now(),
         timestamp: new Date().toISOString()
     };
-
+    
     if (event.data) {
         try {
-            var pushData = event.data.json();
-            data.titulo = pushData.titulo || data.titulo;
-            data.mensaje = pushData.mensaje || data.mensaje;
-            data.url = pushData.url || data.url;
-            data.tipo = pushData.tipo || data.tipo;
-            data.id = pushData.id || data.id;
-            data.icono = pushData.icono || data.icono;
-            data.badge = pushData.badge || data.badge;
+            const pushData = event.data.json();
+            data = { ...data, ...pushData };
         } catch (e) {
             data.mensaje = event.data.text() || data.mensaje;
         }
     }
-
-    // Personalizar según tipo
-    var iconos = {
+    
+    const iconos = {
         'reporte': '📋',
         'reporte_urgente': '🚨',
         'oracion': '🕯️',
@@ -522,11 +594,15 @@ self.addEventListener('push', function(event) {
         'logro': '🏆',
         'bendicion': '🕊️',
         'mensaje': '💬',
-        'recordatorio': '⏰'
+        'recordatorio': '⏰',
+        'sistema': '⚙️',
+        'donacion': '💝',
+        'testimonio': '💬'
     };
-    data.mensaje = (iconos[data.tipo] || '📌') + ' ' + data.mensaje;
-
-    var options = {
+    
+    data.mensaje = `${iconos[data.tipo] || '📌'} ${data.mensaje}`;
+    
+    const options = {
         body: data.mensaje,
         icon: data.icono,
         badge: data.badge,
@@ -537,363 +613,318 @@ self.addEventListener('push', function(event) {
             fecha: data.timestamp
         },
         vibrate: data.tipo === 'reporte_urgente' ? [200, 100, 200, 100, 200] : [100, 50, 100],
-        tag: 'ipuc-notif-' + data.id,
+        tag: `ipuc-notif-${data.id}`,
         renotify: true,
-        requireInteraction: data.tipo === 'reporte_urgente' || data.tipo === 'importante' || data.tipo === 'recordatorio',
+        requireInteraction: ['reporte_urgente', 'importante', 'recordatorio'].includes(data.tipo),
         actions: [
             { action: 'open', title: '📱 Abrir' },
             { action: 'dismiss', title: '✖️ Cerrar' }
         ],
-        sound: '/assets/sounds/notification.mp3'
+        sound: '/assets/sounds/notification.mp3',
+        timestamp: Date.now()
     };
-
+    
     event.waitUntil(
         self.registration.showNotification(data.titulo, options)
     );
 });
 
 // ============================================
-// CLIC EN NOTIFICACION MEJORADO
+// EVENTO: NOTIFICATION CLICK
 // ============================================
-self.addEventListener('notificationclick', function(event) {
+self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     
     if (event.action === 'dismiss') return;
-
-    var urlToOpen = '/';
-    if (event.notification.data && event.notification.data.url) {
-        urlToOpen = event.notification.data.url;
-    }
-
-    // Registrar acción
-    console.log('SW: Notificación clickeada -', event.notification.data);
-
+    
+    const urlToOpen = event.notification.data?.url || '/';
+    
+    console.log('🔗 SW: Notificación clickeada:', event.notification.data);
+    
     event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
-            for (var i = 0; i < windowClients.length; i++) {
-                var client = windowClients[i];
-                if (client.url.indexOf(self.location.origin) !== -1 && 'focus' in client) {
-                    client.focus();
-                    if (urlToOpen !== '/') {
-                        client.navigate(urlToOpen);
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then((windowClients) => {
+                for (const client of windowClients) {
+                    if (client.url.includes(self.location.origin) && 'focus' in client) {
+                        client.focus();
+                        if (urlToOpen !== '/') {
+                            client.navigate(urlToOpen);
+                        }
+                        return;
                     }
-                    return;
                 }
-            }
-            if (clients.openWindow) {
-                return clients.openWindow(urlToOpen);
-            }
-        })
+                
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
+            })
     );
 });
 
 // ============================================
-// SINCRONIZACION MEJORADA
+// EVENTO: SYNC
 // ============================================
-var SYNC_TASKS = {
-    'sync-datos': function() {
-        console.log('SW: Sincronizando datos generales');
+const SYNC_TASKS = {
+    'sync-datos': async () => {
+        console.log('🔄 SW: Sincronizando datos generales');
         return Promise.resolve();
     },
-    'sync-reportes': function() {
-        console.log('SW: Sincronizando reportes pendientes');
-        // Enviar reportes guardados offline
-        return caches.open(REPORTS_CACHE).then(function(cache) {
-            return cache.keys().then(function(keys) {
-                var promises = keys.map(function(key) {
-                    return cache.match(key).then(function(response) {
-                        if (response) {
-                            return response.text().then(function(data) {
-                                try {
-                                    var reporte = JSON.parse(data);
-                                    // Intentar enviar al servidor
-                                    console.log('SW: Enviando reporte offline:', reporte);
-                                    // Aquí iría la lógica de envío
-                                    return cache.delete(key);
-                                } catch (e) {
-                                    console.log('SW: Error procesando reporte:', e);
-                                }
-                            });
-                        }
-                    });
-                });
-                return Promise.all(promises);
-            });
-        });
+    'sync-reportes': async () => {
+        console.log('📋 SW: Sincronizando reportes pendientes');
+        const cache = await caches.open(CACHE_NAMES.reports);
+        const keys = await cache.keys();
+        
+        for (const key of keys) {
+            const response = await cache.match(key);
+            if (response) {
+                try {
+                    const reporte = await response.json();
+                    console.log('  📤 Enviando reporte:', reporte.id);
+                    // Aquí iría la lógica de envío al servidor
+                    await cache.delete(key);
+                } catch (e) {
+                    console.warn('  ⚠️ Error procesando reporte:', e);
+                }
+            }
+        }
     },
-    'sync-radio': function() {
-        console.log('SW: Sincronizando radio');
+    'sync-radio': async () => {
+        console.log('🎵 SW: Sincronizando radio');
         return Promise.resolve();
     },
-    'sync-peticiones': function() {
-        console.log('SW: Sincronizando peticiones');
+    'sync-peticiones': async () => {
+        console.log('🙏 SW: Sincronizando peticiones');
         return Promise.resolve();
     },
-    'sync-logros': function() {
-        console.log('SW: Sincronizando logros');
+    'sync-logros': async () => {
+        console.log('🏆 SW: Sincronizando logros');
+        return Promise.resolve();
+    },
+    'sync-juegos': async () => {
+        console.log('🎮 SW: Sincronizando juegos');
         return Promise.resolve();
     }
 };
 
-self.addEventListener('sync', function(event) {
-    var tags = Object.keys(SYNC_TASKS);
-    if (tags.indexOf(event.tag) !== -1) {
+self.addEventListener('sync', (event) => {
+    if (SYNC_TASKS[event.tag]) {
         event.waitUntil(
-            SYNC_TASKS[event.tag]().catch(function(error) {
-                console.log('SW: Error en sync ' + event.tag + ':', error);
+            SYNC_TASKS[event.tag]().catch((error) => {
+                console.warn(`SW: Error en sync ${event.tag}:`, error);
             })
         );
     }
 });
 
 // ============================================
-// MENSAJES DESDE EL CLIENTE MEJORADO
+// EVENTO: MESSAGE
 // ============================================
-self.addEventListener('message', function(event) {
+self.addEventListener('message', (event) => {
     if (!event.data || !event.data.type) return;
-
-    switch (event.data.type) {
+    
+    const { type } = event.data;
+    const port = event.ports?.[0];
+    
+    switch (type) {
         case 'SKIP_WAITING':
             self.skipWaiting();
             break;
-
+            
         case 'GET_VERSION':
-            var port = event.ports && event.ports[0];
             if (port) {
                 port.postMessage({
                     version: VERSION,
                     versionName: VERSION_NAME,
-                    cache: CACHE_NAME,
-                    assets: PRECACHE_ASSETS.length,
-                    caches: {
-                        runtime: RUNTIME_CACHE,
-                        image: IMAGE_CACHE,
-                        audio: AUDIO_CACHE,
-                        video: VIDEO_CACHE,
-                        font: FONT_CACHE,
-                        api: API_CACHE,
-                        offline: OFFLINE_CACHE,
-                        reports: REPORTS_CACHE,
-                        radio: RADIO_CACHE,
-                        streaming: STREAMING_CACHE,
-                        game: GAME_CACHE,
-                        assistant: ASSISTANT_CACHE
-                    },
+                    buildDate: BUILD_DATE,
+                    caches: CACHE_NAMES,
+                    assetsCount: PRECACHE_ASSETS.length,
                     timestamp: Date.now()
                 });
             }
             break;
-
-        case 'CLEAR_CACHE':
-            caches.keys().then(function(names) {
-                return Promise.all(names.map(function(name) {
-                    return caches.delete(name);
-                }));
-            }).then(function() {
-                console.log('SW: Cache limpiado');
-                var port2 = event.ports && event.ports[0];
-                if (port2) {
-                    port2.postMessage({ success: true, action: 'CLEAR_CACHE' });
-                }
+            
+        case 'GET_CACHE_STATS':
+            if (port) {
+                caches.keys().then(async (cacheNames) => {
+                    const stats = {};
+                    let total = 0;
+                    
+                    for (const name of cacheNames) {
+                        const cache = await caches.open(name);
+                        const keys = await cache.keys();
+                        stats[name] = keys.length;
+                        total += keys.length;
+                    }
+                    
+                    port.postMessage({
+                        success: true,
+                        stats,
+                        total,
+                        timestamp: Date.now()
+                    });
+                });
+            }
+            break;
+            
+        case 'CLEAR_ALL_CACHE':
+            caches.keys().then((names) => {
+                return Promise.all(names.map(name => caches.delete(name)));
+            }).then(() => {
+                console.log('🗑️ SW: Todo el caché limpiado');
+                port?.postMessage({ success: true, action: 'CLEAR_ALL_CACHE' });
             });
             break;
-
-        case 'CLEAR_REPORTS_CACHE':
-            caches.delete(REPORTS_CACHE).then(function(deleted) {
-                console.log('SW: Cache de reportes ' + (deleted ? 'limpiado' : 'no encontrado'));
-                var port3 = event.ports && event.ports[0];
-                if (port3) {
-                    port3.postMessage({ success: deleted, action: 'CLEAR_REPORTS_CACHE' });
-                }
+            
+        case 'CLEAR_OLD_CACHE':
+            const validCaches = Object.values(CACHE_NAMES);
+            caches.keys().then((names) => {
+                return Promise.all(
+                    names.map(name => {
+                        if (!validCaches.includes(name) && name.includes('ipuc-')) {
+                            return caches.delete(name);
+                        }
+                    })
+                );
+            }).then(() => {
+                console.log('🗑️ SW: Cachés antiguas limpiadas');
+                port?.postMessage({ success: true, action: 'CLEAR_OLD_CACHE' });
             });
             break;
-
+            
         case 'REGISTER_SYNC':
             if ('sync' in self.registration) {
-                try {
-                    var syncTag = event.data.tag || 'sync-datos';
-                    self.registration.sync.register(syncTag);
-                    console.log('SW: Sync registrado:', syncTag);
-                    var port4 = event.ports && event.ports[0];
-                    if (port4) {
-                        port4.postMessage({ success: true, tag: syncTag });
-                    }
-                } catch (e) {
-                    console.log('SW: Error al registrar sync:', e);
-                }
+                const syncTag = event.data.tag || 'sync-datos';
+                self.registration.sync.register(syncTag)
+                    .then(() => {
+                        console.log(`🔄 SW: Sync registrado: ${syncTag}`);
+                        port?.postMessage({ success: true, tag: syncTag });
+                    })
+                    .catch((error) => {
+                        console.warn('SW: Error al registrar sync:', error);
+                        port?.postMessage({ success: false, error: error.message });
+                    });
             }
             break;
-
-        case 'GET_OFFLINE_STATUS':
-            var port5 = event.ports && event.ports[0];
-            if (port5) {
-                port5.postMessage({
-                    online: navigator.onLine,
-                    offline: !navigator.onLine,
-                    timestamp: Date.now()
-                });
-            }
-            break;
-
+            
         case 'SAVE_REPORT_OFFLINE':
             if (event.data.reporte) {
-                var reportKey = 'report_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-                var reportData = JSON.stringify(event.data.reporte);
-                var blob = new Blob([reportData], { type: 'application/json' });
-                var response = new Response(blob, {
+                const reportKey = `report_${Date.now()}`;
+                const reportData = JSON.stringify(event.data.reporte);
+                const blob = new Blob([reportData], { type: 'application/json' });
+                const response = new Response(blob, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-cache-time': Date.now().toString(),
-                        'x-version': VERSION,
-                        'x-report-id': reportKey
+                        'X-Report-ID': reportKey,
+                        'X-Version': VERSION
                     }
                 });
-                caches.open(REPORTS_CACHE).then(function(cache) {
+                
+                caches.open(CACHE_NAMES.reports).then((cache) => {
                     cache.put(reportKey, response);
-                    console.log('SW: Reporte guardado offline:', reportKey);
-                    // Registrar sync para enviar cuando haya conexión
+                    console.log('📋 SW: Reporte guardado offline');
+                    
                     if ('sync' in self.registration) {
                         self.registration.sync.register('sync-reportes');
                     }
-                    var port6 = event.ports && event.ports[0];
-                    if (port6) {
-                        port6.postMessage({ success: true, key: reportKey });
-                    }
+                    
+                    port?.postMessage({ success: true, key: reportKey });
                 });
             }
             break;
-
+            
         case 'SAVE_RADIO_OFFLINE':
             if (event.data.radioData) {
-                var radioKey = 'radio_' + Date.now();
-                var radioData = JSON.stringify(event.data.radioData);
-                var blob2 = new Blob([radioData], { type: 'application/json' });
-                var response2 = new Response(blob2, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-cache-time': Date.now().toString(),
-                        'x-version': VERSION
-                    }
+                const radioKey = `radio_${Date.now()}`;
+                const radioData = JSON.stringify(event.data.radioData);
+                const blob = new Blob([radioData], { type: 'application/json' });
+                const response = new Response(blob, {
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                caches.open(RADIO_CACHE).then(function(cache) {
-                    cache.put(radioKey, response2);
-                    console.log('SW: Datos de radio guardados offline');
+                
+                caches.open(CACHE_NAMES.radio).then((cache) => {
+                    cache.put(radioKey, response);
+                    console.log('🎵 SW: Datos de radio guardados offline');
+                    port?.postMessage({ success: true });
                 });
             }
             break;
-
+            
         case 'SAVE_GAME_OFFLINE':
             if (event.data.gameData) {
-                var gameKey = 'game_' + Date.now();
-                var gameData = JSON.stringify(event.data.gameData);
-                var blob3 = new Blob([gameData], { type: 'application/json' });
-                var response3 = new Response(blob3, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-cache-time': Date.now().toString(),
-                        'x-version': VERSION
-                    }
+                const gameKey = `game_${Date.now()}`;
+                const gameData = JSON.stringify(event.data.gameData);
+                const blob = new Blob([gameData], { type: 'application/json' });
+                const response = new Response(blob, {
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                caches.open(GAME_CACHE).then(function(cache) {
-                    cache.put(gameKey, response3);
-                    console.log('SW: Datos de juego guardados offline');
+                
+                caches.open(CACHE_NAMES.games).then((cache) => {
+                    cache.put(gameKey, response);
+                    console.log('🎮 SW: Datos de juego guardados offline');
+                    port?.postMessage({ success: true });
                 });
             }
             break;
-
-        case 'GET_CACHE_STATS':
-            var port7 = event.ports && event.ports[0];
-            if (port7) {
-                caches.keys().then(function(cacheNames) {
-                    var stats = {};
-                    var promises = cacheNames.map(function(name) {
-                        return caches.open(name).then(function(cache) {
-                            return cache.keys().then(function(keys) {
-                                stats[name] = keys.length;
-                            });
-                        });
-                    });
-                    return Promise.all(promises).then(function() {
-                        port7.postMessage({
-                            success: true,
-                            stats: stats,
-                            total: Object.values(stats).reduce(function(a, b) { return a + b; }, 0)
-                        });
-                    });
-                });
-            }
+            
+        case 'PING':
+            port?.postMessage({ 
+                success: true, 
+                pong: true, 
+                timestamp: Date.now() 
+            });
             break;
     }
 });
 
 // ============================================
-// DETECCION DE CONECTIVIDAD MEJORADA
+// EVENTO: ONLINE/OFFLINE
 // ============================================
-self.addEventListener('online', function() {
-    console.log('SW: Conexion restaurada');
+self.addEventListener('online', () => {
+    console.log('🟢 SW: Conexión restaurada');
+    
     // Notificar a todos los clientes
-    self.clients.matchAll({ type: 'window' }).then(function(clients) {
-        for (var i = 0; i < clients.length; i++) {
-            try {
-                clients[i].postMessage({ 
-                    type: 'CONNECTIVITY_CHANGE', 
-                    online: true, 
-                    timestamp: Date.now() 
-                });
-            } catch (e) {}
-        }
+    self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => {
+            client.postMessage({ 
+                type: 'CONNECTIVITY_CHANGE', 
+                online: true,
+                timestamp: Date.now()
+            });
+        });
     });
     
     // Intentar sincronizar al reconectar
     if ('sync' in self.registration) {
-        try {
-            self.registration.sync.register('sync-datos');
-            self.registration.sync.register('sync-reportes');
-            self.registration.sync.register('sync-radio');
-            self.registration.sync.register('sync-peticiones');
-            self.registration.sync.register('sync-logros');
-        } catch (e) {}
+        Object.keys(SYNC_TASKS).forEach((tag) => {
+            self.registration.sync.register(tag).catch(() => {});
+        });
     }
 });
 
-self.addEventListener('offline', function() {
-    console.log('SW: Sin conexion');
-    self.clients.matchAll({ type: 'window' }).then(function(clients) {
-        for (var i = 0; i < clients.length; i++) {
-            try {
-                clients[i].postMessage({ 
-                    type: 'CONNECTIVITY_CHANGE', 
-                    online: false, 
-                    timestamp: Date.now() 
-                });
-            } catch (e) {}
-        }
+self.addEventListener('offline', () => {
+    console.log('🔴 SW: Sin conexión');
+    
+    self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => {
+            client.postMessage({ 
+                type: 'CONNECTIVITY_CHANGE', 
+                online: false,
+                timestamp: Date.now()
+            });
+        });
     });
-});
-
-// ============================================
-// MANEJO DE ERRORES
-// ============================================
-self.addEventListener('error', function(event) {
-    event.preventDefault();
-    console.log('SW: Error capturado:', event.message);
-});
-
-self.addEventListener('unhandledrejection', function(event) {
-    event.preventDefault();
-    console.log('SW: Rejection capturada:', event.reason);
 });
 
 // ============================================
 // PERIODIC SYNC (si está disponible)
 // ============================================
 if ('periodicSync' in self.registration) {
-    self.addEventListener('periodicsync', function(event) {
+    self.addEventListener('periodicsync', (event) => {
         if (event.tag === 'periodic-update') {
             event.waitUntil(
-                Promise.resolve().then(function() {
-                    console.log('SW: Sincronización periódica ejecutada');
-                    // Aquí se puede actualizar contenido en background
+                Promise.resolve().then(() => {
+                    console.log('🔄 SW: Sincronización periódica ejecutada');
+                    // Actualizar contenido en background
                 })
             );
         }
@@ -904,28 +935,33 @@ if ('periodicSync' in self.registration) {
 // BACKGROUND FETCH (si está disponible)
 // ============================================
 if ('backgroundFetch' in self) {
-    self.addEventListener('backgroundfetchsuccess', function(event) {
-        console.log('SW: Background fetch completado:', event.id);
+    self.addEventListener('backgroundfetchsuccess', (event) => {
+        console.log('📥 SW: Background fetch completado:', event.id);
     });
     
-    self.addEventListener('backgroundfetchfail', function(event) {
-        console.log('SW: Background fetch falló:', event.id);
+    self.addEventListener('backgroundfetchfail', (event) => {
+        console.warn('⚠️ SW: Background fetch falló:', event.id);
+    });
+    
+    self.addEventListener('backgroundfetchabort', (event) => {
+        console.warn('⚠️ SW: Background fetch abortado:', event.id);
     });
 }
 
-console.log('✅ IPUC LA FONDA Service Worker v' + VERSION + ' ' + VERSION_NAME + ' cargado');
-console.log('📦 ' + PRECACHE_ASSETS.length + ' assets pre-cacheados');
-console.log('📋 Caches: ' + [
-    CACHE_NAME, RUNTIME_CACHE, IMAGE_CACHE,
-    API_CACHE, OFFLINE_CACHE, AUDIO_CACHE,
-    VIDEO_CACHE, FONT_CACHE, REPORTS_CACHE,
-    SYNC_CACHE, RADIO_CACHE, STREAMING_CACHE,
-    GAME_CACHE, ASSISTANT_CACHE
-].join(', '));
-console.log('🎵 Soporte para Radio y Streaming');
-console.log('🎮 Soporte para Gamificación y Juegos');
-console.log('🤖 Soporte para Asistente Virtual');
-console.log('📡 Soporte offline completo');
+// ============================================
+// LOGS DE INICIALIZACIÓN
+// ============================================
+console.log('========================================');
+console.log('✅ IPUC LA FONDA Service Worker cargado');
+console.log(`📦 Versión: v${VERSION} ${VERSION_NAME}`);
+console.log(`📅 Build: ${BUILD_DATE}`);
+console.log(`📊 Assets pre-cacheados: ${PRECACHE_ASSETS.length}`);
+console.log(`🗄️ Cachés: ${Object.keys(CACHE_NAMES).length}`);
+console.log('🎵 Radio y Streaming: Habilitados');
+console.log('🎮 Gamificación: Habilitada');
+console.log('🤖 Asistente Virtual: Habilitado');
+console.log('📡 Modo Offline: Habilitado');
+console.log('========================================');
 
 /* ============================================
    FINAL DEL SERVICE WORKER v20.0 PRO ULTIMATE
