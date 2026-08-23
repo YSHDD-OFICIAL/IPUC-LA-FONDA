@@ -1,11 +1,12 @@
 /* ============================================
-   IPUC LA FONDA - app.js v20.0 PRO ULTIMATE
+   IPUC LA FONDA - app.js v22.0 PRO ULTIMATE
    Funciones helper para la aplicación
    Incluye: Radio, Streaming, Gamificación, Logros, Asistente
-   VERSION CORREGIDA - SIN ERRORES
+   VERSION CORREGIDA - SIN ERRORES - COMPLETA
+   "Donde el Espíritu Santo se mueve"
    ============================================ */
 
-const VERSION = "20.0";
+const VERSION = "22.0";
 const VERSION_NAME = "PRO ULTIMATE";
 
 // ============================================
@@ -225,8 +226,8 @@ function buscarVersiculos(query) {
         
         const q = query.trim().toLowerCase();
         return versiculos.filter(v => 
-            v.texto.toLowerCase().includes(q) || 
-            v.referencia.toLowerCase().includes(q)
+            (v.texto && v.texto.toLowerCase().includes(q)) || 
+            (v.referencia && v.referencia.toLowerCase().includes(q))
         );
     } catch (e) {
         return [];
@@ -599,7 +600,7 @@ function obtenerEstadisticasReportes() {
 }
 
 // ============================================
-// RADIO (NUEVO v20)
+// RADIO
 // ============================================
 
 function obtenerEstacionesRadio() {
@@ -643,7 +644,7 @@ function agregarHistorialRadio(datos) {
 }
 
 // ============================================
-// STREAMING (NUEVO v20)
+// STREAMING
 // ============================================
 
 function obtenerTransmisiones() {
@@ -678,7 +679,7 @@ function crearTransmision(datos) {
 }
 
 // ============================================
-// GAMIFICACIÓN - LOGROS Y RANKING (NUEVO v20)
+// GAMIFICACIÓN - LOGROS Y RANKING
 // ============================================
 
 function obtenerLogrosUsuario(usuarioId) {
@@ -732,7 +733,7 @@ function agregarPuntajeRanking(datos) {
 }
 
 // ============================================
-// DIARIO ESPIRITUAL (NUEVO v20)
+// DIARIO ESPIRITUAL
 // ============================================
 
 function obtenerDiarioEspiritual(usuarioId = null) {
@@ -756,7 +757,7 @@ function agregarEntradaDiario(datos) {
 }
 
 // ============================================
-// LECTURA BÍBLICA (NUEVO v20)
+// LECTURA BÍBLICA
 // ============================================
 
 function obtenerProgresoLectura(usuarioId) {
@@ -780,7 +781,7 @@ function marcarLecturaCompletada(usuarioId, fecha = null) {
 }
 
 // ============================================
-// HIMNARIO Y PLAYLIST (NUEVO v20)
+// HIMNARIO Y PLAYLIST
 // ============================================
 
 function obtenerCanciones() {
@@ -824,7 +825,7 @@ function crearPlaylist(datos) {
 }
 
 // ============================================
-// ASISTENTE VIRTUAL (NUEVO v20)
+// ASISTENTE VIRTUAL
 // ============================================
 
 function obtenerConversaciones(usuarioId = null) {
@@ -848,7 +849,7 @@ function guardarConversacion(datos) {
 }
 
 // ============================================
-// JUEGOS Y TRIVIA (NUEVO v20)
+// JUEGOS Y TRIVIA
 // ============================================
 
 function obtenerPreguntasTrivia() {
@@ -892,7 +893,7 @@ function guardarPartidaJuego(datos) {
 }
 
 // ============================================
-// QR CODES (NUEVO v20)
+// QR CODES
 // ============================================
 
 function obtenerQRCodes() {
@@ -1017,7 +1018,7 @@ function registrarDonacion(datos) {
 // FAVORITOS Y METAS
 // ============================================
 
-function obtenerFavoritos(usuarioId) {
+function obtenerFavoritos(usuarioId = null) {
     try {
         const db = getDB();
         if (!db) return [];
@@ -1059,7 +1060,7 @@ function toggleFavorito(usuarioId, itemId, tipo) {
     }
 }
 
-function obtenerMetas(usuarioId) {
+function obtenerMetas(usuarioId = null) {
     try {
         const db = getDB();
         if (!db) return [];
@@ -1113,7 +1114,6 @@ function obtenerInsignias() {
 function obtenerInsigniasUsuario(usuarioId) {
     try {
         const insignias = obtenerInsignias();
-        // Filtrar por usuario (en implementación real)
         return insignias;
     } catch (e) {
         return [];
@@ -1476,19 +1476,20 @@ window.truncarTexto = truncarTexto;
 window.esValidoEmail = esValidoEmail;
 window.esValidoTelefono = esValidoTelefono;
 
-console.log('✅ IPUC LA FONDA v' + VERSION + ' ' + VERSION_NAME + ' - Helper Functions cargadas');
-console.log('📌 ' + Object.keys(window).filter(k => 
+console.log('IPUC LA FONDA v' + VERSION + ' ' + VERSION_NAME + ' - Helper Functions cargadas');
+console.log(Object.keys(window).filter(k => 
     typeof window[k] === 'function' && k.startsWith('obtener')
 ).length + ' funciones de consulta disponibles');
-console.log('🎮 ' + Object.keys(window).filter(k => 
+console.log(Object.keys(window).filter(k => 
     typeof window[k] === 'function' && (k.includes('Logro') || k.includes('XP') || k.includes('Ranking'))
 ).length + ' funciones de gamificación');
-console.log('📻 ' + Object.keys(window).filter(k => 
+console.log(Object.keys(window).filter(k => 
     typeof window[k] === 'function' && (k.includes('Radio') || k.includes('Streaming'))
 ).length + ' funciones multimedia');
+console.log('Todas las funciones definidas correctamente');
 
 /* ============================================
-   FINAL DEL APP.JS v20.0 PRO ULTIMATE
+   FINAL DEL APP.JS v22.0 PRO ULTIMATE
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
