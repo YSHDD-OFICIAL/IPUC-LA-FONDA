@@ -5,12 +5,20 @@
    VERSION CORREGIDA - SIN ERRORES
    ============================================ */
 
-var VERSION = "20.0";
-var VERSION_NAME = "PRO ULTIMATE";
+const VERSION = "20.0";
+const VERSION_NAME = "PRO ULTIMATE";
+
+// ============================================
+// UTILIDADES DE BASE DE DATOS
+// ============================================
 
 function getDB() {
     if (typeof window !== 'undefined' && window.db) return window.db;
     return null;
+}
+
+function isValidDB() {
+    return getDB() !== null;
 }
 
 // ============================================
@@ -19,18 +27,24 @@ function getDB() {
 
 function login(usuario, password) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false, error: 'Base de datos no disponible' };
         return db.login(usuario, password);
-    } catch (e) { return { success: false, error: 'Error en el servidor' }; }
+    } catch (e) {
+        console.error('Error en login:', e);
+        return { success: false, error: 'Error en el servidor' };
+    }
 }
 
 function registro(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false, error: 'Base de datos no disponible' };
         return db.registrarUsuario(datos);
-    } catch (e) { return { success: false, error: 'Error en el servidor' }; }
+    } catch (e) {
+        console.error('Error en registro:', e);
+        return { success: false, error: 'Error en el servidor' };
+    }
 }
 
 function logout() {
@@ -38,63 +52,82 @@ function logout() {
         localStorage.removeItem('ipuc20_token');
         localStorage.removeItem('ipuc20_usuario');
         localStorage.removeItem('ipuc20_rol');
-        return { success: true };
-    } catch (e) { return { success: false }; }
+        return { success: true, message: 'Sesión cerrada' };
+    } catch (e) {
+        return { success: false, error: 'Error al cerrar sesión' };
+    }
 }
 
 function verificarSesion() {
     try {
-        var token = localStorage.getItem('ipuc20_token');
-        var udata = localStorage.getItem('ipuc20_usuario');
-        var rol = localStorage.getItem('ipuc20_rol');
+        const token = localStorage.getItem('ipuc20_token');
+        const udata = localStorage.getItem('ipuc20_usuario');
+        const rol = localStorage.getItem('ipuc20_rol');
+        
         if (!token || !udata) return { success: false };
-        return { success: true, usuario: JSON.parse(udata), rol: rol, token: token };
-    } catch (e) { return { success: false }; }
+        
+        return { 
+            success: true, 
+            usuario: JSON.parse(udata), 
+            rol: rol, 
+            token: token 
+        };
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function esAdmin() {
-    var s = verificarSesion();
-    return s.success && s.rol === 'admin';
+    const session = verificarSesion();
+    return session.success && session.rol === 'admin';
 }
 
 function obtenerUsuarioActual() {
-    var s = verificarSesion();
-    return s.success ? s.usuario : null;
+    const session = verificarSesion();
+    return session.success ? session.usuario : null;
 }
 
 function crearPrimerAdmin(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false, error: 'Base de datos no disponible' };
         return db.crearPrimerAdministrador(datos);
-    } catch (e) { return { success: false, error: 'Error al crear admin' }; }
+    } catch (e) {
+        return { success: false, error: 'Error al crear admin' };
+    }
 }
 
 function hayAdministrador() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return false;
-        var a = db.cargar('administradores');
-        return (a && a.administradores && a.administradores.length > 0);
-    } catch (e) { return false; }
+        const admins = db.cargar('administradores');
+        return (admins && admins.administradores && admins.administradores.length > 0);
+    } catch (e) {
+        return false;
+    }
 }
 
 function obtenerUsuarios() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        var u = db.cargar('usuarios');
-        return (u && u.usuarios || []);
-    } catch (e) { return []; }
+        const usuarios = db.cargar('usuarios');
+        return (usuarios && usuarios.usuarios) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerAdministradores() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        var a = db.cargar('administradores');
-        return (a && a.administradores || []);
-    } catch (e) { return []; }
+        const admins = db.cargar('administradores');
+        return (admins && admins.administradores) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
@@ -103,28 +136,34 @@ function obtenerAdministradores() {
 
 function obtenerAsistencia() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getAsistencia();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function registrarAsistencia(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addAsistencia(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function obtenerProximoCulto() {
     try {
-        var ahora = new Date();
-        var domingo = new Date(ahora);
-        domingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
+        const ahora = new Date();
+        const domingo = new Date(ahora);
+        const diasHastaDomingo = (7 - ahora.getDay()) % 7 || 7;
+        domingo.setDate(ahora.getDate() + diasHastaDomingo);
         domingo.setHours(10, 0, 0, 0);
-        if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
-        var diff = Math.max(0, Math.floor((domingo - ahora) / 1000));
+        
+        const diff = Math.max(0, Math.floor((domingo - ahora) / 1000));
+        
         return {
             nombre: 'Culto Dominical',
             dia: 'Domingo',
@@ -132,17 +171,27 @@ function obtenerProximoCulto() {
             inicio: '10:00',
             fin: '12:00',
             estado: 'proximo',
-            segundos_restantes: diff
+            segundos_restantes: diff,
+            dias_restantes: Math.floor(diff / 86400),
+            horas_restantes: Math.floor((diff % 86400) / 3600)
         };
-    } catch (e) { return { mensaje: 'Error', estado: 'error', segundos_restantes: 0 }; }
+    } catch (e) {
+        return { 
+            mensaje: 'Error', 
+            estado: 'error', 
+            segundos_restantes: 0 
+        };
+    }
 }
 
 function obtenerHorarios() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getHorarios();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
@@ -151,57 +200,71 @@ function obtenerHorarios() {
 
 function obtenerVersiculoDiario() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return null;
         return db.getVersiculoDiario();
-    } catch (e) { return null; }
+    } catch (e) {
+        return null;
+    }
 }
 
 function obtenerVersiculos() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getVersiculos();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function buscarVersiculos(query) {
     try {
-        var versiculos = obtenerVersiculos();
+        const versiculos = obtenerVersiculos();
         if (!query || !query.trim()) return versiculos;
-        var q = query.trim().toLowerCase();
-        return versiculos.filter(function(v) {
-            return v.texto.toLowerCase().includes(q) || v.referencia.toLowerCase().includes(q);
-        });
-    } catch (e) { return []; }
+        
+        const q = query.trim().toLowerCase();
+        return versiculos.filter(v => 
+            v.texto.toLowerCase().includes(q) || 
+            v.referencia.toLowerCase().includes(q)
+        );
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
 // NOTICIAS
 // ============================================
 
-function obtenerNoticias(limit) {
+function obtenerNoticias(limit = 50) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getNoticias(limit || 50);
-    } catch (e) { return []; }
+        return db.getNoticias(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearNoticia(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addNoticia(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function eliminarNoticia(id) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.eliminar('noticias', id);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -210,36 +273,44 @@ function eliminarNoticia(id) {
 
 function obtenerEventos() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getEventos();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
-function obtenerEventosProximos(limit) {
+function obtenerEventosProximos(limit = 10) {
     try {
-        var eventos = obtenerEventos();
-        var ahora = new Date();
-        return eventos.filter(function(e) {
-            return new Date(e.fecha) >= ahora;
-        }).slice(0, limit || 10);
-    } catch (e) { return []; }
+        const eventos = obtenerEventos();
+        const ahora = new Date();
+        return eventos
+            .filter(e => new Date(e.fecha) >= ahora)
+            .slice(0, limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearEvento(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addEvento(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function eliminarEvento(id) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.eliminarEvento(id);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -248,50 +319,62 @@ function eliminarEvento(id) {
 
 function obtenerOraciones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getOraciones();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearOracion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addOracion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function orarOracion(id) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.orarOracion(id);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function obtenerPeticiones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getPeticiones();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearPeticion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addPeticion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function orarPeticion(id) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.orarPeticion(id);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -300,178 +383,219 @@ function orarPeticion(id) {
 
 function obtenerBendiciones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getBendiciones();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearBendicion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addBendicion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function obtenerTestimonios() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getTestimonios();
-    } catch (e) { return []; }
+        const testimonios = db.cargar('testimonios');
+        return (testimonios && testimonios.testimonios) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
 // PUBLICACIONES Y COMENTARIOS
 // ============================================
 
-function obtenerPublicaciones(limit) {
+function obtenerPublicaciones(limit = 50) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getPublicaciones(limit || 50);
-    } catch (e) { return []; }
+        return db.getPublicaciones(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearPublicacion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addPublicacion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function getComentariosPublicacion(pubId) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getComentarios(pubId);
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarComentario(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addComentario(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function toggleReaccion(pubId, userId, tipo) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.toggleReaccion(pubId, userId, tipo);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
 // CHAT Y MENSAJES
 // ============================================
 
-function obtenerMensajes(limit) {
+function obtenerMensajes(limit = 50) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getMensajes(limit || 50);
-    } catch (e) { return []; }
+        return db.getMensajes(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function enviarMensaje(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addMensaje(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
 // NOTIFICACIONES
 // ============================================
 
-function obtenerNotificaciones(limit) {
+function obtenerNotificaciones(limit = 50) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getNotificaciones(limit || 50);
-    } catch (e) { return []; }
+        return db.getNotificaciones(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerNoLeidas() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return 0;
         return db.getNoLeidas();
-    } catch (e) { return 0; }
+    } catch (e) {
+        return 0;
+    }
 }
 
 function marcarNotificacionesLeidas() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.marcarLeidas();
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
 // REPORTES
 // ============================================
 
-function obtenerReportes(filtros) {
+function obtenerReportes(filtros = {}) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getReportes(filtros || {});
-    } catch (e) { return []; }
+        return db.getReportes(filtros);
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerReporte(id) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return null;
         return db.getReporte(id);
-    } catch (e) { return null; }
+    } catch (e) {
+        return null;
+    }
 }
 
 function obtenerReportesPendientes() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getReportesPendientes();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearReporte(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addReporte(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
-function cambiarEstadoReporte(id, estado, admin, comentario) {
+function cambiarEstadoReporte(id, estado, admin = 'Admin', comentario = '') {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
-        return db.cambiarEstadoReporte(id, estado, admin || 'Admin', comentario || '');
-    } catch (e) { return { success: false }; }
+        return db.cambiarEstadoReporte(id, estado, admin, comentario);
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function eliminarReporte(id) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.deleteReporte(id);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function obtenerEstadisticasReportes() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return {};
         return db.getEstadisticasReportes();
-    } catch (e) { return {}; }
+    } catch (e) {
+        return {};
+    }
 }
 
 // ============================================
@@ -480,34 +604,42 @@ function obtenerEstadisticasReportes() {
 
 function obtenerEstacionesRadio() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getEstacionesRadio();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarEstacionRadio(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addEstacionRadio(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
-function obtenerHistorialRadio(limit) {
+function obtenerHistorialRadio(limit = 20) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getHistorialRadio(limit || 20);
-    } catch (e) { return []; }
+        return db.getHistorialRadio(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarHistorialRadio(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addHistorialRadio(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -516,27 +648,33 @@ function agregarHistorialRadio(datos) {
 
 function obtenerTransmisiones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getTransmisiones();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerTransmisionActiva() {
     try {
-        var transmisiones = obtenerTransmisiones();
-        return transmisiones.find(function(t) {
-            return t.estado === 'activa' || t.estado === 'en_vivo';
-        }) || null;
-    } catch (e) { return null; }
+        const transmisiones = obtenerTransmisiones();
+        return transmisiones.find(t => 
+            t.estado === 'activa' || t.estado === 'en_vivo'
+        ) || null;
+    } catch (e) {
+        return null;
+    }
 }
 
 function crearTransmision(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addTransmision(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -545,62 +683,76 @@ function crearTransmision(datos) {
 
 function obtenerLogrosUsuario(usuarioId) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getLogrosUsuario(usuarioId);
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
-function desbloquearLogro(usuarioId, logroId, datos) {
+function desbloquearLogro(usuarioId, logroId, datos = {}) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.desbloquearLogro(usuarioId, logroId, datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function agregarXP(usuarioId, cantidad) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.agregarXP(usuarioId, cantidad);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
-function obtenerRanking(limit) {
+function obtenerRanking(limit = 10) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getRanking(limit || 10);
-    } catch (e) { return []; }
+        return db.getRanking(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarPuntajeRanking(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addPuntajeRanking(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
 // DIARIO ESPIRITUAL (NUEVO v20)
 // ============================================
 
-function obtenerDiarioEspiritual(usuarioId) {
+function obtenerDiarioEspiritual(usuarioId = null) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getDiarioEspiritual(usuarioId);
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarEntradaDiario(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addEntradaDiario(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -609,18 +761,22 @@ function agregarEntradaDiario(datos) {
 
 function obtenerProgresoLectura(usuarioId) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return null;
         return db.getProgresoLectura(usuarioId);
-    } catch (e) { return null; }
+    } catch (e) {
+        return null;
+    }
 }
 
-function marcarLecturaCompletada(usuarioId, fecha) {
+function marcarLecturaCompletada(usuarioId, fecha = null) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.marcarLecturaCompletada(usuarioId, fecha);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -629,54 +785,66 @@ function marcarLecturaCompletada(usuarioId, fecha) {
 
 function obtenerCanciones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getCanciones();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarCancion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addCancion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 function obtenerPlaylists() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getPlaylists();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearPlaylist(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addPlaylist(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
 // ASISTENTE VIRTUAL (NUEVO v20)
 // ============================================
 
-function obtenerConversaciones(usuarioId) {
+function obtenerConversaciones(usuarioId = null) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getConversaciones(usuarioId);
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function guardarConversacion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addConversacion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -685,34 +853,42 @@ function guardarConversacion(datos) {
 
 function obtenerPreguntasTrivia() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getPreguntasTrivia();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function agregarPreguntaTrivia(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addPreguntaTrivia(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
-function obtenerPartidasJuego(usuarioId) {
+function obtenerPartidasJuego(usuarioId = null) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getPartidasJuego(usuarioId);
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function guardarPartidaJuego(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addPartidaJuego(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -721,18 +897,22 @@ function guardarPartidaJuego(datos) {
 
 function obtenerQRCodes() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getQRCodes();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function generarQRCode(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addQRCode(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -741,26 +921,35 @@ function generarQRCode(datos) {
 
 function obtenerBiblioteca() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getRecursos();
-    } catch (e) { return []; }
+        const biblioteca = db.cargar('biblioteca');
+        return (biblioteca && biblioteca.recursos) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerPodcast() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getPodcast();
-    } catch (e) { return []; }
+        const podcast = db.cargar('podcast');
+        return (podcast && podcast.episodios) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerEncuestas() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getEncuestas();
-    } catch (e) { return []; }
+        const encuestas = db.cargar('encuestas');
+        return (encuestas && encuestas.encuestas) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
@@ -769,26 +958,35 @@ function obtenerEncuestas() {
 
 function obtenerDirectorio() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getDirectorio();
-    } catch (e) { return []; }
+        const directorio = db.cargar('directorio');
+        return (directorio && directorio.miembros) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerGrupos() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getGrupos();
-    } catch (e) { return []; }
+        const grupos = db.cargar('grupos');
+        return (grupos && grupos.grupos) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerMisiones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getMisiones();
-    } catch (e) { return []; }
+        const misiones = db.cargar('misiones');
+        return (misiones && misiones.misiones) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
@@ -797,54 +995,104 @@ function obtenerMisiones() {
 
 function obtenerDonaciones() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
         return db.getDonaciones();
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 function registrarDonacion(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.addDonacion(datos);
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
 // FAVORITOS Y METAS
 // ============================================
 
-function obtenerFavoritos(uid) {
+function obtenerFavoritos(usuarioId) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getFavoritos(uid);
-    } catch (e) { return []; }
+        const favoritos = db.cargar('favoritos');
+        const lista = (favoritos && favoritos.favoritos) || [];
+        return usuarioId ? lista.filter(f => f.usuario_id === usuarioId) : lista;
+    } catch (e) {
+        return [];
+    }
 }
 
-function toggleFavorito(uid, itemId, tipo) {
+function toggleFavorito(usuarioId, itemId, tipo) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
-        return db.toggleFavorito(uid, itemId, tipo);
-    } catch (e) { return { success: false }; }
+        const favoritos = db.cargar('favoritos');
+        if (!favoritos.favoritos) favoritos.favoritos = [];
+        
+        const existente = favoritos.favoritos.find(f => 
+            f.usuario_id === usuarioId && f.item_id === itemId && f.tipo === tipo
+        );
+        
+        if (existente) {
+            favoritos.favoritos = favoritos.favoritos.filter(f => f.id !== existente.id);
+        } else {
+            favoritos.favoritos.push({
+                id: db._generateId(),
+                usuario_id: usuarioId,
+                item_id: itemId,
+                tipo: tipo,
+                fecha: new Date().toISOString()
+            });
+        }
+        
+        db.guardar('favoritos', favoritos);
+        return { success: true, esFavorito: !existente };
+    } catch (e) {
+        return { success: false };
+    }
 }
 
-function obtenerMetas(uid) {
+function obtenerMetas(usuarioId) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getMetas(uid);
-    } catch (e) { return []; }
+        const metas = db.cargar('metas');
+        const lista = (metas && metas.metas) || [];
+        return usuarioId ? lista.filter(m => m.usuario_id === usuarioId) : lista;
+    } catch (e) {
+        return [];
+    }
 }
 
 function crearMeta(datos) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
-        return db.addMeta(datos);
-    } catch (e) { return { success: false }; }
+        const metas = db.cargar('metas');
+        if (!metas.metas) metas.metas = [];
+        
+        metas.metas.push({
+            id: db._generateId(),
+            usuario_id: datos.usuario_id,
+            titulo: datos.titulo,
+            descripcion: datos.descripcion || '',
+            fecha_objetivo: datos.fecha_objetivo || '',
+            estado: 'pendiente',
+            fecha_creacion: new Date().toISOString()
+        });
+        
+        db.guardar('metas', metas);
+        return { success: true };
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -853,18 +1101,23 @@ function crearMeta(datos) {
 
 function obtenerInsignias() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getInsignias();
-    } catch (e) { return []; }
+        const insignias = db.cargar('insignias');
+        return (insignias && insignias.insignias) || [];
+    } catch (e) {
+        return [];
+    }
 }
 
 function obtenerInsigniasUsuario(usuarioId) {
     try {
-        var insignias = obtenerInsignias();
-        // En una implementación real, se filtrarían por usuario
+        const insignias = obtenerInsignias();
+        // Filtrar por usuario (en implementación real)
         return insignias;
-    } catch (e) { return []; }
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
@@ -873,34 +1126,42 @@ function obtenerInsigniasUsuario(usuarioId) {
 
 function obtenerEstadisticas() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return {};
         return db.getEstadisticas();
-    } catch (e) { return {}; }
+    } catch (e) {
+        return {};
+    }
 }
 
 function obtenerConfiguracion() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return null;
         return db.getConfiguracion();
-    } catch (e) { return null; }
+    } catch (e) {
+        return null;
+    }
 }
 
 function obtenerConfiguracionIglesia() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return {};
         return db.getConfiguracionIglesia();
-    } catch (e) { return {}; }
+    } catch (e) {
+        return {};
+    }
 }
 
-function obtenerLogs(limit) {
+function obtenerLogs(limit = 50) {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return [];
-        return db.getLogs(limit || 50);
-    } catch (e) { return []; }
+        return db.getLogs(limit);
+    } catch (e) {
+        return [];
+    }
 }
 
 // ============================================
@@ -909,31 +1170,39 @@ function obtenerLogs(limit) {
 
 function exportarDatos() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
-        var datos = db.exportarTodo();
-        var blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
+        
+        const datos = db.exportarTodo();
+        const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
         a.href = url;
         a.download = 'ipuc_backup_' + new Date().toISOString().split('T')[0] + '.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        return { success: true };
-    } catch (e) { return { success: false }; }
+        
+        return { success: true, message: 'Datos exportados' };
+    } catch (e) {
+        return { success: false, error: 'Error al exportar' };
+    }
 }
 
 function importarDatos(archivo) {
-    return new Promise(function(resolve) {
+    return new Promise((resolve) => {
         try {
-            var db = getDB();
-            if (!db) { resolve({ success: false, error: 'Base de datos no disponible' }); return; }
-            var reader = new FileReader();
+            const db = getDB();
+            if (!db) {
+                resolve({ success: false, error: 'Base de datos no disponible' });
+                return;
+            }
+            
+            const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    var datos = JSON.parse(e.target.result);
+                    const datos = JSON.parse(e.target.result);
                     resolve(db.importarTodo(datos));
                 } catch (err) {
                     resolve({ success: false, error: 'Error al leer el archivo' });
@@ -951,10 +1220,12 @@ function importarDatos(archivo) {
 
 function limpiarDatos() {
     try {
-        var db = getDB();
+        const db = getDB();
         if (!db) return { success: false };
         return db.limpiarTodo();
-    } catch (e) { return { success: false }; }
+    } catch (e) {
+        return { success: false };
+    }
 }
 
 // ============================================
@@ -963,8 +1234,9 @@ function limpiarDatos() {
 
 function formatearFecha(fecha) {
     try {
-        var d = new Date(fecha);
+        const d = new Date(fecha);
         if (isNaN(d.getTime())) return 'Fecha inválida';
+        
         return d.toLocaleDateString('es-CO', {
             day: 'numeric',
             month: 'short',
@@ -979,8 +1251,9 @@ function formatearFecha(fecha) {
 
 function formatearFechaCorta(fecha) {
     try {
-        var d = new Date(fecha);
+        const d = new Date(fecha);
         if (isNaN(d.getTime())) return 'Fecha inválida';
+        
         return d.toLocaleDateString('es-CO', {
             day: 'numeric',
             month: 'short',
@@ -993,9 +1266,9 @@ function formatearFechaCorta(fecha) {
 
 function obtenerDiasRestantes(fecha) {
     try {
-        var d = new Date(fecha);
-        var ahora = new Date();
-        var diff = Math.ceil((d - ahora) / (1000 * 60 * 60 * 24));
+        const d = new Date(fecha);
+        const ahora = new Date();
+        const diff = Math.ceil((d - ahora) / (1000 * 60 * 60 * 24));
         return Math.max(0, diff);
     } catch (e) {
         return 0;
@@ -1023,9 +1296,21 @@ function esValidoTelefono(telefono) {
     return /^[0-9+\-\s()]{7,15}$/.test(telefono);
 }
 
+function generarQRTexto(datos) {
+    return JSON.stringify(datos);
+}
+
 // ============================================
 // EXPORTAR A WINDOW
 // ============================================
+
+// Versión
+window.VERSION = VERSION;
+window.VERSION_NAME = VERSION_NAME;
+
+// Base de datos
+window.getDB = getDB;
+window.isValidDB = isValidDB;
 
 // Autenticación
 window.login = login;
@@ -1101,49 +1386,49 @@ window.cambiarEstadoReporte = cambiarEstadoReporte;
 window.eliminarReporte = eliminarReporte;
 window.obtenerEstadisticasReportes = obtenerEstadisticasReportes;
 
-// Radio (NUEVO v20)
+// Radio
 window.obtenerEstacionesRadio = obtenerEstacionesRadio;
 window.agregarEstacionRadio = agregarEstacionRadio;
 window.obtenerHistorialRadio = obtenerHistorialRadio;
 window.agregarHistorialRadio = agregarHistorialRadio;
 
-// Streaming (NUEVO v20)
+// Streaming
 window.obtenerTransmisiones = obtenerTransmisiones;
 window.obtenerTransmisionActiva = obtenerTransmisionActiva;
 window.crearTransmision = crearTransmision;
 
-// Gamificación (NUEVO v20)
+// Gamificación
 window.obtenerLogrosUsuario = obtenerLogrosUsuario;
 window.desbloquearLogro = desbloquearLogro;
 window.agregarXP = agregarXP;
 window.obtenerRanking = obtenerRanking;
 window.agregarPuntajeRanking = agregarPuntajeRanking;
 
-// Diario Espiritual (NUEVO v20)
+// Diario Espiritual
 window.obtenerDiarioEspiritual = obtenerDiarioEspiritual;
 window.agregarEntradaDiario = agregarEntradaDiario;
 
-// Lectura Bíblica (NUEVO v20)
+// Lectura Bíblica
 window.obtenerProgresoLectura = obtenerProgresoLectura;
 window.marcarLecturaCompletada = marcarLecturaCompletada;
 
-// Himnario y Playlist (NUEVO v20)
+// Himnario y Playlist
 window.obtenerCanciones = obtenerCanciones;
 window.agregarCancion = agregarCancion;
 window.obtenerPlaylists = obtenerPlaylists;
 window.crearPlaylist = crearPlaylist;
 
-// Asistente (NUEVO v20)
+// Asistente
 window.obtenerConversaciones = obtenerConversaciones;
 window.guardarConversacion = guardarConversacion;
 
-// Juegos (NUEVO v20)
+// Juegos
 window.obtenerPreguntasTrivia = obtenerPreguntasTrivia;
 window.agregarPreguntaTrivia = agregarPreguntaTrivia;
 window.obtenerPartidasJuego = obtenerPartidasJuego;
 window.guardarPartidaJuego = guardarPartidaJuego;
 
-// QR Codes (NUEVO v20)
+// QR Codes
 window.obtenerQRCodes = obtenerQRCodes;
 window.generarQRCode = generarQRCode;
 
@@ -1191,14 +1476,16 @@ window.truncarTexto = truncarTexto;
 window.esValidoEmail = esValidoEmail;
 window.esValidoTelefono = esValidoTelefono;
 
-// Versión
-window.VERSION = VERSION;
-window.VERSION_NAME = VERSION_NAME;
-
 console.log('✅ IPUC LA FONDA v' + VERSION + ' ' + VERSION_NAME + ' - Helper Functions cargadas');
-console.log('📌 ' + Object.keys(window).filter(function(k) {
-    return typeof window[k] === 'function' && k.startsWith('obtener');
-}).length + ' funciones de consulta disponibles');
+console.log('📌 ' + Object.keys(window).filter(k => 
+    typeof window[k] === 'function' && k.startsWith('obtener')
+).length + ' funciones de consulta disponibles');
+console.log('🎮 ' + Object.keys(window).filter(k => 
+    typeof window[k] === 'function' && (k.includes('Logro') || k.includes('XP') || k.includes('Ranking'))
+).length + ' funciones de gamificación');
+console.log('📻 ' + Object.keys(window).filter(k => 
+    typeof window[k] === 'function' && (k.includes('Radio') || k.includes('Streaming'))
+).length + ' funciones multimedia');
 
 /* ============================================
    FINAL DEL APP.JS v20.0 PRO ULTIMATE
