@@ -172,21 +172,23 @@ const APP_STATE = {
 // UTILIDADES GENERALES
 // ============================================
 function showToast(mensaje, tipo = 'info', duracion = 3000) {
-    const c = document.getElementById('toast-container');
-    if (!c) return;
+    const container = document.getElementById('toast-container');
+    if (!container) return;
     
-    const t = document.createElement('div');
-    t.className = `toast ${tipo}`;
+    const toast = document.createElement('div');
+    toast.className = `toast ${tipo}`;
     
     const iconos = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    t.innerHTML = `${iconos[tipo] || '📌'} ${mensaje || ''}`;
+    toast.innerHTML = `${iconos[tipo] || '📌'} ${mensaje || ''}`;
     
-    c.appendChild(t);
+    container.appendChild(toast);
     
     setTimeout(() => {
-        if (t.parentNode) {
-            t.classList.add('toast-hide');
-            setTimeout(() => { if (t.parentNode) t.remove(); }, 300);
+        if (toast.parentNode) {
+            toast.classList.add('toast-hide');
+            setTimeout(() => { 
+                if (toast.parentNode) toast.remove(); 
+            }, 300);
         }
     }, duracion);
 }
@@ -274,30 +276,23 @@ function navegarA(page) {
     APP_STATE.currentPage = page;
     APP_STATE.isLoading = true;
     
-    // Actualizar items activos del sidebar
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
         item.classList.toggle('active', item.getAttribute('data-page') === page);
     });
     
-    // Actualizar título de la página
     const titleEl = document.getElementById('page-title');
     if (titleEl) titleEl.textContent = CONFIG.TITULOS_PAGINAS[page] || page;
     
     const bc = document.getElementById('breadcrumb-current');
     if (bc) bc.textContent = CONFIG.TITULOS_PAGINAS[page] || page;
     
-    // Cargar contenido de la página
     cargarPagina(page);
     
-    // Cerrar sidebar en móvil
     if (window.innerWidth < 1024) cerrarSidebar();
     
-    // Cerrar paneles abiertos
     cerrarPaneles();
     
     APP_STATE.isLoading = false;
-    
-    // Actualizar fecha en header
     actualizarFechaHeader();
 }
 
@@ -379,8 +374,8 @@ function actualizarFechaHeader() {
 function cerrarPaneles() {
     const paneles = ['radio-quick-panel', 'streaming-panel', 'qr-panel', 'reports-quick-panel', 'notification-panel'];
     paneles.forEach(id => {
-        const p = document.getElementById(id);
-        if (p && !p.classList.contains('hidden')) p.classList.add('hidden');
+        const panel = document.getElementById(id);
+        if (panel && !panel.classList.contains('hidden')) panel.classList.add('hidden');
     });
     
     APP_STATE.radioPanelOpen = false;
@@ -400,8 +395,8 @@ function cerrarOtrosPaneles(excepto) {
     
     Object.keys(paneles).forEach(key => {
         if (key !== excepto) {
-            const p = document.getElementById(paneles[key]);
-            if (p && !p.classList.contains('hidden')) p.classList.add('hidden');
+            const panel = document.getElementById(paneles[key]);
+            if (panel && !panel.classList.contains('hidden')) panel.classList.add('hidden');
         }
     });
 }
@@ -416,33 +411,33 @@ function toggleSidebar() {
 
 function abrirSidebar() {
     APP_STATE.sidebarOpen = true;
-    const s = document.getElementById('sidebar');
-    const o = document.getElementById('sidebar-overlay');
-    if (s) s.classList.add('open');
-    if (o) o.classList.remove('hidden');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.add('open');
+    if (overlay) overlay.classList.remove('hidden');
 }
 
 function cerrarSidebar() {
     if (APP_STATE.sidebarLocked) return;
     APP_STATE.sidebarOpen = false;
-    const s = document.getElementById('sidebar');
-    const o = document.getElementById('sidebar-overlay');
-    if (s) s.classList.remove('open');
-    if (o) o.classList.add('hidden');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.add('hidden');
 }
 
 function manejarResponsiveSidebar() {
     if (window.innerWidth >= 1024) {
         APP_STATE.sidebarLocked = true;
-        const s = document.getElementById('sidebar');
-        if (s) s.classList.add('open');
-        const o = document.getElementById('sidebar-overlay');
-        if (o) o.classList.add('hidden');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.add('open');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (overlay) overlay.classList.add('hidden');
     } else {
         APP_STATE.sidebarLocked = false;
         if (!APP_STATE.sidebarOpen) {
-            const sb = document.getElementById('sidebar');
-            if (sb) sb.classList.remove('open');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.classList.remove('open');
         }
     }
 }
@@ -451,35 +446,35 @@ function manejarResponsiveSidebar() {
 // GESTIÓN DE USUARIO
 // ============================================
 function actualizarSidebarUsuario() {
-    const m = document.getElementById('user-mini');
-    if (!m) return;
+    const userMini = document.getElementById('user-mini');
+    if (!userMini) return;
     
-    const img = m.querySelector('img');
-    const nm = m.querySelector('.user-name');
-    const rl = m.querySelector('.user-role');
-    const lvl = document.getElementById('user-level');
+    const img = userMini.querySelector('img');
+    const nombre = userMini.querySelector('.user-name');
+    const rol = userMini.querySelector('.user-role');
+    const nivel = document.getElementById('user-level');
     const xpBar = document.getElementById('user-xp-bar');
     
     if (APP_STATE.usuario) {
         if (img) img.src = APP_STATE.usuario.foto || 'assets/avatars/default.png';
-        if (nm) nm.textContent = APP_STATE.usuario.nombre || 'Usuario';
+        if (nombre) nombre.textContent = APP_STATE.usuario.nombre || 'Usuario';
         
         const roles = { admin: '👑 Administrador', invitado: '👤 Invitado', usuario: '👤 Miembro' };
-        if (rl) rl.textContent = roles[APP_STATE.rol] || 'Miembro';
+        if (rol) rol.textContent = roles[APP_STATE.rol] || 'Miembro';
     } else {
         if (img) img.src = 'assets/avatars/default.png';
-        if (nm) nm.textContent = 'Visitante';
-        if (rl) rl.textContent = 'Sin sesión';
+        if (nombre) nombre.textContent = 'Visitante';
+        if (rol) rol.textContent = 'Sin sesión';
     }
     
-    if (lvl) lvl.textContent = `Lv.${APP_STATE.nivel}`;
+    if (nivel) nivel.textContent = `Lv.${APP_STATE.nivel}`;
     if (xpBar) {
         const porcentaje = Math.min((APP_STATE.xp / APP_STATE.xpSiguiente) * 100, 100);
         xpBar.style.width = `${porcentaje}%`;
     }
     
-    const am = document.getElementById('admin-menu');
-    if (am) am.classList.toggle('hidden', APP_STATE.rol !== 'admin');
+    const adminMenu = document.getElementById('admin-menu');
+    if (adminMenu) adminMenu.classList.toggle('hidden', APP_STATE.rol !== 'admin');
 }
 
 function continuarComoInvitado() {
@@ -516,73 +511,17 @@ function cerrarSesion() {
     showToast('Sesión cerrada', 'info');
 }
 
-function login(email, password) {
-    if (email === 'admin@ipuc.com' && password === 'admin123') {
-        return {
-            success: true,
-            token: `token_${Date.now()}`,
-            usuario: {
-                id: 1,
-                nombre: 'Administrador',
-                correo: email,
-                usuario: 'admin',
-                rol: 'admin',
-                foto: 'assets/avatars/default.png',
-                ministerio: 'Pastoral'
-            },
-            rol: 'admin'
-        };
-    }
-    
-    if (email && password && password.length >= 6) {
-        return {
-            success: true,
-            token: `token_${Date.now()}`,
-            usuario: {
-                id: 2,
-                nombre: email.split('@')[0],
-                correo: email,
-                usuario: email.split('@')[0],
-                rol: 'usuario',
-                foto: 'assets/avatars/default.png',
-                ministerio: 'General'
-            },
-            rol: 'usuario'
-        };
-    }
-    
-    return { success: false, error: 'Credenciales inválidas' };
-}
-
-function registro(datos) {
-    if (datos.nombre && datos.correo && datos.password && datos.password.length >= 8) {
-        return {
-            success: true,
-            usuario: {
-                id: Date.now(),
-                nombre: datos.nombre,
-                correo: datos.correo,
-                usuario: datos.usuario || datos.correo.split('@')[0],
-                rol: 'usuario',
-                foto: 'assets/avatars/default.png',
-                ministerio: datos.ministerio || 'General'
-            }
-        };
-    }
-    return { success: false, error: 'Datos inválidos o contraseña muy corta' };
-}
-
 // ============================================
 // GESTIÓN DE APP (MOSTRAR/OCULTAR)
 // ============================================
 function mostrarApp() {
-    const w = document.getElementById('welcome-screen');
-    const a = document.getElementById('app');
-    const f = document.getElementById('fab-main');
+    const welcome = document.getElementById('welcome-screen');
+    const app = document.getElementById('app');
+    const fab = document.getElementById('fab-main');
     
-    if (w) w.classList.add('hidden');
-    if (a) a.classList.remove('hidden');
-    if (f) f.classList.remove('hidden');
+    if (welcome) welcome.classList.add('hidden');
+    if (app) app.classList.remove('hidden');
+    if (fab) fab.classList.remove('hidden');
     
     actualizarSidebarUsuario();
     navegarA('inicio');
@@ -594,10 +533,10 @@ function mostrarApp() {
 }
 
 function mostrarBienvenida() {
-    const a = document.getElementById('app');
-    const w = document.getElementById('welcome-screen');
-    if (a) a.classList.add('hidden');
-    if (w) w.classList.remove('hidden');
+    const app = document.getElementById('app');
+    const welcome = document.getElementById('welcome-screen');
+    if (app) app.classList.add('hidden');
+    if (welcome) welcome.classList.remove('hidden');
 }
 
 // ============================================
@@ -605,8 +544,8 @@ function mostrarBienvenida() {
 // ============================================
 function toggleRadioPanel() {
     APP_STATE.radioPanelOpen = !APP_STATE.radioPanelOpen;
-    const p = document.getElementById('radio-quick-panel');
-    if (p) p.classList.toggle('hidden', !APP_STATE.radioPanelOpen);
+    const panel = document.getElementById('radio-quick-panel');
+    if (panel) panel.classList.toggle('hidden', !APP_STATE.radioPanelOpen);
     if (APP_STATE.radioPanelOpen) cerrarOtrosPaneles('radio');
 }
 
@@ -674,8 +613,8 @@ function reproducirCancion(index) {
 // ============================================
 function toggleStreamingPanel() {
     APP_STATE.streamingPanelOpen = !APP_STATE.streamingPanelOpen;
-    const p = document.getElementById('streaming-panel');
-    if (p) p.classList.toggle('hidden', !APP_STATE.streamingPanelOpen);
+    const panel = document.getElementById('streaming-panel');
+    if (panel) panel.classList.toggle('hidden', !APP_STATE.streamingPanelOpen);
     if (APP_STATE.streamingPanelOpen) {
         cerrarOtrosPaneles('streaming');
         actualizarStreaming();
@@ -693,8 +632,8 @@ function actualizarStreaming() {
 // ============================================
 function toggleQRPanel() {
     APP_STATE.qrPanelOpen = !APP_STATE.qrPanelOpen;
-    const p = document.getElementById('qr-panel');
-    if (p) p.classList.toggle('hidden', !APP_STATE.qrPanelOpen);
+    const panel = document.getElementById('qr-panel');
+    if (panel) panel.classList.toggle('hidden', !APP_STATE.qrPanelOpen);
     if (APP_STATE.qrPanelOpen) {
         cerrarOtrosPaneles('qr');
         generarQR();
@@ -916,8 +855,8 @@ function agregarXP(cantidad) {
 // ============================================
 function toggleAsistente() {
     APP_STATE.assistantOpen = !APP_STATE.assistantOpen;
-    const a = document.getElementById('assistant');
-    if (a) a.classList.toggle('hidden', !APP_STATE.assistantOpen);
+    const assistant = document.getElementById('assistant');
+    if (assistant) assistant.classList.toggle('hidden', !APP_STATE.assistantOpen);
     if (APP_STATE.assistantOpen && APP_STATE.fabMenuOpen) toggleFabMenu();
 }
 
@@ -999,39 +938,39 @@ function procesarPreguntaAsistente(pregunta) {
 // GESTIÓN DE REPORTES
 // ============================================
 function abrirModalReporte() {
-    const m = document.getElementById('report-modal');
-    if (!m) return;
+    const modal = document.getElementById('report-modal');
+    if (!modal) return;
     
-    const f = document.getElementById('report-form');
-    if (f) f.reset();
+    const form = document.getElementById('report-form');
+    if (form) form.reset();
     
     cambiarTipoReporte('usuario');
-    m.classList.remove('hidden');
+    modal.classList.remove('hidden');
 }
 
 function cerrarModalReporte() {
-    const m = document.getElementById('report-modal');
-    if (m) m.classList.add('hidden');
+    const modal = document.getElementById('report-modal');
+    if (modal) modal.classList.add('hidden');
 }
 
 function cambiarTipoReporte(tipo) {
-    const u = document.getElementById('report-user-group');
-    const d = document.getElementById('report-date-range');
-    const m = document.getElementById('report-ministerio-group');
+    const userGroup = document.getElementById('report-user-group');
+    const dateRange = document.getElementById('report-date-range');
+    const ministerioGroup = document.getElementById('report-ministerio-group');
     
-    if (u) u.style.display = 'none';
-    if (d) d.style.display = 'none';
-    if (m) m.style.display = 'none';
+    if (userGroup) userGroup.style.display = 'none';
+    if (dateRange) dateRange.style.display = 'none';
+    if (ministerioGroup) ministerioGroup.style.display = 'none';
     
     if (tipo === 'usuario' || tipo === 'contenido' || tipo === 'abuso') {
-        if (u) u.style.display = 'block';
+        if (userGroup) userGroup.style.display = 'block';
     }
     if (tipo === 'asistencia' || tipo === 'financiero') {
-        if (d) d.style.display = 'grid';
+        if (dateRange) dateRange.style.display = 'grid';
     }
     if (tipo === 'ministerio') {
-        if (m) m.style.display = 'block';
-        if (d) d.style.display = 'grid';
+        if (ministerioGroup) ministerioGroup.style.display = 'block';
+        if (dateRange) dateRange.style.display = 'grid';
     }
 }
 
@@ -1043,15 +982,15 @@ function generarReporte(e) {
         return;
     }
     
-    const d = document.getElementById('report-descripcion');
-    if (!d || !d.value.trim()) {
+    const descripcion = document.getElementById('report-descripcion');
+    if (!descripcion || !descripcion.value.trim()) {
         showToast('La descripción es obligatoria', 'warning');
         return;
     }
     
     const tipo = document.querySelector('input[name="report-type"]:checked');
-    const urg = document.querySelector('input[name="report-urgencia"]:checked');
-    const mot = document.getElementById('report-motivo');
+    const urgencia = document.querySelector('input[name="report-urgencia"]:checked');
+    const motivo = document.getElementById('report-motivo');
     const fileInput = document.getElementById('report-attachment');
     
     const reporte = {
@@ -1062,9 +1001,9 @@ function generarReporte(e) {
             nombre: APP_STATE.usuario.nombre || 'Anónimo',
             email: APP_STATE.usuario.correo || ''
         },
-        descripcion: d.value.trim(),
-        motivo: mot ? mot.value : '',
-        urgencia: urg ? urg.value : 'baja',
+        descripcion: descripcion.value.trim(),
+        motivo: motivo ? motivo.value : '',
+        urgencia: urgencia ? urgencia.value : 'baja',
         estado: 'pendiente',
         fecha: new Date().toISOString(),
         adjuntos: fileInput && fileInput.files.length > 0 ? fileInput.files.length : 0
@@ -1089,16 +1028,16 @@ function actualizarBadgeReportes() {
     
     APP_STATE.reportsPendientes = count;
     
-    const b = document.getElementById('reports-badge');
-    if (b) {
-        b.textContent = count;
-        b.classList.toggle('hidden', count === 0);
+    const badge = document.getElementById('reports-badge');
+    if (badge) {
+        badge.textContent = count;
+        badge.classList.toggle('hidden', count === 0);
     }
     
-    const p = document.getElementById('pending-reports');
-    if (p) {
-        p.textContent = count;
-        p.classList.toggle('hidden', count === 0);
+    const pending = document.getElementById('pending-reports');
+    if (pending) {
+        pending.textContent = count;
+        pending.classList.toggle('hidden', count === 0);
     }
 }
 
@@ -1152,17 +1091,17 @@ function verDetalleReporte(id) {
 }
 
 function cargarReportesRecientes() {
-    const c = document.getElementById('recent-reports-list');
-    if (!c) return;
+    const container = document.getElementById('recent-reports-list');
+    if (!container) return;
     
-    const rec = APP_STATE.reportes.slice(0, 5);
+    const recientes = APP_STATE.reportes.slice(0, 5);
     
-    if (rec.length === 0) {
-        c.innerHTML = '<div class="report-empty"><p>No hay reportes recientes</p></div>';
+    if (recientes.length === 0) {
+        container.innerHTML = '<div class="report-empty"><p>No hay reportes recientes</p></div>';
         return;
     }
     
-    c.innerHTML = rec.map(r => `
+    container.innerHTML = recientes.map(r => `
         <div class="reporte-mini" onclick="verDetalleReporte('${r.id}')">
             <span class="badge estado-${r.estado || 'pendiente'}">${r.estado || 'pendiente'}</span>
             <span class="badge tipo-${r.tipo || 'general'}">${r.tipo || 'general'}</span>
@@ -1174,8 +1113,8 @@ function cargarReportesRecientes() {
 
 function togglePanelReportes() {
     APP_STATE.reportsPanelOpen = !APP_STATE.reportsPanelOpen;
-    const p = document.getElementById('reports-quick-panel');
-    if (p) p.classList.toggle('hidden', !APP_STATE.reportsPanelOpen);
+    const panel = document.getElementById('reports-quick-panel');
+    if (panel) panel.classList.toggle('hidden', !APP_STATE.reportsPanelOpen);
     
     if (APP_STATE.reportsPanelOpen) {
         cargarReportesRecientes();
@@ -1184,12 +1123,21 @@ function togglePanelReportes() {
 }
 
 // ============================================
+// FAB MENU (CORREGIDO)
+// ============================================
+function toggleFabMenu() {
+    APP_STATE.fabMenuOpen = !APP_STATE.fabMenuOpen;
+    const menu = document.getElementById('fab-menu');
+    if (menu) menu.classList.toggle('hidden', !APP_STATE.fabMenuOpen);
+}
+
+// ============================================
 // BÚSQUEDA GLOBAL
 // ============================================
 function toggleSearchBar() {
     APP_STATE.searchBarOpen = !APP_STATE.searchBarOpen;
-    const b = document.getElementById('search-bar');
-    if (b) b.classList.toggle('hidden', !APP_STATE.searchBarOpen);
+    const bar = document.getElementById('search-bar');
+    if (bar) bar.classList.toggle('hidden', !APP_STATE.searchBarOpen);
     
     if (APP_STATE.searchBarOpen) {
         const input = document.getElementById('global-search-input');
@@ -1209,21 +1157,18 @@ function realizarBusqueda(query) {
     const q = query.toLowerCase();
     let resultados = [];
     
-    // Buscar en páginas
     Object.keys(CONFIG.TITULOS_PAGINAS).forEach(page => {
         if (CONFIG.TITULOS_PAGINAS[page].toLowerCase().includes(q)) {
             resultados.push({ type: 'page', id: page, name: CONFIG.TITULOS_PAGINAS[page], icon: '📄' });
         }
     });
     
-    // Buscar en versículos
     CONFIG.VERSES.forEach((v, i) => {
         if (v.verse.toLowerCase().includes(q) || v.ref.toLowerCase().includes(q)) {
             resultados.push({ type: 'verse', id: `verse_${i}`, name: `${v.verse} - ${v.ref}`, icon: '📖' });
         }
     });
     
-    // Buscar en playlist
     CONFIG.PLAYLIST.forEach((s, i) => {
         if (s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)) {
             resultados.push({ type: 'song', id: `song_${i}`, name: `${s.title} - ${s.artist}`, icon: '🎵' });
@@ -1266,8 +1211,8 @@ function seleccionarResultadoBusqueda(type, id) {
 // ============================================
 function toggleNotificaciones() {
     APP_STATE.notificationsOpen = !APP_STATE.notificationsOpen;
-    const p = document.getElementById('notification-panel');
-    if (p) p.classList.toggle('hidden', !APP_STATE.notificationsOpen);
+    const panel = document.getElementById('notification-panel');
+    if (panel) panel.classList.toggle('hidden', !APP_STATE.notificationsOpen);
     
     if (APP_STATE.notificationsOpen) {
         actualizarNotificaciones();
@@ -1341,14 +1286,14 @@ function actualizarContador() {
     
     try {
         const ahora = new Date();
-        const dom = new Date(ahora);
-        const diasHastaDomingo = (7 - ahora.getDay()) % 7;
-        dom.setDate(ahora.getDate() + (diasHastaDomingo === 0 ? 7 : diasHastaDomingo));
-        dom.setHours(10, 0, 0, 0);
+        const domingo = new Date(ahora);
+        const diasHastaDomingo = (7 - ahora.getDay()) % 7 || 7;
+        domingo.setDate(ahora.getDate() + diasHastaDomingo);
+        domingo.setHours(10, 0, 0, 0);
         
-        if (dom <= ahora) dom.setDate(dom.getDate() + 7);
+        if (domingo <= ahora) domingo.setDate(domingo.getDate() + 7);
         
-        const diff = Math.max(0, (dom - ahora) / 1000);
+        const diff = Math.max(0, (domingo - ahora) / 1000);
         
         if (dd) dd.textContent = String(Math.floor(diff / 86400)).padStart(2, '0');
         if (hh) hh.textContent = String(Math.floor((diff % 86400) / 3600)).padStart(2, '0');
@@ -1361,8 +1306,8 @@ function actualizarContador() {
 // MODALES Y CONFIRMACIONES
 // ============================================
 function cerrarModal() {
-    const m = document.getElementById('modal');
-    if (m) m.classList.add('hidden');
+    const modal = document.getElementById('modal');
+    if (modal) modal.classList.add('hidden');
     const footer = document.getElementById('modal-footer');
     if (footer) {
         footer.classList.add('hidden');
@@ -1371,28 +1316,28 @@ function cerrarModal() {
 }
 
 function confirmarAccion(titulo, mensaje, callback) {
-    const t = document.getElementById('confirm-title');
-    const m = document.getElementById('confirm-message');
+    const titleEl = document.getElementById('confirm-title');
+    const messageEl = document.getElementById('confirm-message');
     const modal = document.getElementById('confirm-modal');
     
     if (!modal) return;
     
-    if (t) t.textContent = titulo || '¿Estás seguro?';
-    if (m) m.textContent = mensaje || '';
+    if (titleEl) titleEl.textContent = titulo || '¿Estás seguro?';
+    if (messageEl) messageEl.textContent = mensaje || '';
     
     APP_STATE.pendingConfirmation = callback;
     modal.classList.remove('hidden');
 }
 
 // ============================================
-// PÁGINAS - IMPLEMENTACIONES COMPLETAS
+// PÁGINAS - IMPLEMENTACIONES
 // ============================================
+
 function cargarInicio(c) {
     const isAdmin = APP_STATE.rol === 'admin';
     
     c.innerHTML = `
         <div class="fade-in">
-            <!-- Contador Regresivo -->
             <div class="card" style="text-align:center;border-left:4px solid var(--dorado);">
                 <h3>⛪ Próximo Culto Dominical</h3>
                 <div style="display:flex;justify-content:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
@@ -1404,7 +1349,6 @@ function cargarInicio(c) {
                 <span class="badge estado-proximo">🔔 PRÓXIMO CULTO</span>
             </div>
             
-            <!-- Banner Principal -->
             <div class="card" style="text-align:center;border-left:4px solid var(--dorado);">
                 <h3>🎉 IPUC LA FONDA v${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</h3>
                 <p>"Donde el Espíritu Santo se mueve"</p>
@@ -1415,7 +1359,6 @@ function cargarInicio(c) {
                 </div>
             </div>
             
-            <!-- Accesos Rápidos -->
             <div class="card">
                 <h3>⚡ Accesos Rápidos</h3>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:8px;">
@@ -1430,7 +1373,6 @@ function cargarInicio(c) {
                 </div>
             </div>
             
-            <!-- Estadísticas -->
             <div class="card">
                 <h3>📊 Estadísticas</h3>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;text-align:center;">
@@ -1612,6 +1554,72 @@ function cargarConfiguracion(c) {
         </div>`;
 }
 
+function cargarSistema(c) {
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2>🖥️ Sistema</h2>
+            <div class="card">
+                <p><strong>Versión:</strong> ${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</p>
+                <p><strong>Modo:</strong> ${APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline'}</p>
+                <p><strong>Tema:</strong> ${APP_STATE.tema}</p>
+                <p><strong>Idioma:</strong> ${APP_STATE.idioma.toUpperCase()}</p>
+                <p><strong>Usuario:</strong> ${APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Invitado'}</p>
+                <p><strong>Nivel:</strong> ${APP_STATE.nivel}</p>
+                <p><strong>XP:</strong> ${APP_STATE.xp} / ${APP_STATE.xpSiguiente}</p>
+            </div>
+        </div>`;
+}
+
+function cargarPeticiones(c) {
+    const peticiones = APP_STATE.peticiones || [];
+    
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2>🙏 Peticiones de Oración</h2>
+            <div class="card">
+                <div class="form-group">
+                    <label>Motivo de Oración</label>
+                    <textarea class="form-input" id="pet-motivo" rows="2" placeholder="Motivo de oración..."></textarea>
+                </div>
+                <button class="btn-primary btn-sm" onclick="crearPeticionLocal()">Enviar Petición</button>
+            </div>
+            ${peticiones.length === 0 ? 
+                '<div class="card"><p>No hay peticiones</p></div>' :
+                peticiones.map(p => `
+                    <div class="card">
+                        <p><strong>${escapeHtml(p.nombre || 'Anónimo')}</strong></p>
+                        <p>${escapeHtml(p.motivo || '')}</p>
+                        <small>${formatearFecha(p.fecha)}</small>
+                    </div>
+                `).join('')
+            }
+        </div>`;
+}
+
+function crearPeticionLocal() {
+    const m = document.getElementById('pet-motivo');
+    if (!m || !m.value.trim()) {
+        showToast('Escribe un motivo', 'warning');
+        return;
+    }
+    if (!APP_STATE.usuario) {
+        showToast('Inicia sesión', 'warning');
+        return;
+    }
+    
+    APP_STATE.peticiones.unshift({
+        id: generarId('pet'),
+        nombre: APP_STATE.usuario.nombre || 'Anónimo',
+        motivo: m.value.trim(),
+        fecha: new Date().toISOString()
+    });
+    
+    m.value = '';
+    showToast('🙏 Petición enviada', 'success');
+    desbloquearLogro('first_prayer');
+    navegarA('peticiones');
+}
+
 function cargarGestionReportes(c) {
     const reportes = APP_STATE.reportes || [];
     const pendientes = reportes.filter(r => r.estado === 'pendiente').length;
@@ -1681,73 +1689,6 @@ function cargarMisReportes(c) {
         </div>`;
 }
 
-function cargarSistema(c) {
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2>🖥️ Sistema</h2>
-            <div class="card">
-                <p><strong>Versión:</strong> ${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</p>
-                <p><strong>Modo:</strong> ${APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline'}</p>
-                <p><strong>Tema:</strong> ${APP_STATE.tema}</p>
-                <p><strong>Idioma:</strong> ${APP_STATE.idioma.toUpperCase()}</p>
-                <p><strong>Usuario:</strong> ${APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Invitado'}</p>
-                <p><strong>Nivel:</strong> ${APP_STATE.nivel}</p>
-                <p><strong>XP:</strong> ${APP_STATE.xp} / ${APP_STATE.xpSiguiente}</p>
-            </div>
-        </div>`;
-}
-
-function cargarPeticiones(c) {
-    const peticiones = APP_STATE.peticiones || [];
-    
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2>🙏 Peticiones de Oración</h2>
-            <div class="card">
-                <div class="form-group">
-                    <label>Motivo de Oración</label>
-                    <textarea class="form-input" id="pet-motivo" rows="2" placeholder="Motivo de oración..."></textarea>
-                </div>
-                <button class="btn-primary btn-sm" onclick="crearPeticionLocal()">Enviar Petición</button>
-            </div>
-            ${peticiones.length === 0 ? 
-                '<div class="card"><p>No hay peticiones</p></div>' :
-                peticiones.map(p => `
-                    <div class="card">
-                        <p><strong>${escapeHtml(p.nombre || 'Anónimo')}</strong></p>
-                        <p>${escapeHtml(p.motivo || '')}</p>
-                        <small>${formatearFecha(p.fecha)}</small>
-                    </div>
-                `).join('')
-            }
-        </div>`;
-}
-
-function crearPeticionLocal() {
-    const m = document.getElementById('pet-motivo');
-    if (!m || !m.value.trim()) {
-        showToast('Escribe un motivo', 'warning');
-        return;
-    }
-    if (!APP_STATE.usuario) {
-        showToast('Inicia sesión', 'warning');
-        return;
-    }
-    
-    APP_STATE.peticiones.unshift({
-        id: generarId('pet'),
-        nombre: APP_STATE.usuario.nombre || 'Anónimo',
-        motivo: m.value.trim(),
-        fecha: new Date().toISOString()
-    });
-    
-    m.value = '';
-    showToast('🙏 Petición enviada', 'success');
-    desbloquearLogro('first_prayer');
-    navegarA('peticiones');
-}
-
-// Páginas adicionales
 function cargarDashboard(c) {
     c.innerHTML = '<div class="fade-in"><h2>📊 Dashboard</h2><div class="card"><p>Panel de Administración</p><p>Bienvenido al panel de control de IPUC LA FONDA</p></div></div>';
 }
@@ -2180,9 +2121,14 @@ function cargarOfrendas(c) {
                 <h3>Ofrenda para la Iglesia</h3>
                 <p>"Cada uno dé como propuso en su corazón, no con tristeza ni por necesidad, porque Dios ama al dador alegre."</p>
                 <p style="font-size:0.9rem;color:var(--gris-texto);">2 Corintios 9:7</p>
-                <button class="btn-primary btn-lg" onclick="showToast('Sistema de pagos disponible pronto','info')" style="margin-top:16px;">💳 Donar Ahora</button>
+                <button class="btn-primary btn-lg" onclick="realizarDonacion()" style="margin-top:16px;">💳 Donar Ahora</button>
             </div>
         </div>`;
+}
+
+function realizarDonacion() {
+    showToast('💝 ¡Gracias por tu donación!', 'success');
+    desbloquearLogro('generous');
 }
 
 function cargarInformes(c) {
@@ -2205,7 +2151,6 @@ function cargarInformes(c) {
         </div>`;
 }
 
-// Páginas administrativas
 function cargarAdminDashboard(c) {
     if (APP_STATE.rol !== 'admin') {
         c.innerHTML = '<div class="card"><p>⛔ Acceso restringido a administradores</p></div>';
@@ -2354,7 +2299,6 @@ function cargarAnaliticas(c) {
         </div>`;
 }
 
-// Páginas placeholder
 function cargarBiblioteca(c) {
     c.innerHTML = '<div class="fade-in"><h2>📚 Biblioteca Digital</h2><div class="card"><p>Recursos cristianos disponibles próximamente</p></div></div>';
 }
@@ -2427,11 +2371,6 @@ function cargarDonaciones(c) {
         </div>`;
 }
 
-function realizarDonacion() {
-    showToast('💝 ¡Gracias por tu donación!', 'success');
-    desbloquearLogro('generous');
-}
-
 function cargarDevocional(c) {
     const verses = CONFIG.VERSES;
     const v = verses[new Date().getDate() % verses.length];
@@ -2453,9 +2392,9 @@ function cargarDevocional(c) {
 document.addEventListener('DOMContentLoaded', function() {
     // Cargar tema
     try {
-        const t = localStorage.getItem('ipuc20_tema') || 'light';
-        APP_STATE.tema = t;
-        aplicarTema(t);
+        const temaGuardado = localStorage.getItem('ipuc20_tema') || 'light';
+        APP_STATE.tema = temaGuardado;
+        aplicarTema(temaGuardado);
     } catch (e) {}
     
     // Cargar idioma
