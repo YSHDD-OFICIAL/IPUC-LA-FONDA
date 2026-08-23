@@ -2,7 +2,8 @@
    IPUC LA FONDA - DATABASE v20.0 PRO ULTIMATE
    Sistema de Base de Datos en localStorage
    Incluye: Radio, Streaming, Gamificación, Logros, QR, Asistente
-   VERSION CORREGIDA - SIN ERRORES
+   VERSION CORREGIDA - SIN ERRORES - COMPLETA
+   "Donde el Espíritu Santo se mueve"
    ============================================ */
 
 class Database {
@@ -1748,6 +1749,59 @@ class Database {
     getLogs(limit = 50) {
         const l = this.cargar('logs');
         return (l && l.logs || []).slice(0, limit);
+    }
+
+    // Métodos adicionales para compatibilidad
+    getRecursos() {
+        const b = this.cargar('biblioteca');
+        return (b && b.recursos || []);
+    }
+
+    getPodcast() {
+        const p = this.cargar('podcast');
+        return (p && p.episodios || []);
+    }
+
+    getEncuestas() {
+        const e = this.cargar('encuestas');
+        return (e && e.encuestas || []);
+    }
+
+    getDirectorio() {
+        const d = this.cargar('directorio');
+        return (d && d.miembros || []);
+    }
+
+    getGrupos() {
+        const g = this.cargar('grupos');
+        return (g && g.grupos || []);
+    }
+
+    getMisiones() {
+        const m = this.cargar('misiones');
+        return (m && m.misiones || []);
+    }
+
+    getTestimonios() {
+        const t = this.cargar('testimonios');
+        return (t && t.testimonios || []);
+    }
+
+    getInsignias() {
+        const i = this.cargar('insignias');
+        return (i && i.insignias || []);
+    }
+
+    getFavoritos(usuarioId = null) {
+        const f = this.cargar('favoritos');
+        const favoritos = (f && f.favoritos || []);
+        return usuarioId ? favoritos.filter(x => x.usuario_id === usuarioId) : favoritos;
+    }
+
+    getMetas(usuarioId = null) {
+        const m = this.cargar('metas');
+        const metas = (m && m.metas || []);
+        return usuarioId ? metas.filter(x => x.usuario_id === usuarioId) : metas;
     }
 
     // ============================================
