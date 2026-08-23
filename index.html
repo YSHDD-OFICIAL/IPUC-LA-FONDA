@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ============================================
-IPUC LA FONDA v20.0 PRO ULTIMATE - 2026
+IPUC LA FONDA v22.0 PRO ULTIMATE - 2026
 Iglesia Pentecostal Unida de Colombia
 "Donde el Espíritu Santo se mueve"
 SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
@@ -25,7 +25,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
     <meta name="application-name" content="IPUC LA FONDA International">
     <meta name="msapplication-TileColor" content="#1a237e">
 
-    <meta name="title" content="IPUC LA FONDA v20.0 PRO ULTIMATE">
+    <meta name="title" content="IPUC LA FONDA v22.0 PRO ULTIMATE">
     <meta name="description" content="IPUC LA FONDA - Plataforma integral con IA, streaming en vivo, gamificación, tienda, y comunidad global.">
     <meta name="keywords" content="IPUC, LA FONDA, iglesia, radio, eventos, comunidad, gamificación, IA, streaming">
     <meta name="author" content="IPUC LA FONDA">
@@ -33,14 +33,14 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
     
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
-    <meta property="og:title" content="IPUC LA FONDA v20.0 PRO ULTIMATE">
+    <meta property="og:title" content="IPUC LA FONDA v22.0 PRO ULTIMATE">
     <meta property="og:description" content="Plataforma integral con IA, streaming, gamificación y comunidad.">
     <meta property="og:image" content="ipuclafonda.png">
     <meta property="og:locale" content="es_CO">
     <meta property="og:site_name" content="IPUC LA FONDA">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="IPUC LA FONDA v20.0 PRO ULTIMATE">
+    <meta name="twitter:title" content="IPUC LA FONDA v22.0 PRO ULTIMATE">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
@@ -66,7 +66,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
     <!-- Leaflet - Mapas -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     
-    <title>IPUC LA FONDA v20.0 PRO | IA · Streaming · Gamificación</title>
+    <title>IPUC LA FONDA v22.0 PRO | IA · Streaming · Gamificación</title>
 </head>
 <body>
 
@@ -97,10 +97,12 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <span class="verse-rotating" id="rotating-verse">Cantad al Señor - Salmo 96:1</span>
                 </div>
                 <div class="splash-features">
-                    <span><i class="bx bx-radio"></i> Radio</span>
-                    <span><i class="bx bx-video"></i> Streaming</span>
+                    <span><i class="bx bx-radio-circle-marked"></i> Radio</span>
+                    <span><i class="bx bx-video-recording"></i> Streaming</span>
                     <span><i class="bx bx-game"></i> Gamificación</span>
-                    <span><i class="bx bx-brain"></i> IA</span>
+                    <span><i class="bx bx-chip"></i> IA</span>
+                    <span><i class="bx bx-cloud-upload"></i> Nube</span>
+                    <span><i class="bx bx-shield-alt"></i> Seguridad</span>
                 </div>
             </div>
             <div class="splash-loader">
@@ -112,8 +114,8 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             </div>
             <div class="splash-footer">
                 <div class="splash-flags">
-                    <span>ES · EN · PT · FR</span>
-                    <span class="splash-version">v20.0 PRO ULTIMATE</span>
+                    <span><i class="bx bx-globe"></i> ES · EN · PT · FR · DE</span>
+                    <span class="splash-version">v22.0 PRO ULTIMATE</span>
                 </div>
             </div>
         </div>
@@ -149,33 +151,35 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <div class="sidebar-stats">
                 <div class="stat-item">
                     <span class="stat-value" id="online-users">0</span>
-                    <span class="stat-label">En Línea</span>
+                    <span class="stat-label"><i class="bx bx-wifi"></i> En Línea</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-value" id="total-members">0</span>
-                    <span class="stat-label">Miembros</span>
+                    <span class="stat-label"><i class="bx bx-group"></i> Miembros</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-value" id="prayers-count">0</span>
-                    <span class="stat-label">Oraciones</span>
+                    <span class="stat-label"><i class="bx bx-pray"></i> Oraciones</span>
                 </div>
             </div>
 
+            <!-- SELECTOR DE IDIOMAS -->
             <div class="sidebar-languages">
-                <button class="lang-btn active" data-lang="es" aria-label="Español">ES</button>
-                <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
-                <button class="lang-btn" data-lang="pt" aria-label="Portugués">PT</button>
-                <button class="lang-btn" data-lang="fr" aria-label="Francés">FR</button>
-                <button class="lang-btn" data-lang="de" aria-label="Deutsch">DE</button>
+                <button class="lang-btn active" data-lang="es" aria-label="Español"><i class="bx bx-globe"></i> ES</button>
+                <button class="lang-btn" data-lang="en" aria-label="English"><i class="bx bx-globe"></i> EN</button>
+                <button class="lang-btn" data-lang="pt" aria-label="Portugués"><i class="bx bx-globe"></i> PT</button>
+                <button class="lang-btn" data-lang="fr" aria-label="Francés"><i class="bx bx-globe"></i> FR</button>
+                <button class="lang-btn" data-lang="de" aria-label="Deutsch"><i class="bx bx-globe"></i> DE</button>
+                <button class="lang-btn" data-lang="it" aria-label="Italiano"><i class="bx bx-globe"></i> IT</button>
             </div>
 
-            <!-- RADIO PLAYER EN SIDEBAR MEJORADO -->
+            <!-- RADIO PLAYER EN SIDEBAR -->
             <div class="sidebar-radio">
                 <div class="radio-mini-player" id="radio-mini">
                     <div class="radio-info">
-                        <i class="bx bx-radio"></i>
+                        <i class="bx bx-radio-circle-marked"></i>
                         <span class="radio-station">Radio IPUC</span>
-                        <span class="radio-status" id="radio-status">🔴 En Vivo</span>
+                        <span class="radio-status" id="radio-status"><i class="bx bx-broadcast"></i> En Vivo</span>
                     </div>
                     <div class="radio-controls">
                         <button class="btn-icon" id="radio-play-toggle" aria-label="Play/Pause Radio">
@@ -190,7 +194,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
 
             <nav class="sidebar-nav" aria-label="Navegación principal">
                 <div class="nav-section">
-                    <span class="nav-section-title">🌟 Principal</span>
+                    <span class="nav-section-title"><i class="bx bx-star"></i> Principal</span>
                     <a href="#inicio" class="nav-item active" data-page="inicio">
                         <i class="bx bx-home-alt-2"></i><span>Inicio</span>
                         <span class="nav-badge new">Nuevo</span>
@@ -203,12 +207,19 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                         <span class="nav-badge live">LIVE</span>
                     </a>
                     <a href="#radio" class="nav-item" data-page="radio">
-                        <i class="bx bx-radio"></i><span>Radio</span>
+                        <i class="bx bx-radio-circle-marked"></i><span>Radio</span>
+                    </a>
+                    <a href="#modo-oracion" class="nav-item" data-page="modo-oracion">
+                        <i class="bx bx-moon"></i><span>Modo Oración</span>
+                        <span class="nav-badge new">Nuevo</span>
+                    </a>
+                    <a href="#notas-rapidas" class="nav-item" data-page="notas-rapidas">
+                        <i class="bx bx-pencil"></i><span>Notas Rápidas</span>
                     </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">⛪ Iglesia</span>
+                    <span class="nav-section-title"><i class="bx bx-church"></i> Iglesia</span>
                     <a href="#eventos" class="nav-item" data-page="eventos">
                         <i class="bx bx-calendar-event"></i><span>Eventos</span>
                         <span class="nav-badge-count" id="eventos-badge">0</span>
@@ -222,10 +233,16 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#mapa" class="nav-item" data-page="mapa">
                         <i class="bx bx-map"></i><span>Ubicación</span>
                     </a>
+                    <a href="#ministerios" class="nav-item" data-page="ministerios">
+                        <i class="bx bx-building-house"></i><span>Ministerios</span>
+                    </a>
+                    <a href="#lideres" class="nav-item" data-page="lideres">
+                        <i class="bx bx-user-pin"></i><span>Líderes</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">🤝 Comunidad</span>
+                    <span class="nav-section-title"><i class="bx bx-group"></i> Comunidad</span>
                     <a href="#chat" class="nav-item" data-page="chat">
                         <i class="bx bx-chat"></i><span>Chat Global</span>
                         <span class="nav-badge-count" id="chat-badge">0</span>
@@ -245,12 +262,18 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#grupos" class="nav-item" data-page="grupos">
                         <i class="bx bx-group"></i><span>Grupos y Células</span>
                     </a>
+                    <a href="#voluntariado" class="nav-item" data-page="voluntariado">
+                        <i class="bx bx-hand"></i><span>Voluntariado</span>
+                    </a>
+                    <a href="#eventos-sociales" class="nav-item" data-page="eventos-sociales">
+                        <i class="bx bx-party"></i><span>Eventos Sociales</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">📖 Espiritual</span>
+                    <span class="nav-section-title"><i class="bx bx-bible"></i> Espiritual</span>
                     <a href="#devocional" class="nav-item" data-page="devocional">
-                        <i class="bx bx-bible"></i><span>Devocional Diario</span>
+                        <i class="bx bx-book-reader"></i><span>Devocional Diario</span>
                     </a>
                     <a href="#lectura-biblica" class="nav-item" data-page="lectura-biblica">
                         <i class="bx bx-book"></i><span>Plan de Lectura</span>
@@ -265,10 +288,16 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#diario-espiritual" class="nav-item" data-page="diario-espiritual">
                         <i class="bx bx-notepad"></i><span>Diario Espiritual</span>
                     </a>
+                    <a href="#memorizacion" class="nav-item" data-page="memorizacion">
+                        <i class="bx bx-brain"></i><span>Memorización</span>
+                    </a>
+                    <a href="#estudios-biblicos" class="nav-item" data-page="estudios-biblicos">
+                        <i class="bx bx-book-content"></i><span>Estudios Bíblicos</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">🎮 Gamificación</span>
+                    <span class="nav-section-title"><i class="bx bx-trophy"></i> Gamificación</span>
                     <a href="#logros" class="nav-item" data-page="logros">
                         <i class="bx bx-trophy"></i><span>Logros</span>
                         <span class="nav-badge-count" id="achievements-count">0</span>
@@ -282,10 +311,17 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#ranking" class="nav-item" data-page="ranking">
                         <i class="bx bx-medal"></i><span>Ranking</span>
                     </a>
+                    <a href="#desafios" class="nav-item" data-page="desafios">
+                        <i class="bx bx-target-lock"></i><span>Desafíos</span>
+                        <span class="nav-badge new">Nuevo</span>
+                    </a>
+                    <a href="#insignias" class="nav-item" data-page="insignias">
+                        <i class="bx bx-badge-check"></i><span>Insignias</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">🎵 Multimedia</span>
+                    <span class="nav-section-title"><i class="bx bx-play-circle"></i> Multimedia</span>
                     <a href="#galeria" class="nav-item" data-page="galeria">
                         <i class="bx bx-images"></i><span>Galería</span>
                     </a>
@@ -298,10 +334,16 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#podcast" class="nav-item" data-page="podcast">
                         <i class="bx bx-microphone"></i><span>Podcast</span>
                     </a>
+                    <a href="#archivo-streaming" class="nav-item" data-page="archivo-streaming">
+                        <i class="bx bx-archive"></i><span>Archivo Streaming</span>
+                    </a>
+                    <a href="#wallpapers" class="nav-item" data-page="wallpapers">
+                        <i class="bx bx-image"></i><span>Wallpapers</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">📚 Recursos</span>
+                    <span class="nav-section-title"><i class="bx bx-book-open"></i> Recursos</span>
                     <a href="#biblioteca" class="nav-item" data-page="biblioteca">
                         <i class="bx bx-book-open"></i><span>Biblioteca Digital</span>
                     </a>
@@ -311,10 +353,16 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#recursos" class="nav-item" data-page="recursos">
                         <i class="bx bx-folder"></i><span>Recursos</span>
                     </a>
+                    <a href="#descargas" class="nav-item" data-page="descargas">
+                        <i class="bx bx-download"></i><span>Descargas</span>
+                    </a>
+                    <a href="#documentos" class="nav-item" data-page="documentos">
+                        <i class="bx bx-file-doc"></i><span>Documentos</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">🛒 Tienda</span>
+                    <span class="nav-section-title"><i class="bx bx-store-alt"></i> Tienda</span>
                     <a href="#tienda" class="nav-item" data-page="tienda">
                         <i class="bx bx-store-alt"></i><span>Tienda Cristiana</span>
                         <span class="nav-badge-count" id="cart-badge">0</span>
@@ -325,22 +373,34 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#ofrendas" class="nav-item" data-page="ofrendas">
                         <i class="bx bx-money"></i><span>Ofrendas</span>
                     </a>
+                    <a href="#suscripciones" class="nav-item" data-page="suscripciones">
+                        <i class="bx bx-credit-card"></i><span>Suscripciones</span>
+                    </a>
+                    <a href="#carrito" class="nav-item" data-page="carrito">
+                        <i class="bx bx-cart"></i><span>Carrito</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">
-                    <span class="nav-section-title">📊 Reportes</span>
+                    <span class="nav-section-title"><i class="bx bx-file"></i> Reportes</span>
                     <a href="#mis-reportes" class="nav-item" data-page="mis-reportes">
                         <i class="bx bx-file"></i><span>Mis Reportes</span>
                     </a>
                     <a href="#informes" class="nav-item" data-page="informes">
                         <i class="bx bx-file-pdf"></i><span>Informes PDF</span>
                     </a>
+                    <a href="#exportar-datos" class="nav-item" data-page="exportar-datos">
+                        <i class="bx bx-export"></i><span>Exportar Datos</span>
+                    </a>
+                    <a href="#historial" class="nav-item" data-page="historial">
+                        <i class="bx bx-history"></i><span>Historial</span>
+                    </a>
                 </div>
 
                 <div id="admin-menu" class="nav-section hidden">
                     <hr class="divider">
                     <span class="nav-section-title admin-label">
-                        <i class="bx bx-shield"></i> Administración
+                        <i class="bx bx-shield-alt"></i> Administración
                     </span>
                     <a href="#admin-dashboard" class="nav-item" data-page="admin-dashboard">
                         <i class="bx bx-line-chart"></i><span>Dashboard Admin</span>
@@ -363,6 +423,15 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     </a>
                     <a href="#sistema" class="nav-item" data-page="sistema">
                         <i class="bx bx-server"></i><span>Sistema</span>
+                    </a>
+                    <a href="#auditoria" class="nav-item" data-page="auditoria">
+                        <i class="bx bx-clipboard"></i><span>Auditoría</span>
+                    </a>
+                    <a href="#backup" class="nav-item" data-page="backup">
+                        <i class="bx bx-cloud-download"></i><span>Copias de Seguridad</span>
+                    </a>
+                    <a href="#permisos" class="nav-item" data-page="permisos">
+                        <i class="bx bx-lock-open-alt"></i><span>Permisos</span>
                     </a>
                 </div>
             </nav>
@@ -390,6 +459,8 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <a href="#logros" role="menuitem"><i class="bx bx-trophy"></i> Mis Logros</a>
                     <a href="#configuracion" role="menuitem"><i class="bx bx-cog"></i> Configuración</a>
                     <a href="#tema" role="menuitem"><i class="bx bx-palette"></i> Temas</a>
+                    <a href="#notas-rapidas" role="menuitem"><i class="bx bx-pencil"></i> Notas Rápidas</a>
+                    <a href="#favoritos" role="menuitem"><i class="bx bx-heart"></i> Favoritos</a>
                     <hr>
                     <a href="#" id="btn-logout" role="menuitem"><i class="bx bx-log-out"></i> Cerrar Sesión</a>
                 </div>
@@ -423,7 +494,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                         <i class="bx bx-search"></i>
                     </button>
                     <button id="radio-toggle" class="btn-icon" aria-label="Radio">
-                        <i class="bx bx-radio"></i>
+                        <i class="bx bx-radio-circle-marked"></i>
                     </button>
                     <button id="reports-quick-toggle" class="btn-icon" aria-label="Reportes rápidos">
                         <i class="bx bx-file"></i>
@@ -435,6 +506,12 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <button id="notifications-toggle" class="btn-icon notification-btn" aria-label="Notificaciones">
                         <i class="bx bx-bell"></i>
                         <span class="badge badge-notifications hidden">0</span>
+                    </button>
+                    <button id="prayer-mode-toggle" class="btn-icon" aria-label="Modo Oración">
+                        <i class="bx bx-moon"></i>
+                    </button>
+                    <button id="focus-mode-toggle" class="btn-icon" aria-label="Modo Concentración">
+                        <i class="bx bx-focus"></i>
                     </button>
                 </div>
             </header>
@@ -452,7 +529,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                         <div class="streaming-placeholder">
                             <i class="bx bx-video-recording"></i>
                             <p>Transmisión en vivo próximamente</p>
-                            <span class="streaming-badge">🔴 EN VIVO</span>
+                            <span class="streaming-badge"><i class="bx bx-broadcast"></i> EN VIVO</span>
                         </div>
                     </div>
                     <div class="streaming-info">
@@ -464,8 +541,9 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                             <span><i class="bx bx-chat"></i> <span id="streaming-chat">0</span></span>
                         </div>
                         <div class="streaming-actions">
-                            <button class="btn-primary btn-sm"><i class="bx bx-share"></i> Compartir</button>
-                            <button class="btn-primary btn-sm"><i class="bx bx-bell"></i> Recordar</button>
+                            <button class="btn-primary btn-sm"><i class="bx bx-share-alt"></i> Compartir</button>
+                            <button class="btn-primary btn-sm"><i class="bx bx-bell-plus"></i> Recordar</button>
+                            <button class="btn-primary btn-sm"><i class="bx bx-download"></i> Descargar</button>
                         </div>
                     </div>
                 </div>
@@ -474,7 +552,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <!-- PANEL DE RADIO RÁPIDO -->
             <div id="radio-quick-panel" class="radio-quick-panel hidden" role="dialog" aria-label="Panel de radio">
                 <div class="radio-quick-header">
-                    <h3><i class="bx bx-radio"></i> Radio IPUC</h3>
+                    <h3><i class="bx bx-radio-circle-marked"></i> Radio IPUC</h3>
                     <button class="btn-icon" id="close-radio-quick" aria-label="Cerrar">
                         <i class="bx bx-x"></i>
                     </button>
@@ -501,7 +579,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                         <i class="bx bx-volume-full"></i>
                     </div>
                     <div class="radio-playlist">
-                        <h4>Lista de Reproducción</h4>
+                        <h4><i class="bx bx-playlist"></i> Lista de Reproducción</h4>
                         <ul id="playlist-songs">
                             <li class="active"><i class="bx bx-play-circle"></i> Santo Espíritu</li>
                             <li><i class="bx bx-play-circle"></i> Alabanzas al Rey</li>
@@ -525,7 +603,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <p>Escanea para compartir</p>
                     <div class="qr-actions">
                         <button class="btn-primary btn-sm"><i class="bx bx-download"></i> Descargar</button>
-                        <button class="btn-primary btn-sm"><i class="bx bx-share"></i> Compartir</button>
+                        <button class="btn-primary btn-sm"><i class="bx bx-share-alt"></i> Compartir</button>
                     </div>
                 </div>
             </div>
@@ -533,7 +611,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <!-- PANEL DE REPORTES RAPIDOS -->
             <div id="reports-quick-panel" class="reports-quick-panel hidden" role="dialog" aria-label="Panel de reportes rápidos">
                 <div class="reports-quick-header">
-                    <h3>Reportes Rápidos</h3>
+                    <h3><i class="bx bx-file"></i> Reportes Rápidos</h3>
                     <button class="btn-icon" id="close-reports-quick" aria-label="Cerrar">
                         <i class="bx bx-x"></i>
                     </button>
@@ -603,25 +681,27 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
                 </div>
                 
-                <!-- VERSÍCULO DEL DÍA MEJORADO -->
+                <!-- VERSÍCULO DEL DÍA -->
                 <div class="welcome-verse-day" id="verse-day">
-                    <i class="bx bx-bible"></i>
+                    <i class="bx bx-book-reader"></i>
                     <div class="verse-content">
                         <span id="daily-verse">"Porque de tal manera amó Dios al mundo..."</span>
                         <span id="daily-verse-ref">Juan 3:16</span>
                     </div>
                 </div>
                 
+                <!-- SELECTOR DE IDIOMAS -->
                 <div class="welcome-languages">
-                    <button class="lang-btn active" data-lang="es">🇪🇸 Español</button>
-                    <button class="lang-btn" data-lang="en">🇬🇧 English</button>
-                    <button class="lang-btn" data-lang="pt">🇵🇹 Português</button>
-                    <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
-                    <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+                    <button class="lang-btn active" data-lang="es"><i class="bx bx-globe"></i> Español</button>
+                    <button class="lang-btn" data-lang="en"><i class="bx bx-globe"></i> English</button>
+                    <button class="lang-btn" data-lang="pt"><i class="bx bx-globe"></i> Português</button>
+                    <button class="lang-btn" data-lang="fr"><i class="bx bx-globe"></i> Français</button>
+                    <button class="lang-btn" data-lang="de"><i class="bx bx-globe"></i> Deutsch</button>
                 </div>
 
+                <!-- ESTADO DEL SISTEMA -->
                 <div id="system-status" class="system-status">
-                    <span id="status-icon" class="status-icon">🔄</span>
+                    <span id="status-icon" class="status-icon"><i class="bx bx-sync bx-spin"></i></span>
                     <span id="status-text">Verificando sistema...</span>
                 </div>
 
@@ -629,14 +709,14 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                 <div id="login-form-container" class="auth-form-container">
                     <form id="login-form" class="auth-form" autocomplete="off">
                         <div class="form-group">
-                            <label for="login-email">Correo Electrónico</label>
+                            <label for="login-email"><i class="bx bx-envelope"></i> Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-envelope"></i>
                                 <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="login-password">Contraseña</label>
+                            <label for="login-password"><i class="bx bx-lock-alt"></i> Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
                                 <input type="password" id="login-password" class="form-input" placeholder="********" required>
@@ -646,9 +726,9 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                             </div>
                         </div>
                         <div class="form-group" id="2fa-group" style="display:none;">
-                            <label for="login-2fa">Código de Verificación</label>
+                            <label for="login-2fa"><i class="bx bx-shield-alt"></i> Código de Verificación</label>
                             <div class="input-wrapper">
-                                <i class="bx bx-shield"></i>
+                                <i class="bx bx-shield-alt"></i>
                                 <input type="text" id="login-2fa" class="form-input" placeholder="Código de 6 dígitos" maxlength="6" pattern="[0-9]{6}">
                             </div>
                             <small class="form-hint">Ingresa el código enviado a tu correo</small>
@@ -670,35 +750,35 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                 <div id="register-form-container" class="auth-form-container hidden">
                     <form id="register-form" class="auth-form" autocomplete="off">
                         <div class="form-group">
-                            <label for="reg-nombre">Nombre Completo</label>
+                            <label for="reg-nombre"><i class="bx bx-user"></i> Nombre Completo</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-user"></i>
                                 <input type="text" id="reg-nombre" class="form-input" placeholder="Tu nombre" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="reg-email">Correo Electrónico</label>
+                            <label for="reg-email"><i class="bx bx-envelope"></i> Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-envelope"></i>
                                 <input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="reg-password">Contraseña</label>
+                            <label for="reg-password"><i class="bx bx-lock-alt"></i> Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
                                 <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="reg-role">Tipo de Usuario</label>
+                            <label for="reg-role"><i class="bx bx-user-voice"></i> Tipo de Usuario</label>
                             <select id="reg-role" class="form-input">
                                 <option value="user">Usuario Normal</option>
                                 <option value="admin">Administrador (requiere clave)</option>
                             </select>
                         </div>
                         <div id="admin-key-group" class="form-group hidden">
-                            <label for="reg-admin-key">Clave de Administrador</label>
+                            <label for="reg-admin-key"><i class="bx bx-key"></i> Clave de Administrador</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-key"></i>
                                 <input type="password" id="reg-admin-key" class="form-input" placeholder="Clave de administrador">
@@ -725,27 +805,31 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <button id="btn-create-admin" class="btn-outline btn-lg btn-block hidden">
                         <i class="bx bx-crown"></i> Crear Primer Administrador
                     </button>
+                    <button id="btn-qr-login" class="btn-outline btn-lg btn-block hidden">
+                        <i class="bx bx-qr-scan"></i> Acceso con QR
+                    </button>
                 </div>
 
                 <div class="welcome-social">
                     <span>Síguenos en:</span>
-                    <a href="#" class="social-link"><i class="bx bxl-youtube"></i></a>
-                    <a href="#" class="social-link"><i class="bx bxl-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="bx bxl-facebook"></i></a>
-                    <a href="#" class="social-link"><i class="bx bxl-whatsapp"></i></a>
-                    <a href="#" class="social-link"><i class="bx bxl-tiktok"></i></a>
-                    <a href="#" class="social-link"><i class="bx bxl-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="bx bxl-telegram"></i></a>
+                    <a href="#" class="social-link" aria-label="YouTube"><i class="bx bxl-youtube"></i></a>
+                    <a href="#" class="social-link" aria-label="Instagram"><i class="bx bxl-instagram"></i></a>
+                    <a href="#" class="social-link" aria-label="Facebook"><i class="bx bxl-facebook"></i></a>
+                    <a href="#" class="social-link" aria-label="WhatsApp"><i class="bx bxl-whatsapp"></i></a>
+                    <a href="#" class="social-link" aria-label="TikTok"><i class="bx bxl-tiktok"></i></a>
+                    <a href="#" class="social-link" aria-label="Twitter"><i class="bx bxl-twitter"></i></a>
+                    <a href="#" class="social-link" aria-label="Telegram"><i class="bx bxl-telegram"></i></a>
+                    <a href="#" class="social-link" aria-label="Discord"><i class="bx bxl-discord-alt"></i></a>
                 </div>
 
                 <div class="welcome-footer">
-                    <p class="welcome-version">v20.0 PRO ULTIMATE &copy; 2026 IPUC LA FONDA</p>
+                    <p class="welcome-version">v22.0 PRO ULTIMATE &copy; 2026 IPUC LA FONDA</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SECCIÓN CREAR ADMINISTRADOR MEJORADA -->
+    <!-- SECCIÓN CREAR ADMINISTRADOR -->
     <div id="create-admin-section" class="create-admin-section hidden">
         <div class="create-admin-card" data-aos="zoom-in" data-aos-duration="800">
             <button class="create-admin-back" id="btn-back-to-welcome" aria-label="Volver">
@@ -817,7 +901,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
         </div>
     </div>
 
-    <!-- MODAL DE REPORTES MEJORADO -->
+    <!-- MODAL DE REPORTES -->
     <div id="report-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
         <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
@@ -830,7 +914,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <div class="modal-body">
                 <form id="report-form" autocomplete="off">
                     <div class="form-section">
-                        <div class="form-section-title">Tipo de Reporte</div>
+                        <div class="form-section-title"><i class="bx bx-list-check"></i> Tipo de Reporte</div>
                         <div class="report-type-selector">
                             <label class="report-type-option">
                                 <input type="radio" name="report-type" value="usuario" checked>
@@ -854,13 +938,13 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                             </label>
                             <label class="report-type-option">
                                 <input type="radio" name="report-type" value="abuso">
-                                <i class="bx bx-shield"></i><span>Abuso</span>
+                                <i class="bx bx-shield-alt"></i><span>Abuso</span>
                             </label>
                         </div>
                     </div>
 
                     <div class="form-section">
-                        <div class="form-section-title">Detalles del Reporte</div>
+                        <div class="form-section-title"><i class="bx bx-detail"></i> Detalles del Reporte</div>
                         
                         <div class="form-group" id="report-user-group">
                             <label for="report-user">Usuario a Reportar</label>
@@ -960,7 +1044,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
         </div>
     </div>
 
-    <!-- PANEL DE NOTIFICACIONES MEJORADO -->
+    <!-- PANEL DE NOTIFICACIONES -->
     <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-label="Panel de notificaciones">
         <div class="notification-header">
             <h3><i class="bx bx-bell"></i> Notificaciones</h3>
@@ -974,10 +1058,10 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             </div>
         </div>
         <div class="notification-filters">
-            <button class="filter-btn active" data-filter="all">Todas</button>
-            <button class="filter-btn" data-filter="evento">Eventos</button>
-            <button class="filter-btn" data-filter="oracion">Oraciones</button>
-            <button class="filter-btn" data-filter="sistema">Sistema</button>
+            <button class="filter-btn active" data-filter="all"><i class="bx bx-list-ul"></i> Todas</button>
+            <button class="filter-btn" data-filter="evento"><i class="bx bx-calendar"></i> Eventos</button>
+            <button class="filter-btn" data-filter="oracion"><i class="bx bx-pray"></i> Oraciones</button>
+            <button class="filter-btn" data-filter="sistema"><i class="bx bx-server"></i> Sistema</button>
         </div>
         <div id="notification-list">
             <div class="notification-empty">
@@ -987,7 +1071,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
         </div>
     </div>
 
-    <!-- MODAL DE EVENTOS MEJORADO -->
+    <!-- MODAL DE EVENTOS -->
     <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
         <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
@@ -1000,30 +1084,30 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <div class="modal-body">
                 <form id="event-form" autocomplete="off">
                     <div class="form-group">
-                        <label for="event-title">Título del Evento *</label>
+                        <label for="event-title"><i class="bx bx-text"></i> Título del Evento *</label>
                         <input type="text" id="event-title" class="form-input" placeholder="Ej: Culto de Adoración" required>
                     </div>
                     <div class="form-group">
-                        <label for="event-desc">Descripción</label>
+                        <label for="event-desc"><i class="bx bx-detail"></i> Descripción</label>
                         <textarea id="event-desc" class="form-input" rows="3" placeholder="Detalles del evento..."></textarea>
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="event-date">Fecha *</label>
+                            <label for="event-date"><i class="bx bx-calendar"></i> Fecha *</label>
                             <input type="date" id="event-date" class="form-input" required>
                         </div>
                         <div class="form-group">
-                            <label for="event-time">Hora *</label>
+                            <label for="event-time"><i class="bx bx-time"></i> Hora *</label>
                             <input type="time" id="event-time" class="form-input" required>
                         </div>
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="event-location">Lugar</label>
+                            <label for="event-location"><i class="bx bx-map"></i> Lugar</label>
                             <input type="text" id="event-location" class="form-input" placeholder="Dirección del evento">
                         </div>
                         <div class="form-group">
-                            <label for="event-type">Tipo de Evento</label>
+                            <label for="event-type"><i class="bx bx-category"></i> Tipo de Evento</label>
                             <select id="event-type" class="form-input">
                                 <option value="culto">Culto</option>
                                 <option value="estudio">Estudio Bíblico</option>
@@ -1039,19 +1123,19 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="event-reminder"> 
-                            Activar recordatorio (24h antes)
+                            <i class="bx bx-bell"></i> Activar recordatorio (24h antes)
                         </label>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" id="btn-cancel-event">Cancelar</button>
-                        <button type="submit" class="btn-primary">Crear Evento</button>
+                        <button type="submit" class="btn-primary"><i class="bx bx-calendar-check"></i> Crear Evento</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE ORACIÓN MEJORADO -->
+    <!-- MODAL DE ORACIÓN -->
     <div id="prayer-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
         <div class="modal-container modal-sm" data-aos="fade-up" data-aos-duration="500">
@@ -1064,11 +1148,11 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <div class="modal-body">
                 <form id="prayer-form" autocomplete="off">
                     <div class="form-group">
-                        <label for="prayer-name">Tu Nombre</label>
+                        <label for="prayer-name"><i class="bx bx-user"></i> Tu Nombre</label>
                         <input type="text" id="prayer-name" class="form-input" placeholder="Anónimo o tu nombre">
                     </div>
                     <div class="form-group">
-                        <label for="prayer-category">Categoría</label>
+                        <label for="prayer-category"><i class="bx bx-category"></i> Categoría</label>
                         <select id="prayer-category" class="form-input">
                             <option value="salud">Salud</option>
                             <option value="familia">Familia</option>
@@ -1080,7 +1164,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="prayer-request">Petición de Oración *</label>
+                        <label for="prayer-request"><i class="bx bx-pray"></i> Petición de Oración *</label>
                         <textarea id="prayer-request" class="form-input" rows="4" placeholder="Comparte tu petición..." required></textarea>
                     </div>
                     <div class="form-group">
@@ -1121,13 +1205,13 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                 <p id="confirm-message"></p>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
-                <button class="btn-primary" id="confirm-accept">Aceptar</button>
+                <button class="btn-secondary" id="confirm-cancel"><i class="bx bx-x"></i> Cancelar</button>
+                <button class="btn-primary" id="confirm-accept"><i class="bx bx-check"></i> Aceptar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE JUEGOS BÍBLICOS MEJORADO -->
+    <!-- MODAL DE JUEGOS -->
     <div id="game-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
         <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
@@ -1138,11 +1222,10 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                 </button>
             </div>
             <div class="modal-body" id="game-body">
-                <!-- El contenido del juego se carga dinámicamente -->
                 <div class="game-container">
                     <div class="game-score">
-                        <span>Puntuación: <strong id="game-score">0</strong></span>
-                        <span>Nivel: <strong id="game-level">1</strong></span>
+                        <span><i class="bx bx-star"></i> Puntuación: <strong id="game-score">0</strong></span>
+                        <span><i class="bx bx-level-up"></i> Nivel: <strong id="game-level">1</strong></span>
                     </div>
                     <div class="game-question" id="game-question">
                         ¿Quién construyó el arca?
@@ -1154,7 +1237,7 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
                         <button class="game-option" data-answer="d">David</button>
                     </div>
                     <div class="game-result" id="game-result"></div>
-                    <button class="btn-primary btn-next hidden" id="game-next">Siguiente</button>
+                    <button class="btn-primary btn-next hidden" id="game-next"><i class="bx bx-right-arrow-alt"></i> Siguiente</button>
                 </div>
             </div>
         </div>
@@ -1189,13 +1272,13 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
         </div>
     </div>
 
-    <!-- ASISTENTE VIRTUAL (CHATBOT) -->
+    <!-- ASISTENTE VIRTUAL -->
     <div id="assistant" class="assistant hidden" role="dialog" aria-label="Asistente virtual">
         <div class="assistant-header">
             <div class="assistant-info">
                 <i class="bx bx-bot"></i>
                 <span>Asistente IPUC</span>
-                <span class="assistant-status">🟢 En línea</span>
+                <span class="assistant-status"><i class="bx bx-circle"></i> En línea</span>
             </div>
             <button class="btn-icon" id="close-assistant" aria-label="Cerrar asistente">
                 <i class="bx bx-x"></i>
@@ -1214,10 +1297,11 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             <button class="btn-icon" id="assistant-send"><i class="bx bx-send"></i></button>
         </div>
         <div class="assistant-suggestions">
-            <button class="suggestion-btn">📖 Versículo del día</button>
-            <button class="suggestion-btn">🙏 Oración</button>
-            <button class="suggestion-btn">📅 Eventos</button>
-            <button class="suggestion-btn">🎵 Música</button>
+            <button class="suggestion-btn"><i class="bx bx-book-reader"></i> Versículo del día</button>
+            <button class="suggestion-btn"><i class="bx bx-pray"></i> Oración</button>
+            <button class="suggestion-btn"><i class="bx bx-calendar"></i> Eventos</button>
+            <button class="suggestion-btn"><i class="bx bx-music"></i> Música</button>
+            <button class="suggestion-btn"><i class="bx bx-question-mark"></i> Ayuda</button>
         </div>
     </div>
 
@@ -1249,6 +1333,12 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
         </button>
         <button class="fab-item" data-action="asistente" role="menuitem">
             <i class="bx bx-bot"></i><span>Asistente</span>
+        </button>
+        <button class="fab-item" data-action="voluntariado" role="menuitem">
+            <i class="bx bx-hand"></i><span>Voluntariado</span>
+        </button>
+        <button class="fab-item" data-action="desafio" role="menuitem">
+            <i class="bx bx-target-lock"></i><span>Desafío</span>
         </button>
     </div>
 
@@ -1288,10 +1378,10 @@ SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN Y MÁS
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function(reg) {
-                        console.log('✅ SW registrado');
+                        console.log('Service Worker registrado');
                     })
                     .catch(function(err) {
-                        console.log('❌ SW error:', err);
+                        console.log('SW error:', err);
                     });
             });
         }
