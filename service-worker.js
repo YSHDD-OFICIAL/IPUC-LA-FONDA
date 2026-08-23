@@ -1,5 +1,5 @@
 /* ============================================
-   IPUC LA FONDA - SERVICE WORKER PWA v20.0 PRO ULTIMATE
+   IPUC LA FONDA - SERVICE WORKER PWA v22.0 PRO ULTIMATE
    Instalable como App Nativa | Offline | Push | Sincronizacion
    Incluye: Radio, Streaming, Gamificación, Logros, Asistente
    VERSION INTERNACIONAL - OPTIMIZADO - COMPLETO
@@ -9,7 +9,7 @@
 // ============================================
 // CONFIGURACIÓN DE CACHÉ
 // ============================================
-const CACHE_VERSION = 'v20.0.2026';
+const CACHE_VERSION = 'v22.0.2026';
 const CACHE_NAMES = {
     static: `ipuc-static-${CACHE_VERSION}`,
     runtime: `ipuc-runtime-${CACHE_VERSION}`,
@@ -24,27 +24,31 @@ const CACHE_NAMES = {
     streaming: `ipuc-streaming-${CACHE_VERSION}`,
     games: `ipuc-games-${CACHE_VERSION}`,
     assistant: `ipuc-assistant-${CACHE_VERSION}`,
-    sync: `ipuc-sync-${CACHE_VERSION}`
+    sync: `ipuc-sync-${CACHE_VERSION}`,
+    wallpapers: `ipuc-wallpapers-${CACHE_VERSION}`,
+    documents: `ipuc-documents-${CACHE_VERSION}`
 };
 
-const VERSION = '20.0';
+const VERSION = '22.0';
 const VERSION_NAME = 'PRO ULTIMATE';
-const BUILD_DATE = '2026-08-22';
+const BUILD_DATE = '2026-08-23';
 
 // Tiempos de expiración en segundos
 const MAX_AGE = {
-    static: 30 * 24 * 60 * 60,      // 30 días
-    runtime: 7 * 24 * 60 * 60,      // 7 días
-    images: 15 * 24 * 60 * 60,      // 15 días
-    audio: 90 * 24 * 60 * 60,       // 90 días
-    video: 30 * 24 * 60 * 60,       // 30 días
-    fonts: 365 * 24 * 60 * 60,      // 1 año
-    api: 1 * 24 * 60 * 60,          // 1 día
-    reports: 12 * 60 * 60,          // 12 horas
-    radio: 1 * 60 * 60,             // 1 hora
-    streaming: 30 * 60,             // 30 minutos
-    games: 7 * 24 * 60 * 60,        // 7 días
-    assistant: 1 * 60 * 60          // 1 hora
+    static: 30 * 24 * 60 * 60,
+    runtime: 7 * 24 * 60 * 60,
+    images: 15 * 24 * 60 * 60,
+    audio: 90 * 24 * 60 * 60,
+    video: 30 * 24 * 60 * 60,
+    fonts: 365 * 24 * 60 * 60,
+    api: 1 * 24 * 60 * 60,
+    reports: 12 * 60 * 60,
+    radio: 1 * 60 * 60,
+    streaming: 30 * 60,
+    games: 7 * 24 * 60 * 60,
+    assistant: 1 * 60 * 60,
+    wallpapers: 30 * 24 * 60 * 60,
+    documents: 30 * 24 * 60 * 60
 };
 
 // Assets a pre-cachear
@@ -68,7 +72,10 @@ const PRECACHE_ASSETS = [
     '/assets/radio/playlist-default.jpg',
     '/assets/streaming/live-placeholder.jpg',
     '/assets/game/trivia-bg.jpg',
-    '/assets/assistant/bot-avatar.png'
+    '/assets/assistant/bot-avatar.png',
+    '/assets/wallpapers/wallpaper-1.jpg',
+    '/assets/wallpapers/wallpaper-2.jpg',
+    '/assets/documents/manual.pdf'
 ];
 
 // Patrones de caché
@@ -85,7 +92,11 @@ const CACHE_PATTERNS = {
     radio: /\/radio\//i,
     streaming: /\/streaming\//i,
     games: /\/game\//i,
-    assistant: /\/assistant\//i
+    assistant: /\/assistant\//i,
+    wallpapers: /\/wallpapers\//i,
+    documents: /\/documents\//i,
+    pdf: /\.pdf$/i,
+    doc: /\.(doc|docx)$/i
 };
 
 // Orígenes permitidos
@@ -96,7 +107,8 @@ const ALLOWED_ORIGINS = [
     'https://fonts.gstatic.com',
     'https://cdn.jsdelivr.net',
     'https://cdnjs.cloudflare.com',
-    'https://boxicons.com'
+    'https://boxicons.com',
+    'https://images.unsplash.com'
 ];
 
 // ============================================
@@ -113,10 +125,13 @@ function shouldCache(url) {
     if (url.includes('token=')) return false;
     if (url.includes('auth=')) return false;
     if (url.includes('private')) return false;
+    if (url.includes('password')) return false;
     return true;
 }
 
 function getCacheNameForUrl(url) {
+    if (CACHE_PATTERNS.pdf.test(url) || CACHE_PATTERNS.doc.test(url)) return CACHE_NAMES.documents;
+    if (CACHE_PATTERNS.wallpapers.test(url)) return CACHE_NAMES.wallpapers;
     if (CACHE_PATTERNS.images.test(url)) return CACHE_NAMES.images;
     if (CACHE_PATTERNS.audio.test(url)) return CACHE_NAMES.audio;
     if (CACHE_PATTERNS.video.test(url)) return CACHE_NAMES.video;
@@ -146,7 +161,7 @@ function getMaxAgeForCache(cacheName) {
 // EVENTO: INSTALL
 // ============================================
 self.addEventListener('install', (event) => {
-    console.log(`📦 SW v${VERSION} ${VERSION_NAME}: Instalando...`);
+    console.log(`SW v${VERSION} ${VERSION_NAME}: Instalando...`);
     
     event.waitUntil(
         caches.open(CACHE_NAMES.static)
@@ -161,15 +176,15 @@ self.addEventListener('install', (event) => {
                         
                         if (response.ok || response.type === 'opaque') {
                             await cache.put(asset, response);
-                            console.log(`  ✓ Cacheado: ${asset}`);
+                            console.log(`  Cacheado: ${asset}`);
                         }
                     } catch (error) {
-                        console.warn(`  ✗ No cacheado: ${asset} - ${error.message}`);
+                        console.warn(`  No cacheado: ${asset} - ${error.message}`);
                     }
                 });
                 
                 await Promise.all(cachePromises);
-                console.log(`📦 SW: Instalación completada (${PRECACHE_ASSETS.length} assets)`);
+                console.log(`SW: Instalacion completada (${PRECACHE_ASSETS.length} assets)`);
                 await self.skipWaiting();
             })
     );
@@ -179,7 +194,7 @@ self.addEventListener('install', (event) => {
 // EVENTO: ACTIVATE
 // ============================================
 self.addEventListener('activate', (event) => {
-    console.log(`🔄 SW v${VERSION} ${VERSION_NAME}: Activando...`);
+    console.log(`SW v${VERSION} ${VERSION_NAME}: Activando...`);
     
     const validCaches = Object.values(CACHE_NAMES);
     
@@ -189,15 +204,15 @@ self.addEventListener('activate', (event) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
                         if (!validCaches.includes(cacheName) && cacheName.includes('ipuc-')) {
-                            console.log(`  🗑️ Eliminando caché antigua: ${cacheName}`);
+                            console.log(`  Eliminando cache antigua: ${cacheName}`);
                             return caches.delete(cacheName);
                         }
                     })
                 );
             })
             .then(() => {
-                console.log('✅ SW: Activación completada');
-                console.log(`📊 Cachés activas: ${validCaches.length}`);
+                console.log('SW: Activacion completada');
+                console.log(`Caches activas: ${validCaches.length}`);
                 return self.clients.claim();
             })
     );
@@ -209,75 +224,84 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     
-    // Solo manejar GET
     if (request.method !== 'GET') return;
     
     const url = new URL(request.url);
     
-    // Verificar origen permitido
     if (!isAllowedUrl(url.origin)) return;
     
-    // No cachear URLs con parámetros sensibles
     if (!shouldCache(url.href)) {
         event.respondWith(fetch(request));
         return;
     }
     
-    // Estrategia: Navegación - Network First con fallback offline
+    // Navegación - Network First con fallback offline
     if (request.mode === 'navigate') {
         event.respondWith(handleNavigation(request));
         return;
     }
     
-    // Estrategia: Audio/Radio - Stale-While-Revalidate
+    // Audio/Radio - Stale-While-Revalidate
     if (CACHE_PATTERNS.audio.test(url.pathname) || CACHE_PATTERNS.radio.test(url.pathname)) {
-        event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.radio || CACHE_NAMES.audio));
+        event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.radio));
         return;
     }
     
-    // Estrategia: Video/Streaming - Network First con fallback
+    // Video/Streaming - Network First
     if (CACHE_PATTERNS.video.test(url.pathname) || CACHE_PATTERNS.streaming.test(url.pathname)) {
-        event.respondWith(networkFirst(request, CACHE_NAMES.streaming || CACHE_NAMES.video));
+        event.respondWith(networkFirst(request, CACHE_NAMES.streaming));
         return;
     }
     
-    // Estrategia: Imágenes - Cache First con actualización
+    // Documentos PDF/DOC - Cache First
+    if (CACHE_PATTERNS.pdf.test(url.pathname) || CACHE_PATTERNS.doc.test(url.pathname)) {
+        event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.documents));
+        return;
+    }
+    
+    // Wallpapers - Cache First
+    if (CACHE_PATTERNS.wallpapers.test(url.pathname)) {
+        event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.wallpapers));
+        return;
+    }
+    
+    // Imágenes - Cache First
     if (CACHE_PATTERNS.images.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.images));
         return;
     }
     
-    // Estrategia: JS/CSS - Cache First con Network Update
+    // JS/CSS - Cache First con Network Update
     if (CACHE_PATTERNS.js.test(url.pathname) || CACHE_PATTERNS.css.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.runtime));
         return;
     }
     
-    // Estrategia: API - Network First con Cache Fallback
+    // API - Network First
     if (CACHE_PATTERNS.api.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.api));
         return;
     }
     
-    // Estrategia: Reportes - Network First
+    // Reportes - Network First
     if (CACHE_PATTERNS.reports.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.reports));
         return;
     }
     
-    // Estrategia: Juegos - Cache First
+    // Juegos - Cache First
     if (CACHE_PATTERNS.games.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.games));
         return;
     }
     
-    // Estrategia: Asistente - Network First
+    // Asistente - Network First
     if (CACHE_PATTERNS.assistant.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.assistant));
         return;
     }
     
-    // Estrategia por defecto: Stale-While-Revalidate
+    // Por defecto: Stale-While-Revalidate
     event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.runtime));
 });
 
@@ -285,7 +309,6 @@ self.addEventListener('fetch', (event) => {
 // ESTRATEGIAS DE CACHÉ
 // ============================================
 
-// Stale-While-Revalidate: Sirve de caché, actualiza en background
 async function staleWhileRevalidate(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
@@ -302,7 +325,6 @@ async function staleWhileRevalidate(request, cacheName) {
     return cachedResponse || fetchPromise;
 }
 
-// Network First: Intenta red, fallback a caché
 async function networkFirst(request, cacheName) {
     const cache = await caches.open(cacheName);
     
@@ -319,18 +341,15 @@ async function networkFirst(request, cacheName) {
         
         if (cachedResponse) return cachedResponse;
         
-        // Fallback específico según tipo
         return createOfflineResponse(request);
     }
 }
 
-// Cache First con actualización en background
 async function cacheFirstWithUpdate(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
     
     if (cachedResponse) {
-        // Actualizar en background
         fetch(request)
             .then((networkResponse) => {
                 if (networkResponse && networkResponse.ok) {
@@ -355,7 +374,6 @@ async function cacheFirstWithUpdate(request, cacheName) {
     }
 }
 
-// Manejo de navegación
 async function handleNavigation(request) {
     try {
         const networkResponse = await fetch(request);
@@ -373,7 +391,6 @@ async function handleNavigation(request) {
         
         if (cachedResponse) return cachedResponse;
         
-        // Fallback a index
         const indexResponse = await cache.match('/');
         if (indexResponse) return indexResponse;
         
@@ -381,7 +398,9 @@ async function handleNavigation(request) {
     }
 }
 
-// Crear respuesta offline
+// ============================================
+// RESPUESTA OFFLINE
+// ============================================
 function createOfflineResponse(request) {
     const url = new URL(request.url);
     
@@ -400,7 +419,7 @@ function createOfflineResponse(request) {
             JSON.stringify({ 
                 error: true, 
                 offline: true, 
-                mensaje: 'Sin conexión a internet' 
+                mensaje: 'Sin conexion a internet' 
             }),
             { 
                 status: 503, 
@@ -415,7 +434,6 @@ function createOfflineResponse(request) {
     return createOfflinePage();
 }
 
-// Página offline mejorada
 function createOfflinePage() {
     return new Response(
         `<!DOCTYPE html>
@@ -452,6 +470,10 @@ function createOfflinePage() {
                     font-size: 4rem;
                     margin-bottom: 16px;
                     animation: float 3s ease-in-out infinite;
+                }
+                .icon i {
+                    font-size: 4rem;
+                    color: #ffd700;
                 }
                 h1 {
                     font-size: 1.8rem;
@@ -503,10 +525,6 @@ function createOfflinePage() {
                 button:hover {
                     opacity: 0.9;
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 30px rgba(255,215,0,0.4);
-                }
-                button:active {
-                    transform: scale(0.95);
                 }
                 .version {
                     font-size: 0.65rem;
@@ -525,23 +543,26 @@ function createOfflinePage() {
                 @media (max-width: 480px) {
                     .container { padding: 30px 20px; }
                     h1 { font-size: 1.5rem; }
-                    .icon { font-size: 3rem; }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="icon">📡</div>
-                <h1>Sin conexión</h1>
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="#ffd700">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                    </svg>
+                </div>
+                <h1>Sin conexion</h1>
                 <p class="subtitle">IPUC LA FONDA</p>
                 <div class="features">
-                    <span>📖 Devocional</span>
-                    <span>🙏 Oración</span>
-                    <span>📅 Eventos</span>
-                    <span>🎵 Radio</span>
+                    <span>Devocional</span>
+                    <span>Oracion</span>
+                    <span>Eventos</span>
+                    <span>Radio</span>
                 </div>
                 <p>Puedes acceder a contenido guardado mientras esperas reconectar</p>
-                <button onclick="location.reload()">🔄 Reintentar</button>
+                <button onclick="location.reload()">Reintentar</button>
                 <p class="version">v${VERSION} ${VERSION_NAME} &copy; ${new Date().getFullYear()}</p>
             </div>
         </body>
@@ -561,11 +582,11 @@ function createOfflinePage() {
 // EVENTO: PUSH NOTIFICATIONS
 // ============================================
 self.addEventListener('push', (event) => {
-    console.log('🔔 SW: Push recibida');
+    console.log('SW: Push recibida');
     
     let data = {
         titulo: 'IPUC LA FONDA',
-        mensaje: 'Tienes una nueva notificación',
+        mensaje: 'Tienes una nueva notificacion',
         url: '/',
         icono: '/assets/icons/icon-192x192.png',
         badge: '/assets/icons/badge-icon.png',
@@ -583,25 +604,6 @@ self.addEventListener('push', (event) => {
         }
     }
     
-    const iconos = {
-        'reporte': '📋',
-        'reporte_urgente': '🚨',
-        'oracion': '🕯️',
-        'evento': '📅',
-        'publicacion': '📝',
-        'radio': '🎵',
-        'streaming': '📺',
-        'logro': '🏆',
-        'bendicion': '🕊️',
-        'mensaje': '💬',
-        'recordatorio': '⏰',
-        'sistema': '⚙️',
-        'donacion': '💝',
-        'testimonio': '💬'
-    };
-    
-    data.mensaje = `${iconos[data.tipo] || '📌'} ${data.mensaje}`;
-    
     const options = {
         body: data.mensaje,
         icon: data.icono,
@@ -617,8 +619,8 @@ self.addEventListener('push', (event) => {
         renotify: true,
         requireInteraction: ['reporte_urgente', 'importante', 'recordatorio'].includes(data.tipo),
         actions: [
-            { action: 'open', title: '📱 Abrir' },
-            { action: 'dismiss', title: '✖️ Cerrar' }
+            { action: 'open', title: 'Abrir' },
+            { action: 'dismiss', title: 'Cerrar' }
         ],
         sound: '/assets/sounds/notification.mp3',
         timestamp: Date.now()
@@ -639,7 +641,7 @@ self.addEventListener('notificationclick', (event) => {
     
     const urlToOpen = event.notification.data?.url || '/';
     
-    console.log('🔗 SW: Notificación clickeada:', event.notification.data);
+    console.log('SW: Notificacion clickeada');
     
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
@@ -666,11 +668,11 @@ self.addEventListener('notificationclick', (event) => {
 // ============================================
 const SYNC_TASKS = {
     'sync-datos': async () => {
-        console.log('🔄 SW: Sincronizando datos generales');
+        console.log('SW: Sincronizando datos generales');
         return Promise.resolve();
     },
     'sync-reportes': async () => {
-        console.log('📋 SW: Sincronizando reportes pendientes');
+        console.log('SW: Sincronizando reportes pendientes');
         const cache = await caches.open(CACHE_NAMES.reports);
         const keys = await cache.keys();
         
@@ -679,29 +681,36 @@ const SYNC_TASKS = {
             if (response) {
                 try {
                     const reporte = await response.json();
-                    console.log('  📤 Enviando reporte:', reporte.id);
-                    // Aquí iría la lógica de envío al servidor
+                    console.log('Enviando reporte:', reporte.id);
                     await cache.delete(key);
                 } catch (e) {
-                    console.warn('  ⚠️ Error procesando reporte:', e);
+                    console.warn('Error procesando reporte:', e);
                 }
             }
         }
     },
     'sync-radio': async () => {
-        console.log('🎵 SW: Sincronizando radio');
+        console.log('SW: Sincronizando radio');
         return Promise.resolve();
     },
     'sync-peticiones': async () => {
-        console.log('🙏 SW: Sincronizando peticiones');
+        console.log('SW: Sincronizando peticiones');
         return Promise.resolve();
     },
     'sync-logros': async () => {
-        console.log('🏆 SW: Sincronizando logros');
+        console.log('SW: Sincronizando logros');
         return Promise.resolve();
     },
     'sync-juegos': async () => {
-        console.log('🎮 SW: Sincronizando juegos');
+        console.log('SW: Sincronizando juegos');
+        return Promise.resolve();
+    },
+    'sync-documentos': async () => {
+        console.log('SW: Sincronizando documentos');
+        return Promise.resolve();
+    },
+    'sync-wallpapers': async () => {
+        console.log('SW: Sincronizando wallpapers');
         return Promise.resolve();
     }
 };
@@ -770,7 +779,7 @@ self.addEventListener('message', (event) => {
             caches.keys().then((names) => {
                 return Promise.all(names.map(name => caches.delete(name)));
             }).then(() => {
-                console.log('🗑️ SW: Todo el caché limpiado');
+                console.log('SW: Todo el cache limpiado');
                 port?.postMessage({ success: true, action: 'CLEAR_ALL_CACHE' });
             });
             break;
@@ -786,7 +795,7 @@ self.addEventListener('message', (event) => {
                     })
                 );
             }).then(() => {
-                console.log('🗑️ SW: Cachés antiguas limpiadas');
+                console.log('SW: Caches antiguas limpiadas');
                 port?.postMessage({ success: true, action: 'CLEAR_OLD_CACHE' });
             });
             break;
@@ -796,7 +805,7 @@ self.addEventListener('message', (event) => {
                 const syncTag = event.data.tag || 'sync-datos';
                 self.registration.sync.register(syncTag)
                     .then(() => {
-                        console.log(`🔄 SW: Sync registrado: ${syncTag}`);
+                        console.log(`SW: Sync registrado: ${syncTag}`);
                         port?.postMessage({ success: true, tag: syncTag });
                     })
                     .catch((error) => {
@@ -821,7 +830,7 @@ self.addEventListener('message', (event) => {
                 
                 caches.open(CACHE_NAMES.reports).then((cache) => {
                     cache.put(reportKey, response);
-                    console.log('📋 SW: Reporte guardado offline');
+                    console.log('SW: Reporte guardado offline');
                     
                     if ('sync' in self.registration) {
                         self.registration.sync.register('sync-reportes');
@@ -832,35 +841,18 @@ self.addEventListener('message', (event) => {
             }
             break;
             
-        case 'SAVE_RADIO_OFFLINE':
-            if (event.data.radioData) {
-                const radioKey = `radio_${Date.now()}`;
-                const radioData = JSON.stringify(event.data.radioData);
-                const blob = new Blob([radioData], { type: 'application/json' });
+        case 'SAVE_DOCUMENT_OFFLINE':
+            if (event.data.documento) {
+                const docKey = `doc_${Date.now()}`;
+                const docData = JSON.stringify(event.data.documento);
+                const blob = new Blob([docData], { type: 'application/json' });
                 const response = new Response(blob, {
                     headers: { 'Content-Type': 'application/json' }
                 });
                 
-                caches.open(CACHE_NAMES.radio).then((cache) => {
-                    cache.put(radioKey, response);
-                    console.log('🎵 SW: Datos de radio guardados offline');
-                    port?.postMessage({ success: true });
-                });
-            }
-            break;
-            
-        case 'SAVE_GAME_OFFLINE':
-            if (event.data.gameData) {
-                const gameKey = `game_${Date.now()}`;
-                const gameData = JSON.stringify(event.data.gameData);
-                const blob = new Blob([gameData], { type: 'application/json' });
-                const response = new Response(blob, {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                
-                caches.open(CACHE_NAMES.games).then((cache) => {
-                    cache.put(gameKey, response);
-                    console.log('🎮 SW: Datos de juego guardados offline');
+                caches.open(CACHE_NAMES.documents).then((cache) => {
+                    cache.put(docKey, response);
+                    console.log('SW: Documento guardado offline');
                     port?.postMessage({ success: true });
                 });
             }
@@ -880,9 +872,8 @@ self.addEventListener('message', (event) => {
 // EVENTO: ONLINE/OFFLINE
 // ============================================
 self.addEventListener('online', () => {
-    console.log('🟢 SW: Conexión restaurada');
+    console.log('SW: Conexion restaurada');
     
-    // Notificar a todos los clientes
     self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((client) => {
             client.postMessage({ 
@@ -893,7 +884,6 @@ self.addEventListener('online', () => {
         });
     });
     
-    // Intentar sincronizar al reconectar
     if ('sync' in self.registration) {
         Object.keys(SYNC_TASKS).forEach((tag) => {
             self.registration.sync.register(tag).catch(() => {});
@@ -902,7 +892,7 @@ self.addEventListener('online', () => {
 });
 
 self.addEventListener('offline', () => {
-    console.log('🔴 SW: Sin conexión');
+    console.log('SW: Sin conexion');
     
     self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((client) => {
@@ -916,15 +906,14 @@ self.addEventListener('offline', () => {
 });
 
 // ============================================
-// PERIODIC SYNC (si está disponible)
+// PERIODIC SYNC
 // ============================================
 if ('periodicSync' in self.registration) {
     self.addEventListener('periodicsync', (event) => {
         if (event.tag === 'periodic-update') {
             event.waitUntil(
                 Promise.resolve().then(() => {
-                    console.log('🔄 SW: Sincronización periódica ejecutada');
-                    // Actualizar contenido en background
+                    console.log('SW: Sincronizacion periodica ejecutada');
                 })
             );
         }
@@ -932,19 +921,15 @@ if ('periodicSync' in self.registration) {
 }
 
 // ============================================
-// BACKGROUND FETCH (si está disponible)
+// BACKGROUND FETCH
 // ============================================
 if ('backgroundFetch' in self) {
     self.addEventListener('backgroundfetchsuccess', (event) => {
-        console.log('📥 SW: Background fetch completado:', event.id);
+        console.log('SW: Background fetch completado:', event.id);
     });
     
     self.addEventListener('backgroundfetchfail', (event) => {
-        console.warn('⚠️ SW: Background fetch falló:', event.id);
-    });
-    
-    self.addEventListener('backgroundfetchabort', (event) => {
-        console.warn('⚠️ SW: Background fetch abortado:', event.id);
+        console.warn('SW: Background fetch fallo:', event.id);
     });
 }
 
@@ -952,19 +937,21 @@ if ('backgroundFetch' in self) {
 // LOGS DE INICIALIZACIÓN
 // ============================================
 console.log('========================================');
-console.log('✅ IPUC LA FONDA Service Worker cargado');
-console.log(`📦 Versión: v${VERSION} ${VERSION_NAME}`);
-console.log(`📅 Build: ${BUILD_DATE}`);
-console.log(`📊 Assets pre-cacheados: ${PRECACHE_ASSETS.length}`);
-console.log(`🗄️ Cachés: ${Object.keys(CACHE_NAMES).length}`);
-console.log('🎵 Radio y Streaming: Habilitados');
-console.log('🎮 Gamificación: Habilitada');
-console.log('🤖 Asistente Virtual: Habilitado');
-console.log('📡 Modo Offline: Habilitado');
+console.log('IPUC LA FONDA Service Worker cargado');
+console.log(`Version: v${VERSION} ${VERSION_NAME}`);
+console.log(`Build: ${BUILD_DATE}`);
+console.log(`Assets pre-cacheados: ${PRECACHE_ASSETS.length}`);
+console.log(`Caches: ${Object.keys(CACHE_NAMES).length}`);
+console.log('Radio y Streaming: Habilitados');
+console.log('Gamificacion: Habilitada');
+console.log('Asistente Virtual: Habilitado');
+console.log('Modo Offline: Habilitado');
+console.log('Documentos: Habilitados');
+console.log('Wallpapers: Habilitados');
 console.log('========================================');
 
 /* ============================================
-   FINAL DEL SERVICE WORKER v20.0 PRO ULTIMATE
+   FINAL DEL SERVICE WORKER v22.0 PRO ULTIMATE
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
