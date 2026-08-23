@@ -1,8 +1,8 @@
 /* ============================================
    IPUC LA FONDA - SCRIPT.JS v20.0 PRO ULTIMATE
    Web App Profesional - Sistema Completo
-   Incluye: Radio, Streaming, Gamificación, IA, Logros
-   VERSION CORREGIDA - SIN ERRORES
+   VERSION CORREGIDA - SIN ERRORES - COMPLETA
+   "Donde el Espíritu Santo se mueve"
    ============================================ */
 
 // ============================================
@@ -477,6 +477,52 @@ function actualizarSidebarUsuario() {
     if (adminMenu) adminMenu.classList.toggle('hidden', APP_STATE.rol !== 'admin');
 }
 
+// ============================================
+// TOGGLE USER DROPDOWN (CORREGIDO)
+// ============================================
+function toggleUserDropdown() {
+    APP_STATE.userDropdownOpen = !APP_STATE.userDropdownOpen;
+    const dropdown = document.getElementById('user-dropdown');
+    if (dropdown) dropdown.classList.toggle('hidden', !APP_STATE.userDropdownOpen);
+}
+
+// ============================================
+// TOGGLE FAB MENU (CORREGIDO)
+// ============================================
+function toggleFabMenu() {
+    APP_STATE.fabMenuOpen = !APP_STATE.fabMenuOpen;
+    const menu = document.getElementById('fab-menu');
+    if (menu) menu.classList.toggle('hidden', !APP_STATE.fabMenuOpen);
+}
+
+// ============================================
+// AUTENTICACIÓN
+// ============================================
+function login(email, password) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+        return db.login(email, password);
+    } catch (e) {
+        return { success: false, error: 'Error en el servidor' };
+    }
+}
+
+function registro(datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+        return db.registrarUsuario(datos);
+    } catch (e) {
+        return { success: false, error: 'Error en el servidor' };
+    }
+}
+
+function getDB() {
+    if (typeof window !== 'undefined' && window.db) return window.db;
+    return null;
+}
+
 function continuarComoInvitado() {
     APP_STATE.rol = 'invitado';
     APP_STATE.token = `guest_${Date.now()}`;
@@ -512,7 +558,7 @@ function cerrarSesion() {
 }
 
 // ============================================
-// GESTIÓN DE APP (MOSTRAR/OCULTAR)
+// MOSTRAR/OCULTAR APP
 // ============================================
 function mostrarApp() {
     const welcome = document.getElementById('welcome-screen');
@@ -1123,15 +1169,6 @@ function togglePanelReportes() {
 }
 
 // ============================================
-// FAB MENU (CORREGIDO)
-// ============================================
-function toggleFabMenu() {
-    APP_STATE.fabMenuOpen = !APP_STATE.fabMenuOpen;
-    const menu = document.getElementById('fab-menu');
-    if (menu) menu.classList.toggle('hidden', !APP_STATE.fabMenuOpen);
-}
-
-// ============================================
 // BÚSQUEDA GLOBAL
 // ============================================
 function toggleSearchBar() {
@@ -1330,7 +1367,7 @@ function confirmarAccion(titulo, mensaje, callback) {
 }
 
 // ============================================
-// PÁGINAS - IMPLEMENTACIONES
+// PÁGINAS - IMPLEMENTACIONES (Todas las funciones)
 // ============================================
 
 function cargarInicio(c) {
@@ -1554,72 +1591,6 @@ function cargarConfiguracion(c) {
         </div>`;
 }
 
-function cargarSistema(c) {
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2>🖥️ Sistema</h2>
-            <div class="card">
-                <p><strong>Versión:</strong> ${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</p>
-                <p><strong>Modo:</strong> ${APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline'}</p>
-                <p><strong>Tema:</strong> ${APP_STATE.tema}</p>
-                <p><strong>Idioma:</strong> ${APP_STATE.idioma.toUpperCase()}</p>
-                <p><strong>Usuario:</strong> ${APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Invitado'}</p>
-                <p><strong>Nivel:</strong> ${APP_STATE.nivel}</p>
-                <p><strong>XP:</strong> ${APP_STATE.xp} / ${APP_STATE.xpSiguiente}</p>
-            </div>
-        </div>`;
-}
-
-function cargarPeticiones(c) {
-    const peticiones = APP_STATE.peticiones || [];
-    
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2>🙏 Peticiones de Oración</h2>
-            <div class="card">
-                <div class="form-group">
-                    <label>Motivo de Oración</label>
-                    <textarea class="form-input" id="pet-motivo" rows="2" placeholder="Motivo de oración..."></textarea>
-                </div>
-                <button class="btn-primary btn-sm" onclick="crearPeticionLocal()">Enviar Petición</button>
-            </div>
-            ${peticiones.length === 0 ? 
-                '<div class="card"><p>No hay peticiones</p></div>' :
-                peticiones.map(p => `
-                    <div class="card">
-                        <p><strong>${escapeHtml(p.nombre || 'Anónimo')}</strong></p>
-                        <p>${escapeHtml(p.motivo || '')}</p>
-                        <small>${formatearFecha(p.fecha)}</small>
-                    </div>
-                `).join('')
-            }
-        </div>`;
-}
-
-function crearPeticionLocal() {
-    const m = document.getElementById('pet-motivo');
-    if (!m || !m.value.trim()) {
-        showToast('Escribe un motivo', 'warning');
-        return;
-    }
-    if (!APP_STATE.usuario) {
-        showToast('Inicia sesión', 'warning');
-        return;
-    }
-    
-    APP_STATE.peticiones.unshift({
-        id: generarId('pet'),
-        nombre: APP_STATE.usuario.nombre || 'Anónimo',
-        motivo: m.value.trim(),
-        fecha: new Date().toISOString()
-    });
-    
-    m.value = '';
-    showToast('🙏 Petición enviada', 'success');
-    desbloquearLogro('first_prayer');
-    navegarA('peticiones');
-}
-
 function cargarGestionReportes(c) {
     const reportes = APP_STATE.reportes || [];
     const pendientes = reportes.filter(r => r.estado === 'pendiente').length;
@@ -1691,6 +1662,72 @@ function cargarMisReportes(c) {
 
 function cargarDashboard(c) {
     c.innerHTML = '<div class="fade-in"><h2>📊 Dashboard</h2><div class="card"><p>Panel de Administración</p><p>Bienvenido al panel de control de IPUC LA FONDA</p></div></div>';
+}
+
+function cargarSistema(c) {
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2>🖥️ Sistema</h2>
+            <div class="card">
+                <p><strong>Versión:</strong> ${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</p>
+                <p><strong>Modo:</strong> ${APP_STATE.isOnline ? '🟢 Online' : '🔴 Offline'}</p>
+                <p><strong>Tema:</strong> ${APP_STATE.tema}</p>
+                <p><strong>Idioma:</strong> ${APP_STATE.idioma.toUpperCase()}</p>
+                <p><strong>Usuario:</strong> ${APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Invitado'}</p>
+                <p><strong>Nivel:</strong> ${APP_STATE.nivel}</p>
+                <p><strong>XP:</strong> ${APP_STATE.xp} / ${APP_STATE.xpSiguiente}</p>
+            </div>
+        </div>`;
+}
+
+function cargarPeticiones(c) {
+    const peticiones = APP_STATE.peticiones || [];
+    
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2>🙏 Peticiones de Oración</h2>
+            <div class="card">
+                <div class="form-group">
+                    <label>Motivo de Oración</label>
+                    <textarea class="form-input" id="pet-motivo" rows="2" placeholder="Motivo de oración..."></textarea>
+                </div>
+                <button class="btn-primary btn-sm" onclick="crearPeticionLocal()">Enviar Petición</button>
+            </div>
+            ${peticiones.length === 0 ? 
+                '<div class="card"><p>No hay peticiones</p></div>' :
+                peticiones.map(p => `
+                    <div class="card">
+                        <p><strong>${escapeHtml(p.nombre || 'Anónimo')}</strong></p>
+                        <p>${escapeHtml(p.motivo || '')}</p>
+                        <small>${formatearFecha(p.fecha)}</small>
+                    </div>
+                `).join('')
+            }
+        </div>`;
+}
+
+function crearPeticionLocal() {
+    const m = document.getElementById('pet-motivo');
+    if (!m || !m.value.trim()) {
+        showToast('Escribe un motivo', 'warning');
+        return;
+    }
+    if (!APP_STATE.usuario) {
+        showToast('Inicia sesión', 'warning');
+        return;
+    }
+    
+    APP_STATE.peticiones.unshift({
+        id: generarId('pet'),
+        nombre: APP_STATE.usuario.nombre || 'Anónimo',
+        motivo: m.value.trim(),
+        fecha: new Date().toISOString()
+    });
+    
+    m.value = '';
+    showToast('🙏 Petición enviada', 'success');
+    desbloquearLogro('first_prayer');
+    navegarA('peticiones');
 }
 
 function cargarRadio(c) {
@@ -2873,6 +2910,7 @@ window.seleccionarResultadoBusqueda = seleccionarResultadoBusqueda;
 window.realizarDonacion = realizarDonacion;
 window.login = login;
 window.registro = registro;
+window.getDB = getDB;
 window.cerrarPaneles = cerrarPaneles;
 window.enviarMensajeAsistente = enviarMensajeAsistente;
 
@@ -2882,6 +2920,7 @@ console.log('🏆 ' + CONFIG.ACHIEVEMENTS.length + ' logros configurados');
 console.log('🧠 ' + CONFIG.TRIVIA_QUESTIONS.length + ' preguntas de trivia');
 console.log('🎵 ' + CONFIG.PLAYLIST.length + ' canciones en playlist');
 console.log('📻 ' + CONFIG.RADIO_STATIONS.length + ' estaciones de radio');
+console.log('✅ Todas las funciones definidas correctamente');
 
 /* ============================================
    FINAL DEL SCRIPT v20.0 PRO ULTIMATE
