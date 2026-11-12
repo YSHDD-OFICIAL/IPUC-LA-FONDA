@@ -11,6 +11,12 @@
 const CONFIG = {
     VERSION: '22.0',
     VERSION_NAME: 'PRO ULTIMATE',
+    // Número de WhatsApp de la iglesia para recibir pedidos de la tienda,
+    // en formato internacional sin "+" ni espacios (ej: '573001234567').
+    // Mientras esté vacío, el botón de "Finalizar pedido" avisa que falta configurarlo.
+    CONTACTO: {
+        whatsapp: ''
+    },
     TITULOS_PAGINAS: {
         'inicio': 'Inicio',
         'horarios': 'Horarios',
@@ -174,6 +180,20 @@ const CONFIG = {
         { plan: 'Básico', precio: '$0', caracteristicas: ['Acceso a devocionales', 'Radio en vivo', 'Chat básico'] },
         { plan: 'Premium', precio: '$5/mes', caracteristicas: ['Todo lo básico', 'Estudios avanzados', 'Sin anuncios', 'Descargas ilimitadas'] },
         { plan: 'Familia', precio: '$12/mes', caracteristicas: ['Todo lo premium', 'Hasta 5 miembros', 'Soporte prioritario'] }
+    ],
+    PRODUCTOS: [
+        { id: 'p1', nombre: 'Biblia de Estudio IPUC', precio: 45000, icono: 'bx bx-book-heart', categoria: 'Libros' },
+        { id: 'p2', nombre: 'Camiseta "Donde el Espíritu se mueve"', precio: 35000, icono: 'bx bxs-tshirt', categoria: 'Ropa' },
+        { id: 'p3', nombre: 'Taza IPUC La Fonda', precio: 20000, icono: 'bx bx-coffee', categoria: 'Accesorios' },
+        { id: 'p4', nombre: 'CD Alabanza y Adoración', precio: 15000, icono: 'bx bx-disc', categoria: 'Música' },
+        { id: 'p5', nombre: 'Libreta de Oración', precio: 12000, icono: 'bx bx-notepad', categoria: 'Papelería' },
+        { id: 'p6', nombre: 'Gorra Bordada IPUC', precio: 28000, icono: 'bx bx-like', categoria: 'Ropa' }
+    ],
+    VIDEOS: [
+        { id: 'v1', titulo: 'Culto Dominical en Vivo', categoria: 'Cultos', url: '', miniatura: 'assets/streaming/live-placeholder.jpg' },
+        { id: 'v2', titulo: 'Serie: Fundamentos de la Fe', categoria: 'Enseñanza', url: '', miniatura: 'assets/wallpapers/wallpaper-1.jpg' },
+        { id: 'v3', titulo: 'Alabanza y Adoración', categoria: 'Música', url: '', miniatura: 'assets/wallpapers/wallpaper-2.jpg' },
+        { id: 'v4', titulo: 'Testimonios de Fe', categoria: 'Testimonios', url: '', miniatura: 'assets/streaming/live-placeholder.jpg' }
     ]
 };
 
@@ -452,6 +472,9 @@ function cargarPagina(page) {
             'eventos-sociales': cargarEventosSociales,
             'memorizacion': cargarMemorizacion,
             'estudios-biblicos': cargarEstudiosBiblicos,
+            'testimonios': cargarTestimonios,
+            'tienda': cargarTienda,
+            'videos': cargarVideos,
             'desafios': cargarDesafios,
             'insignias': cargarInsignias,
             'archivo-streaming': cargarArchivoStreaming,
@@ -1237,6 +1260,15 @@ function marcarLecturaCompletada() {
     APP_STATE.lecturasCompletadas++;
     showToast('Lectura marcada como completada', 'success');
     if (APP_STATE.lecturasCompletadas >= 10) desbloquearLogro('bible_reader');
+
+    // Persistir el avance del plan de lectura
+    if (APP_STATE.usuario && APP_STATE.usuario.id) {
+        const db = getDB();
+        if (db) {
+            db.marcarLecturaCompletada(APP_STATE.usuario.id);
+            sincronizarProgreso();
+        }
+    }
     navegarA('lectura-biblica');
 }
 
@@ -2054,7 +2086,8 @@ function cargarSuscripciones(c) {
 
 function cargarCarrito(c) {
     const carrito = APP_STATE.carrito || [];
-    
+    const total = carrito.reduce((sum, item) => sum + (item.precio || 0), 0);
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-cart"></i> Carrito</h2>
@@ -2063,18 +2096,166 @@ function cargarCarrito(c) {
                 carrito.map(item => `
                     <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
                         <span><i class="bx bx-box"></i> ${item.nombre}</span>
-                        <span>$${item.precio}</span>
+                        <span>$${item.precio.toLocaleString('es-CO')}</span>
                         <button class="btn-danger btn-sm" onclick="eliminarDelCarrito('${item.id}')"><i class="bx bx-trash"></i></button>
                     </div>
-                `).join('')
+                `).join('') +
+                `<div class="card" style="display:flex;justify-content:space-between;align-items:center;font-weight:700;">
+                    <span>Total</span>
+                    <span>$${total.toLocaleString('es-CO')}</span>
+                </div>
+                <button class="btn-primary btn-lg" style="width:100%;margin-top:8px;" onclick="finalizarPedido()">
+                    <i class="bx bxl-whatsapp"></i> Finalizar pedido por WhatsApp
+                </button>`
             }
         </div>`;
+}
+
+function finalizarPedido() {
+    const carrito = APP_STATE.carrito || [];
+    if (carrito.length === 0) {
+        showToast('Tu carrito está vacío', 'info');
+        return;
+    }
+
+    if (!CONFIG.CONTACTO.whatsapp) {
+        showToast('Falta configurar el número de WhatsApp de la iglesia (CONFIG.CONTACTO.whatsapp)', 'error');
+        return;
+    }
+
+    const total = carrito.reduce((sum, item) => sum + (item.precio || 0), 0);
+    const nombreComprador = (APP_STATE.usuario && APP_STATE.usuario.nombre) || 'Visitante';
+
+    let mensaje = `Hola, soy ${nombreComprador} y quiero hacer este pedido en la Tienda IPUC La Fonda:\n\n`;
+    carrito.forEach(item => {
+        mensaje += `• ${item.nombre} - $${item.precio.toLocaleString('es-CO')}\n`;
+    });
+    mensaje += `\nTotal: $${total.toLocaleString('es-CO')}`;
+
+    const url = `https://wa.me/${CONFIG.CONTACTO.whatsapp}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank', 'noopener');
 }
 
 function eliminarDelCarrito(id) {
     APP_STATE.carrito = APP_STATE.carrito.filter(item => item.id !== id);
     showToast('Producto eliminado del carrito', 'info');
     navegarA('carrito');
+}
+
+function agregarAlCarrito(id) {
+    const producto = CONFIG.PRODUCTOS.find(p => p.id === id);
+    if (!producto) return;
+
+    if (!APP_STATE.carrito) APP_STATE.carrito = [];
+    APP_STATE.carrito.push(producto);
+    showToast(`${producto.nombre} agregado al carrito`, 'success');
+}
+
+function cargarTienda(c) {
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2><i class="bx bx-store"></i> Tienda IPUC La Fonda</h2>
+            <p style="opacity:.8;margin-bottom:16px;">Apoya a la iglesia adquiriendo nuestros productos oficiales.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                ${CONFIG.PRODUCTOS.map(p => `
+                    <div class="card" style="text-align:center;">
+                        <div style="font-size:2.5rem;color:var(--primary-color);"><i class="${p.icono}"></i></div>
+                        <h3>${p.nombre}</h3>
+                        <p style="opacity:.7;font-size:.85rem;">${p.categoria}</p>
+                        <p style="font-size:1.3rem;font-weight:700;">$${p.precio.toLocaleString('es-CO')}</p>
+                        <button class="btn-primary btn-sm" onclick="agregarAlCarrito('${p.id}')"><i class="bx bx-cart-add"></i> Agregar al carrito</button>
+                    </div>
+                `).join('')}
+            </div>
+            <div style="text-align:center;margin-top:20px;">
+                <button class="btn-outline" onclick="navegarA('carrito')"><i class="bx bx-cart"></i> Ver carrito</button>
+            </div>
+        </div>`;
+}
+
+function reproducirVideo(id) {
+    const video = CONFIG.VIDEOS.find(v => v.id === id);
+    if (!video) return;
+
+    if (video.url) {
+        window.open(video.url, '_blank', 'noopener');
+    } else {
+        showToast(`"${video.titulo}" aún no tiene un enlace configurado`, 'info');
+    }
+}
+
+function cargarVideos(c) {
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2><i class="bx bx-video"></i> Videos</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+                ${CONFIG.VIDEOS.map(v => `
+                    <div class="card" style="padding:0;overflow:hidden;cursor:pointer;" onclick="reproducirVideo('${v.id}')">
+                        <div style="height:140px;background:center/cover no-repeat url('${v.miniatura}'), var(--card-bg);display:flex;align-items:center;justify-content:center;">
+                            <i class="bx bx-play-circle" style="font-size:3rem;color:#fff;"></i>
+                        </div>
+                        <div style="padding:12px;">
+                            <h3 style="font-size:1rem;">${v.titulo}</h3>
+                            <p style="opacity:.7;font-size:.8rem;">${v.categoria}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+}
+
+function cargarTestimonios(c) {
+    const testimonios = obtenerTestimonios();
+
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2><i class="bx bx-message-dots"></i> Testimonios</h2>
+
+            ${APP_STATE.usuario && APP_STATE.rol !== 'invitado' ? `
+                <div class="card">
+                    <h3>Comparte tu testimonio</h3>
+                    <form id="form-testimonio" onsubmit="return false;">
+                        <input type="text" id="testimonio-titulo" placeholder="Título" class="form-input" style="margin-bottom:8px;" required>
+                        <textarea id="testimonio-contenido" placeholder="Cuéntanos lo que Dios ha hecho en tu vida..." class="form-input" rows="4" required></textarea>
+                        <button type="button" class="btn-primary btn-sm" style="margin-top:8px;" onclick="enviarTestimonio()"><i class="bx bx-send"></i> Publicar</button>
+                    </form>
+                </div>
+            ` : ''}
+
+            ${testimonios.length === 0 ?
+                '<div class="card" style="text-align:center;padding:40px;"><p><i class="bx bx-message-dots"></i> Aún no hay testimonios publicados. ¡Sé el primero!</p></div>' :
+                testimonios.map(t => `
+                    <div class="card">
+                        <h3>${t.titulo}</h3>
+                        <p>${t.contenido}</p>
+                        <p style="opacity:.6;font-size:.8rem;margin-top:8px;"><i class="bx bx-user"></i> ${t.autor} · ${formatearFecha(t.fecha)}</p>
+                    </div>
+                `).join('')
+            }
+        </div>`;
+}
+
+function enviarTestimonio() {
+    const tituloEl = document.getElementById('testimonio-titulo');
+    const contenidoEl = document.getElementById('testimonio-contenido');
+    if (!tituloEl || !contenidoEl || !tituloEl.value.trim() || !contenidoEl.value.trim()) {
+        showToast('Completa el título y el contenido del testimonio', 'error');
+        return;
+    }
+
+    const resultado = crearTestimonio(APP_STATE.usuario.id, {
+        autor: APP_STATE.usuario.nombre,
+        titulo: tituloEl.value.trim(),
+        contenido: contenidoEl.value.trim()
+    });
+
+    if (resultado.success) {
+        showToast('¡Testimonio publicado!', 'success');
+        desbloquearLogro('testimony');
+        navegarA('testimonios');
+    } else {
+        showToast(resultado.error || 'No se pudo publicar el testimonio', 'error');
+    }
 }
 
 function cargarExportarDatos(c) {
@@ -2091,29 +2272,23 @@ function cargarExportarDatos(c) {
 }
 
 function exportarDatos() {
-    const datos = {
-        version: CONFIG.VERSION,
-        fecha: new Date().toISOString(),
-        usuario: APP_STATE.usuario,
-        nivel: APP_STATE.nivel,
-        xp: APP_STATE.xp,
-        logros: APP_STATE.logrosDesbloqueados,
-        publicaciones: APP_STATE.publicaciones,
-        oraciones: APP_STATE.oraciones,
-        bendiciones: APP_STATE.bendiciones,
-        notasRapidas: APP_STATE.notasRapidas
-    };
-    
+    const db = getDB();
+    if (!db) {
+        showToast('No se pudo exportar: base de datos no disponible', 'error');
+        return;
+    }
+
+    const datos = db.exportarTodo();
     const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'ipuc_datos_' + new Date().toISOString().split('T')[0] + '.json';
+    a.download = 'ipuc_backup_' + new Date().toISOString().split('T')[0] + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showToast('Datos exportados correctamente', 'success');
 }
 
@@ -2395,7 +2570,22 @@ function desbloquearLogro(id) {
     APP_STATE.logrosDesbloqueados.push(id);
     showToast(`¡Logro desbloqueado! ${achievement.name}`, 'success', 4000);
     actualizarLogros();
-    agregarXP(20);
+
+    // Persistir el logro (y su XP) en la base de datos
+    if (APP_STATE.usuario && APP_STATE.usuario.id) {
+        const db = getDB();
+        if (db) {
+            db.desbloquearLogro(APP_STATE.usuario.id, id, {
+                nombre: achievement.name,
+                descripcion: achievement.desc || '',
+                icono: achievement.icon || 'bx bx-trophy',
+                xp: 20
+            });
+            sincronizarProgreso();
+        }
+    } else {
+        agregarXP(20);
+    }
 }
 
 function actualizarLogros() {
@@ -2416,6 +2606,12 @@ function agregarXP(cantidad) {
         showToast(`¡Subiste al nivel ${APP_STATE.nivel}!`, 'success');
     }
     actualizarSidebarUsuario();
+
+    // Persistir en la base de datos para que el progreso no se pierda al recargar
+    if (APP_STATE.usuario && APP_STATE.usuario.id) {
+        const db = getDB();
+        if (db) db.agregarXP(APP_STATE.usuario.id, cantidad);
+    }
 }
 
 // ============================================
@@ -2444,6 +2640,51 @@ function registro(datos) {
 function getDB() {
     if (typeof window !== 'undefined' && window.db) return window.db;
     return null;
+}
+
+// Trae de la base de datos (localStorage) el progreso real del usuario
+// (nivel, xp, logros, lecturas) y lo refleja en APP_STATE. Se llama
+// después de iniciar sesión o restaurar sesión para que el progreso
+// guardado no se pierda al recargar la página.
+function sincronizarProgreso() {
+    try {
+        const db = getDB();
+        if (!db || !APP_STATE.usuario || !APP_STATE.usuario.id) return;
+        const uid = APP_STATE.usuario.id;
+
+        const usuarios = db.cargar('usuarios');
+        const admins = db.cargar('administradores');
+        const registro = (usuarios.usuarios || []).find(u => u.id === uid) ||
+                          (admins.administradores || []).find(a => a.id === uid);
+
+        if (registro) {
+            let totalXP = registro.xp || 0;
+            let nivel = 1;
+            let xpNecesario = 100;
+            while (totalXP >= xpNecesario) {
+                totalXP -= xpNecesario;
+                nivel++;
+                xpNecesario = Math.floor(xpNecesario * 1.5);
+            }
+            APP_STATE.nivel = nivel;
+            APP_STATE.xp = totalXP;
+            APP_STATE.xpSiguiente = xpNecesario;
+        }
+
+        const logros = db.cargar('logros');
+        APP_STATE.logrosDesbloqueados = (logros.logros || [])
+            .filter(l => l.usuario_id === uid)
+            .map(l => l.logro_id);
+
+        const lectura = db.cargar('lectura-biblica');
+        const progresoLectura = (lectura.progreso || []).find(p => p.usuario_id === uid);
+        APP_STATE.lecturasCompletadas = progresoLectura ? (progresoLectura.completados || 0) : 0;
+
+        actualizarSidebarUsuario();
+        actualizarLogros();
+    } catch (e) {
+        console.error('Error al sincronizar progreso:', e);
+    }
 }
 
 function continuarComoInvitado() {
@@ -2553,6 +2794,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 APP_STATE.token = token;
                 APP_STATE.usuario = JSON.parse(udata);
                 APP_STATE.rol = rol || 'usuario';
+                sincronizarProgreso();
                 mostrarApp();
             } catch (e) {
                 mostrarBienvenida();
@@ -2778,7 +3020,8 @@ function inicializarEventos() {
                 APP_STATE.token = resultado.token;
                 APP_STATE.usuario = resultado.usuario;
                 APP_STATE.rol = resultado.rol;
-                
+                sincronizarProgreso();
+
                 try {
                     localStorage.setItem('ipuc20_token', resultado.token);
                     localStorage.setItem('ipuc20_usuario', JSON.stringify(resultado.usuario));

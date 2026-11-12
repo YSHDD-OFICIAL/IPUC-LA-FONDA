@@ -1787,6 +1787,31 @@ class Database {
         return (t && t.testimonios || []);
     }
 
+    agregarTestimonio(usuarioId, datos = {}) {
+        try {
+            const t = this.cargar('testimonios');
+            if (!t.testimonios) t.testimonios = [];
+
+            const nuevo = {
+                id: (t.ultimo_id || 0) + 1,
+                usuario_id: usuarioId,
+                autor: datos.autor || 'Anónimo',
+                titulo: datos.titulo || 'Testimonio',
+                contenido: datos.contenido || '',
+                fecha: new Date().toISOString(),
+                likes: 0
+            };
+
+            t.testimonios.unshift(nuevo);
+            t.ultimo_id = nuevo.id;
+            this.guardar('testimonios', t);
+
+            return { success: true, data: nuevo };
+        } catch (e) {
+            return { success: false, error: 'Error al guardar el testimonio: ' + e.message };
+        }
+    }
+
     getInsignias() {
         const i = this.cargar('insignias');
         return (i && i.insignias || []);

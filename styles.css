@@ -1,5 +1,5 @@
 /* ============================================
-   IPUC LA FONDA v20.0 PRO ULTIMATE - CSS COMPLETO
+   IPUC LA FONDA v22.0 PRO ULTIMATE - CSS COMPLETO
    Iglesia Pentecostal Unida de Colombia
    "Donde el Espíritu Santo se mueve"
    Incluye: Radio, Streaming, Gamificación, IA, Logros, y más
@@ -7,7 +7,7 @@
    ============================================ */
 
 /* ============================================
-   1. VARIABLES Y CONFIGURACIÓN GLOBAL v20.0
+   1. VARIABLES Y CONFIGURACIÓN GLOBAL v22.0
    ============================================ */
 :root {
     /* --- Paleta de Colores Institucional --- */
@@ -95,6 +95,7 @@
 
     /* --- Tipografía --- */
     --font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --font-display: 'Playfair Display', 'Georgia', serif;
     --font-size-xs: 0.7rem;
     --font-size-sm: 0.8rem;
     --font-size-md: 0.95rem;
@@ -423,8 +424,9 @@ ul, ol {
 }
 
 .splash-title {
+    font-family: var(--font-display);
     font-size: var(--font-size-4xl);
-    font-weight: 900;
+    font-weight: 700;
     letter-spacing: 1px;
     margin-bottom: 4px;
     background: linear-gradient(135deg, #fff 60%, var(--dorado));
@@ -1937,10 +1939,20 @@ ul, ol {
 }
 
 .welcome-title {
+    font-family: var(--font-display);
     font-size: var(--font-size-3xl);
     color: var(--azul-primario);
-    font-weight: 900;
+    font-weight: 700;
     margin-bottom: 2px;
+}
+
+/* Encabezados de cada sección dentro del contenido: tipografía
+   institucional distinta a la del texto de cuerpo, sin tocar la
+   legibilidad del resto de la app. */
+.page-content > div > h2,
+.page-content h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
 }
 
 .welcome-subtitle {
@@ -3188,6 +3200,7 @@ textarea.form-input {
 
 .card:hover {
     box-shadow: var(--sombra-media);
+    transform: translateY(-3px);
 }
 
 .card-glass {

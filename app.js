@@ -413,6 +413,16 @@ function obtenerTestimonios() {
     }
 }
 
+function crearTestimonio(usuarioId, datos) {
+    try {
+        const db = getDB();
+        if (!db) return { success: false, error: 'Base de datos no disponible' };
+        return db.agregarTestimonio(usuarioId, datos);
+    } catch (e) {
+        return { success: false, error: 'Error al guardar el testimonio' };
+    }
+}
+
 // ============================================
 // PUBLICACIONES Y COMENTARIOS
 // ============================================
@@ -1360,6 +1370,7 @@ window.orarPeticion = orarPeticion;
 window.obtenerBendiciones = obtenerBendiciones;
 window.crearBendicion = crearBendicion;
 window.obtenerTestimonios = obtenerTestimonios;
+window.crearTestimonio = crearTestimonio;
 
 // Publicaciones
 window.obtenerPublicaciones = obtenerPublicaciones;
