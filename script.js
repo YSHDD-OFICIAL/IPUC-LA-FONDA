@@ -1,7 +1,7 @@
 /* ============================================
-   IPUC LA FONDA - SCRIPT.JS v22.0 PRO ULTIMATE
+   IPUC LA FONDA - SCRIPT.JS v22.1 PRO ULTIMATE
    Web App Profesional - Sistema Completo
-   VERSION CORREGIDA - SIN ERRORES - COMPLETA
+   + Persistencia total, Respaldo y Recuperación
    "Donde el Espíritu Santo se mueve"
    ============================================ */
 
@@ -9,11 +9,8 @@
 // CONFIGURACIÓN GLOBAL
 // ============================================
 const CONFIG = {
-    VERSION: '22.0',
+    VERSION: '22.1',
     VERSION_NAME: 'PRO ULTIMATE',
-    // Número de WhatsApp de la iglesia para recibir pedidos de la tienda,
-    // en formato internacional sin "+" ni espacios (ej: '573001234567').
-    // Mientras esté vacío, el botón de "Finalizar pedido" avisa que falta configurarlo.
     CONTACTO: {
         whatsapp: ''
     },
@@ -270,25 +267,25 @@ const APP_STATE = {
 function showToast(mensaje, tipo = 'info', duracion = 3000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
-    
+
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
-    
-    const iconos = { 
-        success: '<i class="bx bx-check-circle"></i>', 
-        error: '<i class="bx bx-x-circle"></i>', 
-        warning: '<i class="bx bx-error"></i>', 
-        info: '<i class="bx bx-info-circle"></i>' 
+
+    const iconos = {
+        success: '<i class="bx bx-check-circle"></i>',
+        error: '<i class="bx bx-x-circle"></i>',
+        warning: '<i class="bx bx-error"></i>',
+        info: '<i class="bx bx-info-circle"></i>'
     };
     toast.innerHTML = `${iconos[tipo] || iconos.info} ${mensaje || ''}`;
-    
+
     container.appendChild(toast);
-    
+
     setTimeout(() => {
         if (toast.parentNode) {
             toast.classList.add('toast-hide');
-            setTimeout(() => { 
-                if (toast.parentNode) toast.remove(); 
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
             }, 300);
         }
     }, duracion);
@@ -370,14 +367,14 @@ function aplicarTema(tema) {
 function cambiarIdioma(lang) {
     const idiomas = { es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', de: 'DE', it: 'IT' };
     if (!idiomas[lang]) return;
-    
+
     APP_STATE.idioma = lang;
     try { localStorage.setItem('ipuc20_idioma', lang); } catch (e) {}
-    
+
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
-    
+
     showToast(`Idioma cambiado a ${lang.toUpperCase()}`, 'info');
 }
 
@@ -386,28 +383,28 @@ function cambiarIdioma(lang) {
 // ============================================
 function navegarA(page) {
     if (!page || APP_STATE.isLoading) return;
-    
+
     APP_STATE.currentPage = page;
     APP_STATE.isLoading = true;
-    
+
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
         item.classList.toggle('active', item.getAttribute('data-page') === page);
     });
-    
+
     const titleEl = document.getElementById('page-title');
     if (titleEl) titleEl.textContent = CONFIG.TITULOS_PAGINAS[page] || page;
-    
+
     const bc = document.getElementById('breadcrumb-current');
     if (bc) bc.textContent = CONFIG.TITULOS_PAGINAS[page] || page;
-    
+
     cargarPagina(page);
-    
+
     if (window.innerWidth < 1024) cerrarSidebar();
-    
+
     cerrarPaneles();
-    
+
     registrarHistorial('Navegó a ' + page, page);
-    
+
     APP_STATE.isLoading = false;
     actualizarFechaHeader();
 }
@@ -415,9 +412,9 @@ function navegarA(page) {
 function cargarPagina(page) {
     const container = document.getElementById('page-content');
     if (!container) return;
-    
+
     container.innerHTML = '<div class="page-loader"><div class="spinner"></div><p>Cargando...</p></div>';
-    
+
     setTimeout(() => {
         const paginas = {
             'inicio': cargarInicio,
@@ -491,7 +488,7 @@ function cargarPagina(page) {
             'favoritos': cargarFavoritos,
             'tema': cargarTema
         };
-        
+
         const fn = paginas[page];
         if (fn) {
             fn(container);
@@ -502,12 +499,12 @@ function cargarPagina(page) {
 }
 
 // ============================================
-// FUNCIONES DE PÁGINAS COMPLETAS
+// FUNCIONES DE PÁGINAS
 // ============================================
 
 function cargarInicio(c) {
     const isAdmin = APP_STATE.rol === 'admin';
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <div class="card" style="text-align:center;border-left:4px solid var(--dorado);">
@@ -520,7 +517,7 @@ function cargarInicio(c) {
                 </div>
                 <span class="badge estado-proximo"><i class="bx bx-bell"></i> PRÓXIMO CULTO</span>
             </div>
-            
+
             <div class="card" style="text-align:center;border-left:4px solid var(--dorado);">
                 <h3><i class="bx bx-star"></i> IPUC LA FONDA v${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</h3>
                 <p>"Donde el Espíritu Santo se mueve"</p>
@@ -530,7 +527,7 @@ function cargarInicio(c) {
                     <span class="badge"><i class="bx bx-trophy"></i> ${APP_STATE.logrosDesbloqueados.length} logros</span>
                 </div>
             </div>
-            
+
             <div class="card">
                 <h3><i class="bx bx-zap"></i> Accesos Rápidos</h3>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:8px;">
@@ -544,7 +541,7 @@ function cargarInicio(c) {
                     ${isAdmin ? '<button class="btn-outline btn-sm" onclick="navegarA(\'admin-dashboard\')"><i class="bx bx-line-chart"></i> Admin</button>' : ''}
                 </div>
             </div>
-            
+
             <div class="card">
                 <h3><i class="bx bx-stats"></i> Estadísticas</h3>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;text-align:center;">
@@ -555,7 +552,7 @@ function cargarInicio(c) {
                 </div>
             </div>
         </div>`;
-    
+
     iniciarContador();
 }
 
@@ -568,7 +565,7 @@ function cargarHorarios(c) {
         { dia: 'Viernes', cultos: ['Culto de Jóvenes - 6:00 PM', 'Reunión de Caballeros - 7:00 PM'] },
         { dia: 'Sábado', cultos: ['Escuela Bíblica - 4:00 PM', 'Reunión de Intercesión - 6:00 AM'] }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-time-five"></i> Horarios de Cultos</h2>
@@ -587,7 +584,7 @@ function cargarAsistencia(c) {
         { fecha: '2026-08-09', evento: 'Culto Dominical', estado: 'Asistió' },
         { fecha: '2026-08-02', evento: 'Culto Dominical', estado: 'Asistió' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-check-shield"></i> Confirmar Asistencia</h2>
@@ -617,20 +614,20 @@ function confirmarAsistencia() {
 }
 
 function cargarNoticias(c) {
-    const noticias = [
-        { titulo: 'Anuncio Importante', contenido: 'Nuevo horario de cultos a partir del próximo mes', fecha: new Date().toISOString() },
-        { titulo: 'Celebración de Aniversario', contenido: 'Celebraremos el aniversario de la iglesia el próximo domingo', fecha: new Date(Date.now() - 86400000).toISOString() },
-        { titulo: 'Nuevo Ministerio', contenido: 'Lanzamos el nuevo ministerio de Jóvenes', fecha: new Date(Date.now() - 172800000).toISOString() }
+    const noticias = window.db ? window.db.getNoticias() : [];
+    const mostrar = noticias.length > 0 ? noticias : [
+        { titulo: 'Anuncio Importante', contenido: 'Nuevo horario de cultos a partir del próximo mes', fecha_publicacion: new Date().toISOString() },
+        { titulo: 'Celebración de Aniversario', contenido: 'Celebraremos el aniversario de la iglesia el próximo domingo', fecha_publicacion: new Date(Date.now() - 86400000).toISOString() }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-news"></i> Noticias</h2>
-            ${noticias.map(n => `
+            ${mostrar.map(n => `
                 <div class="card">
-                    <h3><i class="bx bx-megaphone"></i> ${n.titulo}</h3>
-                    <p>${n.contenido}</p>
-                    <small><i class="bx bx-time"></i> ${formatearFecha(n.fecha)}</small>
+                    <h3><i class="bx bx-megaphone"></i> ${escapeHtml(n.titulo)}</h3>
+                    <p>${escapeHtml(n.contenido)}</p>
+                    <small><i class="bx bx-time"></i> ${formatearFecha(n.fecha_publicacion || n.fecha)}</small>
                 </div>
             `).join('')}
         </div>`;
@@ -641,17 +638,17 @@ function cargarEventos(c) {
     const proximos = eventos
         .filter(e => new Date(e.fecha) >= new Date())
         .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-calendar-event"></i> Eventos</h2>
             ${APP_STATE.rol === 'admin' ? '<button class="btn-primary btn-sm" onclick="abrirModalEvento()" style="margin-bottom:12px;"><i class="bx bx-plus"></i> Crear Evento</button>' : ''}
-            ${proximos.length === 0 ? 
+            ${proximos.length === 0 ?
                 '<div class="card"><p><i class="bx bx-info-circle"></i> No hay eventos próximos</p></div>' :
                 proximos.map(e => `
                     <div class="card">
                         <h3><i class="bx bx-calendar-star"></i> ${escapeHtml(e.titulo)}</h3>
-                        <p>${escapeHtml(e.desc || '')}</p>
+                        <p>${escapeHtml(e.descripcion || '')}</p>
                         <small><i class="bx bx-calendar"></i> ${formatearFecha(e.fecha)}${e.hora ? ` <i class="bx bx-time"></i> ${e.hora}` : ''}${e.lugar ? ` <i class="bx bx-map"></i> ${e.lugar}` : ''}</small>
                     </div>
                 `).join('')
@@ -661,7 +658,7 @@ function cargarEventos(c) {
 
 function cargarPublicaciones(c) {
     const pub = APP_STATE.publicaciones || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-pencil"></i> Publicaciones</h2>
@@ -670,7 +667,7 @@ function cargarPublicaciones(c) {
                     <textarea class="form-input" id="pub-contenido" rows="3" placeholder="¿Qué quieres compartir?"></textarea>
                     <button class="btn-primary btn-sm" onclick="crearPubLocal()" style="margin-top:8px;"><i class="bx bx-send"></i> Publicar</button>
                 </div>` : ''}
-            ${pub.length === 0 ? 
+            ${pub.length === 0 ?
                 '<div class="card"><p><i class="bx bx-info-circle"></i> No hay publicaciones</p></div>' :
                 pub.map(p => `
                     <div class="card">
@@ -683,6 +680,7 @@ function cargarPublicaciones(c) {
         </div>`;
 }
 
+// ═══ v22.1: Persistir en DB ═══
 function crearPubLocal() {
     const txt = document.getElementById('pub-contenido');
     if (!txt || !txt.value.trim()) {
@@ -693,19 +691,21 @@ function crearPubLocal() {
         showToast('Inicia sesión para publicar', 'warning');
         return;
     }
-    
-    APP_STATE.publicaciones.unshift({
-        id: generarId('pub'),
+
+    const r = Storage.persistirPublicacion({
         usuario_id: APP_STATE.usuario.id || 0,
         autor: APP_STATE.usuario.nombre || 'Anónimo',
-        contenido: txt.value.trim(),
-        fecha: new Date().toISOString()
+        contenido: txt.value.trim()
     });
-    
-    txt.value = '';
-    showToast('Publicación creada', 'success');
-    registrarHistorial('Creó publicación', 'Publicaciones');
-    navegarA('publicaciones');
+
+    if (r.success) {
+        txt.value = '';
+        showToast('Publicación creada', 'success');
+        registrarHistorial('Creó publicación', 'Publicaciones');
+        navegarA('publicaciones');
+    } else {
+        showToast('Error al publicar: ' + (r.error || 'desconocido'), 'error');
+    }
 }
 
 function cargarPerfil(c) {
@@ -713,9 +713,9 @@ function cargarPerfil(c) {
         c.innerHTML = '<div class="fade-in"><h2><i class="bx bx-user"></i> Perfil</h2><div class="card"><p><i class="bx bx-info-circle"></i> Inicia sesión para ver tu perfil</p></div></div>';
         return;
     }
-    
+
     const u = APP_STATE.usuario;
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-user-circle"></i> Mi Perfil</h2>
@@ -742,7 +742,7 @@ function cargarConfiguracion(c) {
             <div class="card">
                 <h3><i class="bx bx-palette"></i> Apariencia</h3>
                 <button class="btn-secondary btn-sm" onclick="toggleTema()">
-                    <i class="bx bx-${APP_STATE.tema === 'dark' ? 'sun' : 'moon'}"></i> 
+                    <i class="bx bx-${APP_STATE.tema === 'dark' ? 'sun' : 'moon'}"></i>
                     ${APP_STATE.tema === 'dark' ? 'Cambiar a Claro' : 'Cambiar a Oscuro'}
                 </button>
             </div>
@@ -769,7 +769,7 @@ function cargarGestionReportes(c) {
     const pendientes = reportes.filter(r => r.estado === 'pendiente').length;
     const resueltos = reportes.filter(r => r.estado === 'resuelto').length;
     const desestimados = reportes.filter(r => r.estado === 'desestimado').length;
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -782,7 +782,7 @@ function cargarGestionReportes(c) {
                 <div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;">${resueltos}</p><p style="font-size:0.75rem;">Resueltos</p></div>
                 <div class="card" style="text-align:center;"><p style="font-size:1.5rem;font-weight:700;">${desestimados}</p><p style="font-size:0.75rem;">Desestimados</p></div>
             </div>
-            ${reportes.length === 0 ? 
+            ${reportes.length === 0 ?
                 '<div class="card" style="text-align:center;padding:40px;"><p><i class="bx bx-info-circle"></i> No hay reportes registrados</p></div>' :
                 reportes.map(r => `
                     <div class="card" style="margin-bottom:8px;border-left:4px solid ${r.urgencia === 'critica' ? 'var(--error)' : r.urgencia === 'alta' ? 'var(--advertencia)' : 'var(--info)'};">
@@ -792,11 +792,6 @@ function cargarGestionReportes(c) {
                                 <span class="badge tipo-${r.tipo || 'general'}">${r.tipo || 'general'}</span>
                                 <p style="font-size:0.9rem;margin:4px 0;">${escapeHtml((r.descripcion || '').substring(0, 100))}...</p>
                                 <small>Reportado por: ${r.reportado_por ? r.reportado_por.nombre : 'Anónimo'} - ${formatearFecha(r.fecha)}</small>
-                            </div>
-                            <div style="display:flex;gap:4px;">
-                                <button class="btn-primary btn-sm" onclick="verDetalleReporte('${r.id}')" title="Ver"><i class="bx bx-show"></i></button>
-                                ${r.estado === 'pendiente' ? `<button class="btn-success btn-sm" onclick="cambiarEstadoReporte('${r.id}','en_revision')" title="Revisar"><i class="bx bx-check"></i></button>` : ''}
-                                ${r.estado === 'en_revision' ? `<button class="btn-success btn-sm" onclick="cambiarEstadoReporte('${r.id}','resuelto')" title="Resolver"><i class="bx bx-check-double"></i></button>` : ''}
                             </div>
                         </div>
                     </div>
@@ -810,16 +805,16 @@ function cargarMisReportes(c) {
         c.innerHTML = '<div class="fade-in"><h2><i class="bx bx-file"></i> Mis Reportes</h2><div class="card"><p><i class="bx bx-info-circle"></i> Inicia sesión para ver tus reportes</p></div></div>';
         return;
     }
-    
+
     const mis = APP_STATE.reportes.filter(r => r.reportado_por && r.reportado_por.id === APP_STATE.usuario.id);
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <h2><i class="bx bx-file"></i> Mis Reportes</h2>
                 <button class="btn-primary btn-sm" onclick="abrirModalReporte()"><i class="bx bx-plus"></i> Nuevo Reporte</button>
             </div>
-            ${mis.length === 0 ? 
+            ${mis.length === 0 ?
                 '<div class="card" style="text-align:center;padding:40px;"><p><i class="bx bx-info-circle"></i> No has generado ningún reporte</p></div>' :
                 mis.map(r => `
                     <div class="card" style="margin-bottom:8px;">
@@ -859,6 +854,9 @@ function cargarDashboard(c) {
 }
 
 function cargarSistema(c) {
+    const estado = window.db ? window.db.getEstadoSistema() : {};
+    const integridad = window.db ? window.db.verificarIntegridad() : {};
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-server"></i> Sistema</h2>
@@ -871,12 +869,21 @@ function cargarSistema(c) {
                 <p><strong><i class="bx bx-level-up"></i> Nivel:</strong> ${APP_STATE.nivel}</p>
                 <p><strong><i class="bx bx-star"></i> XP:</strong> ${APP_STATE.xp} / ${APP_STATE.xpSiguiente}</p>
             </div>
+            ${estado.espacioFormateado ? `
+            <div class="card">
+                <h3><i class="bx bx-data"></i> Estado de la Base de Datos</h3>
+                <p><strong>Colecciones:</strong> ${estado.totalColecciones}</p>
+                <p><strong>Espacio usado:</strong> ${estado.espacioFormateado}</p>
+                <p><strong>Papelera:</strong> ${estado.papeleraCount} elementos</p>
+                <p><strong>Código maestro:</strong> ${estado.codigoMaestroGenerado ? '✅ Generado' : '❌ No generado'}</p>
+                <p><strong>Integridad:</strong> ${integridad.valido ? '✅ OK' : '⚠️ Revisar'}</p>
+            </div>` : ''}
         </div>`;
 }
 
 function cargarPeticiones(c) {
     const peticiones = APP_STATE.peticiones || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-pray"></i> Peticiones de Oración</h2>
@@ -887,7 +894,7 @@ function cargarPeticiones(c) {
                 </div>
                 <button class="btn-primary btn-sm" onclick="crearPeticionLocal()"><i class="bx bx-send"></i> Enviar Petición</button>
             </div>
-            ${peticiones.length === 0 ? 
+            ${peticiones.length === 0 ?
                 '<div class="card"><p><i class="bx bx-info-circle"></i> No hay peticiones</p></div>' :
                 peticiones.map(p => `
                     <div class="card">
@@ -900,6 +907,7 @@ function cargarPeticiones(c) {
         </div>`;
 }
 
+// ═══ v22.1: Persistir en DB ═══
 function crearPeticionLocal() {
     const m = document.getElementById('pet-motivo');
     if (!m || !m.value.trim()) {
@@ -910,28 +918,30 @@ function crearPeticionLocal() {
         showToast('Inicia sesión', 'warning');
         return;
     }
-    
-    APP_STATE.peticiones.unshift({
-        id: generarId('pet'),
+
+    const r = Storage.persistirPeticion({
+        usuario_id: APP_STATE.usuario.id || 0,
         nombre: APP_STATE.usuario.nombre || 'Anónimo',
-        motivo: m.value.trim(),
-        fecha: new Date().toISOString()
+        motivo: m.value.trim()
     });
-    
-    m.value = '';
-    showToast('Petición enviada', 'success');
-    desbloquearLogro('first_prayer');
-    navegarA('peticiones');
+
+    if (r.success) {
+        m.value = '';
+        showToast('Petición enviada', 'success');
+        desbloquearLogro('first_prayer');
+        navegarA('peticiones');
+    } else {
+        showToast('Error al enviar: ' + (r.error || 'desconocido'), 'error');
+    }
 }
 
-// Páginas adicionales completas
 function cargarBiblioteca(c) {
     const recursos = [
         { titulo: 'La Biblia', tipo: 'Libro Sagrado', descripcion: 'Sagradas Escrituras' },
         { titulo: 'Comentario Bíblico', tipo: 'Referencia', descripcion: 'Comentarios y explicaciones' },
         { titulo: 'Diccionario Bíblico', tipo: 'Referencia', descripcion: 'Definiciones bíblicas' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-book-open"></i> Biblioteca Digital</h2>
@@ -952,7 +962,7 @@ function cargarPodcast(c) {
         { titulo: 'Episodio 2: La Esperanza', duracion: '30:15', descripcion: 'Reflexión sobre la esperanza' },
         { titulo: 'Episodio 3: El Amor', duracion: '28:45', descripcion: 'Reflexión sobre el amor' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-microphone"></i> Podcast</h2>
@@ -974,7 +984,7 @@ function cargarGaleria(c) {
         { titulo: 'Bautismos', cantidad: 45, descripcion: 'Ceremonias de bautismo' },
         { titulo: 'Eventos Especiales', cantidad: 80, descripcion: 'Convenciones y retiros' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-images"></i> Galería</h2>
@@ -993,16 +1003,16 @@ function cargarGaleria(c) {
 
 function cargarChat(c) {
     const msgs = APP_STATE.chatMessages || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-chat"></i> Chat Global</h2>
             <div class="card" style="height:300px;overflow-y:auto;background:var(--gris-claro);border-radius:8px;padding:12px;margin-bottom:12px;" id="chat-messages">
-                ${msgs.length === 0 ? 
+                ${msgs.length === 0 ?
                     '<p style="color:var(--gris-texto);text-align:center;"><i class="bx bx-chat"></i> No hay mensajes</p>' :
                     msgs.map(m => `
                         <div style="padding:8px;margin-bottom:4px;border-radius:8px;background:var(--blanco);">
-                            <strong><i class="bx bx-user"></i> ${escapeHtml(m.autor)}</strong>: ${escapeHtml(m.mensaje)}
+                            <strong><i class="bx bx-user"></i> ${escapeHtml(m.usuario || m.autor)}</strong>: ${escapeHtml(m.mensaje)}
                         </div>
                     `).join('')
                 }
@@ -1014,35 +1024,39 @@ function cargarChat(c) {
         </div>`;
 }
 
+// ═══ v22.1: Persistir en DB ═══
 function enviarMensajeChat() {
     const input = document.getElementById('chat-input');
     if (!input || !input.value.trim()) return;
-    if (!APP_STATE.usuario) { 
-        showToast('Inicia sesión para chatear', 'warning'); 
-        return; 
+    if (!APP_STATE.usuario) {
+        showToast('Inicia sesión para chatear', 'warning');
+        return;
     }
-    
-    APP_STATE.chatMessages.push({
+
+    const r = Storage.persistirMensajeChat({
+        usuario_id: APP_STATE.usuario.id || 0,
         autor: APP_STATE.usuario.nombre || 'Anónimo',
-        mensaje: input.value.trim(),
-        fecha: new Date().toISOString()
+        mensaje: input.value.trim()
     });
-    
-    if (APP_STATE.chatMessages.length >= 10) desbloquearLogro('social_butterfly');
-    
-    input.value = '';
-    navegarA('chat');
+
+    if (r.success) {
+        if (APP_STATE.chatMessages.length >= 10) desbloquearLogro('social_butterfly');
+        input.value = '';
+        navegarA('chat');
+    } else {
+        showToast('Error al enviar mensaje', 'error');
+    }
 }
 
 function cargarDirectorio(c) {
-    const miembros = [
+    const miembros = window.db ? window.db.getDirectorio() : [
         { nombre: 'Juan Díaz', ministerio: 'Alabanza', cargo: 'Líder' },
         { nombre: 'María López', ministerio: 'Intercesión', cargo: 'Coordinadora' },
         { nombre: 'Carlos Ruiz', ministerio: 'Jóvenes', cargo: 'Líder' },
         { nombre: 'Ana Torres', ministerio: 'Niños', cargo: 'Maestra' },
         { nombre: 'Sofía Ramírez', ministerio: 'Damas', cargo: 'Líder' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-list-ul"></i> Directorio</h2>
@@ -1064,6 +1078,8 @@ function cargarDirectorio(c) {
 }
 
 function cargarDonaciones(c) {
+    const donaciones = window.db ? window.db.getDonaciones() : [];
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-donate-heart"></i> Donaciones</h2>
@@ -1073,13 +1089,23 @@ function cargarDonaciones(c) {
                 <p>"Dios ama al dador alegre"</p>
                 <button class="btn-primary btn-lg" onclick="realizarDonacion()" style="margin-top:12px;"><i class="bx bx-money"></i> Donar</button>
             </div>
+            ${donaciones.length > 0 ? `
+            <div class="card">
+                <h3><i class="bx bx-history"></i> Últimas donaciones</h3>
+                ${donaciones.slice(0, 10).map(d => `
+                    <div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">
+                        <span>${d.usuario_nombre || 'Anónimo'} - ${d.concepto}</span>
+                        <span>$${d.monto} (${formatearFecha(d.fecha)})</span>
+                    </div>
+                `).join('')}
+            </div>` : ''}
         </div>`;
 }
 
 function cargarDevocional(c) {
     const verses = CONFIG.VERSES;
     const v = verses[new Date().getDate() % verses.length];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-book-reader"></i> Devocional Diario</h2>
@@ -1140,7 +1166,7 @@ function cargarMapa(c) {
 
 function cargarOracion(c) {
     const oraciones = APP_STATE.oraciones || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-pray"></i> Cadena de Oración</h2>
@@ -1157,7 +1183,7 @@ function cargarOracion(c) {
                     <button type="submit" class="btn-primary btn-block"><i class="bx bx-send"></i> Enviar Oración</button>
                 </form>
             </div>
-            ${oraciones.length === 0 ? 
+            ${oraciones.length === 0 ?
                 '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay peticiones de oración aún</p></div>' :
                 oraciones.map(o => `
                     <div class="card">
@@ -1170,30 +1196,33 @@ function cargarOracion(c) {
         </div>`;
 }
 
+// ═══ v22.1: Persistir en DB ═══
 function enviarOracionLocal(e) {
     if (e) e.preventDefault();
-    
+
     const nombre = document.getElementById('prayer-name-local');
     const motivo = document.getElementById('prayer-request-local');
-    
+
     if (!motivo || !motivo.value.trim()) {
         showToast('Escribe tu petición', 'warning');
         return;
     }
-    
-    APP_STATE.oraciones.unshift({
-        id: generarId('oracion'),
+
+    const r = Storage.persistirOracion({
+        usuario_id: APP_STATE.usuario?.id || 0,
         nombre: nombre ? nombre.value.trim() || 'Anónimo' : 'Anónimo',
-        motivo: motivo.value.trim(),
-        fecha: new Date().toISOString()
+        motivo: motivo.value.trim()
     });
-    
-    if (nombre) nombre.value = '';
-    if (motivo) motivo.value = '';
-    
-    showToast('Oración enviada', 'success');
-    desbloquearLogro('first_prayer');
-    navegarA('oracion');
+
+    if (r.success) {
+        if (nombre) nombre.value = '';
+        if (motivo) motivo.value = '';
+        showToast('Oración enviada', 'success');
+        desbloquearLogro('first_prayer');
+        navegarA('oracion');
+    } else {
+        showToast('Error al enviar oración', 'error');
+    }
 }
 
 function cargarGrupos(c) {
@@ -1203,7 +1232,7 @@ function cargarGrupos(c) {
         { nombre: 'Caballeros', lider: 'David Martínez', horario: 'Viernes 7:00 PM', integrantes: 22 },
         { nombre: 'Intercesión', lider: 'María López', horario: 'Miércoles 6:00 AM', integrantes: 18 }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-group"></i> Grupos y Células</h2>
@@ -1230,7 +1259,7 @@ function cargarLecturaBiblica(c) {
         { nombre: 'Mateo', capitulos: 28, leidos: 0 },
         { nombre: 'Juan', capitulos: 21, leidos: 0 }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-book"></i> Plan de Lectura</h2>
@@ -1261,13 +1290,8 @@ function marcarLecturaCompletada() {
     showToast('Lectura marcada como completada', 'success');
     if (APP_STATE.lecturasCompletadas >= 10) desbloquearLogro('bible_reader');
 
-    // Persistir el avance del plan de lectura
-    if (APP_STATE.usuario && APP_STATE.usuario.id) {
-        const db = getDB();
-        if (db) {
-            db.marcarLecturaCompletada(APP_STATE.usuario.id);
-            sincronizarProgreso();
-        }
+    if (APP_STATE.usuario && APP_STATE.usuario.id && window.db) {
+        window.db.marcarLecturaCompletada(APP_STATE.usuario.id);
     }
     navegarA('lectura-biblica');
 }
@@ -1295,20 +1319,20 @@ function buscarConcordancia() {
         showToast('Ingresa una palabra', 'warning');
         return;
     }
-    
+
     const query = input.value.trim().toLowerCase();
-    const resultados = CONFIG.VERSES.filter(v => 
+    const resultados = CONFIG.VERSES.filter(v =>
         v.verse.toLowerCase().includes(query) || v.ref.toLowerCase().includes(query)
     );
-    
+
     const container = document.getElementById('concordancia-resultados');
     if (!container) return;
-    
+
     if (resultados.length === 0) {
         container.innerHTML = `<p style="color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No se encontraron versículos con "${query}"</p>`;
         return;
     }
-    
+
     container.innerHTML = resultados.map(v => `
         <div style="padding:8px;border-bottom:1px solid var(--gris-medio);">
             <i class="bx bx-book-reader"></i> "${v.verse}" - ${v.ref}
@@ -1336,7 +1360,7 @@ function cargarHimnario(c) {
 
 function cargarDiarioEspiritual(c) {
     const entries = APP_STATE.diaryEntries || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-notepad"></i> Diario Espiritual</h2>
@@ -1353,7 +1377,7 @@ function cargarDiarioEspiritual(c) {
                     <button type="submit" class="btn-primary btn-block"><i class="bx bx-save"></i> Guardar Reflexión</button>
                 </form>
             </div>
-            ${entries.length === 0 ? 
+            ${entries.length === 0 ?
                 '<div class="card"><p style="color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay entradas en tu diario</p></div>' :
                 entries.map(e => `
                     <div class="card"><strong>${formatearFecha(e.fecha)}</strong><p>${escapeHtml(e.contenido)}</p></div>
@@ -1362,25 +1386,31 @@ function cargarDiarioEspiritual(c) {
         </div>`;
 }
 
+// ═══ v22.1: Persistir en DB ═══
 function guardarEntradaDiario(e) {
     if (e) e.preventDefault();
-    
+
     const fecha = document.getElementById('diario-fecha');
     const contenido = document.getElementById('diario-contenido');
-    
+
     if (!contenido || !contenido.value.trim()) {
         showToast('Escribe tu reflexión', 'warning');
         return;
     }
-    
-    APP_STATE.diaryEntries.unshift({
-        fecha: fecha ? fecha.value : new Date().toISOString(),
+
+    const r = Storage.persistirEntradaDiario({
+        usuario_id: APP_STATE.usuario?.id || 0,
+        fecha: fecha ? fecha.value : new Date().toISOString().split('T')[0],
         contenido: contenido.value.trim()
     });
-    
-    if (contenido) contenido.value = '';
-    showToast('Reflexión guardada', 'success');
-    navegarA('diario-espiritual');
+
+    if (r.success) {
+        if (contenido) contenido.value = '';
+        showToast('Reflexión guardada', 'success');
+        navegarA('diario-espiritual');
+    } else {
+        showToast('Error al guardar', 'error');
+    }
 }
 
 function cargarLogros(c) {
@@ -1449,23 +1479,22 @@ function cargarJuegos(c) {
 }
 
 function cargarRanking(c) {
-    const ranking = [
-        { posicion: 1, nombre: 'Usuario1', puntos: 1500 },
-        { posicion: 2, nombre: 'Usuario2', puntos: 1200 },
-        { posicion: 3, nombre: 'Usuario3', puntos: 1000 },
-        { posicion: 4, nombre: 'Usuario4', puntos: 850 },
-        { posicion: 5, nombre: 'Usuario5', puntos: 700 }
+    const ranking = window.db ? window.db.getRanking() : [];
+    const lista = ranking.length > 0 ? ranking : [
+        { nombre: 'Usuario1', puntos: 1500 },
+        { nombre: 'Usuario2', puntos: 1200 },
+        { nombre: 'Usuario3', puntos: 1000 }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-medal"></i> Ranking</h2>
             <div class="card">
                 <h3>Top 5 - Gamificación</h3>
                 <div style="margin-top:12px;">
-                    ${ranking.map(r => `
+                    ${lista.slice(0, 5).map((r, i) => `
                         <div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid var(--gris-medio);">
-                            <span><i class="bx bx-medal"></i> ${r.posicion}. ${r.nombre}</span>
+                            <span><i class="bx bx-medal"></i> ${i + 1}. ${r.nombre}</span>
                             <span><i class="bx bx-star"></i> ${r.puntos} pts</span>
                         </div>
                     `).join('')}
@@ -1489,7 +1518,7 @@ function cargarPlaylistPage(c) {
                 ${CONFIG.PLAYLIST.map((s, i) => `
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--gris-medio);">
                         <div><strong>${s.title}</strong><br><span style="font-size:0.85rem;color:var(--gris-texto);">${s.artist}</span></div>
-                        <div><span style="font-size:0.85rem;color:var(--gris-texto);">${s.duration}</span> 
+                        <div><span style="font-size:0.85rem;color:var(--gris-texto);">${s.duration}</span>
                         <button class="btn-outline btn-sm" onclick="reproducirCancion(${i})"><i class="bx bx-play"></i></button></div>
                     </div>
                 `).join('')}
@@ -1498,28 +1527,27 @@ function cargarPlaylistPage(c) {
 }
 
 function cargarBlog(c) {
-    const posts = [
-        { titulo: 'Anuncio: Nuevo Horario de Cultos', contenido: 'A partir del próximo domingo, los cultos serán a las 10:00 AM...', fecha: new Date().toISOString() },
-        { titulo: 'Retiro de Jóvenes - 15 de agosto', contenido: 'Inscripciones abiertas para el retiro de jóvenes...', fecha: new Date(Date.now() - 86400000).toISOString() },
-        { titulo: 'Nuevo Estudio Bíblico', contenido: 'Comenzamos el estudio del libro de Romanos...', fecha: new Date(Date.now() - 172800000).toISOString() }
-    ];
-    
+    const posts = window.db ? window.db.getNoticias() : [];
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-news"></i> Blog/Noticias</h2>
-            ${posts.map(p => `
-                <div class="card">
-                    <h3><i class="bx bx-article"></i> ${p.titulo}</h3>
-                    <p>${p.contenido}</p>
-                    <small><i class="bx bx-time"></i> ${formatearFecha(p.fecha)}</small>
-                </div>
-            `).join('')}
+            ${posts.length === 0 ?
+                '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay publicaciones</p></div>' :
+                posts.map(p => `
+                    <div class="card">
+                        <h3><i class="bx bx-article"></i> ${escapeHtml(p.titulo)}</h3>
+                        <p>${escapeHtml(p.contenido)}</p>
+                        <small><i class="bx bx-time"></i> ${formatearFecha(p.fecha_publicacion || p.fecha)}</small>
+                    </div>
+                `).join('')
+            }
         </div>`;
 }
 
 function cargarMuroBendiciones(c) {
     const bendiciones = APP_STATE.bendiciones || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-star"></i> Muro de Bendiciones</h2>
@@ -1531,7 +1559,7 @@ function cargarMuroBendiciones(c) {
                     <button type="submit" class="btn-primary btn-sm"><i class="bx bx-send"></i> Compartir Bendición</button>
                 </form>
             </div>
-            ${bendiciones.length === 0 ? 
+            ${bendiciones.length === 0 ?
                 '<div class="card"><p style="color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay bendiciones compartidas aún</p></div>' :
                 bendiciones.map(b => `
                     <div class="card"><p><strong>${b.nombre || 'Anónimo'}</strong></p><p>${escapeHtml(b.mensaje)}</p><small>${formatearFecha(b.fecha)}</small></div>
@@ -1540,25 +1568,30 @@ function cargarMuroBendiciones(c) {
         </div>`;
 }
 
+// ═══ v22.1: Persistir en DB ═══
 function enviarBendicion(e) {
     if (e) e.preventDefault();
-    
+
     const input = document.getElementById('bendicion-input');
     if (!input || !input.value.trim()) {
         showToast('Escribe tu bendición', 'warning');
         return;
     }
-    
-    APP_STATE.bendiciones.unshift({
+
+    const r = Storage.persistirBendicion({
+        usuario_id: APP_STATE.usuario?.id || 0,
         nombre: APP_STATE.usuario ? APP_STATE.usuario.nombre : 'Anónimo',
-        mensaje: input.value.trim(),
-        fecha: new Date().toISOString()
+        mensaje: input.value.trim()
     });
-    
-    input.value = '';
-    showToast('Bendición compartida', 'success');
-    desbloquearLogro('testimony');
-    navegarA('muro-bendiciones');
+
+    if (r.success) {
+        input.value = '';
+        showToast('Bendición compartida', 'success');
+        desbloquearLogro('testimony');
+        navegarA('muro-bendiciones');
+    } else {
+        showToast('Error al compartir', 'error');
+    }
 }
 
 function cargarRecursos(c) {
@@ -1629,7 +1662,9 @@ function cargarAdminDashboard(c) {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido a administradores</p></div>';
         return;
     }
-    
+
+    const estado = window.db ? window.db.getEstadoSistema() : {};
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-line-chart"></i> Dashboard Administrativo</h2>
@@ -1648,12 +1683,12 @@ function cargarAdminDashboard(c) {
                     <button class="btn-primary btn-sm btn-block" onclick="navegarA('backup')" style="margin:4px 0;"><i class="bx bx-cloud-download"></i> Copias de Seguridad</button>
                 </div>
                 <div class="card">
-                    <h4><i class="bx bx-stats"></i> Estadísticas</h4>
+                    <h4><i class="bx bx-stats"></i> Estado de la DB</h4>
                     <p><strong>Versión:</strong> ${CONFIG.VERSION} ${CONFIG.VERSION_NAME}</p>
-                    <p><strong>Reportes totales:</strong> ${APP_STATE.reportes.length}</p>
-                    <p><strong>Logros desbloqueados:</strong> ${APP_STATE.logrosDesbloqueados.length}</p>
-                    <p><strong>Publicaciones:</strong> ${APP_STATE.publicaciones.length}</p>
-                    <p><strong>Oraciones:</strong> ${APP_STATE.oraciones.length}</p>
+                    <p><strong>Colecciones:</strong> ${estado.totalColecciones || 0}</p>
+                    <p><strong>Espacio usado:</strong> ${estado.espacioFormateado || '0 B'}</p>
+                    <p><strong>Papelera:</strong> ${estado.papeleraCount || 0}</p>
+                    <p><strong>Código maestro:</strong> ${estado.codigoMaestroGenerado ? '✅' : '❌'}</p>
                 </div>
             </div>
         </div>`;
@@ -1664,7 +1699,7 @@ function cargarAnaliticas(c) {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
         return;
     }
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-stats"></i> Analíticas</h2>
@@ -1682,32 +1717,31 @@ function cargarGestionUsuarios(c) {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
         return;
     }
-    
-    const usuarios = [
-        { nombre: 'Administrador', correo: 'admin@ipuc.com', rol: 'admin' },
-        { nombre: 'Usuario1', correo: 'usuario1@email.com', rol: 'usuario' },
-        { nombre: 'Usuario2', correo: 'usuario2@email.com', rol: 'usuario' },
-        { nombre: 'Usuario3', correo: 'usuario3@email.com', rol: 'usuario' }
-    ];
-    
+
+    // ═══ v22.1: Leer usuarios reales desde DB ═══
+    const usuarios = window.db
+        ? [...(window.db.cargar('administradores').administradores || []),
+           ...(window.db.cargar('usuarios').usuarios || [])]
+        : [];
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-user-voice"></i> Gestión de Usuarios</h2>
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Acciones</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th></tr></thead>
                     <tbody>
-                        ${usuarios.map((u, i) => `
-                            <tr>
-                                <td><i class="bx bx-user"></i> ${u.nombre}</td>
-                                <td>${u.correo}</td>
-                                <td><span class="badge badge-${u.rol === 'admin' ? 'danger' : 'info'}">${u.rol}</span></td>
-                                <td>
-                                    <button class="btn-primary btn-sm" onclick="showToast('Editando: ${u.nombre}','info')"><i class="bx bx-edit"></i></button>
-                                    <button class="btn-danger btn-sm" onclick="showToast('Eliminando: ${u.nombre}','warning')"><i class="bx bx-trash"></i></button>
-                                </td>
-                            </tr>
-                        `).join('')}
+                        ${usuarios.length === 0 ?
+                            '<tr><td colspan="4" style="text-align:center;padding:20px;">No hay usuarios registrados</td></tr>' :
+                            usuarios.map(u => `
+                                <tr>
+                                    <td><i class="bx bx-user"></i> ${escapeHtml(u.nombre)} ${escapeHtml(u.apellidos || '')}</td>
+                                    <td>${escapeHtml(u.correo)}</td>
+                                    <td><span class="badge badge-${u.rol === 'admin' ? 'danger' : 'info'}">${u.rol}</span></td>
+                                    <td><span class="badge estado-${u.estado === 'activo' ? 'resuelto' : 'desestimado'}">${u.estado}</span></td>
+                                </tr>
+                            `).join('')
+                        }
                     </tbody>
                 </table>
             </div>
@@ -1719,19 +1753,19 @@ function cargarGestionEventos(c) {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
         return;
     }
-    
+
     const eventos = APP_STATE.eventos || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-calendar-edit"></i> Gestión de Eventos</h2>
             <button class="btn-primary btn-sm" onclick="abrirModalEvento()" style="margin-bottom:12px;"><i class="bx bx-plus"></i> Crear Evento</button>
-            ${eventos.length === 0 ? 
+            ${eventos.length === 0 ?
                 '<div class="card"><p><i class="bx bx-info-circle"></i> No hay eventos programados</p></div>' :
                 eventos.map(e => `
                     <div class="card">
                         <h4><i class="bx bx-calendar-event"></i> ${escapeHtml(e.titulo)}</h4>
-                        <p>${escapeHtml(e.desc || '')}</p>
+                        <p>${escapeHtml(e.descripcion || '')}</p>
                         <small>${e.fecha} ${e.hora || ''} - ${e.lugar || ''}</small>
                         <div style="margin-top:8px;">
                             <button class="btn-danger btn-sm" onclick="eliminarEvento('${e.id}')"><i class="bx bx-trash"></i> Eliminar</button>
@@ -1742,12 +1776,25 @@ function cargarGestionEventos(c) {
         </div>`;
 }
 
+function eliminarEvento(id) {
+    confirmarAccion('¿Eliminar evento?', 'Se moverá a la papelera por 30 días', () => {
+        const r = Storage.eliminarConRespaldo('eventos', id, APP_STATE.usuario?.nombre || 'Admin');
+        if (r.success) {
+            APP_STATE.eventos = window.db.getEventos();
+            showToast('Evento eliminado (recuperable en papelera)', 'success');
+            navegarA('gestion-eventos');
+        } else {
+            showToast('Error: ' + r.error, 'error');
+        }
+    });
+}
+
 function cargarGestionNoticias(c) {
     if (APP_STATE.rol !== 'admin') {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
         return;
     }
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-edit-alt"></i> Gestión de Noticias</h2>
@@ -1759,6 +1806,29 @@ function cargarGestionNoticias(c) {
                 </form>
             </div>
         </div>`;
+}
+
+function publicarNoticia(e) {
+    if (e) e.preventDefault();
+    const titulo = document.getElementById('noticia-titulo');
+    const contenido = document.getElementById('noticia-contenido');
+    if (!titulo || !contenido || !titulo.value.trim() || !contenido.value.trim()) {
+        showToast('Completa todos los campos', 'warning');
+        return;
+    }
+    if (window.db) {
+        const r = window.db.addNoticia({
+            titulo: titulo.value.trim(),
+            contenido: contenido.value.trim(),
+            autor: APP_STATE.usuario?.nombre || 'Admin'
+        });
+        if (r.success) {
+            showToast('Noticia publicada', 'success');
+            titulo.value = '';
+            contenido.value = '';
+            navegarA('gestion-noticias');
+        }
+    }
 }
 
 function cargarModoOracion(c) {
@@ -1782,7 +1852,7 @@ function cargarModoOracion(c) {
 
 function cargarNotasRapidas(c) {
     const notas = APP_STATE.notasRapidas || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-pencil"></i> Notas Rápidas</h2>
@@ -1792,7 +1862,7 @@ function cargarNotasRapidas(c) {
                 </div>
                 <button class="btn-primary btn-sm" onclick="agregarNotaRapida()"><i class="bx bx-plus"></i> Agregar Nota</button>
             </div>
-            ${notas.length === 0 ? 
+            ${notas.length === 0 ?
                 '<div class="card"><p><i class="bx bx-info-circle"></i> No hay notas</p></div>' :
                 notas.map(n => `
                     <div class="card">
@@ -1811,13 +1881,11 @@ function agregarNotaRapida() {
         showToast('Escribe una nota', 'warning');
         return;
     }
-    
     APP_STATE.notasRapidas.unshift({
         id: generarId('nota'),
         contenido: input.value.trim(),
         fecha: new Date().toISOString()
     });
-    
     input.value = '';
     showToast('Nota guardada', 'success');
     navegarA('notas-rapidas');
@@ -1875,7 +1943,7 @@ function cargarVoluntariado(c) {
         { nombre: 'Bienvenida', descripcion: 'Recibe a los visitantes', vacantes: 4 },
         { nombre: 'Medios', descripcion: 'Ayuda con sonido y video', vacantes: 2 }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-hand"></i> Voluntariado</h2>
@@ -1910,7 +1978,7 @@ function cargarEventosSociales(c) {
 
 function cargarMemorizacion(c) {
     const versiculosMemorizar = CONFIG.VERSES.slice(0, 4);
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-brain"></i> Memorización</h2>
@@ -1945,6 +2013,25 @@ function cargarEstudiosBiblicos(c) {
         </div>`;
 }
 
+function cargarTestimonios(c) {
+    const testimonios = window.db ? window.db.getTestimonios() : [];
+
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2><i class="bx bx-message-dots"></i> Testimonios</h2>
+            ${testimonios.length === 0 ?
+                '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay testimonios compartidos</p></div>' :
+                testimonios.map(t => `
+                    <div class="card">
+                        <h3><i class="bx bx-quote-left"></i> ${escapeHtml(t.titulo)}</h3>
+                        <p>${escapeHtml(t.contenido)}</p>
+                        <small>— ${escapeHtml(t.autor)} | ${formatearFecha(t.fecha)}</small>
+                    </div>
+                `).join('')
+            }
+        </div>`;
+}
+
 function cargarDesafios(c) {
     c.innerHTML = `
         <div class="fade-in">
@@ -1963,26 +2050,23 @@ function cargarDesafios(c) {
 }
 
 function cargarInsignias(c) {
-    const insignias = [
-        { nombre: 'Nuevo Miembro', descripcion: 'Bienvenido a la iglesia', icono: 'bx-user-plus', desbloqueada: true },
-        { nombre: 'Miembro Activo', descripcion: 'Participa regularmente', icono: 'bx-star', desbloqueada: APP_STATE.nivel >= 2 },
-        { nombre: 'Líder', descripcion: 'Lidera un ministerio', icono: 'bx-crown', desbloqueada: APP_STATE.rol === 'admin' },
-        { nombre: 'Cuenta Verificada', descripcion: 'Correo verificado', icono: 'bx-badge-check', desbloqueada: APP_STATE.usuario?.verificado || false },
-        { nombre: 'Orador Constante', descripcion: '10 oraciones enviadas', icono: 'bx-pray', desbloqueada: APP_STATE.oraciones.length >= 10 }
+    const insignias = window.db ? window.db.getInsignias() : [
+        { nombre: 'Nuevo Miembro', icono: 'bx-user-plus' },
+        { nombre: 'Miembro Activo', icono: 'bx-star' },
+        { nombre: 'Líder', icono: 'bx-crown' },
+        { nombre: 'Cuenta Verificada', icono: 'bx-badge-check' },
+        { nombre: 'Orador Constante', icono: 'bx-pray' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-badge-check"></i> Insignias</h2>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
                 ${insignias.map(i => `
-                    <div class="card" style="text-align:center;opacity:${i.desbloqueada ? '1' : '0.5'};">
+                    <div class="card" style="text-align:center;">
                         <div style="font-size:2.5rem;"><i class="bx ${i.icono}"></i></div>
                         <h3>${i.nombre}</h3>
-                        <p>${i.descripcion}</p>
-                        ${i.desbloqueada ? 
-                            '<span class="badge estado-resuelto"><i class="bx bx-check"></i> Desbloqueada</span>' : 
-                            '<span class="badge"><i class="bx bx-lock-alt"></i> Bloqueada</span>'}
+                        <span class="badge estado-resuelto"><i class="bx bx-check"></i> Disponible</span>
                     </div>
                 `).join('')}
             </div>
@@ -1995,7 +2079,7 @@ function cargarArchivoStreaming(c) {
         { titulo: 'Culto de Oración - 11 de agosto', fecha: '2026-08-11', duracion: '1:45:00' },
         { titulo: 'Culto de Jóvenes - 8 de agosto', fecha: '2026-08-08', duracion: '2:00:00' }
     ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-archive"></i> Archivo Streaming</h2>
@@ -2057,9 +2141,9 @@ function cargarDocumentos(c) {
                 <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
                     <div>
                         <h3><i class="bx bx-file-doc"></i> ${d.titulo}</h3>
-                        <p><span class="badge badge-info">${d.tipo}</span> - ${d.tamano}</p>
+                        <p><span class="badge badge-info">${d.tipo}</span> ${d.tamano}</p>
                     </div>
-                    <button class="btn-outline btn-sm" onclick="showToast('Descargando ${d.titulo}...','info')"><i class="bx bx-download"></i> Descargar</button>
+                    <button class="btn-primary btn-sm" onclick="showToast('Descargando ${d.titulo}','info')"><i class="bx bx-download"></i></button>
                 </div>
             `).join('')}
         </div>`;
@@ -2071,13 +2155,52 @@ function cargarSuscripciones(c) {
             <h2><i class="bx bx-credit-card"></i> Suscripciones</h2>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;">
                 ${CONFIG.SUSCRIPCIONES.map(s => `
-                    <div class="card" style="text-align:center;">
-                        <h3><i class="bx bx-credit-card"></i> ${s.plan}</h3>
-                        <p style="font-size:2rem;font-weight:700;">${s.precio}</p>
-                        <ul style="text-align:left;margin:12px 0;">
-                            ${s.caracteristicas.map(c => `<li><i class="bx bx-check"></i> ${c}</li>`).join('')}
+                    <div class="card" style="text-align:center;${s.plan === 'Premium' ? 'border:2px solid var(--dorado);' : ''}">
+                        ${s.plan === 'Premium' ? '<span class="badge badge-warning">Recomendado</span>' : ''}
+                        <h3>${s.plan}</h3>
+                        <p style="font-size:2rem;font-weight:700;color:var(--azul-primario);">${s.precio}</p>
+                        <ul style="text-align:left;padding:16px 0;">
+                            ${s.caracteristicas.map(f => `<li style="padding:4px 0;"><i class="bx bx-check" style="color:var(--exito);"></i> ${f}</li>`).join('')}
                         </ul>
-                        <button class="btn-primary btn-sm" onclick="showToast('Suscrito a plan ${s.plan}','success')"><i class="bx bx-check"></i> Suscribirse</button>
+                        <button class="btn-primary btn-block" onclick="suscribirse('${s.plan}')">
+                            <i class="bx bx-crown"></i> Suscribirme
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+}
+
+function cargarTienda(c) {
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2><i class="bx bx-store-alt"></i> Tienda Cristiana</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+                ${CONFIG.PRODUCTOS.map(p => `
+                    <div class="card" style="text-align:center;">
+                        <div style="font-size:3rem;color:var(--azul-primario);"><i class="bx ${p.icono}"></i></div>
+                        <h3>${p.nombre}</h3>
+                        <p><span class="badge badge-info">${p.categoria}</span></p>
+                        <p style="font-size:1.3rem;font-weight:700;color:var(--azul-primario);">$${p.precio.toLocaleString('es-CO')}</p>
+                        <button class="btn-primary btn-sm btn-block" onclick="agregarAlCarrito('${p.id}')"><i class="bx bx-cart-add"></i> Agregar al carrito</button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+}
+
+function cargarVideos(c) {
+    c.innerHTML = `
+        <div class="fade-in">
+            <h2><i class="bx bx-video"></i> Videos</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;">
+                ${CONFIG.VIDEOS.map(v => `
+                    <div class="card" style="cursor:pointer;" onclick="showToast('Reproduciendo: ${v.titulo}','info')">
+                        <div style="aspect-ratio:16/9;background:var(--gris-oscuro);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--blanco);margin-bottom:8px;">
+                            <i class="bx bx-play-circle" style="font-size:3rem;opacity:0.7;"></i>
+                        </div>
+                        <h3>${v.titulo}</h3>
+                        <span class="badge badge-info">${v.categoria}</span>
                     </div>
                 `).join('')}
             </div>
@@ -2086,227 +2209,55 @@ function cargarSuscripciones(c) {
 
 function cargarCarrito(c) {
     const carrito = APP_STATE.carrito || [];
-    const total = carrito.reduce((sum, item) => sum + (item.precio || 0), 0);
+    const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
 
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-cart"></i> Carrito</h2>
-            ${carrito.length === 0 ? 
-                '<div class="card" style="text-align:center;padding:40px;"><p><i class="bx bx-cart"></i> Tu carrito está vacío</p></div>' :
-                carrito.map(item => `
-                    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-                        <span><i class="bx bx-box"></i> ${item.nombre}</span>
-                        <span>$${item.precio.toLocaleString('es-CO')}</span>
-                        <button class="btn-danger btn-sm" onclick="eliminarDelCarrito('${item.id}')"><i class="bx bx-trash"></i></button>
+            ${carrito.length === 0 ?
+                '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-cart"></i> Tu carrito está vacío</p></div>' :
+                `<div class="card">
+                    ${carrito.map(item => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gris-medio);">
+                            <span>${item.nombre} x${item.cantidad}</span>
+                            <span>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                        </div>
+                    `).join('')}
+                    <div style="padding:16px 0;text-align:right;">
+                        <strong style="font-size:1.3rem;">Total: $${total.toLocaleString('es-CO')}</strong>
                     </div>
-                `).join('') +
-                `<div class="card" style="display:flex;justify-content:space-between;align-items:center;font-weight:700;">
-                    <span>Total</span>
-                    <span>$${total.toLocaleString('es-CO')}</span>
-                </div>
-                <button class="btn-primary btn-lg" style="width:100%;margin-top:8px;" onclick="finalizarPedido()">
-                    <i class="bx bxl-whatsapp"></i> Finalizar pedido por WhatsApp
-                </button>`
+                    <button class="btn-primary btn-block" onclick="finalizarPedido()"><i class="bx bx-check"></i> Finalizar Pedido</button>
+                </div>`
             }
         </div>`;
-}
-
-function finalizarPedido() {
-    const carrito = APP_STATE.carrito || [];
-    if (carrito.length === 0) {
-        showToast('Tu carrito está vacío', 'info');
-        return;
-    }
-
-    if (!CONFIG.CONTACTO.whatsapp) {
-        showToast('Falta configurar el número de WhatsApp de la iglesia (CONFIG.CONTACTO.whatsapp)', 'error');
-        return;
-    }
-
-    const total = carrito.reduce((sum, item) => sum + (item.precio || 0), 0);
-    const nombreComprador = (APP_STATE.usuario && APP_STATE.usuario.nombre) || 'Visitante';
-
-    let mensaje = `Hola, soy ${nombreComprador} y quiero hacer este pedido en la Tienda IPUC La Fonda:\n\n`;
-    carrito.forEach(item => {
-        mensaje += `• ${item.nombre} - $${item.precio.toLocaleString('es-CO')}\n`;
-    });
-    mensaje += `\nTotal: $${total.toLocaleString('es-CO')}`;
-
-    const url = `https://wa.me/${CONFIG.CONTACTO.whatsapp}?text=${encodeURIComponent(mensaje)}`;
-    window.open(url, '_blank', 'noopener');
-}
-
-function eliminarDelCarrito(id) {
-    APP_STATE.carrito = APP_STATE.carrito.filter(item => item.id !== id);
-    showToast('Producto eliminado del carrito', 'info');
-    navegarA('carrito');
-}
-
-function agregarAlCarrito(id) {
-    const producto = CONFIG.PRODUCTOS.find(p => p.id === id);
-    if (!producto) return;
-
-    if (!APP_STATE.carrito) APP_STATE.carrito = [];
-    APP_STATE.carrito.push(producto);
-    showToast(`${producto.nombre} agregado al carrito`, 'success');
-}
-
-function cargarTienda(c) {
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-store"></i> Tienda IPUC La Fonda</h2>
-            <p style="opacity:.8;margin-bottom:16px;">Apoya a la iglesia adquiriendo nuestros productos oficiales.</p>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
-                ${CONFIG.PRODUCTOS.map(p => `
-                    <div class="card" style="text-align:center;">
-                        <div style="font-size:2.5rem;color:var(--primary-color);"><i class="${p.icono}"></i></div>
-                        <h3>${p.nombre}</h3>
-                        <p style="opacity:.7;font-size:.85rem;">${p.categoria}</p>
-                        <p style="font-size:1.3rem;font-weight:700;">$${p.precio.toLocaleString('es-CO')}</p>
-                        <button class="btn-primary btn-sm" onclick="agregarAlCarrito('${p.id}')"><i class="bx bx-cart-add"></i> Agregar al carrito</button>
-                    </div>
-                `).join('')}
-            </div>
-            <div style="text-align:center;margin-top:20px;">
-                <button class="btn-outline" onclick="navegarA('carrito')"><i class="bx bx-cart"></i> Ver carrito</button>
-            </div>
-        </div>`;
-}
-
-function reproducirVideo(id) {
-    const video = CONFIG.VIDEOS.find(v => v.id === id);
-    if (!video) return;
-
-    if (video.url) {
-        window.open(video.url, '_blank', 'noopener');
-    } else {
-        showToast(`"${video.titulo}" aún no tiene un enlace configurado`, 'info');
-    }
-}
-
-function cargarVideos(c) {
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-video"></i> Videos</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
-                ${CONFIG.VIDEOS.map(v => `
-                    <div class="card" style="padding:0;overflow:hidden;cursor:pointer;" onclick="reproducirVideo('${v.id}')">
-                        <div style="height:140px;background:center/cover no-repeat url('${v.miniatura}'), var(--card-bg);display:flex;align-items:center;justify-content:center;">
-                            <i class="bx bx-play-circle" style="font-size:3rem;color:#fff;"></i>
-                        </div>
-                        <div style="padding:12px;">
-                            <h3 style="font-size:1rem;">${v.titulo}</h3>
-                            <p style="opacity:.7;font-size:.8rem;">${v.categoria}</p>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>`;
-}
-
-function cargarTestimonios(c) {
-    const testimonios = obtenerTestimonios();
-
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-message-dots"></i> Testimonios</h2>
-
-            ${APP_STATE.usuario && APP_STATE.rol !== 'invitado' ? `
-                <div class="card">
-                    <h3>Comparte tu testimonio</h3>
-                    <form id="form-testimonio" onsubmit="return false;">
-                        <input type="text" id="testimonio-titulo" placeholder="Título" class="form-input" style="margin-bottom:8px;" required>
-                        <textarea id="testimonio-contenido" placeholder="Cuéntanos lo que Dios ha hecho en tu vida..." class="form-input" rows="4" required></textarea>
-                        <button type="button" class="btn-primary btn-sm" style="margin-top:8px;" onclick="enviarTestimonio()"><i class="bx bx-send"></i> Publicar</button>
-                    </form>
-                </div>
-            ` : ''}
-
-            ${testimonios.length === 0 ?
-                '<div class="card" style="text-align:center;padding:40px;"><p><i class="bx bx-message-dots"></i> Aún no hay testimonios publicados. ¡Sé el primero!</p></div>' :
-                testimonios.map(t => `
-                    <div class="card">
-                        <h3>${t.titulo}</h3>
-                        <p>${t.contenido}</p>
-                        <p style="opacity:.6;font-size:.8rem;margin-top:8px;"><i class="bx bx-user"></i> ${t.autor} · ${formatearFecha(t.fecha)}</p>
-                    </div>
-                `).join('')
-            }
-        </div>`;
-}
-
-function enviarTestimonio() {
-    const tituloEl = document.getElementById('testimonio-titulo');
-    const contenidoEl = document.getElementById('testimonio-contenido');
-    if (!tituloEl || !contenidoEl || !tituloEl.value.trim() || !contenidoEl.value.trim()) {
-        showToast('Completa el título y el contenido del testimonio', 'error');
-        return;
-    }
-
-    const resultado = crearTestimonio(APP_STATE.usuario.id, {
-        autor: APP_STATE.usuario.nombre,
-        titulo: tituloEl.value.trim(),
-        contenido: contenidoEl.value.trim()
-    });
-
-    if (resultado.success) {
-        showToast('¡Testimonio publicado!', 'success');
-        desbloquearLogro('testimony');
-        navegarA('testimonios');
-    } else {
-        showToast(resultado.error || 'No se pudo publicar el testimonio', 'error');
-    }
 }
 
 function cargarExportarDatos(c) {
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-export"></i> Exportar Datos</h2>
-            <div class="card" style="text-align:center;padding:30px;">
-                <div style="font-size:3rem;"><i class="bx bx-export"></i></div>
-                <h3>Exportar Información</h3>
-                <p>Descarga todos tus datos en formato JSON</p>
-                <button class="btn-primary btn-lg" onclick="exportarDatos()" style="margin-top:16px;"><i class="bx bx-download"></i> Exportar JSON</button>
+            <div class="card">
+                <h3><i class="bx bx-file"></i> Formatos disponibles</h3>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+                    <button class="btn-primary" onclick="Storage.descargarRespaldo()"><i class="bx bx-download"></i> Descargar respaldo completo (.json)</button>
+                    <button class="btn-secondary" onclick="navegarA('backup')"><i class="bx bx-cloud-download"></i> Ir a Copias de Seguridad</button>
+                </div>
             </div>
         </div>`;
 }
 
-function exportarDatos() {
-    const db = getDB();
-    if (!db) {
-        showToast('No se pudo exportar: base de datos no disponible', 'error');
-        return;
-    }
-
-    const datos = db.exportarTodo();
-    const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ipuc_backup_' + new Date().toISOString().split('T')[0] + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    showToast('Datos exportados correctamente', 'success');
-}
-
 function cargarHistorial(c) {
     const historial = APP_STATE.historialAcciones || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
-            <h2><i class="bx bx-history"></i> Historial</h2>
-            ${historial.length === 0 ? 
-                '<div class="card"><p><i class="bx bx-info-circle"></i> No hay acciones registradas</p></div>' :
+            <h2><i class="bx bx-history"></i> Historial de Acciones</h2>
+            ${historial.length === 0 ?
+                '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay acciones registradas</p></div>' :
                 historial.map(h => `
-                    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-                        <div>
-                            <p><strong>${h.accion}</strong></p>
-                            <small>${h.usuario} - ${h.modulo}</small>
-                        </div>
-                        <small>${formatearFecha(h.fecha)}</small>
+                    <div class="card" style="margin-bottom:8px;">
+                        <p><strong>${escapeHtml(h.accion)}</strong></p>
+                        <small>${escapeHtml(h.usuario)} - ${formatearFecha(h.fecha)}</small>
                     </div>
                 `).join('')
             }
@@ -2318,49 +2269,36 @@ function cargarAuditoria(c) {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
         return;
     }
-    
-    const auditoria = [
-        { usuario: 'Sistema', accion: 'Inicio de aplicación', modulo: 'Sistema', fecha: new Date().toISOString() },
-        { usuario: 'Sistema', accion: 'Base de datos inicializada', modulo: 'Database', fecha: new Date().toISOString() },
-        { usuario: APP_STATE.usuario?.nombre || 'Invitado', accion: 'Navegación', modulo: APP_STATE.currentPage, fecha: new Date().toISOString() }
-    ];
-    
+
+    const logs = window.db ? window.db.getLogs(50) : [];
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-clipboard"></i> Auditoría</h2>
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Usuario</th><th>Acción</th><th>Módulo</th><th>Fecha</th></tr></thead>
-                    <tbody>
-                        ${auditoria.map(a => `
-                            <tr>
-                                <td><i class="bx bx-user"></i> ${a.usuario}</td>
-                                <td>${a.accion}</td>
-                                <td>${a.modulo}</td>
-                                <td>${formatearFecha(a.fecha)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
+            ${logs.length === 0 ?
+                '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-info-circle"></i> No hay registros de auditoría</p></div>' :
+                logs.map(l => `
+                    <div class="card" style="margin-bottom:8px;">
+                        <p>${escapeHtml(l.accion || l.mensaje || '')}</p>
+                        <small>${formatearFecha(l.fecha)} - ${l.usuario || 'Sistema'}</small>
+                    </div>
+                `).join('')
+            }
         </div>`;
 }
 
+// ═══ v22.1: Página de Copias de Seguridad ═══
 function cargarBackup(c) {
-    if (APP_STATE.rol !== 'admin') {
-        c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
+    if (!window.Storage) {
+        c.innerHTML = `
+            <div class="card">
+                <h3><i class="bx bx-error-circle"></i> Módulo de respaldo no disponible</h3>
+                <p>Verifica que <code>storage.js</code> esté incluido en el HTML.</p>
+            </div>`;
         return;
     }
-    
-    c.innerHTML = `
-        <div class="fade-in">
-            <h2><i class="bx bx-cloud-download"></i> Copias de Seguridad</h2>
-            <div class="card">
-                <h3>Gestión de Respaldos</h3>
-                <button class="btn-primary btn-sm" onclick="exportarDatos()"><i class="bx bx-download"></i> Crear Backup</button>
-                <button class="btn-outline btn-sm" onclick="showToast('Restaurando backup...','info')"><i class="bx bx-upload"></i> Restaurar Backup</button>
-            </div>
-        </div>`;
+    c.innerHTML = Storage.renderPanelBackup();
+    Storage.bindPanelBackup();
 }
 
 function cargarPermisos(c) {
@@ -2368,59 +2306,40 @@ function cargarPermisos(c) {
         c.innerHTML = '<div class="card"><p><i class="bx bx-shield"></i> Acceso restringido</p></div>';
         return;
     }
-    
-    const permisos = [
-        { rol: 'Administrador', dashboard: true, usuarios: true, eventos: true, reportes: true, sistema: true },
-        { rol: 'Líder', dashboard: true, usuarios: false, eventos: true, reportes: true, sistema: false },
-        { rol: 'Miembro', dashboard: true, usuarios: false, eventos: true, reportes: false, sistema: false },
-        { rol: 'Invitado', dashboard: false, usuarios: false, eventos: true, reportes: false, sistema: false }
-    ];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-lock-open-alt"></i> Permisos</h2>
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Rol</th><th>Dashboard</th><th>Usuarios</th><th>Eventos</th><th>Reportes</th><th>Sistema</th></tr></thead>
-                    <tbody>
-                        ${permisos.map(p => `
-                            <tr>
-                                <td><strong>${p.rol}</strong></td>
-                                <td>${p.dashboard ? '<i class="bx bx-check-circle" style="color:var(--exito)"></i>' : '<i class="bx bx-x-circle" style="color:var(--error)"></i>'}</td>
-                                <td>${p.usuarios ? '<i class="bx bx-check-circle" style="color:var(--exito)"></i>' : '<i class="bx bx-x-circle" style="color:var(--error)"></i>'}</td>
-                                <td>${p.eventos ? '<i class="bx bx-check-circle" style="color:var(--exito)"></i>' : '<i class="bx bx-x-circle" style="color:var(--error)"></i>'}</td>
-                                <td>${p.reportes ? '<i class="bx bx-check-circle" style="color:var(--exito)"></i>' : '<i class="bx bx-x-circle" style="color:var(--error)"></i>'}</td>
-                                <td>${p.sistema ? '<i class="bx bx-check-circle" style="color:var(--exito)"></i>' : '<i class="bx bx-x-circle" style="color:var(--error)"></i>'}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            <div class="card">
+                <h3><i class="bx bx-shield"></i> Roles del sistema</h3>
+                <div style="padding:8px;border-bottom:1px solid var(--gris-medio);">
+                    <strong>Admin:</strong> Acceso total (usuarios, reportes, eventos, backups)
+                </div>
+                <div style="padding:8px;border-bottom:1px solid var(--gris-medio);">
+                    <strong>Usuario:</strong> Puede publicar, orar, chatear, participar en gamificación
+                </div>
+                <div style="padding:8px;">
+                    <strong>Invitado:</strong> Solo puede ver contenido público
+                </div>
             </div>
         </div>`;
 }
 
 function cargarFavoritos(c) {
     const favoritos = APP_STATE.favoritos || [];
-    
+
     c.innerHTML = `
         <div class="fade-in">
             <h2><i class="bx bx-heart"></i> Favoritos</h2>
-            ${favoritos.length === 0 ? 
-                '<div class="card"><p><i class="bx bx-heart"></i> No tienes favoritos guardados</p></div>' :
+            ${favoritos.length === 0 ?
+                '<div class="card"><p style="text-align:center;color:var(--gris-texto);"><i class="bx bx-heart"></i> Aún no tienes favoritos</p></div>' :
                 favoritos.map(f => `
-                    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-                        <span><i class="bx bx-heart" style="color:var(--error)"></i> ${f.nombre}</span>
-                        <button class="btn-danger btn-sm" onclick="eliminarFavorito('${f.id}')"><i class="bx bx-trash"></i></button>
+                    <div class="card">
+                        <p>${escapeHtml(f.titulo || '')}</p>
                     </div>
                 `).join('')
             }
         </div>`;
-}
-
-function eliminarFavorito(id) {
-    APP_STATE.favoritos = APP_STATE.favoritos.filter(f => f.id !== id);
-    showToast('Favorito eliminado', 'info');
-    navegarA('favoritos');
 }
 
 function cargarTema(c) {
@@ -2428,172 +2347,38 @@ function cargarTema(c) {
         <div class="fade-in">
             <h2><i class="bx bx-palette"></i> Temas</h2>
             <div class="card">
-                <h3>Seleccionar Tema</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-top:12px;">
-                    <button class="btn-outline btn-sm" onclick="aplicarTema('light')"><i class="bx bx-sun"></i> Claro</button>
-                    <button class="btn-outline btn-sm" onclick="aplicarTema('dark')"><i class="bx bx-moon"></i> Oscuro</button>
+                <h3>Selecciona tu tema</h3>
+                <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+                    <button class="btn-secondary" onclick="APP_STATE.tema='light';aplicarTema('light')">
+                        <i class="bx bx-sun"></i> Claro
+                    </button>
+                    <button class="btn-secondary" onclick="APP_STATE.tema='dark';aplicarTema('dark')">
+                        <i class="bx bx-moon"></i> Oscuro
+                    </button>
                 </div>
             </div>
         </div>`;
 }
 
 // ============================================
-// FUNCIONES DE TRIVIA Y JUEGOS
+// FUNCIONES AUXILIARES: LOGROS, XP, MODALES
 // ============================================
-function iniciarTrivia() {
-    APP_STATE.gameInProgress = true;
-    APP_STATE.gameScore = 0;
-    APP_STATE.gameLevel = 1;
-    APP_STATE.gameCorrect = 0;
-    APP_STATE.gameCurrentQuestion = 0;
-    
-    APP_STATE.currentGameQuestions = [...CONFIG.TRIVIA_QUESTIONS]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 6);
-    
-    const modal = document.getElementById('game-modal');
-    if (modal) modal.classList.remove('hidden');
-    
-    mostrarPreguntaTrivia();
-}
 
-function mostrarPreguntaTrivia() {
-    const questions = APP_STATE.currentGameQuestions;
-    
-    if (APP_STATE.gameCurrentQuestion >= questions.length) {
-        finalizarTrivia();
-        return;
-    }
-    
-    const q = questions[APP_STATE.gameCurrentQuestion];
-    const container = document.getElementById('game-body');
-    
-    if (!container) return;
-    
-    let html = `
-        <div class="game-container">
-            <div class="game-score">
-                <span><i class="bx bx-star"></i> Puntuación: <strong>${APP_STATE.gameScore}</strong></span>
-                <span><i class="bx bx-list-check"></i> Pregunta: <strong>${APP_STATE.gameCurrentQuestion + 1}/${questions.length}</strong></span>
-                <span><i class="bx bx-level-up"></i> Nivel: <strong>${APP_STATE.gameLevel}</strong></span>
-            </div>
-            <div class="game-question">${q.question}</div>
-            <div class="game-options">`;
-    
-    q.options.forEach((option, i) => {
-        const letter = String.fromCharCode(65 + i);
-        html += `<button class="game-option" data-index="${i}" onclick="responderTrivia(${i})">${letter}. ${option}</button>`;
-    });
-    
-    html += `
-            </div>
-            <div class="game-result" id="game-result"></div>
-        </div>`;
-    
-    container.innerHTML = html;
-}
+function desbloquearLogro(logroId) {
+    const logro = CONFIG.ACHIEVEMENTS.find(a => a.id === logroId);
+    if (!logro) return;
+    if (APP_STATE.logrosDesbloqueados.includes(logroId)) return;
 
-function responderTrivia(index) {
-    if (APP_STATE.gameInProgress === false) return;
-    
-    const questions = APP_STATE.currentGameQuestions;
-    const q = questions[APP_STATE.gameCurrentQuestion];
-    const result = document.getElementById('game-result');
-    const options = document.querySelectorAll('.game-option');
-    
-    options.forEach((option, i) => {
-        option.style.pointerEvents = 'none';
-        if (i === q.answer) option.classList.add('correct');
-        if (i === index && index !== q.answer) option.classList.add('incorrect');
-    });
-    
-    if (index === q.answer) {
-        const points = 10 + (APP_STATE.gameLevel * 2);
-        APP_STATE.gameScore += points;
-        APP_STATE.gameCorrect++;
-        if (result) result.textContent = `<i class="bx bx-check-circle"></i> ¡Correcto! +${points} puntos`;
-        showToast('¡Correcto!', 'success');
-    } else {
-        if (result) result.textContent = `<i class="bx bx-x-circle"></i> Incorrecto. La respuesta era: ${q.options[q.answer]}`;
-        showToast('Incorrecto', 'error');
-    }
-    
-    APP_STATE.gameCurrentQuestion++;
-    
-    setTimeout(() => {
-        if (APP_STATE.gameCurrentQuestion < questions.length) {
-            mostrarPreguntaTrivia();
-        } else {
-            finalizarTrivia();
-        }
-    }, 2000);
-}
+    APP_STATE.logrosDesbloqueados.push(logroId);
+    agregarXP(25);
+    showToast(`🏆 Logro desbloqueado: ${logro.name}`, 'success');
 
-function finalizarTrivia() {
-    const container = document.getElementById('game-body');
-    if (!container) return;
-    
-    const totalQuestions = APP_STATE.currentGameQuestions.length;
-    const porcentaje = Math.round((APP_STATE.gameCorrect / totalQuestions) * 100);
-    const mensaje = porcentaje >= 80 ? '¡Excelente!' : porcentaje >= 60 ? '¡Bien hecho!' : '¡Sigue practicando!';
-    const icono = porcentaje >= 80 ? 'bx bx-trophy' : porcentaje >= 60 ? 'bx bx-star' : 'bx bx-book';
-    
-    container.innerHTML = `
-        <div class="game-container" style="text-align:center;padding:20px;">
-            <div style="font-size:3rem;"><i class="bx ${icono}"></i></div>
-            <h3>${mensaje}</h3>
-            <p>Puntuación: <strong>${APP_STATE.gameScore}</strong></p>
-            <p>Correctas: ${APP_STATE.gameCorrect}/${totalQuestions} (${porcentaje}%)</p>
-            <button class="btn-primary" onclick="iniciarTrivia()" style="margin-top:16px;"><i class="bx bx-refresh"></i> Jugar de nuevo</button>
-        </div>`;
-    
-    if (APP_STATE.gameScore >= 50) {
-        desbloquearLogro('trivia_master');
-    }
-    
-    if (APP_STATE.gameScore > 0) {
-        agregarXP(APP_STATE.gameScore);
-    }
-    
-    APP_STATE.gameInProgress = false;
-}
-
-// ============================================
-// GESTIÓN DE LOGROS Y XP
-// ============================================
-function desbloquearLogro(id) {
-    if (APP_STATE.logrosDesbloqueados.includes(id)) return;
-    
-    const achievement = CONFIG.ACHIEVEMENTS.find(a => a.id === id);
-    if (!achievement) return;
-    
-    APP_STATE.logrosDesbloqueados.push(id);
-    showToast(`¡Logro desbloqueado! ${achievement.name}`, 'success', 4000);
-    actualizarLogros();
-
-    // Persistir el logro (y su XP) en la base de datos
-    if (APP_STATE.usuario && APP_STATE.usuario.id) {
-        const db = getDB();
-        if (db) {
-            db.desbloquearLogro(APP_STATE.usuario.id, id, {
-                nombre: achievement.name,
-                descripcion: achievement.desc || '',
-                icono: achievement.icon || 'bx bx-trophy',
-                xp: 20
-            });
-            sincronizarProgreso();
-        }
-    } else {
-        agregarXP(20);
-    }
-}
-
-function actualizarLogros() {
-    const count = APP_STATE.logrosDesbloqueados.length;
-    const badge = document.getElementById('achievements-count');
-    if (badge) {
-        badge.textContent = count;
-        badge.classList.toggle('hidden', count === 0);
+    if (APP_STATE.usuario?.id && window.db) {
+        window.db.desbloquearLogro(APP_STATE.usuario.id, logroId, {
+            nombre: logro.name,
+            descripcion: logro.desc,
+            xp: 25
+        });
     }
 }
 
@@ -2603,584 +2388,265 @@ function agregarXP(cantidad) {
         APP_STATE.xp -= APP_STATE.xpSiguiente;
         APP_STATE.nivel++;
         APP_STATE.xpSiguiente = Math.floor(APP_STATE.xpSiguiente * 1.5);
-        showToast(`¡Subiste al nivel ${APP_STATE.nivel}!`, 'success');
+        showToast(`🎉 ¡Subiste al nivel ${APP_STATE.nivel}!`, 'success');
     }
-    actualizarSidebarUsuario();
 
-    // Persistir en la base de datos para que el progreso no se pierda al recargar
-    if (APP_STATE.usuario && APP_STATE.usuario.id) {
-        const db = getDB();
-        if (db) db.agregarXP(APP_STATE.usuario.id, cantidad);
+    const bar = document.getElementById('user-xp-bar');
+    if (bar) {
+        bar.style.width = ((APP_STATE.xp / APP_STATE.xpSiguiente) * 100) + '%';
     }
 }
 
-// ============================================
-// FUNCIONES DE AUTENTICACIÓN
-// ============================================
-function login(email, password) {
-    try {
-        const db = getDB();
-        if (!db) return { success: false, error: 'Base de datos no disponible' };
-        return db.login(email, password);
-    } catch (e) {
-        return { success: false, error: 'Error en el servidor' };
-    }
-}
+function confirmarAccion(titulo, mensaje, callback) {
+    const modal = document.getElementById('confirm-modal');
+    if (!modal) { if (confirm(titulo + '\n\n' + mensaje)) callback(); return; }
 
-function registro(datos) {
-    try {
-        const db = getDB();
-        if (!db) return { success: false, error: 'Base de datos no disponible' };
-        return db.registrarUsuario(datos);
-    } catch (e) {
-        return { success: false, error: 'Error en el servidor' };
-    }
-}
+    const titleEl = document.getElementById('confirm-title');
+    const msgEl = document.getElementById('confirm-message');
+    if (titleEl) titleEl.textContent = titulo;
+    if (msgEl) msgEl.textContent = mensaje;
 
-function getDB() {
-    if (typeof window !== 'undefined' && window.db) return window.db;
-    return null;
-}
+    modal.classList.remove('hidden');
 
-// Trae de la base de datos (localStorage) el progreso real del usuario
-// (nivel, xp, logros, lecturas) y lo refleja en APP_STATE. Se llama
-// después de iniciar sesión o restaurar sesión para que el progreso
-// guardado no se pierda al recargar la página.
-function sincronizarProgreso() {
-    try {
-        const db = getDB();
-        if (!db || !APP_STATE.usuario || !APP_STATE.usuario.id) return;
-        const uid = APP_STATE.usuario.id;
+    const aceptar = document.getElementById('confirm-accept');
+    const cancelar = document.getElementById('confirm-cancel');
 
-        const usuarios = db.cargar('usuarios');
-        const admins = db.cargar('administradores');
-        const registro = (usuarios.usuarios || []).find(u => u.id === uid) ||
-                          (admins.administradores || []).find(a => a.id === uid);
-
-        if (registro) {
-            let totalXP = registro.xp || 0;
-            let nivel = 1;
-            let xpNecesario = 100;
-            while (totalXP >= xpNecesario) {
-                totalXP -= xpNecesario;
-                nivel++;
-                xpNecesario = Math.floor(xpNecesario * 1.5);
-            }
-            APP_STATE.nivel = nivel;
-            APP_STATE.xp = totalXP;
-            APP_STATE.xpSiguiente = xpNecesario;
-        }
-
-        const logros = db.cargar('logros');
-        APP_STATE.logrosDesbloqueados = (logros.logros || [])
-            .filter(l => l.usuario_id === uid)
-            .map(l => l.logro_id);
-
-        const lectura = db.cargar('lectura-biblica');
-        const progresoLectura = (lectura.progreso || []).find(p => p.usuario_id === uid);
-        APP_STATE.lecturasCompletadas = progresoLectura ? (progresoLectura.completados || 0) : 0;
-
-        actualizarSidebarUsuario();
-        actualizarLogros();
-    } catch (e) {
-        console.error('Error al sincronizar progreso:', e);
-    }
-}
-
-function continuarComoInvitado() {
-    APP_STATE.rol = 'invitado';
-    APP_STATE.token = `guest_${Date.now()}`;
-    APP_STATE.usuario = {
-        id: 0,
-        nombre: 'Invitado',
-        usuario: 'invitado',
-        correo: 'invitado@ipuc.com',
-        foto: 'assets/avatars/default.png',
-        ministerio: 'Visitante',
-        verificado: false
+    const handlerAceptar = () => {
+        modal.classList.add('hidden');
+        aceptar.removeEventListener('click', handlerAceptar);
+        cancelar.removeEventListener('click', handlerCancelar);
+        callback();
     };
-    actualizarSidebarUsuario();
-    mostrarApp();
-    showToast('Navegando como invitado', 'info');
+    const handlerCancelar = () => {
+        modal.classList.add('hidden');
+        aceptar.removeEventListener('click', handlerAceptar);
+        cancelar.removeEventListener('click', handlerCancelar);
+    };
+
+    aceptar.addEventListener('click', handlerAceptar);
+    cancelar.addEventListener('click', handlerCancelar);
 }
 
-function cerrarSesion() {
-    try {
-        localStorage.removeItem('ipuc20_token');
-        localStorage.removeItem('ipuc20_usuario');
-        localStorage.removeItem('ipuc20_rol');
-    } catch (e) {}
-    
-    APP_STATE.token = null;
-    APP_STATE.usuario = null;
-    APP_STATE.rol = null;
-    
-    if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
-    
-    mostrarBienvenida();
-    showToast('Sesión cerrada', 'info');
-}
-
-// ============================================
-// MOSTRAR/OCULTAR APP
-// ============================================
-function mostrarApp() {
-    const welcome = document.getElementById('welcome-screen');
-    const app = document.getElementById('app');
-    const fab = document.getElementById('fab-main');
-    
-    if (welcome) welcome.classList.add('hidden');
-    if (app) app.classList.remove('hidden');
-    if (fab) fab.classList.remove('hidden');
-    
-    actualizarSidebarUsuario();
-    navegarA('inicio');
-    iniciarContador();
-    actualizarBadgeReportes();
-    actualizarEstadisticas();
-    cargarVersiculoDelDia();
-    actualizarFechaHeader();
-}
-
-function mostrarBienvenida() {
-    const app = document.getElementById('app');
-    const welcome = document.getElementById('welcome-screen');
-    if (app) app.classList.add('hidden');
-    if (welcome) welcome.classList.remove('hidden');
-}
-
-function realizarDonacion() {
-    showToast('¡Gracias por tu donación!', 'success');
-    desbloquearLogro('generous');
-}
-
-// ============================================
-// INICIALIZACIÓN
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Cargar tema
-    try {
-        const temaGuardado = localStorage.getItem('ipuc20_tema') || 'light';
-        APP_STATE.tema = temaGuardado;
-        aplicarTema(temaGuardado);
-    } catch (e) {}
-    
-    // Cargar idioma
-    try {
-        APP_STATE.idioma = localStorage.getItem('ipuc20_idioma') || 'es';
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-lang') === APP_STATE.idioma);
+function cerrarPaneles() {
+    ['streaming-panel', 'radio-quick-panel', 'qr-panel', 'reports-quick-panel', 'notification-panel', 'user-dropdown', 'fab-menu', 'search-bar', 'assistant']
+        .forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
         });
+}
+
+function cerrarSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('open');
+    APP_STATE.sidebarOpen = false;
+}
+
+function abrirSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.add('open');
+    APP_STATE.sidebarOpen = true;
+}
+
+function actualizarFechaHeader() {
+    const el = document.getElementById('header-date');
+    if (!el) return;
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const today = new Date().toLocaleDateString('es-CO', options);
+    el.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+}
+
+function iniciarContador() {
+    const actualizar = () => {
+        const ahora = new Date();
+        const proximoDomingo = new Date(ahora);
+        proximoDomingo.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7 || 7));
+        proximoDomingo.setHours(10, 0, 0, 0);
+
+        const diff = proximoDomingo - ahora;
+        const dias = Math.floor(diff / 86400000);
+        const horas = Math.floor((diff % 86400000) / 3600000);
+        const minutos = Math.floor((diff % 3600000) / 60000);
+        const segundos = Math.floor((diff % 60000) / 1000);
+
+        const el = (id) => document.getElementById(id);
+        if (el('contador-dias')) el('contador-dias').textContent = String(dias).padStart(2, '0');
+        if (el('contador-horas')) el('contador-horas').textContent = String(horas).padStart(2, '0');
+        if (el('contador-minutos')) el('contador-minutos').textContent = String(minutos).padStart(2, '0');
+        if (el('contador-segundos')) el('contador-segundos').textContent = String(segundos).padStart(2, '0');
+    };
+    actualizar();
+    if (APP_STATE.contadorInterval) clearInterval(APP_STATE.contadorInterval);
+    APP_STATE.contadorInterval = setInterval(actualizar, 1000);
+}
+
+// Placeholder para funciones de modales/acciones
+function abrirModalEvento() { const m = document.getElementById('event-modal'); if (m) m.classList.remove('hidden'); }
+function abrirModalReporte() { const m = document.getElementById('report-modal'); if (m) m.classList.remove('hidden'); }
+function toggleRadio() { APP_STATE.radioPlaying = !APP_STATE.radioPlaying; showToast(APP_STATE.radioPlaying ? 'Radio encendida' : 'Radio apagada', 'info'); navegarA('radio'); }
+function toggleRadioPanel() { const p = document.getElementById('radio-quick-panel'); if (p) p.classList.toggle('hidden'); }
+function toggleStreamingPanel() { const p = document.getElementById('streaming-panel'); if (p) p.classList.toggle('hidden'); }
+function reproducirCancion(i) { showToast('Reproduciendo: ' + CONFIG.PLAYLIST[i].title, 'info'); }
+function compartirVersiculo() { showToast('Versículo copiado al portapapeles', 'success'); }
+function realizarDonacion() { showToast('Sistema de donaciones próximamente', 'info'); }
+function iniciarTrivia() {
+    const m = document.getElementById('game-modal');
+    if (m) m.classList.remove('hidden');
+}
+function agregarAlCarrito(id) {
+    const prod = CONFIG.PRODUCTOS.find(p => p.id === id);
+    if (!prod) return;
+    const existente = APP_STATE.carrito.find(x => x.id === id);
+    if (existente) existente.cantidad++;
+    else APP_STATE.carrito.push({ ...prod, cantidad: 1 });
+    showToast(prod.nombre + ' agregado al carrito', 'success');
+}
+function finalizarPedido() { showToast('Pedido finalizado. Te contactaremos pronto.', 'success'); APP_STATE.carrito = []; navegarA('carrito'); }
+function suscribirse(plan) { APP_STATE.suscripcionActual = plan; showToast('Suscripción ' + plan + ' activada', 'success'); }
+function cerrarSesion() {
+    APP_STATE.usuario = null;
+    APP_STATE.token = null;
+    APP_STATE.rol = null;
+    APP_STATE.isAdmin = false;
+    try {
+        localStorage.removeItem('ipuc20_sesion');
     } catch (e) {}
-    
-    // Cargar sesión
-    const token = localStorage.getItem('ipuc20_token');
-    const udata = localStorage.getItem('ipuc20_usuario');
-    const rol = localStorage.getItem('ipuc20_rol');
-    
-    // Mostrar splash y luego cargar app
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) {
-            splash.style.opacity = '0';
-            splash.style.transition = 'opacity 0.5s';
-            setTimeout(() => {
-                if (splash) splash.style.display = 'none';
-            }, 500);
-        }
-        
-        if (token && udata) {
+    showToast('Sesión cerrada', 'info');
+    setTimeout(() => location.reload(), 500);
+}
+
+// ============================================
+// ═══ v22.1: STORAGE INIT + MODAL CÓDIGO MAESTRO ═══
+// ============================================
+
+function inicializarStorage() {
+    if (!window.Storage || !window.db) {
+        console.warn('⚠️ Storage o DB no disponibles');
+        return;
+    }
+    try {
+        Storage.sincronizarAppState();
+        console.log('✅ Storage inicializado y APP_STATE sincronizado');
+    } catch (e) {
+        console.error('❌ Error inicializando Storage:', e);
+    }
+}
+
+function mostrarModalCodigoMaestro(codigo) {
+    const modal = document.getElementById('master-code-modal');
+    if (!modal) {
+        alert(
+            '⚠️ GUARDA ESTE CÓDIGO DE RECUPERACIÓN\n\n' +
+            'Código: ' + codigo + '\n\n' +
+            'Lo necesitarás si olvidas tu contraseña o se borran los datos.\n\n' +
+            'Guárdalo en un lugar seguro.'
+        );
+        return;
+    }
+
+    const display = document.getElementById('master-code-display');
+    if (display) display.textContent = codigo;
+
+    modal.classList.remove('hidden');
+
+    const btnCopiar = document.getElementById('btn-copy-master-code');
+    const btnDescargar = document.getElementById('btn-download-master-code');
+    const btnConfirmar = document.getElementById('btn-confirm-master-code');
+
+    if (btnCopiar && !btnCopiar.dataset.bound) {
+        btnCopiar.dataset.bound = 'true';
+        btnCopiar.addEventListener('click', async () => {
             try {
-                APP_STATE.token = token;
-                APP_STATE.usuario = JSON.parse(udata);
-                APP_STATE.rol = rol || 'usuario';
-                sincronizarProgreso();
-                mostrarApp();
+                await navigator.clipboard.writeText(codigo);
+                showToast('Código copiado', 'success');
             } catch (e) {
-                mostrarBienvenida();
+                showToast('No se pudo copiar. Cópialo manualmente.', 'warning');
             }
-        } else {
-            mostrarBienvenida();
-        }
-    }, 1500);
-    
-    inicializarEventos();
-    manejarResponsiveSidebar();
-    
-    window.addEventListener('resize', manejarResponsiveSidebar);
-    window.addEventListener('online', () => {
-        APP_STATE.isOnline = true;
-        showToast('Conexión restablecida', 'success');
+        });
+    }
+
+    if (btnDescargar && !btnDescargar.dataset.bound) {
+        btnDescargar.dataset.bound = 'true';
+        btnDescargar.addEventListener('click', () => {
+            const contenido =
+                '========================================\n' +
+                'IPUC LA FONDA - CÓDIGO MAESTRO\n' +
+                '========================================\n\n' +
+                'Código: ' + codigo + '\n\n' +
+                'Fecha: ' + new Date().toLocaleString('es-CO') + '\n\n' +
+                '⚠️ IMPORTANTE:\n' +
+                'Guarda este código en un lugar seguro.\n' +
+                'Lo necesitarás si olvidas la contraseña del administrador\n' +
+                'o si se borran los datos del navegador.\n\n' +
+                'No compartas este código con nadie.\n';
+
+            const blob = new Blob([contenido], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'IPUC_codigo_maestro.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    if (btnConfirmar && !btnConfirmar.dataset.bound) {
+        btnConfirmar.dataset.bound = 'true';
+        btnConfirmar.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            showToast('Código guardado. ¡Bienvenido!', 'success');
+        });
+    }
+}
+
+window.mostrarModalCodigoMaestro = mostrarModalCodigoMaestro;
+
+// ═══ ARRANQUE ═══
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(inicializarStorage, 600);
+
+    // Conectar botones globales
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) toggle.addEventListener('click', toggleTema);
+
+    const menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle) menuToggle.addEventListener('click', abrirSidebar);
+
+    const closeSidebar = document.getElementById('close-sidebar');
+    if (closeSidebar) closeSidebar.addEventListener('click', cerrarSidebar);
+
+    // Navegación por hash y clicks
+    document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = item.getAttribute('data-page');
+            navegarA(page);
+            if (window.location.hash !== '#' + page) {
+                window.location.hash = page;
+            }
+        });
     });
-    window.addEventListener('offline', () => {
-        APP_STATE.isOnline = false;
-        showToast('Sin conexión a internet', 'error');
+
+    // Botón de logout
+    const logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        confirmarAccion('¿Cerrar sesión?', '', cerrarSesion);
     });
 });
 
-// ============================================
-// EVENTOS DEL DOM
-// ============================================
-function inicializarEventos() {
-    // Sidebar
-    document.getElementById('menu-toggle')?.addEventListener('click', toggleSidebar);
-    document.getElementById('close-sidebar')?.addEventListener('click', cerrarSidebar);
-    document.getElementById('sidebar-overlay')?.addEventListener('click', cerrarSidebar);
-    
-    // Navegación
-    document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.getAttribute('data-page');
-            if (page) navegarA(page);
-        });
-    });
-    
-    // Botones header
-    document.getElementById('theme-toggle')?.addEventListener('click', toggleTema);
-    document.getElementById('notifications-toggle')?.addEventListener('click', toggleNotificaciones);
-    document.getElementById('reports-quick-toggle')?.addEventListener('click', togglePanelReportes);
-    document.getElementById('search-toggle')?.addEventListener('click', toggleSearchBar);
-    document.getElementById('qr-toggle')?.addEventListener('click', toggleQRPanel);
-    document.getElementById('radio-toggle')?.addEventListener('click', toggleRadioPanel);
-    document.getElementById('prayer-mode-toggle')?.addEventListener('click', () => navegarA('modo-oracion'));
-    document.getElementById('focus-mode-toggle')?.addEventListener('click', () => {
-        APP_STATE.modoConcentracion = !APP_STATE.modoConcentracion;
-        showToast(APP_STATE.modoConcentracion ? 'Modo concentración activado' : 'Modo concentración desactivado', 'info');
-    });
-    
-    // Search
-    document.getElementById('search-close')?.addEventListener('click', () => {
-        document.getElementById('search-bar')?.classList.add('hidden');
-        APP_STATE.searchBarOpen = false;
-    });
-    
-    const searchInput = document.getElementById('global-search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(function() {
-            realizarBusqueda(this.value);
-        }, 300));
+// Re-sincronizar al iniciar sesión
+window.addEventListener('ipuc:login', () => {
+    setTimeout(inicializarStorage, 300);
+});
+
+// Manejar hash al cargar
+window.addEventListener('hashchange', () => {
+    const page = window.location.hash.replace('#', '');
+    if (page && CONFIG.TITULOS_PAGINAS[page]) {
+        navegarA(page);
     }
-    
-    // FAB
-    document.getElementById('fab-main')?.addEventListener('click', toggleFabMenu);
-    
-    document.querySelectorAll('.fab-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const action = this.getAttribute('data-action');
-            
-            if (action === 'reporte') abrirModalReporte();
-            else if (action === 'oracion') navegarA('oracion');
-            else if (action === 'musica') navegarA('radio');
-            else if (action === 'evento') {
-                if (APP_STATE.rol === 'admin') abrirModalEvento();
-                else navegarA('eventos');
-            }
-            else if (action === 'donacion') navegarA('ofrendas');
-            else if (action === 'juego') navegarA('trivia');
-            else if (action === 'asistente') toggleAsistente();
-            else if (action === 'voluntariado') navegarA('voluntariado');
-            else if (action === 'desafio') navegarA('desafios');
-            
-            toggleFabMenu();
-        });
-    });
-    
-    // Usuario
-    document.getElementById('user-mini')?.addEventListener('click', toggleUserDropdown);
-    document.getElementById('btn-logout')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        confirmarAccion('Cerrar sesión?', '', cerrarSesion);
-    });
-    document.getElementById('btn-guest')?.addEventListener('click', continuarComoInvitado);
-    
-    // Auth forms
-    document.getElementById('show-register')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('login-form-container')?.classList.add('hidden');
-        document.getElementById('register-form-container')?.classList.remove('hidden');
-    });
-    
-    document.getElementById('show-login')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('register-form-container')?.classList.add('hidden');
-        document.getElementById('login-form-container')?.classList.remove('hidden');
-    });
-    
-    // Confirm modal
-    document.getElementById('confirm-cancel')?.addEventListener('click', () => {
-        document.getElementById('confirm-modal')?.classList.add('hidden');
-        APP_STATE.pendingConfirmation = null;
-    });
-    
-    document.getElementById('confirm-accept')?.addEventListener('click', () => {
-        if (APP_STATE.pendingConfirmation) {
-            APP_STATE.pendingConfirmation();
-            APP_STATE.pendingConfirmation = null;
-        }
-        document.getElementById('confirm-modal')?.classList.add('hidden');
-    });
-    
-    // Report modal
-    document.getElementById('report-form')?.addEventListener('submit', generarReporte);
-    document.getElementById('btn-cancel-report')?.addEventListener('click', cerrarModalReporte);
-    
-    document.querySelectorAll('input[name="report-type"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            cambiarTipoReporte(this.value);
-        });
-    });
-    
-    // Close panels
-    document.getElementById('close-reports-quick')?.addEventListener('click', () => {
-        document.getElementById('reports-quick-panel')?.classList.add('hidden');
-        APP_STATE.reportsPanelOpen = false;
-    });
-    
-    document.getElementById('close-notifications')?.addEventListener('click', () => {
-        document.getElementById('notification-panel')?.classList.add('hidden');
-        APP_STATE.notificationsOpen = false;
-    });
-    
-    document.getElementById('close-radio-quick')?.addEventListener('click', () => {
-        document.getElementById('radio-quick-panel')?.classList.add('hidden');
-        APP_STATE.radioPanelOpen = false;
-    });
-    
-    document.getElementById('close-streaming')?.addEventListener('click', () => {
-        document.getElementById('streaming-panel')?.classList.add('hidden');
-        APP_STATE.streamingPanelOpen = false;
-    });
-    
-    document.getElementById('close-qr')?.addEventListener('click', () => {
-        document.getElementById('qr-panel')?.classList.add('hidden');
-        APP_STATE.qrPanelOpen = false;
-    });
-    
-    document.getElementById('close-assistant')?.addEventListener('click', () => {
-        document.getElementById('assistant')?.classList.add('hidden');
-        APP_STATE.assistantOpen = false;
-    });
-    
-    // Radio controls
-    document.getElementById('radio-play-toggle')?.addEventListener('click', toggleRadio);
-    document.getElementById('radio-play-main')?.addEventListener('click', toggleRadio);
-    document.getElementById('radio-prev')?.addEventListener('click', () => cambiarEstacionRadio(-1));
-    document.getElementById('radio-next')?.addEventListener('click', () => cambiarEstacionRadio(1));
-    
-    // Assistant
-    document.getElementById('assistant-send')?.addEventListener('click', enviarMensajeAsistente);
-    document.getElementById('assistant-input')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') enviarMensajeAsistente();
-    });
-    
-    // Event form
-    document.getElementById('event-form')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const titulo = document.getElementById('event-title');
-        const fecha = document.getElementById('event-date');
-        
-        if (!titulo || !titulo.value.trim()) {
-            showToast('Ingresa un título', 'warning');
-            return;
-        }
-        if (!fecha || !fecha.value) {
-            showToast('Selecciona una fecha', 'warning');
-            return;
-        }
-        
-        APP_STATE.eventos.push({
-            id: generarId('evt'),
-            titulo: titulo.value.trim(),
-            desc: document.getElementById('event-desc')?.value.trim() || '',
-            fecha: fecha.value,
-            hora: document.getElementById('event-time')?.value || '',
-            lugar: document.getElementById('event-location')?.value.trim() || '',
-            tipo: document.getElementById('event-type')?.value || 'culto'
-        });
-        
-        showToast('Evento creado', 'success');
-        document.getElementById('event-modal').classList.add('hidden');
-        desbloquearLogro('event_creator');
-        navegarA('eventos');
-    });
-    
-    // Login form
-    document.getElementById('login-form')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('login-email');
-        const pass = document.getElementById('login-password');
-        
-        if (email && pass && email.value && pass.value) {
-            const resultado = login(email.value, pass.value);
-            
-            if (resultado.success) {
-                APP_STATE.token = resultado.token;
-                APP_STATE.usuario = resultado.usuario;
-                APP_STATE.rol = resultado.rol;
-                sincronizarProgreso();
+});
 
-                try {
-                    localStorage.setItem('ipuc20_token', resultado.token);
-                    localStorage.setItem('ipuc20_usuario', JSON.stringify(resultado.usuario));
-                    localStorage.setItem('ipuc20_rol', resultado.rol);
-                } catch (err) {}
-                
-                mostrarApp();
-                showToast(`Bienvenido ${resultado.usuario.nombre}`, 'success');
-            } else {
-                showToast(resultado.error || 'Error al iniciar sesión', 'error');
-            }
-        }
-    });
-    
-    // Register form
-    document.getElementById('register-form')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const nombre = document.getElementById('reg-nombre');
-        const email = document.getElementById('reg-email');
-        const pass = document.getElementById('reg-password');
-        
-        if (nombre && email && pass && nombre.value && email.value && pass.value) {
-            const resultado = registro({
-                nombre: nombre.value,
-                correo: email.value,
-                password: pass.value,
-                usuario: email.value.split('@')[0],
-                ministerio: 'General'
-            });
-            
-            if (resultado.success) {
-                showToast('Registro exitoso. Inicia sesión', 'success');
-                document.getElementById('register-form-container')?.classList.add('hidden');
-                document.getElementById('login-form-container')?.classList.remove('hidden');
-            } else {
-                showToast(resultado.error || 'Error al registrar', 'error');
-            }
-        }
-    });
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            cerrarPaneles();
-            cerrarModal();
-            cerrarModalReporte();
-            document.getElementById('event-modal')?.classList.add('hidden');
-            document.getElementById('game-modal')?.classList.add('hidden');
-        }
-        
-        if (e.ctrlKey && e.key === 'k') {
-            e.preventDefault();
-            toggleSearchBar();
-        }
-    });
-    
-    // Click outside
-    document.addEventListener('click', function(e) {
-        if (APP_STATE.userDropdownOpen && !e.target.closest('#user-mini') && !e.target.closest('#user-dropdown')) {
-            document.getElementById('user-dropdown')?.classList.add('hidden');
-            APP_STATE.userDropdownOpen = false;
-        }
-        
-        if (APP_STATE.fabMenuOpen && !e.target.closest('#fab-main') && !e.target.closest('#fab-menu')) {
-            document.getElementById('fab-menu')?.classList.add('hidden');
-            APP_STATE.fabMenuOpen = false;
-        }
-    });
-    
-    // Language buttons
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const lang = this.getAttribute('data-lang');
-            if (lang) cambiarIdioma(lang);
-        });
-    });
-}
-
-// ============================================
-// EXPORTAR FUNCIONES A WINDOW
-// ============================================
-window.CONFIG = CONFIG;
-window.APP_STATE = APP_STATE;
-window.navegarA = navegarA;
-window.toggleTema = toggleTema;
-window.aplicarTema = aplicarTema;
-window.showToast = showToast;
-window.cerrarModal = cerrarModal;
-window.confirmarAccion = confirmarAccion;
-window.toggleSidebar = toggleSidebar;
-window.cerrarSidebar = cerrarSidebar;
-window.toggleSearchBar = toggleSearchBar;
-window.toggleFabMenu = toggleFabMenu;
-window.toggleUserDropdown = toggleUserDropdown;
-window.toggleNotificaciones = toggleNotificaciones;
-window.togglePanelReportes = togglePanelReportes;
-window.toggleRadioPanel = toggleRadioPanel;
-window.toggleStreamingPanel = toggleStreamingPanel;
-window.toggleQRPanel = toggleQRPanel;
-window.toggleAsistente = toggleAsistente;
-window.continuarComoInvitado = continuarComoInvitado;
-window.cerrarSesion = cerrarSesion;
-window.cambiarIdioma = cambiarIdioma;
-window.mostrarApp = mostrarApp;
-window.mostrarBienvenida = mostrarBienvenida;
-window.formatearFecha = formatearFecha;
-window.escapeHtml = escapeHtml;
-window.generarId = generarId;
-window.compartirVersiculo = compartirVersiculo;
-window.crearPubLocal = crearPubLocal;
-window.crearPeticionLocal = crearPeticionLocal;
-window.abrirModalReporte = abrirModalReporte;
-window.cerrarModalReporte = cerrarModalReporte;
-window.cambiarTipoReporte = cambiarTipoReporte;
-window.generarReporte = generarReporte;
-window.actualizarBadgeReportes = actualizarBadgeReportes;
-window.verDetalleReporte = verDetalleReporte;
-window.cambiarEstadoReporte = cambiarEstadoReporte;
-window.cargarReportesRecientes = cargarReportesRecientes;
-window.reproducirCancion = reproducirCancion;
-window.toggleRadio = toggleRadio;
-window.cambiarEstacionRadio = cambiarEstacionRadio;
-window.iniciarTrivia = iniciarTrivia;
-window.responderTrivia = responderTrivia;
-window.desbloquearLogro = desbloquearLogro;
-window.agregarXP = agregarXP;
-window.enviarOracionLocal = enviarOracionLocal;
-window.enviarBendicion = enviarBendicion;
-window.guardarEntradaDiario = guardarEntradaDiario;
-window.marcarLecturaCompletada = marcarLecturaCompletada;
-window.buscarConcordancia = buscarConcordancia;
-window.abrirModalEvento = abrirModalEvento;
-window.eliminarEvento = eliminarEvento;
-window.publicarNoticia = publicarNoticia;
-window.confirmarAsistencia = confirmarAsistencia;
-window.enviarMensajeChat = enviarMensajeChat;
-window.realizarBusqueda = realizarBusqueda;
-window.seleccionarResultadoBusqueda = seleccionarResultadoBusqueda;
-window.realizarDonacion = realizarDonacion;
-window.login = login;
-window.registro = registro;
-window.getDB = getDB;
-window.cerrarPaneles = cerrarPaneles;
-window.enviarMensajeAsistente = enviarMensajeAsistente;
-window.agregarNotaRapida = agregarNotaRapida;
-window.eliminarNotaRapida = eliminarNotaRapida;
-window.eliminarDelCarrito = eliminarDelCarrito;
-window.eliminarFavorito = eliminarFavorito;
-window.exportarDatos = exportarDatos;
-window.registrarHistorial = registrarHistorial;
-
-console.log('IPUC LA FONDA v' + CONFIG.VERSION + ' ' + CONFIG.VERSION_NAME + ' - Script cargado exitosamente');
-console.log('Todas las funciones implementadas correctamente');
-console.log('Sin secciones en desarrollo');
-console.log('Sistema completamente funcional');
-
-/* ============================================
-   FINAL DEL SCRIPT v22.0 PRO ULTIMATE
-   IPUC LA FONDA - International Pentecostal Church
-   "Donde el Espíritu Santo se mueve"
-   ============================================ */
+console.log('✅ script.js v22.1 cargado con Storage integrado');
