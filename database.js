@@ -1,8 +1,9 @@
 /* ============================================
-   IPUC LA FONDA - DATABASE v22.1 PRO ULTIMATE
+   IPUC LA FONDA - DATABASE v22.1 PRO PREMIUM
    Sistema de Base de Datos en localStorage
    Incluye: Radio, Streaming, Gamificación, Logros, QR, Asistente
-   + Respaldo automático, Papelera y Código Maestro de Recuperación
+   + Respaldo automático, Papelera, Código Maestro de Recuperación
+   + CUENTA OFICIAL DEL ADMINISTRADOR + Cambio de contraseña
    "Donde el Espíritu Santo se mueve"
    ============================================ */
 
@@ -11,11 +12,21 @@ class Database {
         this.prefix = 'ipuc20_';
         this.cache = new Map();
         this.cacheTimeout = 600000; // 10 minutos en ms
-        this.version = '22.1';                       // ═══ NUEVO v22.1 ═══
-        this.versionName = 'PRO ULTIMATE';           // ═══ NUEVO v22.1 ═══
+        this.version = '22.1';                       // ═══ v22.2 ═══
+        this.versionName = 'PRO PREMIUM';            // ═══ v22.2 ═══
         this.initialized = false;
         this.backupInterval = 300000; // 5 minutos
         this.maxCacheSize = 100;
+
+        // ═══ v22.2: Datos de la cuenta oficial ═══
+        this.CUENTA_OFICIAL = {
+            correo: 'ipuclafonda@gmail.com',
+            usuario: 'ipuclafonda',
+            passwordTextoPlano: null, // NUNCA se guarda (solo para doc)
+            hashOficial: '2d8f8a1e'   // ⚠️ Hash de IPUCLAFONDA2027
+                                      // Verifica con: db.hashPassword('IPUCLAFONDA2027')
+        };
+
         this._startAutoBackup();
     }
 
@@ -88,7 +99,6 @@ class Database {
 
     _liberarEspacio() {
         try {
-            // Eliminar backups antiguos (mantener solo 3)
             const backups = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
@@ -101,7 +111,6 @@ class Database {
                 localStorage.removeItem(backups[j]);
             }
 
-            // Limpiar datos antiguos
             const collectionsToTrim = ['logs', 'notificaciones', 'chat', 'mensajes'];
             collectionsToTrim.forEach(coll => {
                 try {
@@ -131,7 +140,6 @@ class Database {
 
         const clave = this._getKey(nombre);
 
-        // Verificar caché primero
         const cached = this._getFromCache(clave);
         if (cached !== null) {
             return this._cloneDeep(cached);
@@ -268,7 +276,7 @@ class Database {
             'trivia': { preguntas: [], ultimo_id: 0 },
             'ranking': { puntajes: [], ultimo_id: 0 },
             'mensajes': { mensajes: [], ultimo_id: 0 },
-            // ═══ NUEVO v22.1: Colecciones para respaldo y recuperación ═══
+            // ═══ v22.1: Respaldo y recuperación ═══
             '_papelera': { items: [], ultimo_id: 0 },
             '_meta_recuperacion': {
                 codigo_maestro: null,
@@ -281,7 +289,6 @@ class Database {
                 ultimo_respaldo_auto: null,
                 total_respaldos: 0
             }
-            // ═══ FIN NUEVO v22.1 ═══
         };
 
         if (defs[nombre]) {
@@ -322,6 +329,234 @@ class Database {
         return p && p.length >= 8;
     }
 
+    // ═══ v22.2: Crea la cuenta oficial del administrador ═══
+    /**
+     * Crea la cuenta oficial del administrador principal.
+     * - Solo se crea si NO existe ya un admin con ese correo.
+     * - NO sobrescribe otros admins.
+     * - Usa hash pre-calculado (nunca guarda la contraseña en texto plano).
+     * - Genera el código maestro automáticamente si Storage está disponible.
+     */
+    _crearCuentaOficial() {
+        try {
+            const admins = this.cargar('administradores');
+
+            // Verificar si ya existe la cuenta oficial (por correo)
+            const yaExiste = (admins.administradores || []).some(
+                a => a.correo === this.CUENTA_OFICIAL.correo
+            );
+
+            if (yaExiste) {
+                return {
+                    success: false,
+                    motivo: 'La cuenta oficial ya existe',
+                    correo: this.CUENTA_OFICIAL.correo
+                };
+            }
+
+            // ═══ v22.2: Verificar si el hash es válido ═══
+            let hashFinal = this.CUENTA_OFICIAL.hashOficial;
+            const testHash = this.hashPassword('IPUCLAFONDA2027');
+
+            if (hashFinal !== testHash) {
+                // Fallback: si el hash pre-calculado no coincide, calcularlo al vuelo
+                console.warn(
+                    '⚠️ [Database] El hash pre-calculado no coincide. ' +
+                    'Usando hash al vuelo. ' +
+                    `Esperado: ${testHash}, en código: ${hashFinal}`
+                );
+                hashFinal = testHash;
+            }
+
+            // Determinar el próximo ID disponible
+            const ultimoId = (admins.administradores || []).reduce(
+                (max, a) => Math.max(max, a.id || 0), 0
+            );
+            const nuevoId = ultimoId + 1;
+
+            const adminOficial = {
+                id: nuevoId,
+                nombre: 'Administrador',
+                apellidos: 'IPUC LA FONDA',
+                correo: this.CUENTA_OFICIAL.correo,
+                usuario: this.CUENTA_OFICIAL.usuario,
+                password: hashFinal,
+                rol: 'admin',
+                verificado: true,
+                fecha_registro: new Date().toISOString(),
+                estado: 'activo',
+                ministerio: 'Pastoral',
+                foto: 'assets/avatars/admin.png',
+                esAdminInicial: true,
+                esAdminOficial: true,                  // ═══ v22.2 ═══
+                passwordCambiada: false,                // ═══ v22.2 ═══
+                nivel: 1,
+                xp: 0,
+                logros: [],
+                codigo_maestro_generado: false
+            };
+
+            if (!admins.administradores) admins.administradores = [];
+            admins.administradores.push(adminOficial);
+            admins.ultimo_id = nuevoId;
+
+            if (!this.guardar('administradores', admins)) {
+                return { success: false, error: 'No se pudo guardar el administrador' };
+            }
+
+            console.log('✅ [Database] Cuenta oficial del administrador creada:', adminOficial.correo);
+
+            // ═══ v22.2: Generar código maestro automáticamente ═══
+            setTimeout(() => {
+                try {
+                    if (window.Storage && typeof window.Storage.generarCodigoMaestro === 'function') {
+                        const codigo = window.Storage.generarCodigoMaestro();
+                        if (codigo) {
+                            console.log('🔑 [Database] Código maestro generado automáticamente:', codigo);
+                            console.log('   ⚠️ GUÁRDALO en un lugar seguro. No se mostrará de nuevo.');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Error generando código maestro para cuenta oficial:', e);
+                }
+            }, 800);
+
+            return { success: true, data: adminOficial };
+        } catch (e) {
+            console.error('❌ Error creando cuenta oficial:', e);
+            return { success: false, error: e.message };
+        }
+    }
+
+    /**
+     * Verifica si un usuario es la cuenta oficial.
+     */
+    esCuentaOficial(usuarioOCorreo) {
+        if (!usuarioOCorreo) return false;
+        const valor = String(usuarioOCorreo).toLowerCase();
+        return valor === this.CUENTA_OFICIAL.correo.toLowerCase() ||
+               valor === this.CUENTA_OFICIAL.usuario.toLowerCase();
+    }
+
+    /**
+     * Devuelve advertencia si la cuenta oficial aún usa la contraseña por defecto.
+     */
+    getAdvertenciaCuentaOficial() {
+        try {
+            const admins = this.cargar('administradores');
+            const oficial = (admins.administradores || []).find(a => a.esAdminOficial);
+
+            if (!oficial) {
+                return {
+                    existe: false,
+                    advertencia: null,
+                    mensaje: 'La cuenta oficial no existe'
+                };
+            }
+
+            if (oficial.passwordCambiada) {
+                return {
+                    existe: true,
+                    advertencia: false,
+                    mensaje: 'La cuenta oficial tiene contraseña personalizada ✅'
+                };
+            }
+
+            return {
+                existe: true,
+                advertencia: true,
+                mensaje: '⚠️ La cuenta oficial usa la contraseña por defecto. ' +
+                         'Cámbiala desde Mi Perfil → Cambiar contraseña.'
+            };
+        } catch (e) {
+            return { existe: false, advertencia: null, error: e.message };
+        }
+    }
+
+    // ═══ v22.2: Cambiar contraseña del admin/usuarios ═══
+    /**
+     * Permite cambiar la contraseña de un usuario.
+     * @param {string|number} usuarioId - ID del usuario
+     * @param {string} passwordActual - Contraseña actual (verificación)
+     * @param {string} passwordNueva - Nueva contraseña (mín. 8 caracteres)
+     * @returns {{success: boolean, error?: string, esOficial?: boolean}}
+     */
+    cambiarPassword(usuarioId, passwordActual, passwordNueva) {
+        try {
+            // Validaciones
+            if (!usuarioId) {
+                return { success: false, error: 'ID de usuario requerido' };
+            }
+            if (!passwordActual || !passwordNueva) {
+                return { success: false, error: 'Contraseñas requeridas' };
+            }
+            if (!this._validarPassword(passwordNueva)) {
+                return { success: false, error: 'Contraseña nueva mínimo 8 caracteres' };
+            }
+            if (passwordActual === passwordNueva) {
+                return { success: false, error: 'La nueva contraseña debe ser diferente' };
+            }
+
+            const hashActual = this.hashPassword(passwordActual);
+            const hashNuevo = this.hashPassword(passwordNueva);
+
+            // Buscar en administradores
+            const admins = this.cargar('administradores');
+            const adminIdx = (admins.administradores || []).findIndex(a => a.id === usuarioId);
+
+            if (adminIdx >= 0) {
+                const admin = admins.administradores[adminIdx];
+
+                if (admin.password !== hashActual) {
+                    return { success: false, error: 'Contraseña actual incorrecta' };
+                }
+
+                admin.password = hashNuevo;
+                admin.passwordCambiada = true;      // ═══ v22.2 ═══
+                admin.fecha_cambio_password = new Date().toISOString();
+
+                if (this.guardar('administradores', admins)) {
+                    console.log('✅ [Database] Contraseña de administrador actualizada:', admin.usuario);
+                    return {
+                        success: true,
+                        esOficial: admin.esAdminOficial || false,
+                        mensaje: 'Contraseña actualizada correctamente'
+                    };
+                }
+                return { success: false, error: 'Error al guardar' };
+            }
+
+            // Buscar en usuarios
+            const usuarios = this.cargar('usuarios');
+            const userIdx = (usuarios.usuarios || []).findIndex(u => u.id === usuarioId);
+
+            if (userIdx >= 0) {
+                const user = usuarios.usuarios[userIdx];
+
+                if (user.password !== hashActual) {
+                    return { success: false, error: 'Contraseña actual incorrecta' };
+                }
+
+                user.password = hashNuevo;
+                user.fecha_cambio_password = new Date().toISOString();
+
+                if (this.guardar('usuarios', usuarios)) {
+                    console.log('✅ [Database] Contraseña de usuario actualizada:', user.usuario);
+                    return {
+                        success: true,
+                        esOficial: false,
+                        mensaje: 'Contraseña actualizada correctamente'
+                    };
+                }
+                return { success: false, error: 'Error al guardar' };
+            }
+
+            return { success: false, error: 'Usuario no encontrado' };
+        } catch (e) {
+            return { success: false, error: 'Error: ' + e.message };
+        }
+    }
+
     crearPrimerAdministrador(datos) {
         try {
             const admins = this.cargar('administradores');
@@ -354,12 +589,13 @@ class Database {
                 fecha_registro: new Date().toISOString(),
                 estado: 'activo',
                 ministerio: datos.ministerio || 'Pastoral',
-                foto: 'assets/avatars/admin.png',
+                foto: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKYAAACUCAMAAAAu5KLjAAAANlBMVEXl5uivtLi9wsWssbXo6euprrKyt7vc3uDT1tnf4ePY2923vL/Bxci6vsKttLrQ09bIy87R1NMZNpqKAAAECElEQVR4nO2b23LcIAxAAclgbDD0/3+22N402ZsX0K5wM5ynTiYzPREIAxJCdDqdTqfT6XQ6nU6n0/mdIH7/C49+sSGIdgzRKe+9cjFM9oSmyTF6LeEbqVUU5zJFG+YB5C0w+FGcRhRFmO8dd1Hw4SQRxVE/kdxF9XQCTzTqQHI3dba16HEovzzn1gGNsCwvNSXI0NTTvQ7lzhDbeWK2pVygnefL5LmKp2vjibHEMk3QJvMT/5RZJhrkO06lkhK0ZdcUvjiYEhR3OEsn5sWTe3payFjV75l5h71gxbwOZ2TVLM+fnQVYw1kZzDWcjLPT1lom+DRrZ+YWTr5kR10fzEVxWYqJMOZSGyZLdATLNOpMmtaTNLk2dIYwNROax1KMlKmZ9sdMK3wgao4so05ZNVeYPkRYsdO8gieHKIv7hudJ9f9Ek2gpZx5N4tTk0qw6XvBrEi2ZNMmZzqQ5EzV5TutYdMN1D9dXqOom4ZuB6ZhB3Xowbd9rD+kXgMdSWFqqMy2bhbfEd8Hkup+h5RBMTJq0AzDfpRw+K1HmBJOvUoCEQxtwXsDr6l0SW56vVCcRXwKt1C6dMHNa1q9JI6tm2nTmVH7vgsl3a3jRrFo7gb/+XzHsXFu4K4q/7OD4JQUW1gkWYK5dfXkW7juhUUsSjgWxXNr1+eA45Is2bJ7BKaO9Zxtw3bQJDU3Wng5884Yp9aITaVmWgbfu+xAcXwQUfOuerg20EZ6JLnKQ4Ty9kW5tMHsQSKm5ampZoAhKw3VQAbQ7UZfpDgozOg3DFzDH0Z5NcgdRWDOGECZjz9yqfUNroVtWJTONMUZ3aSh3MY6TESeR3Yc5rumzTch/WQT7D6T2awd800m69uNHNd9m+M2alNDehTbN+un/NHFOC2PW1mP9O7SbuGOKdnL6QT/+MQOoYNhUEY2bl6pzehp/xfTttEEfzcVj0mYKIH48pGhi5kb4MKbqo9MUhaNLbqLSf6yTAq0rzprnDPNHtiUo0nBTa78/SUNv3u6JE7VS+UBUvvnwgVYVHHWzWd77SCfrGUslb6wYuKxnLDWkY6d+zwxFQ+07esU7jksVrwVKeUeBnViVzvOk3nVj/Lyk3AoclIBSGxHyPT3Fk8sypfxcfRnGFku5XXlXalIKqDWelXn0+ZXoxrOq0GEJRfM6oGIPSu55rfEsrsggx7J+hy/VJPa2V1L8wkB9aEt0TOGrJ9616KdmUTciuUWznoLtPIZmlkXPiUhPWIjk96xMTfJnJ/+bSX10QfTMjmZLy+wHMK1WowuQ+RYCVUvLRN4ST2x2pZM16gwn3mPyzsMN1/aLpsoZdc4T0GPyGoGIjwTo5L1rbbBtvyavx9OpxvisaN4VctnJsex0Or+Pv0+WNhUXOXRxAAAAAElFTkSuQmCC',
                 esAdminInicial: true,
                 nivel: 1,
                 xp: 0,
                 logros: [],
-                codigo_maestro_generado: false  // ═══ NUEVO v22.1 ═══
+                passwordCambiada: false,
+                codigo_maestro_generado: false
             };
 
             if (!admins.administradores) admins.administradores = [];
@@ -367,9 +603,7 @@ class Database {
             admins.ultimo_id = 1;
 
             if (this.guardar('administradores', admins)) {
-                // ═══ NUEVO v22.1: Generar código maestro de recuperación ═══
                 this._notificarCodigoMaestro();
-                // ═══ FIN NUEVO v22.1 ═══
 
                 const config = this.cargar('configuracion');
                 if (config && config.aplicacion) {
@@ -385,21 +619,18 @@ class Database {
         }
     }
 
-    // ═══ NUEVO v22.1: Notificar código maestro al crear admin ═══
     _notificarCodigoMaestro() {
         setTimeout(() => {
             try {
                 if (window.Storage && typeof window.Storage.generarCodigoMaestro === 'function') {
                     const codigo = window.Storage.generarCodigoMaestro();
 
-                    // Marcar admin como con código generado
                     const admins = this.cargar('administradores');
                     if (admins.administradores && admins.administradores[0]) {
                         admins.administradores[0].codigo_maestro_generado = true;
                         this.guardar('administradores', admins);
                     }
 
-                    // Mostrar modal bonito si existe, si no usar alert
                     if (typeof window.mostrarModalCodigoMaestro === 'function') {
                         window.mostrarModalCodigoMaestro(codigo);
                     } else {
@@ -416,7 +647,6 @@ class Database {
             }
         }, 500);
     }
-    // ═══ FIN NUEVO v22.1 ═══
 
     login(usuario, password) {
         try {
@@ -425,12 +655,13 @@ class Database {
             }
 
             const hash = this.hashPassword(password);
+            const usuarioLower = usuario.toLowerCase().trim();
 
             // Buscar en administradores
             const admins = this.cargar('administradores');
             if (admins.administradores) {
                 const admin = admins.administradores.find(a =>
-                    (a.usuario === usuario || a.correo === usuario) && a.password === hash
+                    (a.usuario === usuarioLower || a.correo === usuarioLower) && a.password === hash
                 );
 
                 if (admin) {
@@ -438,10 +669,26 @@ class Database {
                         return { success: false, error: 'Cuenta desactivada' };
                     }
 
+                    // ═══ v22.2: Advertencia en localhost para cuenta oficial ═══
+                    if (admin.esAdminOficial && !admin.passwordCambiada) {
+                        const hostname = (typeof window !== 'undefined' && window.location)
+                            ? window.location.hostname
+                            : 'unknown';
+                        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                            console.warn(
+                                '⚠️ [Database] Iniciando sesión con la cuenta oficial ' +
+                                'que usa la contraseña por defecto. ' +
+                                'Cámbiala antes de desplegar a producción.'
+                            );
+                        }
+                    }
+
                     return {
                         success: true,
                         token: 't20_' + Date.now(),
                         rol: 'admin',
+                        esCuentaOficial: admin.esAdminOficial || false, // ═══ v22.2 ═══
+                        passwordCambiada: admin.passwordCambiada || false, // ═══ v22.2 ═══
                         usuario: {
                             id: admin.id,
                             nombre: admin.nombre,
@@ -453,7 +700,9 @@ class Database {
                             ministerio: admin.ministerio,
                             nivel: admin.nivel || 1,
                             xp: admin.xp || 0,
-                            logros: admin.logros || []
+                            logros: admin.logros || [],
+                            esCuentaOficial: admin.esAdminOficial || false,
+                            passwordCambiada: admin.passwordCambiada || false
                         }
                     };
                 }
@@ -463,7 +712,7 @@ class Database {
             const usuarios = this.cargar('usuarios');
             if (usuarios.usuarios) {
                 const user = usuarios.usuarios.find(u =>
-                    (u.usuario === usuario || u.correo === usuario) && u.password === hash
+                    (u.usuario === usuarioLower || u.correo === usuarioLower) && u.password === hash
                 );
 
                 if (user) {
@@ -475,6 +724,8 @@ class Database {
                         success: true,
                         token: 't20_' + Date.now(),
                         rol: 'usuario',
+                        esCuentaOficial: false,
+                        passwordCambiada: true,
                         usuario: {
                             id: user.id,
                             nombre: user.nombre,
@@ -511,6 +762,14 @@ class Database {
 
             if (!this._validarPassword(datos.password)) {
                 return { success: false, error: 'Contraseña mínima 8 caracteres' };
+            }
+
+            // ═══ v22.2: Proteger el correo/usuario oficial ═══
+            if (this.esCuentaOficial(datos.correo) || this.esCuentaOficial(datos.usuario)) {
+                return {
+                    success: false,
+                    error: 'Este correo/usuario está reservado para la cuenta oficial'
+                };
             }
 
             const usuarios = this.cargar('usuarios');
@@ -742,7 +1001,6 @@ class Database {
     }
 
     eliminarEvento(id) {
-        // ═══ NUEVO v22.1: Usar papelera si Storage está disponible ═══
         if (window.Storage && typeof window.Storage.eliminarConRespaldo === 'function') {
             return window.Storage.eliminarConRespaldo('eventos', id, 'Admin');
         }
@@ -1004,7 +1262,6 @@ class Database {
 
     agregarXP(usuarioId, cantidad) {
         try {
-            // Buscar en usuarios
             const usuarios = this.cargar('usuarios');
             let user = usuarios.usuarios?.find(u => u.id === usuarioId);
 
@@ -1025,7 +1282,6 @@ class Database {
                 return { success: true };
             }
 
-            // Buscar en administradores
             const admins = this.cargar('administradores');
             const admin = admins.administradores?.find(a => a.id === usuarioId);
 
@@ -1375,7 +1631,7 @@ class Database {
     }
 
     // ============================================
-    // REPORTES MEJORADOS
+    // REPORTES
     // ============================================
 
     getReportes(filtros = {}) {
@@ -1479,7 +1735,6 @@ class Database {
     }
 
     deleteReporte(id) {
-        // ═══ NUEVO v22.1: Usar papelera si Storage está disponible ═══
         if (window.Storage && typeof window.Storage.eliminarConRespaldo === 'function') {
             return window.Storage.eliminarConRespaldo('reportes', id, 'Admin');
         }
@@ -1736,23 +1991,24 @@ class Database {
         };
     }
 
-    // ═══ NUEVO v22.1: Estado completo del sistema para panel de backup ═══
     getEstadoSistema() {
         try {
             const papelera = this.cargar('_papelera');
             const metaRec = this.cargar('_meta_recuperacion');
             const metaResp = this.cargar('_meta_respaldo');
 
-            // Calcular espacio usado
             let bytesUsados = 0;
             let totalColecciones = 0;
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
                 if (k && k.startsWith(this.prefix) && !k.includes('backup_')) {
-                    bytesUsados += (localStorage.getItem(k) || '').length * 2; // UTF-16
+                    bytesUsados += (localStorage.getItem(k) || '').length * 2;
                     totalColecciones++;
                 }
             }
+
+            // ═══ v22.2: Info de la cuenta oficial ═══
+            const advertenciaOficial = this.getAdvertenciaCuentaOficial();
 
             return {
                 version: this.version,
@@ -1764,7 +2020,12 @@ class Database {
                 ultimoRespaldoManual: metaResp ? metaResp.ultimo_respaldo_manual : null,
                 ultimoRespaldoAuto: metaResp ? metaResp.ultimo_respaldo_auto : null,
                 codigoMaestroGenerado: !!(metaRec && metaRec.codigo_maestro),
-                codigoMaestroUsos: metaRec ? (metaRec.usos || 0) : 0
+                codigoMaestroUsos: metaRec ? (metaRec.usos || 0) : 0,
+                cuentaOficial: {
+                    existe: advertenciaOficial.existe,
+                    tieneAdvertencia: advertenciaOficial.advertencia,
+                    mensaje: advertenciaOficial.mensaje
+                }
             };
         } catch (e) {
             return { error: e.message };
@@ -1777,7 +2038,6 @@ class Database {
         return (b / 1048576).toFixed(2) + ' MB';
     }
 
-    // ═══ NUEVO v22.1: Verificar integridad de la base de datos ═══
     verificarIntegridad() {
         const reporte = {
             valido: true,
@@ -1815,13 +2075,19 @@ class Database {
                 }
             });
 
-            // Verificar que exista al menos un admin
             const admins = this.cargar('administradores');
             if (!admins.administradores || admins.administradores.length === 0) {
                 reporte.advertencias.push('No hay administradores registrados');
             }
 
-            // Verificar código maestro
+            // ═══ v22.2: Verificar cuenta oficial ═══
+            const advOficial = this.getAdvertenciaCuentaOficial();
+            if (!advOficial.existe) {
+                reporte.advertencias.push('La cuenta oficial no existe');
+            } else if (advOficial.advertencia) {
+                reporte.advertencias.push(advOficial.mensaje);
+            }
+
             const metaRec = this.cargar('_meta_recuperacion');
             if (!metaRec || !metaRec.codigo_maestro) {
                 reporte.advertencias.push('No se ha generado el código maestro de recuperación');
@@ -1834,7 +2100,6 @@ class Database {
 
         return reporte;
     }
-    // ═══ FIN NUEVO v22.1 ═══
 
     // ============================================
     // EXPORTACIÓN E IMPORTACIÓN
@@ -1885,7 +2150,6 @@ class Database {
             this.initialized = false;
             this.inicializarDatos();
 
-            // Marcar respaldo
             try {
                 const meta = this.cargar('_meta_respaldo');
                 meta.ultimo_respaldo_manual = new Date().toISOString();
@@ -2015,9 +2279,7 @@ class Database {
             'lectura-biblica', 'concordancia', 'himnario', 'playlist',
             'radio', 'streaming', 'qr-codes', 'asistente',
             'juegos', 'trivia', 'ranking', 'mensajes',
-            // ═══ NUEVO v22.1 ═══
             '_papelera', '_meta_recuperacion', '_meta_respaldo'
-            // ═══ FIN NUEVO v22.1 ═══
         ];
 
         collections.forEach(coll => {
@@ -2030,12 +2292,9 @@ class Database {
         this._inicializarDefectos();
         this.initialized = true;
 
-        // ═══ NUEVO v22.1: Purgar papelera vieja (más de 30 días) ═══
         this._purgarPapeleraAutomatica();
-        // ═══ FIN NUEVO v22.1 ═══
     }
 
-    // ═══ NUEVO v22.1: Auto-purgar papelera al iniciar ═══
     _purgarPapeleraAutomatica() {
         try {
             const papelera = this.cargar('_papelera');
@@ -2045,7 +2304,7 @@ class Database {
             const antes = papelera.items.length;
 
             papelera.items = papelera.items.filter(item => {
-                if (!item.expira) return true; // Sin fecha de expiración, conservar
+                if (!item.expira) return true;
                 return new Date(item.expira) > ahora;
             });
 
@@ -2058,7 +2317,6 @@ class Database {
             console.warn('Error purgando papelera:', e);
         }
     }
-    // ═══ FIN NUEVO v22.1 ═══
 
     _inicializarDefectos() {
         // Horarios por defecto
@@ -2120,9 +2378,9 @@ class Database {
                 registro_abierto: true,
                 primer_administrador_creado: false,
                 fecha_instalacion: new Date().toISOString(),
-                respaldo_automatico: true,     // ═══ NUEVO v22.1 ═══
-                papelera_activa: true,         // ═══ NUEVO v22.1 ═══
-                codigo_maestro_activo: true    // ═══ NUEVO v22.1 ═══
+                respaldo_automatico: true,
+                papelera_activa: true,
+                codigo_maestro_activo: true
             };
             this.guardar('configuracion', config);
         }
@@ -2170,6 +2428,9 @@ class Database {
             radio.ultimo_id = radio.estaciones.length;
             this.guardar('radio', radio);
         }
+
+        // ═══ v22.2: Crear cuenta oficial del administrador ═══
+        this._crearCuentaOficial();
     }
 }
 
@@ -2188,6 +2449,14 @@ if (typeof window !== 'undefined') {
             console.log('🗄️ ' + window.db._getAllNames().length + ' colecciones activas');
             console.log('🛡️ Papelera: ' + (window.db.cargar('_papelera').items || []).length + ' elementos');
             console.log('🔑 Código maestro: ' + (window.db.cargar('_meta_recuperacion').codigo_maestro ? 'Generado' : 'No generado'));
+            // ═══ v22.2: Log de cuenta oficial ═══
+            const admins = window.db.cargar('administradores');
+            const oficial = (admins.administradores || []).find(a => a.esAdminOficial);
+            if (oficial) {
+                console.log('👑 Cuenta oficial: ' + oficial.correo + ' (' + (oficial.passwordCambiada ? 'contraseña personalizada ✅' : '⚠️ contraseña por defecto') + ')');
+            } else {
+                console.log('ℹ️ Cuenta oficial no creada (probablemente ya hay otros admins)');
+            }
         } catch (e) {
             console.error('❌ Error inicializando Database:', e);
         }
@@ -2196,7 +2465,7 @@ if (typeof window !== 'undefined') {
 }
 
 /* ============================================
-   FINAL DEL DATABASE v22.1 PRO ULTIMATE
+   FINAL DEL DATABASE v22.1 PRO PREMIUM
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
