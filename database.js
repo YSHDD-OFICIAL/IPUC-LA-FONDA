@@ -1,8 +1,8 @@
 /* ============================================
-   IPUC LA FONDA - DATABASE v20.0 PRO ULTIMATE
+   IPUC LA FONDA - DATABASE v22.1 PRO ULTIMATE
    Sistema de Base de Datos en localStorage
    Incluye: Radio, Streaming, Gamificación, Logros, QR, Asistente
-   VERSION CORREGIDA - SIN ERRORES - COMPLETA
+   + Respaldo automático, Papelera y Código Maestro de Recuperación
    "Donde el Espíritu Santo se mueve"
    ============================================ */
 
@@ -11,8 +11,8 @@ class Database {
         this.prefix = 'ipuc20_';
         this.cache = new Map();
         this.cacheTimeout = 600000; // 10 minutos en ms
-        this.version = '20.0';
-        this.versionName = 'PRO ULTIMATE';
+        this.version = '22.1';                       // ═══ NUEVO v22.1 ═══
+        this.versionName = 'PRO ULTIMATE';           // ═══ NUEVO v22.1 ═══
         this.initialized = false;
         this.backupInterval = 300000; // 5 minutos
         this.maxCacheSize = 100;
@@ -22,7 +22,7 @@ class Database {
     // ============================================
     // UTILIDADES BÁSICAS
     // ============================================
-    
+
     _getKey(name) {
         return this.prefix + name;
     }
@@ -128,19 +128,19 @@ class Database {
 
     cargar(nombre) {
         if (!this._isValidKey(nombre)) return null;
-        
+
         const clave = this._getKey(nombre);
-        
+
         // Verificar caché primero
         const cached = this._getFromCache(clave);
         if (cached !== null) {
             return this._cloneDeep(cached);
         }
-        
+
         try {
             const datos = localStorage.getItem(clave);
             if (!datos || datos === 'null') return this._crearDefecto(nombre);
-            
+
             const parsed = JSON.parse(datos);
             this._updateCache(clave, parsed);
             return parsed;
@@ -151,13 +151,13 @@ class Database {
 
     guardar(nombre, datos) {
         if (!this._isValidKey(nombre) || !this._isObject(datos)) return false;
-        
+
         const clave = this._getKey(nombre);
-        
+
         try {
             const anterior = localStorage.getItem(clave);
             if (anterior) this._crearRespaldo(nombre, anterior);
-            
+
             if (this._safeSetItem(clave, JSON.stringify(datos))) {
                 return true;
             }
@@ -169,13 +169,13 @@ class Database {
 
     eliminar(nombre, id) {
         if (!this._isValidKey(nombre) || !id) return false;
-        
+
         const col = this.cargar(nombre);
         if (!col) return false;
-        
+
         let encontrado = false;
         const keys = Object.keys(col);
-        
+
         for (const key of keys) {
             const val = col[key];
             if (Array.isArray(val)) {
@@ -187,7 +187,7 @@ class Database {
                 }
             }
         }
-        
+
         if (!encontrado) return false;
         return this.guardar(nombre, col);
     }
@@ -267,9 +267,23 @@ class Database {
             'juegos': { partidas: [], ultimo_id: 0 },
             'trivia': { preguntas: [], ultimo_id: 0 },
             'ranking': { puntajes: [], ultimo_id: 0 },
-            'mensajes': { mensajes: [], ultimo_id: 0 }
+            'mensajes': { mensajes: [], ultimo_id: 0 },
+            // ═══ NUEVO v22.1: Colecciones para respaldo y recuperación ═══
+            '_papelera': { items: [], ultimo_id: 0 },
+            '_meta_recuperacion': {
+                codigo_maestro: null,
+                fecha_generacion: null,
+                usos: 0,
+                ultimo_uso: null
+            },
+            '_meta_respaldo': {
+                ultimo_respaldo_manual: null,
+                ultimo_respaldo_auto: null,
+                total_respaldos: 0
+            }
+            // ═══ FIN NUEVO v22.1 ═══
         };
-        
+
         if (defs[nombre]) {
             const clave = this._getKey(nombre);
             if (!localStorage.getItem(clave)) {
@@ -277,7 +291,7 @@ class Database {
             }
             return defs[nombre];
         }
-        
+
         return { datos: [], ultimo_id: 0 };
     }
 
@@ -287,16 +301,16 @@ class Database {
 
     hashPassword(pw) {
         if (!pw || typeof pw !== 'string') return '00000000';
-        
+
         let h = 0;
         const salt = 'ipuc20_salt_2026';
         const str = pw + salt;
-        
+
         for (let i = 0; i < str.length; i++) {
             h = ((h << 5) - h) + str.charCodeAt(i);
             h = h & h;
         }
-        
+
         return Math.abs(h).toString(16).padStart(8, '0');
     }
 
@@ -311,23 +325,23 @@ class Database {
     crearPrimerAdministrador(datos) {
         try {
             const admins = this.cargar('administradores');
-            
+
             if (admins.administradores && admins.administradores.length > 0) {
                 return { success: false, error: 'Ya existe un administrador' };
             }
-            
+
             if (!datos.nombre || !datos.correo || !datos.usuario || !datos.password) {
                 return { success: false, error: 'Campos obligatorios' };
             }
-            
+
             if (!this._validarCorreo(datos.correo)) {
                 return { success: false, error: 'Correo inválido' };
             }
-            
+
             if (!this._validarPassword(datos.password)) {
                 return { success: false, error: 'Contraseña mínima 8 caracteres' };
             }
-            
+
             const admin = {
                 id: 1,
                 nombre: datos.nombre.trim(),
@@ -344,14 +358,19 @@ class Database {
                 esAdminInicial: true,
                 nivel: 1,
                 xp: 0,
-                logros: []
+                logros: [],
+                codigo_maestro_generado: false  // ═══ NUEVO v22.1 ═══
             };
-            
+
             if (!admins.administradores) admins.administradores = [];
             admins.administradores.push(admin);
             admins.ultimo_id = 1;
-            
+
             if (this.guardar('administradores', admins)) {
+                // ═══ NUEVO v22.1: Generar código maestro de recuperación ═══
+                this._notificarCodigoMaestro();
+                // ═══ FIN NUEVO v22.1 ═══
+
                 const config = this.cargar('configuracion');
                 if (config && config.aplicacion) {
                     config.aplicacion.primer_administrador_creado = true;
@@ -359,33 +378,66 @@ class Database {
                 }
                 return { success: true, data: admin };
             }
-            
+
             return { success: false, error: 'Error al guardar' };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
         }
     }
 
+    // ═══ NUEVO v22.1: Notificar código maestro al crear admin ═══
+    _notificarCodigoMaestro() {
+        setTimeout(() => {
+            try {
+                if (window.Storage && typeof window.Storage.generarCodigoMaestro === 'function') {
+                    const codigo = window.Storage.generarCodigoMaestro();
+
+                    // Marcar admin como con código generado
+                    const admins = this.cargar('administradores');
+                    if (admins.administradores && admins.administradores[0]) {
+                        admins.administradores[0].codigo_maestro_generado = true;
+                        this.guardar('administradores', admins);
+                    }
+
+                    // Mostrar modal bonito si existe, si no usar alert
+                    if (typeof window.mostrarModalCodigoMaestro === 'function') {
+                        window.mostrarModalCodigoMaestro(codigo);
+                    } else {
+                        alert(
+                            '⚠️ GUARDA ESTE CÓDIGO DE RECUPERACIÓN\n\n' +
+                            'Código: ' + codigo + '\n\n' +
+                            'Lo necesitarás si olvidas tu contraseña o se borran los datos del navegador.\n\n' +
+                            'Guárdalo en un lugar seguro (papel, gestor de contraseñas, correo).'
+                        );
+                    }
+                }
+            } catch (e) {
+                console.error('Error generando código maestro:', e);
+            }
+        }, 500);
+    }
+    // ═══ FIN NUEVO v22.1 ═══
+
     login(usuario, password) {
         try {
             if (!usuario || !password) {
                 return { success: false, error: 'Credenciales requeridas' };
             }
-            
+
             const hash = this.hashPassword(password);
-            
+
             // Buscar en administradores
             const admins = this.cargar('administradores');
             if (admins.administradores) {
-                const admin = admins.administradores.find(a => 
+                const admin = admins.administradores.find(a =>
                     (a.usuario === usuario || a.correo === usuario) && a.password === hash
                 );
-                
+
                 if (admin) {
                     if (admin.estado !== 'activo') {
                         return { success: false, error: 'Cuenta desactivada' };
                     }
-                    
+
                     return {
                         success: true,
                         token: 't20_' + Date.now(),
@@ -406,19 +458,19 @@ class Database {
                     };
                 }
             }
-            
+
             // Buscar en usuarios
             const usuarios = this.cargar('usuarios');
             if (usuarios.usuarios) {
-                const user = usuarios.usuarios.find(u => 
+                const user = usuarios.usuarios.find(u =>
                     (u.usuario === usuario || u.correo === usuario) && u.password === hash
                 );
-                
+
                 if (user) {
                     if (user.estado !== 'activo') {
                         return { success: false, error: 'Cuenta desactivada' };
                     }
-                    
+
                     return {
                         success: true,
                         token: 't20_' + Date.now(),
@@ -440,7 +492,7 @@ class Database {
                     };
                 }
             }
-            
+
             return { success: false, error: 'Credenciales inválidas' };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -452,25 +504,25 @@ class Database {
             if (!datos.nombre || !datos.correo || !datos.usuario || !datos.password) {
                 return { success: false, error: 'Campos obligatorios' };
             }
-            
+
             if (!this._validarCorreo(datos.correo)) {
                 return { success: false, error: 'Correo inválido' };
             }
-            
+
             if (!this._validarPassword(datos.password)) {
                 return { success: false, error: 'Contraseña mínima 8 caracteres' };
             }
-            
+
             const usuarios = this.cargar('usuarios');
-            
+
             if (usuarios.usuarios) {
                 const correoExiste = usuarios.usuarios.some(u => u.correo === datos.correo.toLowerCase());
                 if (correoExiste) return { success: false, error: 'Correo ya registrado' };
-                
+
                 const usuarioExiste = usuarios.usuarios.some(u => u.usuario === datos.usuario.toLowerCase());
                 if (usuarioExiste) return { success: false, error: 'Usuario ya existe' };
             }
-            
+
             const nuevo = {
                 id: (usuarios.usuarios ? usuarios.usuarios.length : 0) + 1,
                 nombre: datos.nombre.trim(),
@@ -492,22 +544,22 @@ class Database {
                 xp: 0,
                 logros: []
             };
-            
+
             if (!usuarios.usuarios) usuarios.usuarios = [];
             usuarios.usuarios.push(nuevo);
             usuarios.ultimo_id = nuevo.id;
-            
+
             if (this.guardar('usuarios', usuarios)) {
-                return { 
-                    success: true, 
-                    data: { 
-                        id: nuevo.id, 
-                        nombre: nuevo.nombre, 
-                        usuario: nuevo.usuario 
-                    } 
+                return {
+                    success: true,
+                    data: {
+                        id: nuevo.id,
+                        nombre: nuevo.nombre,
+                        usuario: nuevo.usuario
+                    }
                 };
             }
-            
+
             return { success: false, error: 'Error al guardar' };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -528,7 +580,7 @@ class Database {
             if (!datos.autor || !datos.contenido) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const pub = this.cargar('publicaciones');
             const nueva = {
                 id: this._generateId(),
@@ -540,17 +592,17 @@ class Database {
                 comentarios_count: 0,
                 estado: 'publicado'
             };
-            
+
             if (!pub.publicaciones) pub.publicaciones = [];
             pub.publicaciones.unshift(nueva);
-            
+
             if (pub.publicaciones.length > 100) {
                 pub.publicaciones = pub.publicaciones.slice(0, 100);
             }
-            
+
             pub.ultimo_id = nueva.id;
             this.guardar('publicaciones', pub);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -568,7 +620,7 @@ class Database {
             if (!datos.publicacion_id || !datos.autor || !datos.contenido) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const com = this.cargar('comentarios');
             const nuevo = {
                 id: this._generateId(),
@@ -579,14 +631,14 @@ class Database {
                 fecha: new Date().toISOString(),
                 estado: 'activo'
             };
-            
+
             if (!com.comentarios) com.comentarios = [];
             com.comentarios.push(nuevo);
-            
+
             if (com.comentarios.length > 500) {
                 com.comentarios = com.comentarios.slice(-500);
             }
-            
+
             this.guardar('comentarios', com);
             return { success: true, data: nuevo };
         } catch (e) {
@@ -598,15 +650,15 @@ class Database {
         try {
             const reacciones = this.cargar('reacciones');
             if (!reacciones.reacciones) reacciones.reacciones = {};
-            
+
             const clave = pubId + '_' + userId;
-            
+
             if (reacciones.reacciones[clave] === tipo) {
                 delete reacciones.reacciones[clave];
             } else {
                 reacciones.reacciones[clave] = tipo;
             }
-            
+
             this.guardar('reacciones', reacciones);
             return { success: true };
         } catch (e) {
@@ -628,7 +680,7 @@ class Database {
             if (!datos.titulo || !datos.contenido) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const noticias = this.cargar('noticias');
             const nueva = {
                 id: this._generateId(),
@@ -638,14 +690,14 @@ class Database {
                 estado: 'publicado',
                 autor: datos.autor || 'Admin'
             };
-            
+
             if (!noticias.noticias) noticias.noticias = [];
             noticias.noticias.unshift(nueva);
-            
+
             if (noticias.noticias.length > 100) {
                 noticias.noticias = noticias.noticias.slice(0, 100);
             }
-            
+
             this.guardar('noticias', noticias);
             return { success: true, data: nueva };
         } catch (e) {
@@ -663,7 +715,7 @@ class Database {
             if (!datos.titulo || !datos.fecha) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const eventos = this.cargar('eventos');
             const nuevo = {
                 id: this._generateId(),
@@ -678,11 +730,11 @@ class Database {
                 creado_por: datos.creado_por || 'Admin',
                 recordatorio: datos.recordatorio || false
             };
-            
+
             if (!eventos.eventos) eventos.eventos = [];
             eventos.eventos.push(nuevo);
             this.guardar('eventos', eventos);
-            
+
             return { success: true, data: nuevo };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -690,6 +742,10 @@ class Database {
     }
 
     eliminarEvento(id) {
+        // ═══ NUEVO v22.1: Usar papelera si Storage está disponible ═══
+        if (window.Storage && typeof window.Storage.eliminarConRespaldo === 'function') {
+            return window.Storage.eliminarConRespaldo('eventos', id, 'Admin');
+        }
         return this.eliminar('eventos', id);
     }
 
@@ -707,7 +763,7 @@ class Database {
             if (!datos.usuario_id || !datos.nombre) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const asistencia = this.cargar('asistencia');
             const nuevo = {
                 id: this._generateId(),
@@ -717,11 +773,11 @@ class Database {
                 estado: datos.estado || 'Asistiré',
                 tipo: datos.tipo || 'Hermano'
             };
-            
+
             if (!asistencia.registros) asistencia.registros = [];
             asistencia.registros.push(nuevo);
             this.guardar('asistencia', asistencia);
-            
+
             return { success: true, data: nuevo };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -740,7 +796,7 @@ class Database {
     addOracion(datos) {
         try {
             if (!datos.motivo) return { success: false, error: 'Motivo requerido' };
-            
+
             const oraciones = this.cargar('oraciones');
             const nueva = {
                 id: this._generateId(),
@@ -753,11 +809,11 @@ class Database {
                 oraciones_count: 0,
                 estado: 'activa'
             };
-            
+
             if (!oraciones.oraciones) oraciones.oraciones = [];
             oraciones.oraciones.unshift(nueva);
             this.guardar('oraciones', oraciones);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -768,13 +824,13 @@ class Database {
         try {
             const oraciones = this.cargar('oraciones');
             const oracion = oraciones.oraciones?.find(o => o.id === id);
-            
+
             if (oracion) {
                 oracion.oraciones_count = (oracion.oraciones_count || 0) + 1;
                 this.guardar('oraciones', oraciones);
                 return { success: true };
             }
-            
+
             return { success: false };
         } catch (e) {
             return { success: false };
@@ -789,7 +845,7 @@ class Database {
     addBendicion(datos) {
         try {
             if (!datos.mensaje) return { success: false, error: 'Mensaje requerido' };
-            
+
             const bendiciones = this.cargar('bendiciones');
             const nueva = {
                 id: this._generateId(),
@@ -799,11 +855,11 @@ class Database {
                 fecha: new Date().toISOString(),
                 reacciones: 0
             };
-            
+
             if (!bendiciones.bendiciones) bendiciones.bendiciones = [];
             bendiciones.bendiciones.unshift(nueva);
             this.guardar('bendiciones', bendiciones);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -824,7 +880,7 @@ class Database {
             if (!datos.nombre || !datos.motivo) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const peticiones = this.cargar('peticiones');
             const nueva = {
                 id: this._generateId(),
@@ -836,11 +892,11 @@ class Database {
                 estado: 'activa',
                 oraciones: 0
             };
-            
+
             if (!peticiones.peticiones) peticiones.peticiones = [];
             peticiones.peticiones.unshift(nueva);
             this.guardar('peticiones', peticiones);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -851,13 +907,13 @@ class Database {
         try {
             const peticiones = this.cargar('peticiones');
             const peticion = peticiones.peticiones?.find(p => p.id === id);
-            
+
             if (peticion) {
                 peticion.oraciones = (peticion.oraciones || 0) + 1;
                 this.guardar('peticiones', peticiones);
                 return { success: true };
             }
-            
+
             return { success: false };
         } catch (e) {
             return { success: false };
@@ -878,7 +934,7 @@ class Database {
             if (!datos.usuario || !datos.mensaje) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const chat = this.cargar('chat');
             const nuevo = {
                 id: this._generateId(),
@@ -887,14 +943,14 @@ class Database {
                 mensaje: datos.mensaje.trim().substring(0, 500),
                 fecha: new Date().toISOString()
             };
-            
+
             if (!chat.mensajes) chat.mensajes = [];
             chat.mensajes.push(nuevo);
-            
+
             if (chat.mensajes.length > 200) {
                 chat.mensajes = chat.mensajes.slice(-200);
             }
-            
+
             this.guardar('chat', chat);
             return { success: true, data: nuevo };
         } catch (e) {
@@ -918,12 +974,12 @@ class Database {
     desbloquearLogro(usuarioId, logroId, datos = {}) {
         try {
             const logros = this.cargar('logros');
-            const existe = logros.logros?.some(l => 
+            const existe = logros.logros?.some(l =>
                 l.usuario_id === usuarioId && l.logro_id === logroId
             );
-            
+
             if (existe) return { success: false, error: 'Logro ya desbloqueado' };
-            
+
             const nuevo = {
                 id: this._generateId(),
                 usuario_id: usuarioId,
@@ -933,13 +989,13 @@ class Database {
                 icono: datos.icono || '🏆',
                 fecha: new Date().toISOString()
             };
-            
+
             if (!logros.logros) logros.logros = [];
             logros.logros.push(nuevo);
             this.guardar('logros', logros);
-            
+
             this.agregarXP(usuarioId, datos.xp || 10);
-            
+
             return { success: true, data: nuevo };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -951,45 +1007,45 @@ class Database {
             // Buscar en usuarios
             const usuarios = this.cargar('usuarios');
             let user = usuarios.usuarios?.find(u => u.id === usuarioId);
-            
+
             if (user) {
                 user.xp = (user.xp || 0) + cantidad;
                 let xp = user.xp;
                 let nivel = user.nivel || 1;
                 let xpNecesario = 100;
-                
+
                 while (xp >= xpNecesario) {
                     xp -= xpNecesario;
                     nivel++;
                     xpNecesario = Math.floor(xpNecesario * 1.5);
                 }
-                
+
                 user.nivel = nivel;
                 this.guardar('usuarios', usuarios);
                 return { success: true };
             }
-            
+
             // Buscar en administradores
             const admins = this.cargar('administradores');
             const admin = admins.administradores?.find(a => a.id === usuarioId);
-            
+
             if (admin) {
                 admin.xp = (admin.xp || 0) + cantidad;
                 let xp = admin.xp;
                 let nivel = admin.nivel || 1;
                 let xpNecesario = 100;
-                
+
                 while (xp >= xpNecesario) {
                     xp -= xpNecesario;
                     nivel++;
                     xpNecesario = Math.floor(xpNecesario * 1.5);
                 }
-                
+
                 admin.nivel = nivel;
                 this.guardar('administradores', admins);
                 return { success: true };
             }
-            
+
             return { success: false, error: 'Usuario no encontrado' };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1008,10 +1064,10 @@ class Database {
             if (!datos.usuario_id || !datos.puntos) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const ranking = this.cargar('ranking');
             const existente = ranking.puntajes?.find(r => r.usuario_id === datos.usuario_id);
-            
+
             if (existente) {
                 existente.puntos += datos.puntos;
                 existente.fecha_actualizacion = new Date().toISOString();
@@ -1025,7 +1081,7 @@ class Database {
                     fecha: new Date().toISOString()
                 });
             }
-            
+
             this.guardar('ranking', ranking);
             return { success: true };
         } catch (e) {
@@ -1048,7 +1104,7 @@ class Database {
             if (!datos.usuario_id || !datos.contenido) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const diario = this.cargar('diario-espiritual');
             const nueva = {
                 id: this._generateId(),
@@ -1058,11 +1114,11 @@ class Database {
                 titulo: datos.titulo || '',
                 fecha_creacion: new Date().toISOString()
             };
-            
+
             if (!diario.entradas) diario.entradas = [];
             diario.entradas.unshift(nueva);
             this.guardar('diario-espiritual', diario);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1072,7 +1128,7 @@ class Database {
     getProgresoLectura(usuarioId) {
         const l = this.cargar('lectura-biblica');
         const progreso = (l && l.progreso || []);
-        
+
         if (usuarioId) {
             return progreso.find(p => p.usuario_id === usuarioId) || {
                 usuario_id: usuarioId,
@@ -1081,7 +1137,7 @@ class Database {
                 fecha_inicio: new Date().toISOString()
             };
         }
-        
+
         return progreso;
     }
 
@@ -1089,9 +1145,9 @@ class Database {
         try {
             const lectura = this.cargar('lectura-biblica');
             if (!lectura.progreso) lectura.progreso = [];
-            
+
             let progreso = lectura.progreso.find(p => p.usuario_id === usuarioId);
-            
+
             if (progreso) {
                 progreso.completados = (progreso.completados || 0) + 1;
                 progreso.ultima_lectura = fecha || new Date().toISOString();
@@ -1106,9 +1162,9 @@ class Database {
                 };
                 lectura.progreso.push(progreso);
             }
-            
+
             this.guardar('lectura-biblica', lectura);
-            
+
             if (progreso.completados >= 10) {
                 this.desbloquearLogro(usuarioId, 'bible_reader', {
                     nombre: 'Lector de la Biblia',
@@ -1117,7 +1173,7 @@ class Database {
                     xp: 25
                 });
             }
-            
+
             return { success: true };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1138,7 +1194,7 @@ class Database {
             if (!datos.titulo || !datos.artista) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const himnario = this.cargar('himnario');
             const nueva = {
                 id: this._generateId(),
@@ -1149,11 +1205,11 @@ class Database {
                 letra: datos.letra || '',
                 fecha_agregado: new Date().toISOString()
             };
-            
+
             if (!himnario.canciones) himnario.canciones = [];
             himnario.canciones.push(nueva);
             this.guardar('himnario', himnario);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1168,7 +1224,7 @@ class Database {
     addPlaylist(datos) {
         try {
             if (!datos.nombre) return { success: false, error: 'Nombre requerido' };
-            
+
             const playlist = this.cargar('playlist');
             const nueva = {
                 id: this._generateId(),
@@ -1178,11 +1234,11 @@ class Database {
                 usuario_id: datos.usuario_id || 0,
                 fecha_creacion: new Date().toISOString()
             };
-            
+
             if (!playlist.listas) playlist.listas = [];
             playlist.listas.push(nueva);
             this.guardar('playlist', playlist);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1199,7 +1255,7 @@ class Database {
             if (!datos.nombre || !datos.url) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const radio = this.cargar('radio');
             const nueva = {
                 id: this._generateId(),
@@ -1209,11 +1265,11 @@ class Database {
                 imagen: datos.imagen || '',
                 activa: true
             };
-            
+
             if (!radio.estaciones) radio.estaciones = [];
             radio.estaciones.push(nueva);
             this.guardar('radio', radio);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1228,7 +1284,7 @@ class Database {
     addHistorialRadio(datos) {
         try {
             if (!datos.cancion) return { success: false };
-            
+
             const radio = this.cargar('radio');
             const nueva = {
                 id: this._generateId(),
@@ -1236,14 +1292,14 @@ class Database {
                 artista: datos.artista || '',
                 fecha: new Date().toISOString()
             };
-            
+
             if (!radio.historial) radio.historial = [];
             radio.historial.push(nueva);
-            
+
             if (radio.historial.length > 50) {
                 radio.historial = radio.historial.slice(-50);
             }
-            
+
             this.guardar('radio', radio);
             return { success: true };
         } catch (e) {
@@ -1257,7 +1313,7 @@ class Database {
 
     getTransmisiones() {
         const s = this.cargar('streaming');
-        return (s && s.transmisiones || []).sort((a, b) => 
+        return (s && s.transmisiones || []).sort((a, b) =>
             new Date(b.fecha_inicio) - new Date(a.fecha_inicio)
         );
     }
@@ -1265,7 +1321,7 @@ class Database {
     addTransmision(datos) {
         try {
             if (!datos.titulo) return { success: false, error: 'Título requerido' };
-            
+
             const streaming = this.cargar('streaming');
             const nueva = {
                 id: this._generateId(),
@@ -1278,11 +1334,11 @@ class Database {
                 espectadores: 0,
                 likes: 0
             };
-            
+
             if (!streaming.transmisiones) streaming.transmisiones = [];
             streaming.transmisiones.push(nueva);
             this.guardar('streaming', streaming);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1297,7 +1353,7 @@ class Database {
     addQRCode(datos) {
         try {
             if (!datos.url || !datos.titulo) return { success: false };
-            
+
             const qr = this.cargar('qr-codes');
             const nuevo = {
                 id: this._generateId(),
@@ -1307,11 +1363,11 @@ class Database {
                 fecha_creacion: new Date().toISOString(),
                 usos: 0
             };
-            
+
             if (!qr.codigos) qr.codigos = [];
             qr.codigos.push(nuevo);
             this.guardar('qr-codes', qr);
-            
+
             return { success: true, data: nuevo };
         } catch (e) {
             return { success: false };
@@ -1325,11 +1381,11 @@ class Database {
     getReportes(filtros = {}) {
         const r = this.cargar('reportes');
         let lista = (r && r.reportes || []);
-        
+
         if (filtros.estado) lista = lista.filter(x => x.estado === filtros.estado);
         if (filtros.tipo) lista = lista.filter(x => x.tipo === filtros.tipo);
         if (filtros.urgencia) lista = lista.filter(x => x.urgencia === filtros.urgencia);
-        
+
         return lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     }
 
@@ -1347,7 +1403,7 @@ class Database {
             if (!datos.tipo || !datos.descripcion) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const reportes = this.cargar('reportes');
             const nuevo = {
                 id: this._generateId(),
@@ -1369,16 +1425,16 @@ class Database {
                     comentario: 'Reporte creado'
                 }]
             };
-            
+
             if (!reportes.reportes) reportes.reportes = [];
             reportes.reportes.unshift(nuevo);
-            
+
             if (reportes.reportes.length > 100) {
                 reportes.reportes = reportes.reportes.slice(0, 100);
             }
-            
+
             reportes.ultimo_id = nuevo.id;
-            
+
             if (this.guardar('reportes', reportes)) {
                 this._agregarNotificacion({
                     titulo: 'Nuevo reporte',
@@ -1387,7 +1443,7 @@ class Database {
                 });
                 return { success: true, data: nuevo };
             }
-            
+
             return { success: false, error: 'Error al guardar' };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1398,15 +1454,15 @@ class Database {
         try {
             const reportes = this.cargar('reportes');
             const reporte = reportes.reportes?.find(r => r.id === id);
-            
+
             if (!reporte) return { success: false };
-            
+
             reporte.estado = nuevoEstado;
-            
+
             if (nuevoEstado === 'resuelto' || nuevoEstado === 'desestimado') {
                 reporte.fecha_resolucion = new Date().toISOString();
             }
-            
+
             if (!reporte.historial) reporte.historial = [];
             reporte.historial.push({
                 estado: nuevoEstado,
@@ -1414,7 +1470,7 @@ class Database {
                 usuario: admin,
                 comentario: comentario || 'Estado: ' + nuevoEstado
             });
-            
+
             this.guardar('reportes', reportes);
             return { success: true, data: reporte };
         } catch (e) {
@@ -1423,13 +1479,17 @@ class Database {
     }
 
     deleteReporte(id) {
+        // ═══ NUEVO v22.1: Usar papelera si Storage está disponible ═══
+        if (window.Storage && typeof window.Storage.eliminarConRespaldo === 'function') {
+            return window.Storage.eliminarConRespaldo('reportes', id, 'Admin');
+        }
         return this.eliminar('reportes', id);
     }
 
     getEstadisticasReportes() {
         const r = this.cargar('reportes');
         const lista = (r && r.reportes || []);
-        
+
         return {
             total: lista.length,
             pendientes: lista.filter(x => x.estado === 'pendiente').length,
@@ -1455,14 +1515,14 @@ class Database {
                 tipo: datos.tipo || 'general',
                 icono: datos.icono || '📌'
             };
-            
+
             if (!notif.notificaciones) notif.notificaciones = [];
             notif.notificaciones.unshift(nueva);
-            
+
             if (notif.notificaciones.length > 100) {
                 notif.notificaciones = notif.notificaciones.slice(0, 100);
             }
-            
+
             this.guardar('notificaciones', notif);
         } catch (e) {}
     }
@@ -1479,13 +1539,13 @@ class Database {
     marcarLeidas() {
         try {
             const n = this.cargar('notificaciones');
-            
+
             if (n && n.notificaciones) {
                 n.notificaciones.forEach(notif => notif.leida = true);
                 this.guardar('notificaciones', n);
                 return { success: true };
             }
-            
+
             return { success: false };
         } catch (e) {
             return { success: false };
@@ -1505,7 +1565,7 @@ class Database {
     addConversacion(datos) {
         try {
             if (!datos.usuario_id || !datos.mensaje) return { success: false };
-            
+
             const asistente = this.cargar('asistente');
             const nueva = {
                 id: this._generateId(),
@@ -1514,14 +1574,14 @@ class Database {
                 respuesta: datos.respuesta || '',
                 fecha: new Date().toISOString()
             };
-            
+
             if (!asistente.conversaciones) asistente.conversaciones = [];
             asistente.conversaciones.push(nueva);
-            
+
             if (asistente.conversaciones.length > 100) {
                 asistente.conversaciones = asistente.conversaciones.slice(-100);
             }
-            
+
             this.guardar('asistente', asistente);
             return { success: true, data: nueva };
         } catch (e) {
@@ -1543,7 +1603,7 @@ class Database {
             if (!datos.pregunta || !datos.opciones || datos.respuesta === undefined) {
                 return { success: false, error: 'Datos incompletos' };
             }
-            
+
             const trivia = this.cargar('trivia');
             const nueva = {
                 id: this._generateId(),
@@ -1553,11 +1613,11 @@ class Database {
                 categoria: datos.categoria || 'general',
                 dificultad: datos.dificultad || 'media'
             };
-            
+
             if (!trivia.preguntas) trivia.preguntas = [];
             trivia.preguntas.push(nueva);
             this.guardar('trivia', trivia);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1573,7 +1633,7 @@ class Database {
     addPartidaJuego(datos) {
         try {
             if (!datos.usuario_id || !datos.puntaje) return { success: false };
-            
+
             const juegos = this.cargar('juegos');
             const nueva = {
                 id: this._generateId(),
@@ -1583,17 +1643,17 @@ class Database {
                 nivel_alcanzado: datos.nivel || 1,
                 fecha: new Date().toISOString()
             };
-            
+
             if (!juegos.partidas) juegos.partidas = [];
             juegos.partidas.push(nueva);
             this.guardar('juegos', juegos);
-            
+
             this.addPuntajeRanking({
                 usuario_id: datos.usuario_id,
                 nombre: datos.nombre || 'Usuario',
                 puntos: datos.puntaje
             });
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false };
@@ -1626,7 +1686,7 @@ class Database {
     getVersiculoDiario() {
         const versiculos = this.getVersiculos();
         if (versiculos.length === 0) return null;
-        
+
         const idx = new Date().getDate() % versiculos.length;
         return versiculos[idx] || versiculos[0];
     }
@@ -1639,7 +1699,7 @@ class Database {
     addDonacion(datos) {
         try {
             if (!datos.monto) return { success: false, error: 'Monto requerido' };
-            
+
             const donaciones = this.cargar('donaciones');
             const nueva = {
                 id: this._generateId(),
@@ -1650,11 +1710,11 @@ class Database {
                 concepto: datos.concepto || 'Ofrenda',
                 fecha: new Date().toISOString()
             };
-            
+
             if (!donaciones.donaciones) donaciones.donaciones = [];
             donaciones.donaciones.push(nueva);
             this.guardar('donaciones', donaciones);
-            
+
             return { success: true, data: nueva };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1676,22 +1736,122 @@ class Database {
         };
     }
 
+    // ═══ NUEVO v22.1: Estado completo del sistema para panel de backup ═══
+    getEstadoSistema() {
+        try {
+            const papelera = this.cargar('_papelera');
+            const metaRec = this.cargar('_meta_recuperacion');
+            const metaResp = this.cargar('_meta_respaldo');
+
+            // Calcular espacio usado
+            let bytesUsados = 0;
+            let totalColecciones = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith(this.prefix) && !k.includes('backup_')) {
+                    bytesUsados += (localStorage.getItem(k) || '').length * 2; // UTF-16
+                    totalColecciones++;
+                }
+            }
+
+            return {
+                version: this.version,
+                versionName: this.versionName,
+                totalColecciones: totalColecciones,
+                espacioUsado: bytesUsados,
+                espacioFormateado: this._formatBytes(bytesUsados),
+                papeleraCount: (papelera && papelera.items) ? papelera.items.length : 0,
+                ultimoRespaldoManual: metaResp ? metaResp.ultimo_respaldo_manual : null,
+                ultimoRespaldoAuto: metaResp ? metaResp.ultimo_respaldo_auto : null,
+                codigoMaestroGenerado: !!(metaRec && metaRec.codigo_maestro),
+                codigoMaestroUsos: metaRec ? (metaRec.usos || 0) : 0
+            };
+        } catch (e) {
+            return { error: e.message };
+        }
+    }
+
+    _formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1048576).toFixed(2) + ' MB';
+    }
+
+    // ═══ NUEVO v22.1: Verificar integridad de la base de datos ═══
+    verificarIntegridad() {
+        const reporte = {
+            valido: true,
+            errores: [],
+            advertencias: [],
+            colecciones: {},
+            totalRegistros: 0
+        };
+
+        try {
+            const nombres = this._getAllNames();
+
+            nombres.forEach(nombre => {
+                if (nombre.startsWith('backup_')) return;
+
+                try {
+                    const datos = this.cargar(nombre);
+                    if (!datos) {
+                        reporte.advertencias.push(`Colección "${nombre}" vacía o inexistente`);
+                        return;
+                    }
+
+                    let registros = 0;
+                    Object.keys(datos).forEach(key => {
+                        if (Array.isArray(datos[key])) {
+                            registros += datos[key].length;
+                        }
+                    });
+
+                    reporte.colecciones[nombre] = registros;
+                    reporte.totalRegistros += registros;
+                } catch (e) {
+                    reporte.errores.push(`Error en "${nombre}": ${e.message}`);
+                    reporte.valido = false;
+                }
+            });
+
+            // Verificar que exista al menos un admin
+            const admins = this.cargar('administradores');
+            if (!admins.administradores || admins.administradores.length === 0) {
+                reporte.advertencias.push('No hay administradores registrados');
+            }
+
+            // Verificar código maestro
+            const metaRec = this.cargar('_meta_recuperacion');
+            if (!metaRec || !metaRec.codigo_maestro) {
+                reporte.advertencias.push('No se ha generado el código maestro de recuperación');
+            }
+
+        } catch (e) {
+            reporte.errores.push('Error general: ' + e.message);
+            reporte.valido = false;
+        }
+
+        return reporte;
+    }
+    // ═══ FIN NUEVO v22.1 ═══
+
     // ============================================
     // EXPORTACIÓN E IMPORTACIÓN
     // ============================================
 
     exportarTodo() {
         const datos = {};
-        
+
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
-            if (k && k.startsWith(this.prefix)) {
+            if (k && k.startsWith(this.prefix) && !k.includes('backup_')) {
                 try {
                     datos[k] = JSON.parse(localStorage.getItem(k));
                 } catch (e) {}
             }
         }
-        
+
         return {
             version: this.version,
             versionName: this.versionName,
@@ -1699,7 +1859,9 @@ class Database {
             datos: datos,
             metadata: {
                 total_items: Object.keys(datos).length,
-                exportado_por: 'IPUC LA FONDA'
+                exportado_por: 'IPUC LA FONDA',
+                iglesia: 'IPUC LA FONDA',
+                lema: 'Donde el Espíritu Santo se mueve'
             }
         };
     }
@@ -1709,20 +1871,28 @@ class Database {
             if (!exportData || !exportData.datos) {
                 return { success: false, error: 'Datos inválidos' };
             }
-            
+
             const datos = exportData.datos;
             const keys = Object.keys(datos);
-            
+
             keys.forEach(key => {
                 if (key.startsWith(this.prefix)) {
                     this._safeSetItem(key, JSON.stringify(datos[key]));
                 }
             });
-            
+
             this.cache.clear();
             this.initialized = false;
             this.inicializarDatos();
-            
+
+            // Marcar respaldo
+            try {
+                const meta = this.cargar('_meta_respaldo');
+                meta.ultimo_respaldo_manual = new Date().toISOString();
+                meta.total_respaldos = (meta.total_respaldos || 0) + 1;
+                this.guardar('_meta_respaldo', meta);
+            } catch (e) {}
+
             return { success: true, items_importados: keys.length };
         } catch (e) {
             return { success: false, error: 'Error: ' + e.message };
@@ -1731,18 +1901,18 @@ class Database {
 
     limpiarTodo() {
         const keys = [];
-        
+
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
             if (k && k.startsWith(this.prefix)) keys.push(k);
         }
-        
+
         keys.forEach(k => localStorage.removeItem(k));
-        
+
         this.cache.clear();
         this.initialized = false;
         this.inicializarDatos();
-        
+
         return { success: true, items_eliminados: keys.length };
     }
 
@@ -1844,19 +2014,51 @@ class Database {
             'oraciones', 'bendiciones', 'logros', 'diario-espiritual',
             'lectura-biblica', 'concordancia', 'himnario', 'playlist',
             'radio', 'streaming', 'qr-codes', 'asistente',
-            'juegos', 'trivia', 'ranking', 'mensajes'
+            'juegos', 'trivia', 'ranking', 'mensajes',
+            // ═══ NUEVO v22.1 ═══
+            '_papelera', '_meta_recuperacion', '_meta_respaldo'
+            // ═══ FIN NUEVO v22.1 ═══
         ];
-        
+
         collections.forEach(coll => {
             const clave = this._getKey(coll);
             if (!localStorage.getItem(clave)) {
                 this._crearDefecto(coll);
             }
         });
-        
+
         this._inicializarDefectos();
         this.initialized = true;
+
+        // ═══ NUEVO v22.1: Purgar papelera vieja (más de 30 días) ═══
+        this._purgarPapeleraAutomatica();
+        // ═══ FIN NUEVO v22.1 ═══
     }
+
+    // ═══ NUEVO v22.1: Auto-purgar papelera al iniciar ═══
+    _purgarPapeleraAutomatica() {
+        try {
+            const papelera = this.cargar('_papelera');
+            if (!papelera || !papelera.items || papelera.items.length === 0) return;
+
+            const ahora = new Date();
+            const antes = papelera.items.length;
+
+            papelera.items = papelera.items.filter(item => {
+                if (!item.expira) return true; // Sin fecha de expiración, conservar
+                return new Date(item.expira) > ahora;
+            });
+
+            const purgados = antes - papelera.items.length;
+            if (purgados > 0) {
+                this.guardar('_papelera', papelera);
+                console.log(`🗑️ Papelera: ${purgados} elementos expirados eliminados`);
+            }
+        } catch (e) {
+            console.warn('Error purgando papelera:', e);
+        }
+    }
+    // ═══ FIN NUEVO v22.1 ═══
 
     _inicializarDefectos() {
         // Horarios por defecto
@@ -1870,7 +2072,7 @@ class Database {
             ];
             this.guardar('horarios', horarios);
         }
-        
+
         // Versículos por defecto
         const versiculos = this.cargar('versiculos');
         if (!versiculos.versiculos || versiculos.versiculos.length === 0) {
@@ -1884,7 +2086,7 @@ class Database {
             versiculos.ultimo_id = 5;
             this.guardar('versiculos', versiculos);
         }
-        
+
         // Insignias por defecto
         const insignias = this.cargar('insignias');
         if (!insignias.insignias || insignias.insignias.length === 0) {
@@ -1899,7 +2101,7 @@ class Database {
             insignias.ultimo_id = 6;
             this.guardar('insignias', insignias);
         }
-        
+
         // Configuración por defecto
         const config = this.cargar('configuracion');
         if (!config.iglesia || !config.iglesia.nombre) {
@@ -1917,11 +2119,14 @@ class Database {
                 versionName: this.versionName,
                 registro_abierto: true,
                 primer_administrador_creado: false,
-                fecha_instalacion: new Date().toISOString()
+                fecha_instalacion: new Date().toISOString(),
+                respaldo_automatico: true,     // ═══ NUEVO v22.1 ═══
+                papelera_activa: true,         // ═══ NUEVO v22.1 ═══
+                codigo_maestro_activo: true    // ═══ NUEVO v22.1 ═══
             };
             this.guardar('configuracion', config);
         }
-        
+
         // Preguntas de Trivia por defecto
         const trivia = this.cargar('trivia');
         if (!trivia.preguntas || trivia.preguntas.length === 0) {
@@ -1938,7 +2143,7 @@ class Database {
             trivia.ultimo_id = trivia.preguntas.length;
             this.guardar('trivia', trivia);
         }
-        
+
         // Canciones por defecto
         const himnario = this.cargar('himnario');
         if (!himnario.canciones || himnario.canciones.length === 0) {
@@ -1953,7 +2158,7 @@ class Database {
             himnario.ultimo_id = himnario.canciones.length;
             this.guardar('himnario', himnario);
         }
-        
+
         // Estaciones de Radio por defecto
         const radio = this.cargar('radio');
         if (!radio.estaciones || radio.estaciones.length === 0) {
@@ -1981,6 +2186,8 @@ if (typeof window !== 'undefined') {
             console.log('📌 Sistema listo para usar');
             console.log('📊 ' + Object.keys(window.db.getEstadisticas()).length + ' estadísticas disponibles');
             console.log('🗄️ ' + window.db._getAllNames().length + ' colecciones activas');
+            console.log('🛡️ Papelera: ' + (window.db.cargar('_papelera').items || []).length + ' elementos');
+            console.log('🔑 Código maestro: ' + (window.db.cargar('_meta_recuperacion').codigo_maestro ? 'Generado' : 'No generado'));
         } catch (e) {
             console.error('❌ Error inicializando Database:', e);
         }
@@ -1989,7 +2196,7 @@ if (typeof window !== 'undefined') {
 }
 
 /* ============================================
-   FINAL DEL DATABASE v20.0 PRO ULTIMATE
+   FINAL DEL DATABASE v22.1 PRO ULTIMATE
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
