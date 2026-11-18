@@ -1,13 +1,14 @@
 /* ============================================
-   IPUC LA FONDA v22.0 PRO ULTIMATE - CSS COMPLETO
+   IPUC LA FONDA v22.1 PRO ULTIMATE - CSS COMPLETO
    Iglesia Pentecostal Unida de Colombia
    "Donde el Espíritu Santo se mueve"
-   Incluye: Radio, Streaming, Gamificación, IA, Logros, y más
+   Incluye: Radio, Streaming, Gamificación, IA, Logros,
+   + Respaldo, Papelera, Snapshots y Recuperación
    PRODUCCIÓN - RESPONSIVO - OPTIMIZADO
    ============================================ */
 
 /* ============================================
-   1. VARIABLES Y CONFIGURACIÓN GLOBAL v22.0
+   1. VARIABLES Y CONFIGURACIÓN GLOBAL v22.1
    ============================================ */
 :root {
     /* --- Paleta de Colores Institucional --- */
@@ -78,6 +79,14 @@
     --incorrect-color: #f44336;
     --game-bg: #f5f5f5;
 
+    /* ═══ v22.1: Colores de Backup y Recuperación ═══ */
+    --backup-primario: #00897b;
+    --backup-secundario: #26a69a;
+    --backup-surface: #e0f2f1;
+    --snapshot-color: #7e57c2;
+    --papelera-color: #ef6c00;
+    --codigo-maestro-color: #f9a825;
+
     /* --- Sombras --- */
     --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.08);
     --sombra-media: 0 4px 16px rgba(0, 0, 0, 0.12);
@@ -86,6 +95,7 @@
     --sombra-reporte: 0 4px 16px rgba(0, 0, 0, 0.1);
     --sombra-dorada: 0 4px 20px rgba(255, 215, 0, 0.3);
     --sombra-live: 0 0 30px rgba(255, 23, 68, 0.2);
+    --sombra-backup: 0 4px 20px rgba(0, 137, 123, 0.25); /* ═══ v22.1 ═══ */
 
     /* --- Bordes --- */
     --borde-radius: 16px;
@@ -96,6 +106,7 @@
     /* --- Tipografía --- */
     --font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     --font-display: 'Playfair Display', 'Georgia', serif;
+    --font-mono: 'Courier New', 'Consolas', monospace; /* ═══ v22.1 ═══ */
     --font-size-xs: 0.7rem;
     --font-size-sm: 0.8rem;
     --font-size-md: 0.95rem;
@@ -132,6 +143,7 @@
     --z-radio: 930;
     --z-game: 940;
     --z-achievement: 945;
+    --z-backup-modal: 6200; /* ═══ v22.1 ═══ */
 
     /* --- Espaciado --- */
     --spacing-xs: 4px;
@@ -142,7 +154,7 @@
 }
 
 /* ============================================
-   2. MODO OSCURO v20.0
+   2. MODO OSCURO v22.1
    ============================================ */
 [data-theme="dark"] {
     --blanco: #1a1a2e;
@@ -171,6 +183,10 @@
     --sombra-live: 0 0 30px rgba(255, 23, 68, 0.1);
     --radio-bg: #0d1b5e;
     --radio-text: #ffffff;
+
+    /* ═══ v22.1: Backup en modo oscuro ═══ */
+    --backup-surface: rgba(0, 137, 123, 0.15);
+    --sombra-backup: 0 4px 20px rgba(0, 200, 180, 0.15);
 }
 
 /* ============================================
@@ -625,7 +641,7 @@ ul, ol {
 }
 
 /* ============================================
-   6. SIDEBAR v20.0 MEJORADA
+   6. SIDEBAR v22.1
    ============================================ */
 .sidebar-overlay {
     position: fixed;
@@ -952,6 +968,20 @@ ul, ol {
     flex-shrink: 0;
 }
 
+/* ═══ v22.1: Item de Backup destacado ═══ */
+.nav-item[data-critical="true"] {
+    background: linear-gradient(90deg, transparent, var(--backup-surface));
+    border-left: 3px solid var(--backup-primario);
+}
+
+.nav-item[data-critical="true"]:hover {
+    background: var(--backup-surface);
+}
+
+.nav-item[data-critical="true"] i {
+    color: var(--backup-primario);
+}
+
 /* Badges de navegación */
 .nav-badge {
     background: var(--info);
@@ -1136,7 +1166,7 @@ ul, ol {
 }
 
 /* ============================================
-   7. HEADER v20.0
+   7. HEADER
    ============================================ */
 .header {
     height: var(--header-height);
@@ -1305,7 +1335,7 @@ ul, ol {
 }
 
 /* ============================================
-   8. PANEL DE STREAMING (NUEVO v20)
+   8. PANEL DE STREAMING
    ============================================ */
 .streaming-panel {
     position: fixed;
@@ -1429,7 +1459,7 @@ ul, ol {
 }
 
 /* ============================================
-   9. PANEL DE QR CODE (NUEVO v20)
+   9. PANEL DE QR CODE
    ============================================ */
 .qr-panel {
     position: fixed;
@@ -1616,7 +1646,7 @@ ul, ol {
 }
 
 /* ============================================
-   11. PANEL DE RADIO (NUEVO v20)
+   11. PANEL DE RADIO
    ============================================ */
 .radio-quick-panel {
     position: fixed;
@@ -1833,7 +1863,7 @@ ul, ol {
 }
 
 /* ============================================
-   13. WELCOME SCREEN MEJORADA
+   13. WELCOME SCREEN
    ============================================ */
 .welcome-screen {
     position: fixed;
@@ -1946,9 +1976,6 @@ ul, ol {
     margin-bottom: 2px;
 }
 
-/* Encabezados de cada sección dentro del contenido: tipografía
-   institucional distinta a la del texto de cuerpo, sin tocar la
-   legibilidad del resto de la app. */
 .page-content > div > h2,
 .page-content h2 {
     font-family: var(--font-display);
@@ -2133,7 +2160,7 @@ ul, ol {
 }
 
 .captcha-text {
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 1.3rem;
     font-weight: 700;
     background: var(--gris-claro);
@@ -2255,6 +2282,30 @@ ul, ol {
     background: #388e3c;
 }
 
+/* ═══ v22.1: Botón de backup ═══ */
+.btn-backup {
+    background: var(--backup-primario);
+    color: var(--blanco);
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--borde-radius);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    box-shadow: var(--sombra-backup);
+}
+
+.btn-backup:hover {
+    background: var(--backup-secundario);
+    transform: translateY(-2px);
+}
+
 .btn-lg {
     padding: 14px 32px;
     font-size: var(--font-size-lg);
@@ -2281,7 +2332,7 @@ ul, ol {
 }
 
 /* ============================================
-   15. MODALES v20.0
+   15. MODALES
    ============================================ */
 .modal {
     position: fixed;
@@ -2388,7 +2439,7 @@ ul, ol {
 }
 
 /* ============================================
-   16. MODAL DE REPORTES MEJORADO
+   16. MODAL DE REPORTES
    ============================================ */
 #report-modal .modal-container {
     max-width: 600px;
@@ -2602,7 +2653,7 @@ ul, ol {
 }
 
 /* ============================================
-   18. NOTIFICACIONES MEJORADAS
+   18. NOTIFICACIONES
    ============================================ */
 .notification-panel {
     position: fixed;
@@ -2697,7 +2748,7 @@ ul, ol {
 }
 
 /* ============================================
-   19. FAB MEJORADO
+   19. FAB
    ============================================ */
 .fab {
     position: fixed;
@@ -2765,7 +2816,7 @@ ul, ol {
 }
 
 /* ============================================
-   20. ASISTENTE VIRTUAL (NUEVO v20)
+   20. ASISTENTE VIRTUAL
    ============================================ */
 .assistant {
     position: fixed;
@@ -2907,7 +2958,7 @@ ul, ol {
 }
 
 /* ============================================
-   21. JUEGOS BÍBLICOS (NUEVO v20)
+   21. JUEGOS BÍBLICOS
    ============================================ */
 .game-container {
     padding: 12px 0;
@@ -2977,7 +3028,7 @@ ul, ol {
 }
 
 /* ============================================
-   22. LOGROS Y GAMIFICACIÓN (NUEVO v20)
+   22. LOGROS Y GAMIFICACIÓN
    ============================================ */
 .achievement-grid {
     display: grid;
@@ -3451,7 +3502,346 @@ textarea.form-input {
 }
 
 /* ============================================
-   28. RESPONSIVE v20.0
+   ═══ v22.1: SECCIÓN DE BACKUP Y RECUPERACIÓN ═══
+   ============================================ */
+
+/* --- Contenedor general del panel de backup --- */
+#page-content .backup-panel {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* --- Indicador de estado del sistema (4 tarjetas) --- */
+.backup-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.backup-status-card {
+    text-align: center;
+    padding: 14px 8px;
+    background: var(--gris-claro);
+    border-radius: var(--borde-radius-sm);
+    border: 1px solid var(--gris-medio);
+    transition: all var(--transition-fast);
+}
+
+.backup-status-card:hover {
+    border-color: var(--backup-primario);
+    box-shadow: var(--sombra-suave);
+}
+
+.backup-status-card strong {
+    font-size: 1.3rem;
+    display: block;
+    color: var(--azul-primario);
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.backup-status-card small {
+    font-size: var(--font-size-xs);
+    color: var(--gris-texto);
+    display: block;
+}
+
+.backup-status-card.warning strong {
+    color: var(--advertencia);
+}
+
+.backup-status-card.success strong {
+    color: var(--exito);
+}
+
+.backup-status-card.info strong {
+    color: var(--info);
+}
+
+/* --- Tarjetas de acciones (descargar/restaurar) --- */
+.backup-actions-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+/* --- Lista de snapshots --- */
+.snapshot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.snapshot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--gris-claro);
+    border-radius: var(--borde-radius-sm);
+    border-left: 3px solid var(--snapshot-color);
+    gap: 8px;
+    transition: all var(--transition-fast);
+}
+
+.snapshot-item:hover {
+    background: var(--azul-surface);
+}
+
+.snapshot-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.snapshot-info strong {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.snapshot-info small {
+    font-size: var(--font-size-xs);
+    color: var(--gris-texto);
+    display: block;
+}
+
+.snapshot-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.snapshot-actions .btn-sm {
+    min-height: 32px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+}
+
+/* --- Lista de papelera --- */
+.papelera-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.papelera-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--gris-claro);
+    border-radius: var(--borde-radius-sm);
+    border-left: 3px solid var(--papelera-color);
+    gap: 8px;
+    transition: all var(--transition-fast);
+}
+
+.papelera-item:hover {
+    background: var(--advertencia-claro);
+}
+
+.papelera-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.papelera-info .badge {
+    position: static;
+    display: inline-block;
+    margin-bottom: 4px;
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    background: var(--info);
+    color: var(--blanco);
+    border-radius: 10px;
+}
+
+.papelera-info small {
+    font-size: var(--font-size-xs);
+    color: var(--gris-texto);
+    display: block;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.papelera-actions {
+    flex-shrink: 0;
+}
+
+/* --- Display del código maestro --- */
+.codigo-maestro-display {
+    padding: 16px;
+    background: var(--gris-claro);
+    border-radius: var(--borde-radius-sm);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: var(--azul-primario);
+    user-select: all;
+    cursor: pointer;
+    border: 2px dashed var(--dorado);
+    transition: all var(--transition-fast);
+    word-break: break-all;
+}
+
+.codigo-maestro-display:hover {
+    background: var(--dorado-claro);
+    border-color: var(--dorado-oscuro);
+}
+
+.codigo-maestro-display.oculto {
+    color: var(--gris-texto);
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+/* --- Modal de código maestro --- */
+#master-code-modal .modal-container {
+    max-width: 520px;
+}
+
+#master-code-modal .modal-header {
+    background: linear-gradient(135deg, var(--dorado), var(--dorado-oscuro));
+    color: var(--azul-primario);
+    border-radius: var(--borde-radius-lg) var(--borde-radius-lg) 0 0;
+}
+
+#master-code-modal .modal-header h2 {
+    color: var(--azul-primario);
+}
+
+#master-code-modal .modal-close {
+    color: var(--azul-primario);
+}
+
+#master-code-modal .modal-close:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+#master-code-display {
+    padding: 20px;
+    background: var(--dorado-claro);
+    border-radius: var(--borde-radius-sm);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--azul-primario);
+    user-select: all;
+    cursor: pointer;
+    border: 2px dashed var(--dorado);
+    word-break: break-all;
+}
+
+/* --- Modal de confirmación de restauración --- */
+#restore-confirm-modal .modal-header {
+    background: var(--advertencia);
+    color: var(--blanco);
+    border-radius: var(--borde-radius-lg) var(--borde-radius-lg) 0 0;
+}
+
+#restore-confirm-modal .modal-header h2 {
+    color: var(--blanco);
+}
+
+#restore-confirm-modal .modal-close {
+    color: var(--blanco);
+}
+
+#restore-confirm-modal .modal-close:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* --- Alertas dentro del panel de backup --- */
+.backup-alert {
+    padding: 12px 16px;
+    border-radius: var(--borde-radius-sm);
+    margin-top: 12px;
+    font-size: var(--font-size-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.backup-alert i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.backup-alert.warning {
+    background: var(--advertencia-claro);
+    border-left: 4px solid var(--advertencia);
+    color: #e65100;
+}
+
+.backup-alert.info {
+    background: var(--info-claro);
+    border-left: 4px solid var(--info);
+    color: #0d47a1;
+}
+
+.backup-alert.success {
+    background: var(--exito-claro);
+    border-left: 4px solid var(--exito);
+    color: #1b5e20;
+}
+
+.backup-alert.error {
+    background: var(--error-claro);
+    border-left: 4px solid var(--error);
+    color: #b71c1c;
+}
+
+/* --- Código en el panel --- */
+#page-content code {
+    background: var(--gris-claro);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--azul-primario);
+    border: 1px solid var(--gris-medio);
+}
+
+/* --- Indicador de "última copia" --- */
+.backup-last-time {
+    padding: 8px 12px;
+    background: var(--backup-surface);
+    border-radius: var(--borde-radius-sm);
+    font-size: var(--font-size-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--backup-primario);
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.backup-last-time.warning {
+    background: var(--advertencia-claro);
+    color: var(--advertencia);
+}
+
+.backup-last-time i {
+    font-size: 1.1rem;
+}
+
+/* ============================================
+   28. RESPONSIVE v22.1
    ============================================ */
 @media (min-width: 1024px) {
     .sidebar {
@@ -3528,6 +3918,26 @@ textarea.form-input {
     .welcome-logo {
         width: 80px; height: 80px;
     }
+
+    /* ═══ v22.1: Responsive del backup ═══ */
+    .backup-status-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .snapshot-item,
+    .papelera-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .snapshot-actions,
+    .papelera-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    #master-code-display {
+        font-size: 1.1rem;
+        padding: 14px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -3594,6 +4004,27 @@ textarea.form-input {
     .achievement-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
+
+    /* ═══ v22.1: Backup en móviles pequeños ═══ */
+    .backup-status-grid {
+        grid-template-columns: 1fr;
+    }
+    .backup-actions-grid {
+        flex-direction: column;
+    }
+    .backup-actions-grid > button {
+        width: 100%;
+    }
+    .codigo-maestro-display {
+        font-size: 1rem;
+        letter-spacing: 1px;
+        padding: 12px;
+    }
+    #master-code-display {
+        font-size: 1rem;
+        letter-spacing: 1px;
+        padding: 12px;
+    }
 }
 
 /* ============================================
@@ -3634,7 +4065,7 @@ textarea.form-input {
 }
 
 /* ============================================
-   FINAL DEL CSS v20.0 PRO ULTIMATE
+   FINAL DEL CSS v22.1 PRO ULTIMATE
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
