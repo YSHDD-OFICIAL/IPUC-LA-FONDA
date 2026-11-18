@@ -1,7 +1,8 @@
 /* ============================================
-   IPUC LA FONDA - SERVICE WORKER PWA v22.0 PRO ULTIMATE
+   IPUC LA FONDA - SERVICE WORKER PWA v22.1 PRO ULTIMATE
    Instalable como App Nativa | Offline | Push | Sincronizacion
-   Incluye: Radio, Streaming, Gamificación, Logros, Asistente
+   Incluye: Radio, Streaming, Gamificación, Logros, Asistente,
+   + Respaldo automático, Papelera y Recuperación
    VERSION INTERNACIONAL - OPTIMIZADO - COMPLETO
    "Donde el Espíritu Santo se mueve"
    ============================================ */
@@ -9,7 +10,7 @@
 // ============================================
 // CONFIGURACIÓN DE CACHÉ
 // ============================================
-const CACHE_VERSION = 'v22.0.2026';
+const CACHE_VERSION = 'v22.1.2026'; // ═══ v22.1: actualizado ═══
 const CACHE_NAMES = {
     static: `ipuc-static-${CACHE_VERSION}`,
     runtime: `ipuc-runtime-${CACHE_VERSION}`,
@@ -26,12 +27,14 @@ const CACHE_NAMES = {
     assistant: `ipuc-assistant-${CACHE_VERSION}`,
     sync: `ipuc-sync-${CACHE_VERSION}`,
     wallpapers: `ipuc-wallpapers-${CACHE_VERSION}`,
-    documents: `ipuc-documents-${CACHE_VERSION}`
+    documents: `ipuc-documents-${CACHE_VERSION}`,
+    // ═══ v22.1: Cache para respaldos offline ═══
+    respaldos: `ipuc-respaldos-${CACHE_VERSION}`
 };
 
-const VERSION = '22.0';
+const VERSION = '22.1'; // ═══ v22.1: actualizado ═══
 const VERSION_NAME = 'PRO ULTIMATE';
-const BUILD_DATE = '2026-08-23';
+const BUILD_DATE = '2026-11-18'; // ═══ v22.1: actualizado ═══
 
 // Tiempos de expiración en segundos
 const MAX_AGE = {
@@ -48,7 +51,8 @@ const MAX_AGE = {
     games: 7 * 24 * 60 * 60,
     assistant: 1 * 60 * 60,
     wallpapers: 30 * 24 * 60 * 60,
-    documents: 30 * 24 * 60 * 60
+    documents: 30 * 24 * 60 * 60,
+    respaldos: 30 * 24 * 60 * 60 // ═══ v22.1 ═══
 };
 
 // Assets a pre-cachear
@@ -57,6 +61,7 @@ const PRECACHE_ASSETS = [
     '/index.html',
     '/styles.css',
     '/database.js',
+    '/storage.js',          // ═══ v22.1: NUEVO ═══
     '/app.js',
     '/script.js',
     '/manifest.json',
@@ -96,7 +101,9 @@ const CACHE_PATTERNS = {
     wallpapers: /\/wallpapers\//i,
     documents: /\/documents\//i,
     pdf: /\.pdf$/i,
-    doc: /\.(doc|docx)$/i
+    doc: /\.(doc|docx)$/i,
+    // ═══ v22.1: Patrón para respaldos ═══
+    respaldos: /(respaldo|backup|\.json$)/i
 };
 
 // Orígenes permitidos
@@ -109,6 +116,16 @@ const ALLOWED_ORIGINS = [
     'https://cdnjs.cloudflare.com',
     'https://boxicons.com',
     'https://images.unsplash.com'
+];
+
+// ═══ v22.1: URLs que NUNCA deben ir a caché ═══
+const NEVER_CACHE_URLS = [
+    '/api/auth',
+    '/api/login',
+    '/api/respaldo',
+    '/api/backup',
+    '/storage-export',
+    '/storage-import'
 ];
 
 // ============================================
@@ -126,6 +143,13 @@ function shouldCache(url) {
     if (url.includes('auth=')) return false;
     if (url.includes('private')) return false;
     if (url.includes('password')) return false;
+
+    // ═══ v22.1: Nunca cachear URLs de respaldo/auth ═══
+    const urlLower = url.toLowerCase();
+    for (const never of NEVER_CACHE_URLS) {
+        if (urlLower.includes(never.toLowerCase())) return false;
+    }
+
     return true;
 }
 
@@ -145,6 +169,8 @@ function getCacheNameForUrl(url) {
     if (CACHE_PATTERNS.html.test(url)) return CACHE_NAMES.runtime;
     if (CACHE_PATTERNS.js.test(url)) return CACHE_NAMES.runtime;
     if (CACHE_PATTERNS.css.test(url)) return CACHE_NAMES.runtime;
+    // ═══ v22.1: Respaldos van a su cache propia ═══
+    if (CACHE_PATTERNS.respaldos.test(url)) return CACHE_NAMES.respaldos;
     return CACHE_NAMES.runtime;
 }
 
@@ -162,18 +188,18 @@ function getMaxAgeForCache(cacheName) {
 // ============================================
 self.addEventListener('install', (event) => {
     console.log(`SW v${VERSION} ${VERSION_NAME}: Instalando...`);
-    
+
     event.waitUntil(
         caches.open(CACHE_NAMES.static)
             .then(async (cache) => {
                 const cachePromises = PRECACHE_ASSETS.map(async (asset) => {
                     try {
-                        const response = await fetch(asset, { 
+                        const response = await fetch(asset, {
                             mode: 'no-cors',
                             cache: 'no-cache',
                             credentials: 'same-origin'
                         });
-                        
+
                         if (response.ok || response.type === 'opaque') {
                             await cache.put(asset, response);
                             console.log(`  Cacheado: ${asset}`);
@@ -182,7 +208,7 @@ self.addEventListener('install', (event) => {
                         console.warn(`  No cacheado: ${asset} - ${error.message}`);
                     }
                 });
-                
+
                 await Promise.all(cachePromises);
                 console.log(`SW: Instalacion completada (${PRECACHE_ASSETS.length} assets)`);
                 await self.skipWaiting();
@@ -195,9 +221,9 @@ self.addEventListener('install', (event) => {
 // ============================================
 self.addEventListener('activate', (event) => {
     console.log(`SW v${VERSION} ${VERSION_NAME}: Activando...`);
-    
+
     const validCaches = Object.values(CACHE_NAMES);
-    
+
     event.waitUntil(
         caches.keys()
             .then((cacheNames) => {
@@ -223,84 +249,91 @@ self.addEventListener('activate', (event) => {
 // ============================================
 self.addEventListener('fetch', (event) => {
     const { request } = event;
-    
+
     if (request.method !== 'GET') return;
-    
+
     const url = new URL(request.url);
-    
+
     if (!isAllowedUrl(url.origin)) return;
-    
+
     if (!shouldCache(url.href)) {
         event.respondWith(fetch(request));
         return;
     }
-    
+
     // Navegación - Network First con fallback offline
     if (request.mode === 'navigate') {
         event.respondWith(handleNavigation(request));
         return;
     }
-    
+
+    // ═══ v22.1: Respaldos - Network Only (no cachear) ═══
+    if (CACHE_PATTERNS.respaldos.test(url.pathname) &&
+        (url.pathname.endsWith('.json') || url.pathname.includes('respaldo'))) {
+        event.respondWith(fetch(request));
+        return;
+    }
+
     // Audio/Radio - Stale-While-Revalidate
     if (CACHE_PATTERNS.audio.test(url.pathname) || CACHE_PATTERNS.radio.test(url.pathname)) {
         event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.radio));
         return;
     }
-    
+
     // Video/Streaming - Network First
     if (CACHE_PATTERNS.video.test(url.pathname) || CACHE_PATTERNS.streaming.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.streaming));
         return;
     }
-    
+
     // Documentos PDF/DOC - Cache First
     if (CACHE_PATTERNS.pdf.test(url.pathname) || CACHE_PATTERNS.doc.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.documents));
         return;
     }
-    
+
     // Wallpapers - Cache First
     if (CACHE_PATTERNS.wallpapers.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.wallpapers));
         return;
     }
-    
+
     // Imágenes - Cache First
     if (CACHE_PATTERNS.images.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.images));
         return;
     }
-    
+
     // JS/CSS - Cache First con Network Update
     if (CACHE_PATTERNS.js.test(url.pathname) || CACHE_PATTERNS.css.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.runtime));
         return;
     }
-    
+
     // API - Network First
     if (CACHE_PATTERNS.api.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.api));
         return;
     }
-    
+
     // Reportes - Network First
     if (CACHE_PATTERNS.reports.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.reports));
         return;
     }
-    
+
     // Juegos - Cache First
     if (CACHE_PATTERNS.games.test(url.pathname)) {
         event.respondWith(cacheFirstWithUpdate(request, CACHE_NAMES.games));
         return;
     }
-    
+
     // Asistente - Network First
     if (CACHE_PATTERNS.assistant.test(url.pathname)) {
         event.respondWith(networkFirst(request, CACHE_NAMES.assistant));
         return;
     }
-    
+
     // Por defecto: Stale-While-Revalidate
     event.respondWith(staleWhileRevalidate(request, CACHE_NAMES.runtime));
 });
@@ -312,7 +345,7 @@ self.addEventListener('fetch', (event) => {
 async function staleWhileRevalidate(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
-    
+
     const fetchPromise = fetch(request)
         .then(async (networkResponse) => {
             if (networkResponse && networkResponse.ok) {
@@ -321,26 +354,26 @@ async function staleWhileRevalidate(request, cacheName) {
             return networkResponse;
         })
         .catch(() => cachedResponse);
-    
+
     return cachedResponse || fetchPromise;
 }
 
 async function networkFirst(request, cacheName) {
     const cache = await caches.open(cacheName);
-    
+
     try {
         const networkResponse = await fetch(request);
-        
+
         if (networkResponse && networkResponse.ok) {
             await cache.put(request, networkResponse.clone());
         }
-        
+
         return networkResponse;
     } catch (error) {
         const cachedResponse = await cache.match(request);
-        
+
         if (cachedResponse) return cachedResponse;
-        
+
         return createOfflineResponse(request);
     }
 }
@@ -348,7 +381,7 @@ async function networkFirst(request, cacheName) {
 async function cacheFirstWithUpdate(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
-    
+
     if (cachedResponse) {
         fetch(request)
             .then((networkResponse) => {
@@ -357,17 +390,17 @@ async function cacheFirstWithUpdate(request, cacheName) {
                 }
             })
             .catch(() => {});
-        
+
         return cachedResponse;
     }
-    
+
     try {
         const networkResponse = await fetch(request);
-        
+
         if (networkResponse && networkResponse.ok) {
             await cache.put(request, networkResponse.clone());
         }
-        
+
         return networkResponse;
     } catch (error) {
         return createOfflineResponse(request);
@@ -377,23 +410,23 @@ async function cacheFirstWithUpdate(request, cacheName) {
 async function handleNavigation(request) {
     try {
         const networkResponse = await fetch(request);
-        
+
         if (networkResponse && networkResponse.ok) {
             const cache = await caches.open(CACHE_NAMES.runtime);
             await cache.put(request, networkResponse.clone());
             return networkResponse;
         }
-        
+
         throw new Error('Network response not ok');
     } catch (error) {
         const cache = await caches.open(CACHE_NAMES.runtime);
         const cachedResponse = await cache.match(request);
-        
+
         if (cachedResponse) return cachedResponse;
-        
+
         const indexResponse = await cache.match('/');
         if (indexResponse) return indexResponse;
-        
+
         return createOfflinePage();
     }
 }
@@ -403,7 +436,7 @@ async function handleNavigation(request) {
 // ============================================
 function createOfflineResponse(request) {
     const url = new URL(request.url);
-    
+
     if (CACHE_PATTERNS.images.test(url.pathname)) {
         return new Response(
             `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
@@ -413,24 +446,24 @@ function createOfflineResponse(request) {
             { status: 200, headers: { 'Content-Type': 'image/svg+xml' } }
         );
     }
-    
+
     if (request.headers.get('Accept')?.includes('application/json')) {
         return new Response(
-            JSON.stringify({ 
-                error: true, 
-                offline: true, 
-                mensaje: 'Sin conexion a internet' 
+            JSON.stringify({
+                error: true,
+                offline: true,
+                mensaje: 'Sin conexion a internet'
             }),
-            { 
-                status: 503, 
-                headers: { 
+            {
+                status: 503,
+                headers: {
                     'Content-Type': 'application/json',
                     'X-Offline': 'true'
-                } 
+                }
             }
         );
     }
-    
+
     return createOfflinePage();
 }
 
@@ -567,13 +600,13 @@ function createOfflinePage() {
             </div>
         </body>
         </html>`,
-        { 
-            status: 503, 
-            headers: { 
+        {
+            status: 503,
+            headers: {
                 'Content-Type': 'text/html; charset=utf-8',
                 'X-Offline': 'true',
                 'Cache-Control': 'no-cache'
-            } 
+            }
         }
     );
 }
@@ -583,7 +616,7 @@ function createOfflinePage() {
 // ============================================
 self.addEventListener('push', (event) => {
     console.log('SW: Push recibida');
-    
+
     let data = {
         titulo: 'IPUC LA FONDA',
         mensaje: 'Tienes una nueva notificacion',
@@ -594,7 +627,7 @@ self.addEventListener('push', (event) => {
         id: Date.now(),
         timestamp: new Date().toISOString()
     };
-    
+
     if (event.data) {
         try {
             const pushData = event.data.json();
@@ -603,7 +636,7 @@ self.addEventListener('push', (event) => {
             data.mensaje = event.data.text() || data.mensaje;
         }
     }
-    
+
     const options = {
         body: data.mensaje,
         icon: data.icono,
@@ -625,7 +658,7 @@ self.addEventListener('push', (event) => {
         sound: '/assets/sounds/notification.mp3',
         timestamp: Date.now()
     };
-    
+
     event.waitUntil(
         self.registration.showNotification(data.titulo, options)
     );
@@ -636,13 +669,13 @@ self.addEventListener('push', (event) => {
 // ============================================
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    
+
     if (event.action === 'dismiss') return;
-    
+
     const urlToOpen = event.notification.data?.url || '/';
-    
+
     console.log('SW: Notificacion clickeada');
-    
+
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((windowClients) => {
@@ -655,7 +688,7 @@ self.addEventListener('notificationclick', (event) => {
                         return;
                     }
                 }
-                
+
                 if (clients.openWindow) {
                     return clients.openWindow(urlToOpen);
                 }
@@ -675,7 +708,7 @@ const SYNC_TASKS = {
         console.log('SW: Sincronizando reportes pendientes');
         const cache = await caches.open(CACHE_NAMES.reports);
         const keys = await cache.keys();
-        
+
         for (const key of keys) {
             const response = await cache.match(key);
             if (response) {
@@ -712,6 +745,26 @@ const SYNC_TASKS = {
     'sync-wallpapers': async () => {
         console.log('SW: Sincronizando wallpapers');
         return Promise.resolve();
+    },
+    // ═══ v22.1: Sincronización de respaldos ═══
+    'sync-backup': async () => {
+        console.log('SW: Sincronizando respaldo pendiente');
+        const cache = await caches.open(CACHE_NAMES.respaldos);
+        const keys = await cache.keys();
+
+        for (const key of keys) {
+            const response = await cache.match(key);
+            if (response) {
+                try {
+                    const data = await response.json();
+                    console.log('Respaldo pendiente detectado:', data.fecha || 'sin fecha');
+                    // Aquí se podría subir el respaldo a un servidor si existiera.
+                    // Sin backend real, solo se loguea y se deja disponible.
+                } catch (e) {
+                    console.warn('Error procesando respaldo:', e);
+                }
+            }
+        }
     }
 };
 
@@ -730,15 +783,15 @@ self.addEventListener('sync', (event) => {
 // ============================================
 self.addEventListener('message', (event) => {
     if (!event.data || !event.data.type) return;
-    
+
     const { type } = event.data;
     const port = event.ports?.[0];
-    
+
     switch (type) {
         case 'SKIP_WAITING':
             self.skipWaiting();
             break;
-            
+
         case 'GET_VERSION':
             if (port) {
                 port.postMessage({
@@ -747,24 +800,25 @@ self.addEventListener('message', (event) => {
                     buildDate: BUILD_DATE,
                     caches: CACHE_NAMES,
                     assetsCount: PRECACHE_ASSETS.length,
+                    hasBackupModule: true, // ═══ v22.1 ═══
                     timestamp: Date.now()
                 });
             }
             break;
-            
+
         case 'GET_CACHE_STATS':
             if (port) {
                 caches.keys().then(async (cacheNames) => {
                     const stats = {};
                     let total = 0;
-                    
+
                     for (const name of cacheNames) {
                         const cache = await caches.open(name);
                         const keys = await cache.keys();
                         stats[name] = keys.length;
                         total += keys.length;
                     }
-                    
+
                     port.postMessage({
                         success: true,
                         stats,
@@ -774,7 +828,7 @@ self.addEventListener('message', (event) => {
                 });
             }
             break;
-            
+
         case 'CLEAR_ALL_CACHE':
             caches.keys().then((names) => {
                 return Promise.all(names.map(name => caches.delete(name)));
@@ -783,7 +837,7 @@ self.addEventListener('message', (event) => {
                 port?.postMessage({ success: true, action: 'CLEAR_ALL_CACHE' });
             });
             break;
-            
+
         case 'CLEAR_OLD_CACHE':
             const validCaches = Object.values(CACHE_NAMES);
             caches.keys().then((names) => {
@@ -799,7 +853,7 @@ self.addEventListener('message', (event) => {
                 port?.postMessage({ success: true, action: 'CLEAR_OLD_CACHE' });
             });
             break;
-            
+
         case 'REGISTER_SYNC':
             if ('sync' in self.registration) {
                 const syncTag = event.data.tag || 'sync-datos';
@@ -814,7 +868,7 @@ self.addEventListener('message', (event) => {
                     });
             }
             break;
-            
+
         case 'SAVE_REPORT_OFFLINE':
             if (event.data.reporte) {
                 const reportKey = `report_${Date.now()}`;
@@ -827,20 +881,20 @@ self.addEventListener('message', (event) => {
                         'X-Version': VERSION
                     }
                 });
-                
+
                 caches.open(CACHE_NAMES.reports).then((cache) => {
                     cache.put(reportKey, response);
                     console.log('SW: Reporte guardado offline');
-                    
+
                     if ('sync' in self.registration) {
                         self.registration.sync.register('sync-reportes');
                     }
-                    
+
                     port?.postMessage({ success: true, key: reportKey });
                 });
             }
             break;
-            
+
         case 'SAVE_DOCUMENT_OFFLINE':
             if (event.data.documento) {
                 const docKey = `doc_${Date.now()}`;
@@ -849,7 +903,7 @@ self.addEventListener('message', (event) => {
                 const response = new Response(blob, {
                     headers: { 'Content-Type': 'application/json' }
                 });
-                
+
                 caches.open(CACHE_NAMES.documents).then((cache) => {
                     cache.put(docKey, response);
                     console.log('SW: Documento guardado offline');
@@ -857,12 +911,79 @@ self.addEventListener('message', (event) => {
                 });
             }
             break;
-            
+
+        // ═══ v22.1: Nuevos handlers de respaldo ═══
+
+        case 'SAVE_RESPALDO_OFFLINE':
+            if (event.data.respaldo) {
+                const respaldoKey = `respaldo_${Date.now()}`;
+                const respaldoData = JSON.stringify(event.data.respaldo);
+                const blob = new Blob([respaldoData], { type: 'application/json' });
+                const response = new Response(blob, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Respaldo-ID': respaldoKey,
+                        'X-Version': VERSION,
+                        'X-Fecha': new Date().toISOString()
+                    }
+                });
+
+                caches.open(CACHE_NAMES.respaldos).then((cache) => {
+                    cache.put(respaldoKey, response);
+                    console.log('SW: Respaldo guardado offline');
+
+                    if ('sync' in self.registration) {
+                        self.registration.sync.register('sync-backup');
+                    }
+
+                    port?.postMessage({ success: true, key: respaldoKey });
+                });
+            }
+            break;
+
+        case 'LIST_RESPALDOS':
+            caches.open(CACHE_NAMES.respaldos).then(async (cache) => {
+                const keys = await cache.keys();
+                port?.postMessage({
+                    success: true,
+                    total: keys.length,
+                    keys: keys.map(k => k.url)
+                });
+            });
+            break;
+
+        case 'GET_LAST_RESPALDO':
+            caches.open(CACHE_NAMES.respaldos).then(async (cache) => {
+                const keys = await cache.keys();
+                if (keys.length === 0) {
+                    port?.postMessage({ success: false, error: 'Sin respaldos' });
+                    return;
+                }
+                const lastKey = keys[keys.length - 1];
+                const response = await cache.match(lastKey);
+                if (response) {
+                    try {
+                        const data = await response.json();
+                        port?.postMessage({ success: true, respaldo: data, key: lastKey.url });
+                    } catch (e) {
+                        port?.postMessage({ success: false, error: e.message });
+                    }
+                }
+            });
+            break;
+
+        case 'CLEAR_RESPALDOS':
+            caches.delete(CACHE_NAMES.respaldos).then(() => {
+                console.log('SW: Cache de respaldos limpiada');
+                port?.postMessage({ success: true, action: 'CLEAR_RESPALDOS' });
+            });
+            break;
+
         case 'PING':
-            port?.postMessage({ 
-                success: true, 
-                pong: true, 
-                timestamp: Date.now() 
+            port?.postMessage({
+                success: true,
+                pong: true,
+                timestamp: Date.now()
             });
             break;
     }
@@ -873,17 +994,17 @@ self.addEventListener('message', (event) => {
 // ============================================
 self.addEventListener('online', () => {
     console.log('SW: Conexion restaurada');
-    
+
     self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((client) => {
-            client.postMessage({ 
-                type: 'CONNECTIVITY_CHANGE', 
+            client.postMessage({
+                type: 'CONNECTIVITY_CHANGE',
                 online: true,
                 timestamp: Date.now()
             });
         });
     });
-    
+
     if ('sync' in self.registration) {
         Object.keys(SYNC_TASKS).forEach((tag) => {
             self.registration.sync.register(tag).catch(() => {});
@@ -893,11 +1014,11 @@ self.addEventListener('online', () => {
 
 self.addEventListener('offline', () => {
     console.log('SW: Sin conexion');
-    
+
     self.clients.matchAll({ type: 'window' }).then((clients) => {
         clients.forEach((client) => {
-            client.postMessage({ 
-                type: 'CONNECTIVITY_CHANGE', 
+            client.postMessage({
+                type: 'CONNECTIVITY_CHANGE',
                 online: false,
                 timestamp: Date.now()
             });
@@ -917,6 +1038,23 @@ if ('periodicSync' in self.registration) {
                 })
             );
         }
+        // ═══ v22.1: Respaldo periódico ═══
+        if (event.tag === 'periodic-backup') {
+            event.waitUntil(
+                Promise.resolve().then(() => {
+                    console.log('SW: Recordatorio de respaldo periodico');
+                    self.clients.matchAll({ type: 'window' }).then((clients) => {
+                        clients.forEach((client) => {
+                            client.postMessage({
+                                type: 'BACKUP_REMINDER',
+                                mensaje: 'Es hora de hacer un respaldo',
+                                timestamp: Date.now()
+                            });
+                        });
+                    });
+                })
+            );
+        }
     });
 }
 
@@ -927,7 +1065,7 @@ if ('backgroundFetch' in self) {
     self.addEventListener('backgroundfetchsuccess', (event) => {
         console.log('SW: Background fetch completado:', event.id);
     });
-    
+
     self.addEventListener('backgroundfetchfail', (event) => {
         console.warn('SW: Background fetch fallo:', event.id);
     });
@@ -948,10 +1086,16 @@ console.log('Asistente Virtual: Habilitado');
 console.log('Modo Offline: Habilitado');
 console.log('Documentos: Habilitados');
 console.log('Wallpapers: Habilitados');
+// ═══ v22.1 ═══
+console.log('📦 Respaldo automatico: Habilitado');
+console.log('🗑️  Papelera: Habilitada');
+console.log('🔑 Codigo maestro: Habilitado');
+console.log('📸 Snapshots: Habilitados');
+// ═══ FIN v22.1 ═══
 console.log('========================================');
 
 /* ============================================
-   FINAL DEL SERVICE WORKER v22.0 PRO ULTIMATE
+   FINAL DEL SERVICE WORKER v22.1 PRO ULTIMATE
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
