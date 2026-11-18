@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <!-- ============================================
-IPUC LA FONDA v22.1 PRO ULTIMATE - 2026
+IPUC LA FONDA v22.2 PRO PREMIUM - 2026
 Iglesia Pentecostal Unida de Colombia
 "Donde el Espíritu Santo se mueve"
 SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN,
-RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
+RESPALDO AUTOMÁTICO, CUENTA OFICIAL Y CAMBIO DE CONTRASEÑA
 ============================================ -->
 <html lang="es-CO">
 <head>
@@ -26,22 +26,24 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
     <meta name="application-name" content="IPUC LA FONDA International">
     <meta name="msapplication-TileColor" content="#1a237e">
 
-    <meta name="title" content="IPUC LA FONDA v22.1 PRO ULTIMATE">
-    <meta name="description" content="IPUC LA FONDA - Plataforma integral con IA, streaming en vivo, gamificación, tienda, respaldo automático y comunidad global.">
-    <meta name="keywords" content="IPUC, LA FONDA, iglesia, radio, eventos, comunidad, gamificación, IA, streaming, respaldo, backup">
+    <meta name="title" content="IPUC LA FONDA v22.2 PRO PREMIUM">
+    <meta name="description" content="IPUC LA FONDA - Plataforma integral con IA, streaming en vivo, gamificación, tienda, respaldo automático, cuenta oficial y comunidad global.">
+    <meta name="keywords" content="IPUC, LA FONDA, iglesia, radio, eventos, comunidad, gamificación, IA, streaming, respaldo, backup, premium">
     <meta name="author" content="IPUC LA FONDA">
     <meta name="robots" content="index, follow">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ipuclafonda.netlify.app/">
-    <meta property="og:title" content="IPUC LA FONDA v22.1 PRO ULTIMATE">
+    <meta property="og:title" content="IPUC LA FONDA v22.2 PRO PREMIUM">
     <meta property="og:description" content="Plataforma integral con IA, streaming, gamificación, respaldo automático y comunidad.">
     <meta property="og:image" content="ipuclafonda.png">
     <meta property="og:locale" content="es_CO">
     <meta property="og:site_name" content="IPUC LA FONDA">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="IPUC LA FONDA v22.1 PRO ULTIMATE">
+    <meta name="twitter:title" content="IPUC LA FONDA v22.2 PRO PREMIUM">
+    <meta name="twitter:description" content="Plataforma integral con IA, streaming, gamificación, respaldo automático y comunidad.">
+    <meta name="twitter:image" content="ipuclafonda.png">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
@@ -57,9 +59,8 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
 
-    <!-- ═══ NUEVO v22.1: CSS corregido (styles.css) ═══ -->
-    <!-- Si tu archivo real se llama "estilos.css", cambia esta línea -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- ═══ CSS principal (con cache-busting v22.2) ═══ -->
+    <link rel="stylesheet" href="styles.css?v=22.2">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
@@ -69,9 +70,22 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
     <!-- Leaflet - Mapas -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-    <title>IPUC LA FONDA v22.1 PRO | IA · Streaming · Gamificación · Respaldo</title>
+    <title>IPUC LA FONDA v22.2 PRO | IA · Streaming · Gamificación · Respaldo · Premium</title>
 </head>
 <body>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         NOSCRIPT (usuarios sin JavaScript)
+         ═══════════════════════════════════════════════════════════════ -->
+    <noscript>
+        <div style="position:fixed;inset:0;background:#1a237e;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;text-align:center;z-index:999999;font-family:sans-serif;">
+            <h1 style="font-size:1.5rem;margin-bottom:16px;">⚠️ JavaScript Deshabilitado</h1>
+            <p style="margin-bottom:16px;max-width:400px;">Esta aplicación requiere JavaScript para funcionar. Por favor, actívalo en tu navegador.</p>
+            <a href="https://wa.me/573128813818" style="background:#ffd700;color:#1a237e;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:700;">
+                Contactar por WhatsApp
+            </a>
+        </div>
+    </noscript>
 
     <!-- ═══════════════════════════════════════════════════════════════
          SPLASH SCREEN
@@ -120,7 +134,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
             <div class="splash-footer">
                 <div class="splash-flags">
                     <span><i class="bx bx-globe"></i> ES · EN · PT · FR · DE</span>
-                    <span class="splash-version">v22.1 PRO ULTIMATE</span>
+                    <span class="splash-version">v22.2 PRO PREMIUM</span>
                 </div>
             </div>
         </div>
@@ -138,7 +152,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
         <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menu principal">
             <div class="sidebar-header">
                 <div class="logo-mini">
-                    <img src="ipuclafonda.png" alt="Logo IPUC" width="40" height="40">
+                    <img src="ipuclafonda.png" alt="Logo IPUC" width="40" height="40" loading="lazy">
                     <span class="logo-badge">PRO</span>
                 </div>
                 <div class="sidebar-brand">
@@ -156,7 +170,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 <span class="search-shortcut">Ctrl+K</span>
             </div>
 
-            <!-- Estadísticas en sidebar -->
             <div class="sidebar-stats">
                 <div class="stat-item">
                     <span class="stat-value" id="online-users">0</span>
@@ -172,7 +185,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 </div>
             </div>
 
-            <!-- Selector de idiomas -->
             <div class="sidebar-languages">
                 <button class="lang-btn active" data-lang="es" aria-label="Español"><i class="bx bx-globe"></i> ES</button>
                 <button class="lang-btn" data-lang="en" aria-label="English"><i class="bx bx-globe"></i> EN</button>
@@ -182,7 +194,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 <button class="lang-btn" data-lang="it" aria-label="Italiano"><i class="bx bx-globe"></i> IT</button>
             </div>
 
-            <!-- Radio player en sidebar -->
             <div class="sidebar-radio">
                 <div class="radio-mini-player" id="radio-mini">
                     <div class="radio-info">
@@ -406,7 +417,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     </a>
                 </div>
 
-                <!-- ═══ NUEVO v22.1: Menú admin con Copias de Seguridad destacada ═══ -->
+                <!-- ═══ v22.2: Menú Admin ═══ -->
                 <div id="admin-menu" class="nav-section hidden">
                     <hr class="divider">
                     <span class="nav-section-title admin-label">
@@ -437,7 +448,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     <a href="#auditoria" class="nav-item" data-page="auditoria">
                         <i class="bx bx-clipboard"></i><span>Auditoría</span>
                     </a>
-                    <!-- Copias de Seguridad: destacada con badge "CRÍTICO" -->
                     <a href="#backup" class="nav-item" data-page="backup" data-critical="true">
                         <i class="bx bx-cloud-download"></i><span>Copias de Seguridad</span>
                         <span class="nav-badge" style="background:var(--exito);">Backup</span>
@@ -451,7 +461,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
             <div class="sidebar-footer">
                 <div class="user-mini" id="user-mini" role="button" tabindex="0" aria-label="Menu de usuario">
                     <div class="user-mini-avatar">
-                        <img src="assets/avatars/default.png" alt="Avatar" width="42" height="42" id="user-avatar">
+                        <img src="ipuclafonda.png" alt="Avatar" width="42" height="42" id="user-avatar" loading="lazy">
                         <span class="user-status offline" id="user-status"></span>
                         <span class="user-level" id="user-level">Lv.1</span>
                     </div>
@@ -563,7 +573,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 </div>
             </div>
 
-            <!-- ═══ PANEL DE RADIO RÁPIDO ═══ -->
+            <!-- ═══ PANEL DE RADIO ═══ -->
             <div id="radio-quick-panel" class="radio-quick-panel hidden" role="dialog" aria-label="Panel de radio">
                 <div class="radio-quick-header">
                     <h3><i class="bx bx-radio-circle-marked"></i> Radio IPUC</h3>
@@ -573,7 +583,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 </div>
                 <div class="radio-player-full">
                     <div class="radio-art">
-                        <img src="radio-art.jpg" alt="Radio IPUC" id="radio-art-img">
+                        <img src="ipuclafonda.png" alt="Radio IPUC" id="radio-art-img" loading="lazy">
                         <div class="radio-playing" id="radio-playing">Alabanzas de Adoración</div>
                         <div class="radio-artist" id="radio-artist">IPUC LA FONDA</div>
                     </div>
@@ -604,7 +614,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 </div>
             </div>
 
-            <!-- ═══ PANEL DE QR CODE ═══ -->
+            <!-- ═══ PANEL DE QR ═══ -->
             <div id="qr-panel" class="qr-panel hidden" role="dialog" aria-label="QR Code">
                 <div class="qr-header">
                     <h3><i class="bx bx-qr"></i> Compartir Iglesia</h3>
@@ -677,7 +687,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════
-         WELCOME SCREEN (Login / Registro / Invitado)
+         WELCOME SCREEN
          ═══════════════════════════════════════════════════════════════ -->
     <div id="welcome-screen" class="welcome-screen" role="main" aria-label="Pantalla de bienvenida">
         <div class="welcome-background">
@@ -697,7 +707,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
                 </div>
 
-                <!-- Versículo del día -->
                 <div class="welcome-verse-day" id="verse-day">
                     <i class="bx bx-book-reader"></i>
                     <div class="verse-content">
@@ -706,7 +715,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     </div>
                 </div>
 
-                <!-- Selector de idiomas -->
                 <div class="welcome-languages">
                     <button class="lang-btn active" data-lang="es"><i class="bx bx-globe"></i> Español</button>
                     <button class="lang-btn" data-lang="en"><i class="bx bx-globe"></i> English</button>
@@ -715,28 +723,27 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     <button class="lang-btn" data-lang="de"><i class="bx bx-globe"></i> Deutsch</button>
                 </div>
 
-                <!-- Estado del sistema -->
                 <div id="system-status" class="system-status">
                     <span id="status-icon" class="status-icon"><i class="bx bx-sync bx-spin"></i></span>
                     <span id="status-text">Verificando sistema...</span>
                 </div>
 
-                <!-- ═══ NUEVO v22.1: Login con recuperación de contraseña ═══ -->
+                <!-- ═══ Login ═══ -->
                 <div id="login-form-container" class="auth-form-container">
-                    <form id="login-form" class="auth-form" autocomplete="off">
+                    <form id="login-form" class="auth-form" autocomplete="on">
                         <div class="form-group">
                             <label for="login-email"><i class="bx bx-envelope"></i> Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-envelope"></i>
-                                <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" required>
+                                <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" required autocomplete="username">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="login-password"><i class="bx bx-lock-alt"></i> Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="login-password" class="form-input" placeholder="********" required>
-                                <button type="button" class="btn-toggle-password" id="toggle-password">
+                                <input type="password" id="login-password" class="form-input" placeholder="********" required autocomplete="current-password">
+                                <button type="button" class="btn-toggle-password" id="toggle-password" aria-label="Mostrar contraseña">
                                     <i class="bx bx-show"></i>
                                 </button>
                             </div>
@@ -745,7 +752,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                             <label for="login-2fa"><i class="bx bx-shield-alt"></i> Código de Verificación</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-shield-alt"></i>
-                                <input type="text" id="login-2fa" class="form-input" placeholder="Código de 6 dígitos" maxlength="6" pattern="[0-9]{6}">
+                                <input type="text" id="login-2fa" class="form-input" placeholder="Código de 6 dígitos" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code">
                             </div>
                             <small class="form-hint">Ingresa el código enviado a tu correo</small>
                         </div>
@@ -754,7 +761,6 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                                 <input type="checkbox" id="remember-me">
                                 <span>Recordarme</span>
                             </label>
-                            <!-- ═══ NUEVO v22.1: Enlace a recuperación con código maestro ═══ -->
                             <a href="#" id="forgot-password" class="forgot-link" data-action="recovery-code">
                                 ¿Olvidaste tu contraseña?
                             </a>
@@ -763,10 +769,18 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                             <i class="bx bx-log-in"></i> Iniciar Sesión
                         </button>
                         <p class="auth-switch">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
+
+                        <!-- ═══ v22.2: Hint de cuenta oficial (opcional) ═══ -->
+                        <!-- Descomenta si quieres mostrar el correo oficial -->
+                        <!--
+                        <p style="font-size:0.75rem;color:var(--gris-texto);text-align:center;margin-top:8px;">
+                            <i class="bx bx-crown"></i> Cuenta oficial: <strong>ipuclafonda@gmail.com</strong>
+                        </p>
+                        -->
                     </form>
                 </div>
 
-                <!-- ═══ NUEVO v22.1: Formulario de recuperación con código maestro ═══ -->
+                <!-- ═══ Recuperación ═══ -->
                 <div id="recovery-form-container" class="auth-form-container hidden">
                     <form id="recovery-form" class="auth-form" autocomplete="off">
                         <div style="text-align:center;margin-bottom:16px;">
@@ -780,7 +794,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                             <label for="recovery-code"><i class="bx bx-key"></i> Código Maestro</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-key"></i>
-                                <input type="text" id="recovery-code" class="form-input" placeholder="LF-2026-XXXX-XXXX" required>
+                                <input type="text" id="recovery-code" class="form-input" placeholder="LF-2026-XXXX-XXXX" required autocomplete="off">
                             </div>
                             <small class="form-hint">Ejemplo: LF-2026-A3X9-K2P7</small>
                         </div>
@@ -788,14 +802,14 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                             <label for="recovery-new-password"><i class="bx bx-lock-alt"></i> Nueva Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="recovery-new-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+                                <input type="password" id="recovery-new-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="recovery-confirm-password"><i class="bx bx-lock-alt"></i> Confirmar Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="recovery-confirm-password" class="form-input" placeholder="Repite la contraseña" required minlength="8">
+                                <input type="password" id="recovery-confirm-password" class="form-input" placeholder="Repite la contraseña" required minlength="8" autocomplete="new-password">
                             </div>
                         </div>
                         <button type="submit" class="btn-primary btn-lg btn-block">
@@ -805,28 +819,28 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     </form>
                 </div>
 
-                <!-- ═══ NUEVO v22.1: Formulario de registro mejorado ═══ -->
+                <!-- ═══ Registro ═══ -->
                 <div id="register-form-container" class="auth-form-container hidden">
                     <form id="register-form" class="auth-form" autocomplete="off">
                         <div class="form-group">
                             <label for="reg-nombre"><i class="bx bx-user"></i> Nombre Completo</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-user"></i>
-                                <input type="text" id="reg-nombre" class="form-input" placeholder="Tu nombre" required>
+                                <input type="text" id="reg-nombre" class="form-input" placeholder="Tu nombre" required autocomplete="name">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="reg-email"><i class="bx bx-envelope"></i> Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-envelope"></i>
-                                <input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com" required>
+                                <input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com" required autocomplete="email">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="reg-password"><i class="bx bx-lock-alt"></i> Contraseña</label>
                             <div class="input-wrapper">
                                 <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+                                <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
                             </div>
                         </div>
                         <div class="form-group">
@@ -846,8 +860,8 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                         <div class="form-group">
                             <div class="captcha-container">
                                 <span id="captcha-text" class="captcha-text">A1B2C3</span>
-                                <button type="button" id="captcha-refresh" class="btn-icon"><i class="bx bx-refresh"></i></button>
-                                <input type="text" id="captcha-input" class="form-input" placeholder="Ingresa el código" required>
+                                <button type="button" id="captcha-refresh" class="btn-icon" aria-label="Refrescar captcha"><i class="bx bx-refresh"></i></button>
+                                <input type="text" id="captcha-input" class="form-input" placeholder="Ingresa el código" required autocomplete="off">
                             </div>
                         </div>
                         <button type="submit" class="btn-primary btn-lg btn-block">
@@ -882,14 +896,14 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 </div>
 
                 <div class="welcome-footer">
-                    <p class="welcome-version">v22.1 PRO ULTIMATE &copy; 2026 IPUC LA FONDA</p>
+                    <p class="welcome-version">v22.2 PRO PREMIUM &copy; 2026 IPUC LA FONDA</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════
-         SECCIÓN CREAR ADMINISTRADOR
+         CREAR ADMINISTRADOR
          ═══════════════════════════════════════════════════════════════ -->
     <div id="create-admin-section" class="create-admin-section hidden">
         <div class="create-admin-card" data-aos="zoom-in" data-aos-duration="800">
@@ -897,7 +911,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 <i class="bx bx-arrow-back"></i> Volver
             </button>
             <div class="header">
-                <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="logo-img" width="80" height="80">
+                <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="logo-img" width="80" height="80" loading="lazy">
                 <h2>IPUC LA FONDA</h2>
                 <p class="subtitle">Configuración del Primer Administrador</p>
                 <p class="subtitle-info">Este será el administrador principal del sistema</p>
@@ -911,20 +925,20 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="admin-nombre">Nombre *</label>
-                            <input type="text" class="form-input" id="admin-nombre" name="nombre" placeholder="LUIS ESTEBAN" required>
+                            <input type="text" class="form-input" id="admin-nombre" name="nombre" placeholder="LUIS ESTEBAN" required autocomplete="given-name">
                         </div>
                         <div class="form-group">
                             <label for="admin-apellidos">Apellidos *</label>
-                            <input type="text" class="form-input" id="admin-apellidos" name="apellidos" placeholder="POTOSI VENTE" required>
+                            <input type="text" class="form-input" id="admin-apellidos" name="apellidos" placeholder="POTOSI VENTE" required autocomplete="family-name">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="admin-correo">Correo Electrónico *</label>
-                        <input type="email" class="form-input" id="admin-correo" name="correo" placeholder="correo@ejemplo.com" required>
+                        <input type="email" class="form-input" id="admin-correo" name="correo" placeholder="correo@ejemplo.com" required autocomplete="email">
                     </div>
                     <div class="form-group">
                         <label for="admin-celular">Celular</label>
-                        <input type="tel" class="form-input" id="admin-celular" name="celular" placeholder="3128813818">
+                        <input type="tel" class="form-input" id="admin-celular" name="celular" placeholder="3128813818" autocomplete="tel">
                     </div>
                 </div>
 
@@ -934,11 +948,11 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     </div>
                     <div class="form-group">
                         <label for="admin-usuario">Usuario *</label>
-                        <input type="text" class="form-input" id="admin-usuario" name="usuario" placeholder="admin" required>
+                        <input type="text" class="form-input" id="admin-usuario" name="usuario" placeholder="admin" required autocomplete="username">
                     </div>
                     <div class="form-group">
                         <label for="admin-password">Contraseña *</label>
-                        <input type="password" class="form-input" id="admin-password" name="password" placeholder="Mínimo 8 caracteres" required minlength="8">
+                        <input type="password" class="form-input" id="admin-password" name="password" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
                         <div class="password-strength" id="password-strength">
                             <span class="strength-bar"></span>
                             <span class="strength-bar"></span>
@@ -950,7 +964,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                     </div>
                     <div class="form-group">
                         <label for="admin-confirmar-password">Confirmar Contraseña *</label>
-                        <input type="password" class="form-input" id="admin-confirmar-password" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="8">
+                        <input type="password" class="form-input" id="admin-confirmar-password" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="8" autocomplete="new-password">
                     </div>
                 </div>
 
@@ -966,7 +980,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
          MODALES
          ═══════════════════════════════════════════════════════════════ -->
 
-    <!-- ═══ NUEVO v22.1: MODAL DE CÓDIGO MAESTRO DE RECUPERACIÓN ═══ -->
+    <!-- ═══ MODAL CÓDIGO MAESTRO ═══ -->
     <div id="master-code-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="master-code-title">
         <div class="modal-backdrop"></div>
         <div class="modal-container" data-aos="zoom-in" data-aos-duration="500">
@@ -985,14 +999,14 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                         <strong>Guárdalo en un lugar seguro</strong> (papel, gestor de contraseñas, correo).
                     </p>
                 </div>
-                <div id="master-code-display" style="padding:20px;background:var(--gris-claro);border-radius:var(--borde-radius-sm);text-align:center;font-family:'Courier New',monospace;font-size:1.4rem;font-weight:700;letter-spacing:2px;color:var(--azul-primario);user-select:all;cursor:pointer;border:2px dashed var(--dorado);">
+                <div id="master-code-display" style="padding:20px;background:var(--gris-claro);border-radius:var(--borde-radius-sm);text-align:center;font-family:'Courier New',monospace;font-size:1.4rem;font-weight:700;letter-spacing:2px;color:var(--azul-primario);user-select:all;cursor:pointer;border:2px dashed var(--dorado);word-break:break-all;">
                     LF-2026-XXXX-XXXX
                 </div>
-                <div style="display:flex;gap:8px;margin-top:16px;">
-                    <button class="btn-primary" id="btn-copy-master-code" style="flex:1;">
+                <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+                    <button class="btn-primary" id="btn-copy-master-code" style="flex:1;min-width:140px;">
                         <i class="bx bx-copy"></i> Copiar
                     </button>
-                    <button class="btn-secondary" id="btn-download-master-code" style="flex:1;">
+                    <button class="btn-secondary" id="btn-download-master-code" style="flex:1;min-width:140px;">
                         <i class="bx bx-download"></i> Descargar .txt
                     </button>
                 </div>
@@ -1152,7 +1166,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
         </div>
     </div>
 
-    <!-- ═══ PANEL DE NOTIFICACIONES ═══ -->
+    <!-- ═══ NOTIFICACIONES ═══ -->
     <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-label="Panel de notificaciones">
         <div class="notification-header">
             <h3><i class="bx bx-bell"></i> Notificaciones</h3>
@@ -1319,7 +1333,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
         </div>
     </div>
 
-    <!-- ═══ NUEVO v22.1: MODAL DE CONFIRMACIÓN DE RESTAURACIÓN ═══ -->
+    <!-- ═══ MODAL CONFIRMACIÓN RESTAURACIÓN ═══ -->
     <div id="restore-confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal-backdrop"></div>
         <div class="modal-container modal-sm" data-aos="zoom-in" data-aos-duration="400">
@@ -1492,70 +1506,79 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-    <!-- Script inline: inicialización de librerías y utilidades visuales -->
+    <!-- Script inline: inicialización de librerías visuales -->
     <script>
-        AOS.init({
-            once: true,
-            offset: 50,
-            duration: 800
-        });
+        // Inicializar AOS (animaciones)
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                once: true,
+                offset: 50,
+                duration: 800
+            });
+        }
 
-        // QR Code
+        // Generar QR Code (si existe el contenedor y la librería)
         document.addEventListener('DOMContentLoaded', function() {
             const qrContainer = document.getElementById('qr-code');
-            if (qrContainer) {
-                new QRCode(qrContainer, {
-                    text: 'https://ipuclafonda.netlify.app/',
-                    width: 150,
-                    height: 150,
-                    colorDark: '#1a237e',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.H
-                });
+            if (qrContainer && typeof QRCode !== 'undefined') {
+                try {
+                    new QRCode(qrContainer, {
+                        text: 'https://ipuclafonda.netlify.app/',
+                        width: 150,
+                        height: 150,
+                        colorDark: '#1a237e',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } catch (e) {
+                    console.warn('QR no generado:', e);
+                }
             }
         });
     </script>
 
-    <!-- ═══ NUEVO v22.1: Orden correcto de scripts ═══ -->
-    <script src="database.js"></script>
-    <script src="storage.js"></script>   <!-- NUEVO: Sistema de respaldo y recuperación -->
-    <script src="app.js"></script>
-    <script src="script.js"></script>
+    <!-- ═══ v22.2: Orden correcto de scripts (con cache-busting) ═══ -->
+    <script src="database.js?v=22.2"></script>
+    <script src="storage.js?v=22.2"></script>
+    <script src="script.js?v=22.2"></script>
 
     <!-- Service Worker y utilidades finales -->
     <script>
-        // Registro del Service Worker
+        // ═══ Registro del Service Worker ═══
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function(reg) {
-                        console.log('✅ Service Worker registrado');
+                        console.log('✅ Service Worker registrado:', reg.scope);
                     })
                     .catch(function(err) {
-                        console.log('⚠️ SW error:', err);
+                        console.warn('⚠️ SW error:', err);
                     });
             });
         }
 
-        // Detección de modo PWA
+        // ═══ Detección de modo PWA (standalone) ═══
         if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
             document.body.classList.add('pwa-mode');
         }
 
-        // Fecha actual en el header
+        // ═══ Fecha actual en el header ═══
         document.addEventListener('DOMContentLoaded', function() {
             const dateElement = document.getElementById('header-date');
             if (dateElement) {
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const today = new Date().toLocaleDateString('es-CO', options);
-                dateElement.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+                try {
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    const today = new Date().toLocaleDateString('es-CO', options);
+                    dateElement.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+                } catch (e) {}
             }
 
-            // Toggle password
+            // ═══ Toggle de contraseña en login ═══
             const togglePassword = document.getElementById('toggle-password');
             if (togglePassword) {
                 togglePassword.addEventListener('click', function() {
                     const passwordInput = document.getElementById('login-password');
+                    if (!passwordInput) return;
                     if (passwordInput.type === 'password') {
                         passwordInput.type = 'text';
                         this.querySelector('i').className = 'bx bx-hide';
@@ -1567,16 +1590,18 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
             }
         });
 
-        // ═══ NUEVO v22.1: Manejo de recuperación con código maestro ═══
+        // ═══ v22.2: Manejo de recuperación con código maestro ═══
         document.addEventListener('DOMContentLoaded', function() {
             const forgotLink = document.getElementById('forgot-password');
             const recoveryContainer = document.getElementById('recovery-form-container');
             const loginContainer = document.getElementById('login-form-container');
+            const registerContainer = document.getElementById('register-form-container');
             const backToLogin = document.getElementById('back-to-login-from-recovery');
 
             if (forgotLink && recoveryContainer && loginContainer) {
                 forgotLink.addEventListener('click', function(e) {
                     e.preventDefault();
+                    if (registerContainer) registerContainer.classList.add('hidden');
                     loginContainer.classList.add('hidden');
                     recoveryContainer.classList.remove('hidden');
                 });
@@ -1590,7 +1615,7 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 });
             }
 
-            // Formulario de recuperación
+            // Formulario de recuperación con código maestro
             const recoveryForm = document.getElementById('recovery-form');
             if (recoveryForm) {
                 recoveryForm.addEventListener('submit', function(e) {
@@ -1604,7 +1629,12 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                         return;
                     }
 
-                    if (window.Storage) {
+                    if (pass1.length < 8) {
+                        if (window.showToast) showToast('La contraseña debe tener al menos 8 caracteres', 'error');
+                        return;
+                    }
+
+                    if (window.Storage && typeof window.Storage.resetearPasswordConCodigo === 'function') {
                         const r = window.Storage.resetearPasswordConCodigo(codigo, pass1);
                         if (r.success) {
                             if (window.showToast) showToast('✅ Cuenta recuperada. Ya puedes iniciar sesión.', 'success');
@@ -1620,6 +1650,47 @@ RESPALDO AUTOMÁTICO Y RECUPERACIÓN DE CUENTA
                 });
             }
         });
+
+        // ═══ v22.2: File Handlers (abrir .json de respaldo) ═══
+        if ('launchQueue' in window && typeof window.launchQueue !== 'undefined') {
+            try {
+                window.launchQueue.setConsumer(async (launchParams) => {
+                    if (!launchParams || !launchParams.files || launchParams.files.length === 0) return;
+
+                    console.log('📂 Archivo detectado desde el sistema:', launchParams.files.length);
+
+                    const fileHandle = launchParams.files[0];
+                    try {
+                        const file = await fileHandle.getFile();
+
+                        // Esperar a que Storage esté listo
+                        setTimeout(async () => {
+                            if (window.Storage && typeof window.Storage.importarRespaldoDesdeArchivo === 'function') {
+                                const confirmar = confirm(
+                                    '📂 Se detectó un archivo de respaldo.\n\n' +
+                                    '¿Quieres restaurarlo? Se reemplazarán los datos actuales.'
+                                );
+                                if (confirmar) {
+                                    const r = await window.Storage.importarRespaldoDesdeArchivo(file);
+                                    if (r.success) {
+                                        if (window.showToast) showToast('✅ Respaldo restaurado. Recargando...', 'success');
+                                        setTimeout(() => location.reload(), 1500);
+                                    } else {
+                                        if (window.showToast) showToast('❌ Error: ' + r.error, 'error');
+                                    }
+                                }
+                            } else {
+                                console.warn('⚠️ Storage no disponible para importar el archivo');
+                            }
+                        }, 1500);
+                    } catch (err) {
+                        console.warn('Error leyendo el archivo:', err);
+                    }
+                });
+            } catch (e) {
+                console.warn('launchQueue no soportado:', e);
+            }
+        }
     </script>
 </body>
 </html>
