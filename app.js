@@ -1,12 +1,12 @@
 /* ============================================
-   IPUC LA FONDA - app.js v22.0 PRO ULTIMATE
+   IPUC LA FONDA - app.js v22.1 PRO ULTIMATE
    Funciones helper para la aplicación
    Incluye: Radio, Streaming, Gamificación, Logros, Asistente
-   VERSION CORREGIDA - SIN ERRORES - COMPLETA
+   + Respaldo, Papelera, Snapshots y Recuperación
    "Donde el Espíritu Santo se mueve"
    ============================================ */
 
-const VERSION = "22.0";
+const VERSION = "22.1";
 const VERSION_NAME = "PRO ULTIMATE";
 
 // ============================================
@@ -20,6 +20,20 @@ function getDB() {
 
 function isValidDB() {
     return getDB() !== null;
+}
+
+function getStorage() {
+    if (typeof window !== 'undefined' && window.Storage) return window.Storage;
+    return null;
+}
+
+// ═══ v22.1: Helper para mostrar toasts desde cualquier función ═══
+function _notificar(mensaje, tipo = 'info') {
+    if (typeof window.showToast === 'function') {
+        window.showToast(mensaje, tipo);
+    } else {
+        console.log(`[${tipo.toUpperCase()}] ${mensaje}`);
+    }
 }
 
 // ============================================
@@ -64,14 +78,14 @@ function verificarSesion() {
         const token = localStorage.getItem('ipuc20_token');
         const udata = localStorage.getItem('ipuc20_usuario');
         const rol = localStorage.getItem('ipuc20_rol');
-        
+
         if (!token || !udata) return { success: false };
-        
-        return { 
-            success: true, 
-            usuario: JSON.parse(udata), 
-            rol: rol, 
-            token: token 
+
+        return {
+            success: true,
+            usuario: JSON.parse(udata),
+            rol: rol,
+            token: token
         };
     } catch (e) {
         return { success: false };
@@ -162,9 +176,9 @@ function obtenerProximoCulto() {
         const diasHastaDomingo = (7 - ahora.getDay()) % 7 || 7;
         domingo.setDate(ahora.getDate() + diasHastaDomingo);
         domingo.setHours(10, 0, 0, 0);
-        
+
         const diff = Math.max(0, Math.floor((domingo - ahora) / 1000));
-        
+
         return {
             nombre: 'Culto Dominical',
             dia: 'Domingo',
@@ -177,10 +191,10 @@ function obtenerProximoCulto() {
             horas_restantes: Math.floor((diff % 86400) / 3600)
         };
     } catch (e) {
-        return { 
-            mensaje: 'Error', 
-            estado: 'error', 
-            segundos_restantes: 0 
+        return {
+            mensaje: 'Error',
+            estado: 'error',
+            segundos_restantes: 0
         };
     }
 }
@@ -223,10 +237,10 @@ function buscarVersiculos(query) {
     try {
         const versiculos = obtenerVersiculos();
         if (!query || !query.trim()) return versiculos;
-        
+
         const q = query.trim().toLowerCase();
-        return versiculos.filter(v => 
-            (v.texto && v.texto.toLowerCase().includes(q)) || 
+        return versiculos.filter(v =>
+            (v.texto && v.texto.toLowerCase().includes(q)) ||
             (v.referencia && v.referencia.toLowerCase().includes(q))
         );
     } catch (e) {
@@ -260,6 +274,11 @@ function crearNoticia(datos) {
 
 function eliminarNoticia(id) {
     try {
+        // ═══ v22.1: Usar papelera ═══
+        const storage = getStorage();
+        if (storage) {
+            return storage.eliminarConRespaldo('noticias', id, 'Admin');
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.eliminar('noticias', id);
@@ -296,6 +315,11 @@ function obtenerEventosProximos(limit = 10) {
 
 function crearEvento(datos) {
     try {
+        // ═══ v22.1: Persistir también en APP_STATE si existe ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirEvento === 'function') {
+            return storage.persistirEvento(datos);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addEvento(datos);
@@ -306,6 +330,11 @@ function crearEvento(datos) {
 
 function eliminarEvento(id) {
     try {
+        // ═══ v22.1: Usar papelera (recuperable 30 días) ═══
+        const storage = getStorage();
+        if (storage) {
+            return storage.eliminarConRespaldo('eventos', id, 'Admin');
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.eliminarEvento(id);
@@ -330,6 +359,11 @@ function obtenerOraciones() {
 
 function crearOracion(datos) {
     try {
+        // ═══ v22.1: Persistir en DB + APP_STATE ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirOracion === 'function') {
+            return storage.persistirOracion(datos);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addOracion(datos);
@@ -360,6 +394,11 @@ function obtenerPeticiones() {
 
 function crearPeticion(datos) {
     try {
+        // ═══ v22.1: Persistir en DB + APP_STATE ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirPeticion === 'function') {
+            return storage.persistirPeticion(datos);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addPeticion(datos);
@@ -394,6 +433,11 @@ function obtenerBendiciones() {
 
 function crearBendicion(datos) {
     try {
+        // ═══ v22.1: Persistir en DB + APP_STATE ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirBendicion === 'function') {
+            return storage.persistirBendicion(datos);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addBendicion(datos);
@@ -439,6 +483,11 @@ function obtenerPublicaciones(limit = 50) {
 
 function crearPublicacion(datos) {
     try {
+        // ═══ v22.1: Persistir en DB + APP_STATE ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirPublicacion === 'function') {
+            return storage.persistirPublicacion(datos);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addPublicacion(datos);
@@ -493,6 +542,17 @@ function obtenerMensajes(limit = 50) {
 
 function enviarMensaje(datos) {
     try {
+        // ═══ v22.1: Persistir en DB + APP_STATE ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirMensajeChat === 'function') {
+            // Adaptar nombre de campo si viene como "usuario" (como en db)
+            const datosAdaptados = {
+                autor: datos.usuario || datos.autor,
+                mensaje: datos.mensaje,
+                usuario_id: datos.usuario_id || 0
+            };
+            return storage.persistirMensajeChat(datosAdaptados);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addMensaje(datos);
@@ -591,6 +651,11 @@ function cambiarEstadoReporte(id, estado, admin = 'Admin', comentario = '') {
 
 function eliminarReporte(id) {
     try {
+        // ═══ v22.1: Usar papelera ═══
+        const storage = getStorage();
+        if (storage) {
+            return storage.eliminarConRespaldo('reportes', id, 'Admin');
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.deleteReporte(id);
@@ -670,7 +735,7 @@ function obtenerTransmisiones() {
 function obtenerTransmisionActiva() {
     try {
         const transmisiones = obtenerTransmisiones();
-        return transmisiones.find(t => 
+        return transmisiones.find(t =>
             t.estado === 'activa' || t.estado === 'en_vivo'
         ) || null;
     } catch (e) {
@@ -758,6 +823,11 @@ function obtenerDiarioEspiritual(usuarioId = null) {
 
 function agregarEntradaDiario(datos) {
     try {
+        // ═══ v22.1: Persistir en DB + APP_STATE ═══
+        const storage = getStorage();
+        if (storage && typeof storage.persistirEntradaDiario === 'function') {
+            return storage.persistirEntradaDiario(datos);
+        }
         const db = getDB();
         if (!db) return { success: false };
         return db.addEntradaDiario(datos);
@@ -1018,7 +1088,23 @@ function registrarDonacion(datos) {
     try {
         const db = getDB();
         if (!db) return { success: false };
-        return db.addDonacion(datos);
+        const r = db.addDonacion(datos);
+
+        // ═══ v22.1: Notificar y actualizar estado si es exitoso ═══
+        if (r.success) {
+            _notificar('Donación registrada. ¡Dios te bendiga!', 'success');
+
+            // Desbloquear logro "generous" si es la primera donación
+            if (typeof window.desbloquearLogro === 'function' && datos.usuario_id) {
+                window.desbloquearLogro(datos.usuario_id, 'generous', {
+                    nombre: 'Corazón Generoso',
+                    descripcion: 'Realizaste tu primera donación',
+                    icono: '💝',
+                    xp: 30
+                });
+            }
+        }
+        return r;
     } catch (e) {
         return { success: false };
     }
@@ -1046,11 +1132,11 @@ function toggleFavorito(usuarioId, itemId, tipo) {
         if (!db) return { success: false };
         const favoritos = db.cargar('favoritos');
         if (!favoritos.favoritos) favoritos.favoritos = [];
-        
-        const existente = favoritos.favoritos.find(f => 
+
+        const existente = favoritos.favoritos.find(f =>
             f.usuario_id === usuarioId && f.item_id === itemId && f.tipo === tipo
         );
-        
+
         if (existente) {
             favoritos.favoritos = favoritos.favoritos.filter(f => f.id !== existente.id);
         } else {
@@ -1062,7 +1148,7 @@ function toggleFavorito(usuarioId, itemId, tipo) {
                 fecha: new Date().toISOString()
             });
         }
-        
+
         db.guardar('favoritos', favoritos);
         return { success: true, esFavorito: !existente };
     } catch (e) {
@@ -1088,7 +1174,7 @@ function crearMeta(datos) {
         if (!db) return { success: false };
         const metas = db.cargar('metas');
         if (!metas.metas) metas.metas = [];
-        
+
         metas.metas.push({
             id: db._generateId(),
             usuario_id: datos.usuario_id,
@@ -1098,7 +1184,7 @@ function crearMeta(datos) {
             estado: 'pendiente',
             fecha_creacion: new Date().toISOString()
         });
-        
+
         db.guardar('metas', metas);
         return { success: true };
     } catch (e) {
@@ -1175,14 +1261,320 @@ function obtenerLogs(limit = 50) {
 }
 
 // ============================================
-// EXPORTACIÓN E IMPORTACIÓN
+// ═══ v22.1: PAPELERA (soft delete) ═══
+// ============================================
+
+/**
+ * Elimina un registro moviéndolo a la papelera (recuperable 30 días).
+ * @param {string} coleccion - Nombre de la colección
+ * @param {string|number} id - ID del registro
+ * @param {string} usuario - Quién elimina
+ */
+function eliminarConRespaldo(coleccion, id, usuario = 'Sistema') {
+    const storage = getStorage();
+    if (!storage) {
+        _notificar('Módulo de papelera no disponible', 'error');
+        return { success: false, error: 'Storage no disponible' };
+    }
+    return storage.eliminarConRespaldo(coleccion, id, usuario);
+}
+
+/**
+ * Lista todos los registros en la papelera.
+ */
+function listarPapelera() {
+    const storage = getStorage();
+    if (!storage) return [];
+    return storage.listarPapelera();
+}
+
+/**
+ * Restaura un registro de la papelera a su colección original.
+ */
+function restaurarDePapelera(idPapelera) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.restaurarDePapelera(idPapelera);
+}
+
+/**
+ * Vacía la papelera completamente (IRREVERSIBLE).
+ */
+function vaciarPapelera() {
+    const storage = getStorage();
+    if (!storage) return { success: false };
+    return storage.vaciarPapelera();
+}
+
+/**
+ * Purga de la papelera los registros con más de 30 días.
+ */
+function purgarPapeleraVieja() {
+    const storage = getStorage();
+    if (!storage) return { purgados: 0 };
+    return storage.purgarPapeleraVieja();
+}
+
+// ============================================
+// ═══ v22.1: SNAPSHOTS (Puntos de Restauración) ═══
+// ============================================
+
+/**
+ * Crea un snapshot completo del estado actual en IndexedDB.
+ * @param {string} nombre - Nombre descriptivo del snapshot
+ */
+async function crearSnapshot(nombre = null) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.crearSnapshot(nombre);
+}
+
+/**
+ * Lista los snapshots existentes.
+ */
+async function listarSnapshots() {
+    const storage = getStorage();
+    if (!storage) return [];
+    return storage.listarSnapshots();
+}
+
+/**
+ * Restaura un snapshot específico por ID.
+ */
+async function restaurarSnapshot(id) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.restaurarSnapshot(id);
+}
+
+/**
+ * Elimina un snapshot por ID.
+ */
+async function eliminarSnapshot(id) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.eliminarSnapshot(id);
+}
+
+// ============================================
+// ═══ v22.1: CÓDIGO MAESTRO DE RECUPERACIÓN ═══
+// ============================================
+
+/**
+ * Genera un código maestro único tipo LF-2026-XXXX-XXXX.
+ */
+function generarCodigoMaestro() {
+    const storage = getStorage();
+    if (!storage) return null;
+    return storage.generarCodigoMaestro();
+}
+
+/**
+ * Obtiene el código maestro actual.
+ */
+function obtenerCodigoMaestro() {
+    const storage = getStorage();
+    if (!storage) return null;
+    return storage.obtenerCodigoMaestro();
+}
+
+/**
+ * Valida un código maestro contra el guardado.
+ */
+function validarCodigoMaestro(codigo) {
+    const storage = getStorage();
+    if (!storage) return false;
+    return storage.validarCodigoMaestro(codigo);
+}
+
+/**
+ * Resetea la contraseña del primer admin usando el código maestro.
+ * @param {string} codigo - Código maestro
+ * @param {string} nuevaPass - Nueva contraseña (mín 8 caracteres)
+ */
+function resetearPasswordConCodigo(codigo, nuevaPass) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.resetearPasswordConCodigo(codigo, nuevaPass);
+}
+
+// ============================================
+// ═══ v22.1: RESPALDO MANUAL ═══
+// ============================================
+
+/**
+ * Descarga un respaldo completo en formato .json.
+ */
+function descargarRespaldo() {
+    const storage = getStorage();
+    if (!storage) {
+        _notificar('Módulo de respaldo no disponible', 'error');
+        return { success: false, error: 'Storage no disponible' };
+    }
+    return storage.descargarRespaldo();
+}
+
+/**
+ * Importa un respaldo desde un archivo .json.
+ * @param {File} archivo - Archivo JSON del respaldo
+ */
+async function importarRespaldoDesdeArchivo(archivo) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.importarRespaldoDesdeArchivo(archivo);
+}
+
+/**
+ * Devuelve el estado actual de los respaldos.
+ */
+function estadoRespaldos() {
+    const storage = getStorage();
+    if (!storage) return {};
+    return storage.estadoRespaldos();
+}
+
+/**
+ * Devuelve el estado completo del sistema para el panel de backup.
+ */
+function obtenerEstadoSistema() {
+    const db = getDB();
+    if (!db) return {};
+    if (typeof db.getEstadoSistema === 'function') {
+        return db.getEstadoSistema();
+    }
+    return {};
+}
+
+/**
+ * Verifica la integridad de la base de datos.
+ */
+function verificarIntegridad() {
+    const db = getDB();
+    if (!db) return { valido: false, errores: ['DB no disponible'] };
+    if (typeof db.verificarIntegridad === 'function') {
+        return db.verificarIntegridad();
+    }
+    return { valido: true, errores: [], advertencias: [] };
+}
+
+// ============================================
+// ═══ v22.1: SINCRONIZACIÓN APP_STATE ═══
+// ============================================
+
+/**
+ * Sincroniza el estado global con la base de datos persistente.
+ * Llamar al iniciar sesión o al cargar la app.
+ */
+function sincronizarAppState() {
+    const storage = getStorage();
+    if (!storage) {
+        _notificar('Storage no disponible para sincronizar', 'warning');
+        return { success: false };
+    }
+    try {
+        storage.sincronizarAppState();
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+}
+
+/**
+ * Inicializa Storage (llamar después de que DOM esté listo).
+ */
+function inicializarStorage() {
+    if (!window.Storage || !window.db) {
+        console.warn('⚠️ Storage o DB no disponibles');
+        return;
+    }
+    try {
+        window.Storage.sincronizarAppState();
+        console.log('✅ Storage inicializado y APP_STATE sincronizado');
+    } catch (e) {
+        console.error('❌ Error inicializando Storage:', e);
+    }
+}
+
+/**
+ * Diagnóstico completo del sistema.
+ */
+function diagnostico() {
+    const storage = getStorage();
+    if (!storage) return { error: 'Storage no disponible' };
+    if (typeof storage.diagnostico === 'function') {
+        return storage.diagnostico();
+    }
+    return {
+        version: VERSION + ' ' + VERSION_NAME,
+        db: !!getDB(),
+        storage: !!storage,
+        indexedDB: 'indexedDB' in window,
+        timestamp: new Date().toISOString()
+    };
+}
+
+// ============================================
+// ═══ v22.1: PERSISTENCIA DIRECTA (PUENTE) ═══
+// ============================================
+
+function persistirPublicacion(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirPublicacion(datos);
+}
+
+function persistirPeticion(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirPeticion(datos);
+}
+
+function persistirOracion(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirOracion(datos);
+}
+
+function persistirBendicion(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirBendicion(datos);
+}
+
+function persistirMensajeChat(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirMensajeChat(datos);
+}
+
+function persistirEntradaDiario(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirEntradaDiario(datos);
+}
+
+function persistirEvento(datos) {
+    const storage = getStorage();
+    if (!storage) return { success: false, error: 'Storage no disponible' };
+    return storage.persistirEvento(datos);
+}
+
+// ============================================
+// EXPORTACIÓN E IMPORTACIÓN (JSON completo)
 // ============================================
 
 function exportarDatos() {
     try {
         const db = getDB();
         if (!db) return { success: false };
-        
+
+        // ═══ v22.1: Usar Storage si está disponible (mejor metadata) ═══
+        const storage = getStorage();
+        if (storage) {
+            return storage.descargarRespaldo();
+        }
+
+        // Fallback a exportación directa
         const datos = db.exportarTodo();
         const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -1193,7 +1585,7 @@ function exportarDatos() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         return { success: true, message: 'Datos exportados' };
     } catch (e) {
         return { success: false, error: 'Error al exportar' };
@@ -1208,7 +1600,15 @@ function importarDatos(archivo) {
                 resolve({ success: false, error: 'Base de datos no disponible' });
                 return;
             }
-            
+
+            // ═══ v22.1: Usar Storage si está disponible ═══
+            const storage = getStorage();
+            if (storage) {
+                storage.importarRespaldoDesdeArchivo(archivo).then(resolve);
+                return;
+            }
+
+            // Fallback a importación directa
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -1246,7 +1646,7 @@ function formatearFecha(fecha) {
     try {
         const d = new Date(fecha);
         if (isNaN(d.getTime())) return 'Fecha inválida';
-        
+
         return d.toLocaleDateString('es-CO', {
             day: 'numeric',
             month: 'short',
@@ -1263,7 +1663,7 @@ function formatearFechaCorta(fecha) {
     try {
         const d = new Date(fecha);
         if (isNaN(d.getTime())) return 'Fecha inválida';
-        
+
         return d.toLocaleDateString('es-CO', {
             day: 'numeric',
             month: 'short',
@@ -1321,6 +1721,7 @@ window.VERSION_NAME = VERSION_NAME;
 // Base de datos
 window.getDB = getDB;
 window.isValidDB = isValidDB;
+window.getStorage = getStorage;
 
 // Autenticación
 window.login = login;
@@ -1472,6 +1873,46 @@ window.obtenerEstadisticas = obtenerEstadisticas;
 window.obtenerConfiguracion = obtenerConfiguracion;
 window.obtenerConfiguracionIglesia = obtenerConfiguracionIglesia;
 window.obtenerLogs = obtenerLogs;
+window.obtenerEstadoSistema = obtenerEstadoSistema;
+window.verificarIntegridad = verificarIntegridad;
+
+// ═══ v22.1: PAPELERA ═══
+window.eliminarConRespaldo = eliminarConRespaldo;
+window.listarPapelera = listarPapelera;
+window.restaurarDePapelera = restaurarDePapelera;
+window.vaciarPapelera = vaciarPapelera;
+window.purgarPapeleraVieja = purgarPapeleraVieja;
+
+// ═══ v22.1: SNAPSHOTS ═══
+window.crearSnapshot = crearSnapshot;
+window.listarSnapshots = listarSnapshots;
+window.restaurarSnapshot = restaurarSnapshot;
+window.eliminarSnapshot = eliminarSnapshot;
+
+// ═══ v22.1: CÓDIGO MAESTRO ═══
+window.generarCodigoMaestro = generarCodigoMaestro;
+window.obtenerCodigoMaestro = obtenerCodigoMaestro;
+window.validarCodigoMaestro = validarCodigoMaestro;
+window.resetearPasswordConCodigo = resetearPasswordConCodigo;
+
+// ═══ v22.1: RESPALDO MANUAL ═══
+window.descargarRespaldo = descargarRespaldo;
+window.importarRespaldoDesdeArchivo = importarRespaldoDesdeArchivo;
+window.estadoRespaldos = estadoRespaldos;
+
+// ═══ v22.1: SINCRONIZACIÓN ═══
+window.sincronizarAppState = sincronizarAppState;
+window.inicializarStorage = inicializarStorage;
+window.diagnostico = diagnostico;
+
+// ═══ v22.1: PERSISTENCIA DIRECTA ═══
+window.persistirPublicacion = persistirPublicacion;
+window.persistirPeticion = persistirPeticion;
+window.persistirOracion = persistirOracion;
+window.persistirBendicion = persistirBendicion;
+window.persistirMensajeChat = persistirMensajeChat;
+window.persistirEntradaDiario = persistirEntradaDiario;
+window.persistirEvento = persistirEvento;
 
 // Exportación
 window.exportarDatos = exportarDatos;
@@ -1488,19 +1929,22 @@ window.esValidoEmail = esValidoEmail;
 window.esValidoTelefono = esValidoTelefono;
 
 console.log('IPUC LA FONDA v' + VERSION + ' ' + VERSION_NAME + ' - Helper Functions cargadas');
-console.log(Object.keys(window).filter(k => 
+console.log(Object.keys(window).filter(k =>
     typeof window[k] === 'function' && k.startsWith('obtener')
 ).length + ' funciones de consulta disponibles');
-console.log(Object.keys(window).filter(k => 
+console.log(Object.keys(window).filter(k =>
     typeof window[k] === 'function' && (k.includes('Logro') || k.includes('XP') || k.includes('Ranking'))
 ).length + ' funciones de gamificación');
-console.log(Object.keys(window).filter(k => 
+console.log(Object.keys(window).filter(k =>
     typeof window[k] === 'function' && (k.includes('Radio') || k.includes('Streaming'))
 ).length + ' funciones multimedia');
+console.log(Object.keys(window).filter(k =>
+    typeof window[k] === 'function' && (k.includes('Papelera') || k.includes('Snapshot') || k.includes('Respaldo') || k.includes('CodigoMaestro'))
+).length + ' funciones de respaldo y recuperación');
 console.log('Todas las funciones definidas correctamente');
 
 /* ============================================
-   FINAL DEL APP.JS v22.0 PRO ULTIMATE
+   FINAL DEL APP.JS v22.1 PRO ULTIMATE
    IPUC LA FONDA - International Pentecostal Church
    "Donde el Espíritu Santo se mueve"
    ============================================ */
