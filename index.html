@@ -1,1597 +1,516 @@
 <!DOCTYPE html>
 <!-- ============================================
-IPUC LA FONDA v22.3 PRO PREMIUM - 2026
-Iglesia Pentecostal Unida de Colombia
-"Donde el Espíritu Santo se mueve"
-SISTEMA COMPLETO CON IA, STREAMING, GAMIFICACIÓN,
-RESPALDO AUTOMÁTICO, CUENTA OFICIAL Y CAMBIO DE CONTRASEÑA
+IPUC LA FONDA — "Un Señor, una fe, un bautismo"
+Cuenta verificada admin: ipuclafonda@gmail.com
+CSP estricta · 100% local · PWA offline · Sin CDN
 ============================================ -->
 <html lang="es-CO">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="color-scheme" content="light dark">
-    <meta name="handheldfriendly" content="true">
-    <meta name="mobileoptimized" content="width">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="handheldfriendly" content="true" />
+  <meta name="mobileoptimized" content="width" />
 
-    <meta name="theme-color" content="#0a1628" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#1a237e" media="(prefers-color-scheme: light)">
+  <!-- ================= CSP ESTRICTA ================= -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self';
+    style-src 'self';
+    img-src 'self' data: blob:;
+    media-src 'self' blob:;
+    font-src 'self';
+    connect-src 'self';
+    frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://www.facebook.com https://web.facebook.com https://www.google.com https://maps.google.com;
+    frame-ancestors 'self';
+    form-action 'self';
+    base-uri 'self';
+    object-src 'none';
+    worker-src 'self';
+    manifest-src 'self';
+  " />
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="IPUC LA FONDA">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="IPUC LA FONDA International">
-    <meta name="msapplication-TileColor" content="#1a237e">
+  <meta name="theme-color" content="#0a1628" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#0B3D91" media="(prefers-color-scheme: light)" />
 
-    <meta name="title" content="IPUC LA FONDA">
-    <meta name="description" content="IPUC LA FONDA - Plataforma integral con IA, streaming en vivo, gamificación, tienda, respaldo automático, cuenta oficial y comunidad global.">
-    <meta name="keywords" content="IPUC, LA FONDA, iglesia, radio, eventos, comunidad, gamificación, IA, streaming, respaldo, backup, premium">
-    <meta name="author" content="IPUC LA FONDA">
-    <meta name="robots" content="index, follow">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IPUC La Fonda" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="IPUC La Fonda" />
+  <meta name="msapplication-TileColor" content="#0B3D91" />
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ipuclafonda.netlify.app/">
-    <meta property="og:title" content="IPUC LA FONDA">
-    <meta property="og:description" content="Plataforma integral con IA, streaming, gamificación, respaldo automático y comunidad.">
-    <meta property="og:image" content="ipuclafonda.png">
-    <meta property="og:locale" content="es_CO">
-    <meta property="og:site_name" content="IPUC LA FONDA">
+  <meta name="description" content="Aplicación oficial de la Iglesia Pentecostal Unida de Colombia – La Fonda. Un Señor, una fe, un bautismo." />
+  <meta name="keywords" content="IPUC, La Fonda, iglesia, comunidad, videos, eventos, oración" />
+  <meta name="author" content="IPUC La Fonda" />
+  <meta name="robots" content="index, follow" />
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="IPUC LA FONDA v22.3 PRO PREMIUM">
-    <meta name="twitter:description" content="Plataforma integral con IA, streaming, gamificación, respaldo automático y comunidad.">
-    <meta name="twitter:image" content="ipuclafonda.png">
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="IPUC La Fonda" />
+  <meta property="og:description" content="Un Señor, una fe, un bautismo." />
+  <meta property="og:image" content="assets/logo.png" />
+  <meta property="og:locale" content="es_CO" />
+  <meta property="og:site_name" content="IPUC La Fonda" />
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512x512.png">
-    <link rel="shortcut icon" href="favicon.ico">
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="IPUC La Fonda" />
+  <meta name="twitter:description" content="Un Señor, una fe, un bautismo." />
+  <meta name="twitter:image" content="assets/logo.png" />
 
-    <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    <link rel="dns-prefetch" href="https://unpkg.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
 
-    <!-- ═══ CSS principal (con cache-busting v22.3) ═══ -->
-    <link rel="stylesheet" href="styles.css?v=22.3">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 
-    <!-- AOS - Animaciones -->
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
-
-    <!-- Leaflet - Mapas -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-    <title>IPUC LA FONDA</title>
+  <title>IPUC La Fonda</title>
 </head>
 <body>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         NOSCRIPT (usuarios sin JavaScript)
-         ═══════════════════════════════════════════════════════════════ -->
-    <noscript>
-        <div style="position:fixed;inset:0;background:#1a237e;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;text-align:center;z-index:999999;font-family:sans-serif;">
-            <h1 style="font-size:1.5rem;margin-bottom:16px;">⚠️ JavaScript Deshabilitado</h1>
-            <p style="margin-bottom:16px;max-width:400px;">Esta aplicación requiere JavaScript para funcionar. Por favor, actívalo en tu navegador.</p>
-            <a href="https://wa.me/573128813818" style="background:#ffd700;color:#1a237e;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:700;">
-                Contactar por WhatsApp
-            </a>
-        </div>
-    </noscript>
-
-    <!-- ═══════════════════════════════════════════════════════════════
-         SPLASH SCREEN
-         ═══════════════════════════════════════════════════════════════ -->
-    <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive">
-        <div class="splash-background">
-            <div class="splash-particles"></div>
-            <div class="splash-glow"></div>
-            <div class="splash-aurora"></div>
-            <div class="splash-cross-glow"></div>
-            <div class="splash-dove"></div>
-            <div class="splash-fire"></div>
-            <div class="splash-stars"></div>
-        </div>
-        <div class="splash-content">
-            <div class="splash-logo-container">
-                <div class="splash-logo-ring"></div>
-                <div class="splash-logo-ring-2"></div>
-                <div class="splash-logo-ring-3"></div>
-                <div class="splash-logo-ring-4"></div>
-                <img src="ipuclafonda.png" alt="Logo IPUC LA FONDA" class="splash-logo-img" width="140" height="140" loading="eager" draggable="false">
-            </div>
-            <div class="splash-text">
-                <h1 class="splash-title">IPUC LA FONDA</h1>
-                <p class="splash-subtitle">Iglesia Pentecostal Unida de Colombia</p>
-                <p class="splash-motto">"Donde el Espíritu Santo se mueve"</p>
-                <div class="splash-verses">
-                    <span class="verse-rotating" id="rotating-verse">Cantad al Señor - Salmo 96:1</span>
-                </div>
-                <div class="splash-features">
-                    <span><i class="bx bx-radio-circle-marked"></i> Radio</span>
-                    <span><i class="bx bx-video-recording"></i> Streaming</span>
-                    <span><i class="bx bx-game"></i> Gamificación</span>
-                    <span><i class="bx bx-chip"></i> IA</span>
-                    <span><i class="bx bx-cloud-upload"></i> Nube</span>
-                    <span><i class="bx bx-shield-alt"></i> Seguridad</span>
-                </div>
-            </div>
-            <div class="splash-loader">
-                <div class="loader-ring"></div>
-                <p class="loader-text" id="splash-loader-text">Cargando sistema...</p>
-                <div class="splash-progress">
-                    <div class="progress-bar" id="splash-progress-bar"></div>
-                </div>
-            </div>
-            <div class="splash-footer">
-                <div class="splash-flags">
-                    <span><i class="bx bx-globe"></i> ES · EN · PT · FR · DE</span>
-                    <span class="splash-version">v22.3</span>
-                </div>
-            </div>
-        </div>
+  <noscript>
+    <div class="noscript-overlay">
+      <h1>⚠️ JavaScript deshabilitado</h1>
+      <p>Esta aplicación requiere JavaScript para funcionar. Por favor actívalo en tu navegador.</p>
+      <a href="https://wa.me/573128813818">Contactar por WhatsApp</a>
     </div>
+  </noscript>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         APP PRINCIPAL
-         ═══════════════════════════════════════════════════════════════ -->
-    <div id="app" class="app hidden" role="main">
-        <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
+  <!-- ================ SPLASH ================ -->
+  <div id="splash-screen" class="splash-screen" role="alert" aria-live="assertive">
+    <div class="splash-background">
+      <div class="splash-particles"></div>
+      <div class="splash-glow"></div>
+      <div class="splash-aurora"></div>
+      <div class="splash-cross-glow"></div>
+      <div class="splash-dove"></div>
+      <div class="splash-fire"></div>
+      <div class="splash-stars"></div>
+    </div>
+    <div class="splash-content">
+      <div class="splash-logo-container">
+        <div class="splash-logo-ring"></div>
+        <div class="splash-logo-ring-2"></div>
+        <div class="splash-logo-ring-3"></div>
+        <div class="splash-logo-ring-4"></div>
+        <img src="assets/logo.png" alt="Logo IPUC La Fonda" class="splash-logo-img" width="140" height="140" loading="eager" draggable="false" />
+      </div>
+      <div class="splash-text">
+        <h1 class="splash-title">IPUC La Fonda</h1>
+        <p class="splash-subtitle">Iglesia Pentecostal Unida de Colombia</p>
+        <p class="splash-motto">"Un Señor, una fe, un bautismo"</p>
+        <div class="splash-verses">
+          <span class="verse-rotating" id="rotating-verse">"Cantad al Señor" — Salmo 96:1</span>
+        </div>
+        <div class="splash-features">
+          <span><i class="bx bx-radio-circle-marked"></i> Radio</span>
+          <span><i class="bx bx-video-recording"></i> Streaming</span>
+          <span><i class="bx bx-game"></i> Comunidad</span>
+          <span><i class="bx bx-book-open"></i> Escuela</span>
+          <span><i class="bx bx-cloud-upload"></i> Nube</span>
+          <span><i class="bx bx-shield-alt"></i> Seguridad</span>
+        </div>
+      </div>
+      <div class="splash-loader">
+        <div class="loader-ring"></div>
+        <p class="loader-text" id="splash-loader-text">Cargando sistema…</p>
+        <div class="splash-progress">
+          <div class="progress-bar" id="splash-progress-bar"></div>
+        </div>
+      </div>
+      <div class="splash-footer">
+        <div class="splash-flags">
+          <span><i class="bx bx-globe"></i> ES · EN · PT · FR · DE</span>
+          <span class="splash-version">v1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menu principal">
-            <div class="sidebar-header">
-                <div class="logo-mini">
-                    <img src="ipuclafonda.png" alt="Logo IPUC" width="40" height="40" loading="lazy">
-                    <span class="logo-badge">PRO</span>
-                </div>
-                <div class="sidebar-brand">
-                    <h2>IPUC LA FONDA</h2>
-                    <span class="sidebar-slogan">Adoración Global</span>
-                </div>
-                <button id="close-sidebar" class="btn-icon" aria-label="Cerrar menu">
-                    <i class="bx bx-x"></i>
+  <!-- ================ APP ================ -->
+  <div id="app" class="app hidden" role="main">
+    <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
+
+    <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menú principal">
+      <div class="sidebar-header">
+        <div class="logo-mini">
+          <img src="assets/logo.png" alt="Logo IPUC" width="40" height="40" loading="lazy" />
+        </div>
+        <div class="sidebar-brand">
+          <h2>IPUC La Fonda</h2>
+          <span class="sidebar-slogan">Un Señor, una fe, un bautismo</span>
+        </div>
+        <button id="close-sidebar" class="btn-icon" aria-label="Cerrar menú">
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-search">
+        <i class="bx bx-search"></i>
+        <input type="search" id="sidebar-search-input" placeholder="Buscar…" aria-label="Buscar" autocomplete="off" />
+        <span class="search-shortcut">Ctrl+K</span>
+      </div>
+
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="online-users">0</span>
+          <span class="stat-label"><i class="bx bx-wifi"></i> En línea</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="total-members">0</span>
+          <span class="stat-label"><i class="bx bx-group"></i> Miembros</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="prayers-count">0</span>
+          <span class="stat-label"><i class="bx bx-hands-praying"></i> Oraciones</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navegación principal">
+        <div class="nav-section">
+          <span class="nav-section-title"><i class="bx bx-star"></i> Principal</span>
+          <a href="#/inicio" class="nav-item active" data-page="inicio"><i class="bx bx-home"></i><span>Inicio</span></a>
+          <a href="#/eventos" class="nav-item" data-page="eventos"><i class="bx bx-calendar"></i><span>Eventos</span><span class="nav-badge-count" id="eventos-badge">0</span></a>
+          <a href="#/videos" class="nav-item" data-page="videos"><i class="bx bx-play-circle"></i><span>Videos</span></a>
+          <a href="#/oracion" class="nav-item" data-page="oracion"><i class="bx bx-hands-praying"></i><span>Oración</span></a>
+          <a href="#/nosotros" class="nav-item" data-page="nosotros"><i class="bx bx-church"></i><span>Nosotros</span></a>
+          <a href="#/cultos" class="nav-item" data-page="cultos"><i class="bx bx-time"></i><span>Horarios</span></a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-section-title"><i class="bx bx-group"></i> Comunidad</span>
+          <a href="#/ministerios" class="nav-item" data-page="ministerios"><i class="bx bx-buildings"></i><span>Ministerios</span></a>
+          <a href="#/lideres" class="nav-item" data-page="lideres"><i class="bx bx-user"></i><span>Líderes</span></a>
+          <a href="#/testimonios" class="nav-item" data-page="testimonios"><i class="bx bx-message"></i><span>Testimonios</span></a>
+          <a href="#/celulas" class="nav-item" data-page="celulas"><i class="bx bx-group"></i><span>Células</span></a>
+          <a href="#/voluntariado" class="nav-item" data-page="voluntariado"><i class="bx bx-heart"></i><span>Voluntariado</span></a>
+          <a href="#/solicitudes" class="nav-item" data-page="solicitudes"><i class="bx bx-list-check"></i><span>Solicitudes</span></a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-section-title"><i class="bx bx-book"></i> Espiritual</span>
+          <a href="#/devocional" class="nav-item" data-page="devocional"><i class="bx bx-book-open"></i><span>Devocional</span></a>
+          <a href="#/cursos" class="nav-item" data-page="cursos"><i class="bx bx-book-content"></i><span>Escuela dominical</span></a>
+          <a href="#/discipulado" class="nav-item" data-page="discipulado"><i class="bx bx-award"></i><span>Discipulado</span></a>
+          <a href="#/reloj-oracion" class="nav-item" data-page="reloj-oracion"><i class="bx bx-time"></i><span>Reloj de oración</span></a>
+          <a href="#/carnet" class="nav-item" data-page="carnet"><i class="bx bx-file"></i><span>Carnet digital</span></a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-section-title"><i class="bx bx-download"></i> Recursos</span>
+          <a href="#/galeria" class="nav-item" data-page="galeria"><i class="bx bx-image"></i><span>Galería</span></a>
+          <a href="#/recursos" class="nav-item" data-page="recursos"><i class="bx bx-folder"></i><span>Recursos</span></a>
+          <a href="#/faq" class="nav-item" data-page="faq"><i class="bx bx-help-circle"></i><span>Preguntas</span></a>
+          <a href="#/boletin" class="nav-item" data-page="boletin"><i class="bx bx-print"></i><span>Boletín</span></a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-section-title"><i class="bx bx-donate-heart"></i> Ofrendas</span>
+          <a href="#/ofrendas" class="nav-item" data-page="ofrendas"><i class="bx bx-info-circle"></i><span>Ofrendas</span></a>
+          <a href="#/campanas" class="nav-item" data-page="campanas"><i class="bx bx-trending-up"></i><span>Campañas</span></a>
+          <a href="#/transparencia" class="nav-item" data-page="transparencia"><i class="bx bx-file"></i><span>Transparencia</span></a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-section-title"><i class="bx bx-shield"></i> Legal</span>
+          <a href="#/privacidad" class="nav-item" data-page="privacidad"><i class="bx bx-lock"></i><span>Privacidad</span></a>
+          <a href="#/terminos" class="nav-item" data-page="terminos"><i class="bx bx-clipboard"></i><span>Términos</span></a>
+          <a href="#/normas" class="nav-item" data-page="normas"><i class="bx bx-check-circle"></i><span>Normas</span></a>
+        </div>
+
+        <div id="admin-menu" class="nav-section hidden">
+          <hr class="divider" />
+          <span class="nav-section-title admin-label"><i class="bx bx-shield"></i> Administración</span>
+          <a href="#/admin" class="nav-item" data-page="admin"><i class="bx bx-chart"></i><span>Dashboard</span></a>
+          <a href="#/admin/usuarios" class="nav-item" data-page="admin-usuarios"><i class="bx bx-user"></i><span>Usuarios</span></a>
+          <a href="#/admin/eventos" class="nav-item" data-page="admin-eventos"><i class="bx bx-calendar"></i><span>Eventos</span></a>
+          <a href="#/admin/videos" class="nav-item" data-page="admin-videos"><i class="bx bx-video"></i><span>Moderar videos</span></a>
+          <a href="#/admin/ajustes" class="nav-item" data-page="admin-ajustes"><i class="bx bx-cog"></i><span>Ajustes</span></a>
+          <a href="#/admin/auditoria" class="nav-item" data-page="admin-auditoria"><i class="bx bx-clipboard"></i><span>Auditoría</span></a>
+          <a href="#/admin/backup" class="nav-item" data-page="admin-backup"><i class="bx bx-save"></i><span>Respaldos</span></a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini" id="user-mini" role="button" tabindex="0" aria-label="Menú de usuario">
+          <div class="user-mini-avatar">
+            <img src="assets/logo.png" alt="Avatar" width="42" height="42" id="user-avatar" loading="lazy" />
+            <span class="user-status offline" id="user-status"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-name" id="user-name">Visitante</span>
+            <span class="user-role" id="user-role">Sin sesión</span>
+          </div>
+          <i class="bx bx-chevron-up"></i>
+        </div>
+        <div id="user-dropdown" class="user-dropdown hidden" role="menu">
+          <a href="#/perfil" role="menuitem"><i class="bx bx-user"></i> Mi perfil</a>
+          <a href="#/mis-videos" role="menuitem"><i class="bx bx-video"></i> Mis videos</a>
+          <a href="#/mis-solicitudes" role="menuitem"><i class="bx bx-list-check"></i> Mis solicitudes</a>
+          <a href="#/ajustes" role="menuitem"><i class="bx bx-cog"></i> Ajustes</a>
+          <hr />
+          <a href="#" id="btn-logout" role="menuitem"><i class="bx bx-log-out"></i> Cerrar sesión</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <div class="header-left">
+          <button id="menu-toggle" class="btn-icon" aria-label="Abrir menú"><i class="bx bx-menu"></i></button>
+          <nav class="breadcrumb" aria-label="Ruta de navegación">
+            <ol>
+              <li><a href="#/inicio"><i class="bx bx-home"></i></a></li>
+              <li class="separator"><i class="bx bx-chevron-right"></i></li>
+              <li class="current" id="breadcrumb-current">Inicio</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="header-center">
+          <h1 id="page-title">Inicio</h1>
+          <span class="header-date" id="header-date"></span>
+        </div>
+        <div class="header-right">
+          <button id="search-toggle" class="btn-icon" aria-label="Buscar"><i class="bx bx-search"></i></button>
+          <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema"><i class="bx bx-moon"></i></button>
+          <button id="font-decrease" class="btn-icon" aria-label="Reducir letra">A-</button>
+          <button id="font-increase" class="btn-icon" aria-label="Aumentar letra">A+</button>
+          <button id="notifications-toggle" class="btn-icon notification-btn" aria-label="Notificaciones">
+            <i class="bx bx-bell"></i>
+            <span class="badge badge-notifications hidden" id="notif-badge">0</span>
+          </button>
+          <a href="#/perfil" id="header-avatar" class="header-avatar" aria-label="Perfil">
+            <img src="assets/logo.png" alt="Avatar" width="32" height="32" loading="lazy" />
+          </a>
+        </div>
+      </header>
+
+      <div id="search-bar" class="search-bar hidden" role="search">
+        <div class="search-bar-content">
+          <i class="bx bx-search"></i>
+          <input type="search" id="global-search-input" placeholder="Buscar en toda la app…" autocomplete="off" />
+          <button class="btn-icon" id="search-close" aria-label="Cerrar búsqueda"><i class="bx bx-x"></i></button>
+        </div>
+        <div class="search-results" id="search-results"></div>
+      </div>
+
+      <div id="page-content" class="page-content" tabindex="-1">
+        <div class="page-loader">
+          <div class="spinner"></div>
+          <p>Cargando…</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================ BIENVENIDA / LOGIN ================ -->
+  <div id="welcome-screen" class="welcome-screen" role="main" aria-label="Pantalla de bienvenida">
+    <div class="welcome-background">
+      <div class="welcome-overlay"></div>
+      <div class="welcome-particles"></div>
+      <div class="welcome-aurora"></div>
+      <div class="welcome-cross"></div>
+      <div class="welcome-dove"></div>
+      <div class="welcome-fire"></div>
+    </div>
+    <div class="welcome-container">
+      <div class="welcome-card">
+        <div class="welcome-header">
+          <img src="assets/logo.png" alt="IPUC La Fonda" class="welcome-logo" width="100" height="100" loading="eager" />
+          <h1 class="welcome-title">IPUC La Fonda</h1>
+          <p class="welcome-subtitle">Iglesia Pentecostal Unida de Colombia</p>
+          <p class="welcome-verse">"Un Señor, una fe, un bautismo"</p>
+        </div>
+
+        <div class="welcome-verse-day" id="verse-day">
+          <i class="bx bx-book-open"></i>
+          <div class="verse-content">
+            <span id="daily-verse">"Un Señor, una fe, un bautismo"</span>
+            <span id="daily-verse-ref">Efesios 4:5</span>
+          </div>
+        </div>
+
+        <div id="system-status" class="system-status">
+          <span id="status-icon" class="status-icon"><i class="bx bx-refresh"></i></span>
+          <span id="status-text">Verificando sistema…</span>
+        </div>
+
+        <!-- Login -->
+        <div id="login-form-container" class="auth-form-container">
+          <form id="login-form" class="auth-form" autocomplete="on">
+            <div class="form-group">
+              <label for="login-email"><i class="bx bx-envelope"></i> Correo electrónico</label>
+              <div class="input-wrapper">
+                <i class="bx bx-envelope"></i>
+                <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" required autocomplete="username" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="login-password"><i class="bx bx-lock"></i> Contraseña</label>
+              <div class="input-wrapper">
+                <i class="bx bx-lock"></i>
+                <input type="password" id="login-password" class="form-input" placeholder="********" required autocomplete="current-password" />
+                <button type="button" class="btn-toggle-password" id="toggle-password" aria-label="Mostrar contraseña">
+                  <i class="bx bx-show"></i>
                 </button>
+              </div>
             </div>
-
-            <div class="sidebar-search">
-                <i class="bx bx-search"></i>
-                <input type="search" id="sidebar-search-input" placeholder="Buscar..." aria-label="Buscar" autocomplete="off">
-                <span class="search-shortcut">Ctrl+K</span>
+            <div class="form-options">
+              <label class="checkbox-label">
+                <input type="checkbox" id="remember-me" />
+                <span>Mantener sesión</span>
+              </label>
             </div>
-
-            <div class="sidebar-stats">
-                <div class="stat-item">
-                    <span class="stat-value" id="online-users">0</span>
-                    <span class="stat-label"><i class="bx bx-wifi"></i> En Línea</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value" id="total-members">0</span>
-                    <span class="stat-label"><i class="bx bx-group"></i> Miembros</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value" id="prayers-count">0</span>
-                    <span class="stat-label"><i class="bx bx-pray"></i> Oraciones</span>
-                </div>
-            </div>
-
-            <div class="sidebar-languages">
-                <button class="lang-btn active" data-lang="es" aria-label="Español"><i class="bx bx-globe"></i> ES</button>
-                <button class="lang-btn" data-lang="en" aria-label="English"><i class="bx bx-globe"></i> EN</button>
-                <button class="lang-btn" data-lang="pt" aria-label="Portugués"><i class="bx bx-globe"></i> PT</button>
-                <button class="lang-btn" data-lang="fr" aria-label="Francés"><i class="bx bx-globe"></i> FR</button>
-                <button class="lang-btn" data-lang="de" aria-label="Deutsch"><i class="bx bx-globe"></i> DE</button>
-                <button class="lang-btn" data-lang="it" aria-label="Italiano"><i class="bx bx-globe"></i> IT</button>
-            </div>
-
-            <div class="sidebar-radio">
-                <div class="radio-mini-player" id="radio-mini">
-                    <div class="radio-info">
-                        <i class="bx bx-radio-circle-marked"></i>
-                        <span class="radio-station">Radio IPUC</span>
-                        <span class="radio-status" id="radio-status"><i class="bx bx-broadcast"></i> En Vivo</span>
-                    </div>
-                    <div class="radio-controls">
-                        <button class="btn-icon" id="radio-play-toggle" aria-label="Play/Pause Radio">
-                            <i class="bx bx-play-circle"></i>
-                        </button>
-                        <div class="radio-wave">
-                            <span></span><span></span><span></span><span></span><span></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav" aria-label="Navegación principal">
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-star"></i> Principal</span>
-                    <a href="#inicio" class="nav-item active" data-page="inicio">
-                        <i class="bx bx-home-alt-2"></i><span>Inicio</span>
-                        <span class="nav-badge new">Nuevo</span>
-                    </a>
-                    <a href="#dashboard" class="nav-item" data-page="dashboard">
-                        <i class="bx bx-line-chart"></i><span>Panel de Control</span>
-                    </a>
-                    <a href="#streaming" class="nav-item" data-page="streaming">
-                        <i class="bx bx-video-recording"></i><span>En Vivo</span>
-                        <span class="nav-badge live">LIVE</span>
-                    </a>
-                    <a href="#radio" class="nav-item" data-page="radio">
-                        <i class="bx bx-radio-circle-marked"></i><span>Radio</span>
-                    </a>
-                    <a href="#modo-oracion" class="nav-item" data-page="modo-oracion">
-                        <i class="bx bx-moon"></i><span>Modo Oración</span>
-                        <span class="nav-badge new">Nuevo</span>
-                    </a>
-                    <a href="#notas-rapidas" class="nav-item" data-page="notas-rapidas">
-                        <i class="bx bx-pencil"></i><span>Notas Rápidas</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-church"></i> Iglesia</span>
-                    <a href="#eventos" class="nav-item" data-page="eventos">
-                        <i class="bx bx-calendar-event"></i><span>Eventos</span>
-                        <span class="nav-badge-count" id="eventos-badge">0</span>
-                    </a>
-                    <a href="#horarios" class="nav-item" data-page="horarios">
-                        <i class="bx bx-time-five"></i><span>Horarios</span>
-                    </a>
-                    <a href="#asistencia" class="nav-item" data-page="asistencia">
-                        <i class="bx bx-check-shield"></i><span>Asistencia</span>
-                    </a>
-                    <a href="#mapa" class="nav-item" data-page="mapa">
-                        <i class="bx bx-map"></i><span>Ubicación</span>
-                    </a>
-                    <a href="#ministerios" class="nav-item" data-page="ministerios">
-                        <i class="bx bx-building-house"></i><span>Ministerios</span>
-                    </a>
-                    <a href="#lideres" class="nav-item" data-page="lideres">
-                        <i class="bx bx-user-pin"></i><span>Líderes</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-group"></i> Comunidad</span>
-                    <a href="#chat" class="nav-item" data-page="chat">
-                        <i class="bx bx-chat"></i><span>Chat Global</span>
-                        <span class="nav-badge-count" id="chat-badge">0</span>
-                    </a>
-                    <a href="#oracion" class="nav-item" data-page="oracion">
-                        <i class="bx bx-pray"></i><span>Cadena de Oración</span>
-                    </a>
-                    <a href="#peticiones" class="nav-item" data-page="peticiones">
-                        <i class="bx bx-heart"></i><span>Peticiones</span>
-                    </a>
-                    <a href="#testimonios" class="nav-item" data-page="testimonios">
-                        <i class="bx bx-message-dots"></i><span>Testimonios</span>
-                    </a>
-                    <a href="#muro-bendiciones" class="nav-item" data-page="muro-bendiciones">
-                        <i class="bx bx-star"></i><span>Muro de Bendiciones</span>
-                    </a>
-                    <a href="#grupos" class="nav-item" data-page="grupos">
-                        <i class="bx bx-group"></i><span>Grupos y Células</span>
-                    </a>
-                    <a href="#voluntariado" class="nav-item" data-page="voluntariado">
-                        <i class="bx bx-hand"></i><span>Voluntariado</span>
-                    </a>
-                    <a href="#eventos-sociales" class="nav-item" data-page="eventos-sociales">
-                        <i class="bx bx-party"></i><span>Eventos Sociales</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-bible"></i> Espiritual</span>
-                    <a href="#devocional" class="nav-item" data-page="devocional">
-                        <i class="bx bx-book-reader"></i><span>Devocional Diario</span>
-                    </a>
-                    <a href="#lectura-biblica" class="nav-item" data-page="lectura-biblica">
-                        <i class="bx bx-book"></i><span>Plan de Lectura</span>
-                        <span class="nav-badge-count" id="lecture-progress">0%</span>
-                    </a>
-                    <a href="#concordancia" class="nav-item" data-page="concordancia">
-                        <i class="bx bx-search-alt"></i><span>Concordancia</span>
-                    </a>
-                    <a href="#himnario" class="nav-item" data-page="himnario">
-                        <i class="bx bx-music"></i><span>Himnario</span>
-                    </a>
-                    <a href="#diario-espiritual" class="nav-item" data-page="diario-espiritual">
-                        <i class="bx bx-notepad"></i><span>Diario Espiritual</span>
-                    </a>
-                    <a href="#memorizacion" class="nav-item" data-page="memorizacion">
-                        <i class="bx bx-brain"></i><span>Memorización</span>
-                    </a>
-                    <a href="#estudios-biblicos" class="nav-item" data-page="estudios-biblicos">
-                        <i class="bx bx-book-content"></i><span>Estudios Bíblicos</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-trophy"></i> Gamificación</span>
-                    <a href="#logros" class="nav-item" data-page="logros">
-                        <i class="bx bx-trophy"></i><span>Logros</span>
-                        <span class="nav-badge-count" id="achievements-count">0</span>
-                    </a>
-                    <a href="#trivia" class="nav-item" data-page="trivia">
-                        <i class="bx bx-brain"></i><span>Trivia Bíblica</span>
-                    </a>
-                    <a href="#juegos" class="nav-item" data-page="juegos">
-                        <i class="bx bx-game"></i><span>Juegos</span>
-                    </a>
-                    <a href="#ranking" class="nav-item" data-page="ranking">
-                        <i class="bx bx-medal"></i><span>Ranking</span>
-                    </a>
-                    <a href="#desafios" class="nav-item" data-page="desafios">
-                        <i class="bx bx-target-lock"></i><span>Desafíos</span>
-                        <span class="nav-badge new">Nuevo</span>
-                    </a>
-                    <a href="#insignias" class="nav-item" data-page="insignias">
-                        <i class="bx bx-badge-check"></i><span>Insignias</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-play-circle"></i> Multimedia</span>
-                    <a href="#galeria" class="nav-item" data-page="galeria">
-                        <i class="bx bx-images"></i><span>Galería</span>
-                    </a>
-                    <a href="#videos" class="nav-item" data-page="videos">
-                        <i class="bx bx-video"></i><span>Videos</span>
-                    </a>
-                    <a href="#playlist" class="nav-item" data-page="playlist">
-                        <i class="bx bx-playlist"></i><span>Playlist de Adoración</span>
-                    </a>
-                    <a href="#podcast" class="nav-item" data-page="podcast">
-                        <i class="bx bx-microphone"></i><span>Podcast</span>
-                    </a>
-                    <a href="#archivo-streaming" class="nav-item" data-page="archivo-streaming">
-                        <i class="bx bx-archive"></i><span>Archivo Streaming</span>
-                    </a>
-                    <a href="#wallpapers" class="nav-item" data-page="wallpapers">
-                        <i class="bx bx-image"></i><span>Wallpapers</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-book-open"></i> Recursos</span>
-                    <a href="#biblioteca" class="nav-item" data-page="biblioteca">
-                        <i class="bx bx-book-open"></i><span>Biblioteca Digital</span>
-                    </a>
-                    <a href="#blog" class="nav-item" data-page="blog">
-                        <i class="bx bx-news"></i><span>Blog/Noticias</span>
-                    </a>
-                    <a href="#recursos" class="nav-item" data-page="recursos">
-                        <i class="bx bx-folder"></i><span>Recursos</span>
-                    </a>
-                    <a href="#descargas" class="nav-item" data-page="descargas">
-                        <i class="bx bx-download"></i><span>Descargas</span>
-                    </a>
-                    <a href="#documentos" class="nav-item" data-page="documentos">
-                        <i class="bx bx-file-doc"></i><span>Documentos</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-store-alt"></i> Tienda</span>
-                    <a href="#tienda" class="nav-item" data-page="tienda">
-                        <i class="bx bx-store-alt"></i><span>Tienda Cristiana</span>
-                        <span class="nav-badge-count" id="cart-badge">0</span>
-                    </a>
-                    <a href="#donaciones" class="nav-item" data-page="donaciones">
-                        <i class="bx bx-donate-heart"></i><span>Donaciones</span>
-                    </a>
-                    <a href="#ofrendas" class="nav-item" data-page="ofrendas">
-                        <i class="bx bx-money"></i><span>Ofrendas</span>
-                    </a>
-                    <a href="#suscripciones" class="nav-item" data-page="suscripciones">
-                        <i class="bx bx-credit-card"></i><span>Suscripciones</span>
-                    </a>
-                    <a href="#carrito" class="nav-item" data-page="carrito">
-                        <i class="bx bx-cart"></i><span>Carrito</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <span class="nav-section-title"><i class="bx bx-file"></i> Reportes</span>
-                    <a href="#mis-reportes" class="nav-item" data-page="mis-reportes">
-                        <i class="bx bx-file"></i><span>Mis Reportes</span>
-                    </a>
-                    <a href="#informes" class="nav-item" data-page="informes">
-                        <i class="bx bx-file-pdf"></i><span>Informes PDF</span>
-                    </a>
-                    <a href="#exportar-datos" class="nav-item" data-page="exportar-datos">
-                        <i class="bx bx-export"></i><span>Exportar Datos</span>
-                    </a>
-                    <a href="#historial" class="nav-item" data-page="historial">
-                        <i class="bx bx-history"></i><span>Historial</span>
-                    </a>
-                </div>
-
-                <div id="admin-menu" class="nav-section hidden">
-                    <hr class="divider">
-                    <span class="nav-section-title admin-label">
-                        <i class="bx bx-shield-alt"></i> Administración
-                    </span>
-                    <a href="#admin-dashboard" class="nav-item" data-page="admin-dashboard">
-                        <i class="bx bx-line-chart"></i><span>Dashboard Admin</span>
-                    </a>
-                    <a href="#gestion-usuarios" class="nav-item" data-page="gestion-usuarios">
-                        <i class="bx bx-user-voice"></i><span>Usuarios</span>
-                    </a>
-                    <a href="#gestion-reportes" class="nav-item" data-page="gestion-reportes">
-                        <i class="bx bx-file"></i><span>Gestión Reportes</span>
-                        <span class="nav-badge-count" id="pending-reports">0</span>
-                    </a>
-                    <a href="#gestion-eventos" class="nav-item" data-page="gestion-eventos">
-                        <i class="bx bx-calendar-edit"></i><span>Gestión Eventos</span>
-                    </a>
-                    <a href="#gestion-noticias" class="nav-item" data-page="gestion-noticias">
-                        <i class="bx bx-edit-alt"></i><span>Noticias</span>
-                    </a>
-                    <a href="#analiticas" class="nav-item" data-page="analiticas">
-                        <i class="bx bx-stats"></i><span>Analíticas</span>
-                    </a>
-                    <a href="#sistema" class="nav-item" data-page="sistema">
-                        <i class="bx bx-server"></i><span>Sistema</span>
-                    </a>
-                    <a href="#auditoria" class="nav-item" data-page="auditoria">
-                        <i class="bx bx-clipboard"></i><span>Auditoría</span>
-                    </a>
-                    <a href="#backup" class="nav-item" data-page="backup" data-critical="true">
-                        <i class="bx bx-cloud-download"></i><span>Copias de Seguridad</span>
-                        <span class="nav-badge" style="background:var(--exito);">Backup</span>
-                    </a>
-                    <a href="#permisos" class="nav-item" data-page="permisos">
-                        <i class="bx bx-lock-open-alt"></i><span>Permisos</span>
-                    </a>
-                </div>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-mini" id="user-mini" role="button" tabindex="0" aria-label="Menu de usuario">
-                    <div class="user-mini-avatar">
-                        <img src="ipuclafonda.png" alt="Avatar" width="42" height="42" id="user-avatar" loading="lazy">
-                        <span class="user-status offline" id="user-status"></span>
-                        <span class="user-level" id="user-level">Lv.1</span>
-                    </div>
-                    <div class="user-info">
-                        <span class="user-name" id="user-name">Visitante</span>
-                        <span class="user-role" id="user-role">Sin sesión</span>
-                        <div class="user-xp-bar">
-                            <div class="xp-bar" id="user-xp-bar" style="width:0%"></div>
-                        </div>
-                    </div>
-                    <i class="bx bx-chevron-up"></i>
-                </div>
-                <div id="user-dropdown" class="user-dropdown hidden" role="menu">
-                    <a href="#perfil" role="menuitem"><i class="bx bx-user"></i> Mi Perfil</a>
-                    <a href="#mis-reportes" role="menuitem"><i class="bx bx-file"></i> Mis Reportes</a>
-                    <a href="#diario-espiritual" role="menuitem"><i class="bx bx-notepad"></i> Diario Espiritual</a>
-                    <a href="#logros" role="menuitem"><i class="bx bx-trophy"></i> Mis Logros</a>
-                    <a href="#configuracion" role="menuitem"><i class="bx bx-cog"></i> Configuración</a>
-                    <a href="#tema" role="menuitem"><i class="bx bx-palette"></i> Temas</a>
-                    <a href="#notas-rapidas" role="menuitem"><i class="bx bx-pencil"></i> Notas Rápidas</a>
-                    <a href="#favoritos" role="menuitem"><i class="bx bx-heart"></i> Favoritos</a>
-                    <hr>
-                    <a href="#" id="btn-logout" role="menuitem"><i class="bx bx-log-out"></i> Cerrar Sesión</a>
-                </div>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="header">
-                <div class="header-left">
-                    <button id="menu-toggle" class="btn-icon" aria-label="Abrir menu">
-                        <i class="bx bx-menu-alt-left"></i>
-                    </button>
-                    <nav class="breadcrumb" aria-label="Ruta de navegación">
-                        <ol>
-                            <li><a href="#inicio"><i class="bx bx-home"></i></a></li>
-                            <li class="separator"><i class="bx bx-chevron-right"></i></li>
-                            <li class="current" id="breadcrumb-current">Inicio</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div class="header-center">
-                    <h1 id="page-title">Inicio</h1>
-                    <span class="header-date" id="header-date"></span>
-                </div>
-                <div class="header-right">
-                    <button id="qr-toggle" class="btn-icon" aria-label="QR Code">
-                        <i class="bx bx-qr"></i>
-                    </button>
-                    <button id="search-toggle" class="btn-icon" aria-label="Buscar">
-                        <i class="bx bx-search"></i>
-                    </button>
-                    <button id="radio-toggle" class="btn-icon" aria-label="Radio">
-                        <i class="bx bx-radio-circle-marked"></i>
-                    </button>
-                    <button id="reports-quick-toggle" class="btn-icon" aria-label="Reportes rápidos">
-                        <i class="bx bx-file"></i>
-                        <span class="badge badge-reports hidden" id="reports-badge">0</span>
-                    </button>
-                    <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema">
-                        <i class="bx bx-moon"></i>
-                    </button>
-                    <button id="notifications-toggle" class="btn-icon notification-btn" aria-label="Notificaciones">
-                        <i class="bx bx-bell"></i>
-                        <span class="badge badge-notifications hidden">0</span>
-                    </button>
-                    <button id="prayer-mode-toggle" class="btn-icon" aria-label="Modo Oración">
-                        <i class="bx bx-moon"></i>
-                    </button>
-                    <button id="focus-mode-toggle" class="btn-icon" aria-label="Modo Concentración">
-                        <i class="bx bx-focus"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div id="streaming-panel" class="streaming-panel hidden" role="dialog" aria-label="Panel de streaming">
-                <div class="streaming-header">
-                    <h3><i class="bx bx-video-recording"></i> Transmisión en Vivo</h3>
-                    <button class="btn-icon" id="close-streaming" aria-label="Cerrar">
-                        <i class="bx bx-x"></i>
-                    </button>
-                </div>
-                <div class="streaming-container">
-                    <div class="streaming-player">
-                        <div class="streaming-placeholder">
-                            <i class="bx bx-video-recording"></i>
-                            <p>Transmisión en vivo próximamente</p>
-                            <span class="streaming-badge"><i class="bx bx-broadcast"></i> EN VIVO</span>
-                        </div>
-                    </div>
-                    <div class="streaming-info">
-                        <h4 id="streaming-title">Culto de Adoración</h4>
-                        <p id="streaming-desc">Únete a nuestra transmisión en vivo</p>
-                        <div class="streaming-stats">
-                            <span><i class="bx bx-user"></i> <span id="viewers-count">0</span> espectadores</span>
-                            <span><i class="bx bx-heart"></i> <span id="streaming-likes">0</span></span>
-                            <span><i class="bx bx-chat"></i> <span id="streaming-chat">0</span></span>
-                        </div>
-                        <div class="streaming-actions">
-                            <button class="btn-primary btn-sm"><i class="bx bx-share-alt"></i> Compartir</button>
-                            <button class="btn-primary btn-sm"><i class="bx bx-bell-plus"></i> Recordar</button>
-                            <button class="btn-primary btn-sm"><i class="bx bx-download"></i> Descargar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="radio-quick-panel" class="radio-quick-panel hidden" role="dialog" aria-label="Panel de radio">
-                <div class="radio-quick-header">
-                    <h3><i class="bx bx-radio-circle-marked"></i> Radio IPUC</h3>
-                    <button class="btn-icon" id="close-radio-quick" aria-label="Cerrar">
-                        <i class="bx bx-x"></i>
-                    </button>
-                </div>
-                <div class="radio-player-full">
-                    <div class="radio-art">
-                        <img src="ipuclafonda.png" alt="Radio IPUC" id="radio-art-img" loading="lazy">
-                        <div class="radio-playing" id="radio-playing">Alabanzas de Adoración</div>
-                        <div class="radio-artist" id="radio-artist">IPUC LA FONDA</div>
-                    </div>
-                    <div class="radio-controls-full">
-                        <button class="btn-radio" id="radio-prev"><i class="bx bx-rewind"></i></button>
-                        <button class="btn-radio btn-radio-main" id="radio-play-main">
-                            <i class="bx bx-play-circle"></i>
-                        </button>
-                        <button class="btn-radio" id="radio-next"><i class="bx bx-fast-forward"></i></button>
-                    </div>
-                    <div class="radio-progress">
-                        <input type="range" min="0" max="100" value="0" id="radio-progress-bar">
-                    </div>
-                    <div class="radio-volume">
-                        <i class="bx bx-volume-low"></i>
-                        <input type="range" min="0" max="100" value="70" id="radio-volume-bar">
-                        <i class="bx bx-volume-full"></i>
-                    </div>
-                    <div class="radio-playlist">
-                        <h4><i class="bx bx-playlist"></i> Lista de Reproducción</h4>
-                        <ul id="playlist-songs">
-                            <li class="active"><i class="bx bx-play-circle"></i> Santo Espíritu</li>
-                            <li><i class="bx bx-play-circle"></i> Alabanzas al Rey</li>
-                            <li><i class="bx bx-play-circle"></i> Adoración Profunda</li>
-                            <li><i class="bx bx-play-circle"></i> Glorioso Día</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="qr-panel" class="qr-panel hidden" role="dialog" aria-label="QR Code">
-                <div class="qr-header">
-                    <h3><i class="bx bx-qr"></i> Compartir Iglesia</h3>
-                    <button class="btn-icon" id="close-qr" aria-label="Cerrar">
-                        <i class="bx bx-x"></i>
-                    </button>
-                </div>
-                <div class="qr-container">
-                    <div id="qr-code"></div>
-                    <p>Escanea para compartir</p>
-                    <div class="qr-actions">
-                        <button class="btn-primary btn-sm"><i class="bx bx-download"></i> Descargar</button>
-                        <button class="btn-primary btn-sm"><i class="bx bx-share-alt"></i> Compartir</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="reports-quick-panel" class="reports-quick-panel hidden" role="dialog" aria-label="Panel de reportes rápidos">
-                <div class="reports-quick-header">
-                    <h3><i class="bx bx-file"></i> Reportes Rápidos</h3>
-                    <button class="btn-icon" id="close-reports-quick" aria-label="Cerrar">
-                        <i class="bx bx-x"></i>
-                    </button>
-                </div>
-                <div class="reports-quick-actions">
-                    <button class="report-action-btn" data-report="usuario">
-                        <i class="bx bx-user"></i><span>Reportar Usuario</span>
-                    </button>
-                    <button class="report-action-btn" data-report="contenido">
-                        <i class="bx bx-message-error"></i><span>Reportar Contenido</span>
-                    </button>
-                    <button class="report-action-btn" data-report="asistencia">
-                        <i class="bx bx-calendar"></i><span>Ver Asistencia</span>
-                    </button>
-                    <button class="report-action-btn" data-report="financiero">
-                        <i class="bx bx-money"></i><span>Mis Donaciones</span>
-                    </button>
-                </div>
-                <div class="reports-recent">
-                    <h4>Reportes Recientes</h4>
-                    <div id="recent-reports-list">
-                        <div class="report-empty">
-                            <p>No hay reportes recientes</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="search-bar" class="search-bar hidden" role="search">
-                <div class="search-bar-content">
-                    <i class="bx bx-search"></i>
-                    <input type="search" id="global-search-input" placeholder="Buscar..." autocomplete="off">
-                    <button class="btn-icon" id="search-close" aria-label="Cerrar búsqueda">
-                        <i class="bx bx-x"></i>
-                    </button>
-                </div>
-                <div class="search-results" id="search-results"></div>
-            </div>
-
-            <div id="page-content" class="page-content">
-                <div class="page-loader">
-                    <div class="spinner"></div>
-                    <p>Cargando sistema...</p>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="welcome-screen" class="welcome-screen" role="main" aria-label="Pantalla de bienvenida">
-        <div class="welcome-background">
-            <div class="welcome-overlay"></div>
-            <div class="welcome-particles"></div>
-            <div class="welcome-aurora"></div>
-            <div class="welcome-cross"></div>
-            <div class="welcome-dove"></div>
-            <div class="welcome-fire"></div>
-        </div>
-        <div class="welcome-container">
-            <div class="welcome-card" data-aos="fade-up" data-aos-duration="1000">
-                <div class="welcome-header">
-                    <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="welcome-logo" width="100" height="100" loading="eager">
-                    <h1 class="welcome-title">IPUC LA FONDA</h1>
-                    <p class="welcome-subtitle">Iglesia Pentecostal Unida de Colombia</p>
-                    <p class="welcome-verse">"Donde el Espíritu Santo se mueve"</p>
-                </div>
-
-                <div class="welcome-verse-day" id="verse-day">
-                    <i class="bx bx-book-reader"></i>
-                    <div class="verse-content">
-                        <span id="daily-verse">"Porque de tal manera amó Dios al mundo..."</span>
-                        <span id="daily-verse-ref">Juan 3:16</span>
-                    </div>
-                </div>
-
-                <div class="welcome-languages">
-                    <button class="lang-btn active" data-lang="es"><i class="bx bx-globe"></i> Español</button>
-                    <button class="lang-btn" data-lang="en"><i class="bx bx-globe"></i> English</button>
-                    <button class="lang-btn" data-lang="pt"><i class="bx bx-globe"></i> Português</button>
-                    <button class="lang-btn" data-lang="fr"><i class="bx bx-globe"></i> Français</button>
-                    <button class="lang-btn" data-lang="de"><i class="bx bx-globe"></i> Deutsch</button>
-                </div>
-
-                <div id="system-status" class="system-status">
-                    <span id="status-icon" class="status-icon"><i class="bx bx-sync bx-spin"></i></span>
-                    <span id="status-text">Verificando sistema...</span>
-                </div>
-
-                <div id="login-form-container" class="auth-form-container">
-                    <form id="login-form" class="auth-form" autocomplete="on">
-                        <div class="form-group">
-                            <label for="login-email"><i class="bx bx-envelope"></i> Correo Electrónico</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-envelope"></i>
-                                <input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" required autocomplete="username">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password"><i class="bx bx-lock-alt"></i> Contraseña</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="login-password" class="form-input" placeholder="********" required autocomplete="current-password">
-                                <button type="button" class="btn-toggle-password" id="toggle-password" aria-label="Mostrar contraseña">
-                                    <i class="bx bx-show"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-group" id="2fa-group" style="display:none;">
-                            <label for="login-2fa"><i class="bx bx-shield-alt"></i> Código de Verificación</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-shield-alt"></i>
-                                <input type="text" id="login-2fa" class="form-input" placeholder="Código de 6 dígitos" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code">
-                            </div>
-                            <small class="form-hint">Ingresa el código enviado a tu correo</small>
-                        </div>
-                        <div class="form-options">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="remember-me">
-                                <span>Recordarme</span>
-                            </label>
-                            <a href="#" id="forgot-password" class="forgot-link" data-action="recovery-code">
-                                ¿Olvidaste tu contraseña?
-                            </a>
-                        </div>
-                        <button type="submit" class="btn-primary btn-lg btn-block">
-                            <i class="bx bx-log-in"></i> Iniciar Sesión
-                        </button>
-                        <p class="auth-switch">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
-                    </form>
-                </div>
-
-                <div id="recovery-form-container" class="auth-form-container hidden">
-                    <form id="recovery-form" class="auth-form" autocomplete="off">
-                        <div style="text-align:center;margin-bottom:16px;">
-                            <i class="bx bx-key" style="font-size:3rem;color:var(--dorado);"></i>
-                            <h3 style="margin-top:8px;">Recuperar Cuenta</h3>
-                            <p style="font-size:0.85rem;color:var(--gris-texto);">
-                                Ingresa tu código maestro de recuperación
-                            </p>
-                        </div>
-                        <div class="form-group">
-                            <label for="recovery-code"><i class="bx bx-key"></i> Código Maestro</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-key"></i>
-                                <input type="text" id="recovery-code" class="form-input" placeholder="LF-2026-XXXX-XXXX" required autocomplete="off">
-                            </div>
-                            <small class="form-hint">Ejemplo: LF-2026-A3X9-K2P7</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="recovery-new-password"><i class="bx bx-lock-alt"></i> Nueva Contraseña</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="recovery-new-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="recovery-confirm-password"><i class="bx bx-lock-alt"></i> Confirmar Contraseña</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="recovery-confirm-password" class="form-input" placeholder="Repite la contraseña" required minlength="8" autocomplete="new-password">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary btn-lg btn-block">
-                            <i class="bx bx-check-shield"></i> Recuperar Cuenta
-                        </button>
-                        <p class="auth-switch"><a href="#" id="back-to-login-from-recovery">← Volver al inicio de sesión</a></p>
-                    </form>
-                </div>
-
-                <div id="register-form-container" class="auth-form-container hidden">
-                    <form id="register-form" class="auth-form" autocomplete="off">
-                        <div class="form-group">
-                            <label for="reg-nombre"><i class="bx bx-user"></i> Nombre Completo</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-user"></i>
-                                <input type="text" id="reg-nombre" class="form-input" placeholder="Tu nombre" required autocomplete="name">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-email"><i class="bx bx-envelope"></i> Correo Electrónico</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-envelope"></i>
-                                <input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com" required autocomplete="email">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-password"><i class="bx bx-lock-alt"></i> Contraseña</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-lock-alt"></i>
-                                <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-role"><i class="bx bx-user-voice"></i> Tipo de Usuario</label>
-                            <select id="reg-role" class="form-input">
-                                <option value="user">Usuario Normal</option>
-                                <option value="admin">Administrador (requiere clave)</option>
-                            </select>
-                        </div>
-                        <div id="admin-key-group" class="form-group hidden">
-                            <label for="reg-admin-key"><i class="bx bx-key"></i> Clave de Administrador</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-key"></i>
-                                <input type="password" id="reg-admin-key" class="form-input" placeholder="Clave de administrador">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="captcha-container">
-                                <span id="captcha-text" class="captcha-text">A1B2C3</span>
-                                <button type="button" id="captcha-refresh" class="btn-icon" aria-label="Refrescar captcha"><i class="bx bx-refresh"></i></button>
-                                <input type="text" id="captcha-input" class="form-input" placeholder="Ingresa el código" required autocomplete="off">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary btn-lg btn-block">
-                            <i class="bx bx-user-plus"></i> Crear Cuenta
-                        </button>
-                        <p class="auth-switch">¿Ya tienes cuenta? <a href="#" id="show-login">Inicia Sesión</a></p>
-                    </form>
-                </div>
-
-                <div class="welcome-actions">
-                    <button id="btn-guest" class="btn-outline btn-lg btn-block">
-                        <i class="bx bx-user"></i> Explorar como Invitado
-                    </button>
-                    <button id="btn-create-admin" class="btn-outline btn-lg btn-block hidden">
-                        <i class="bx bx-crown"></i> Crear Primer Administrador
-                    </button>
-                    <button id="btn-qr-login" class="btn-outline btn-lg btn-block hidden">
-                        <i class="bx bx-qr-scan"></i> Acceso con QR
-                    </button>
-                </div>
-
-                <div class="welcome-social">
-                    <span>Síguenos en:</span>
-                    <a href="#" class="social-link" aria-label="YouTube"><i class="bx bxl-youtube"></i></a>
-                    <a href="#" class="social-link" aria-label="Instagram"><i class="bx bxl-instagram"></i></a>
-                    <a href="#" class="social-link" aria-label="Facebook"><i class="bx bxl-facebook"></i></a>
-                    <a href="#" class="social-link" aria-label="WhatsApp"><i class="bx bxl-whatsapp"></i></a>
-                    <a href="#" class="social-link" aria-label="TikTok"><i class="bx bxl-tiktok"></i></a>
-                    <a href="#" class="social-link" aria-label="Twitter"><i class="bx bxl-twitter"></i></a>
-                    <a href="#" class="social-link" aria-label="Telegram"><i class="bx bxl-telegram"></i></a>
-                    <a href="#" class="social-link" aria-label="Discord"><i class="bx bxl-discord-alt"></i></a>
-                </div>
-
-                <div class="welcome-footer">
-                    <p class="welcome-version">v22.3 &copy; 2026 IPUC LA FONDA</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="create-admin-section" class="create-admin-section hidden">
-        <div class="create-admin-card" data-aos="zoom-in" data-aos-duration="800">
-            <button class="create-admin-back" id="btn-back-to-welcome" aria-label="Volver">
-                <i class="bx bx-arrow-back"></i> Volver
+            <button type="submit" class="btn-primary btn-lg btn-block">
+              <i class="bx bx-log-in"></i> Iniciar sesión
             </button>
-            <div class="header">
-                <img src="ipuclafonda.png" alt="IPUC LA FONDA" class="logo-img" width="80" height="80" loading="lazy">
-                <h2>IPUC LA FONDA</h2>
-                <p class="subtitle">Configuración del Primer Administrador</p>
-                <p class="subtitle-info">Este será el administrador principal del sistema</p>
-            </div>
-
-            <form id="formAdmin" autocomplete="off" novalidate>
-                <div class="form-section">
-                    <div class="form-section-title">
-                        <i class="bx bx-user-detail"></i> Información Personal
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="admin-nombre">Nombre *</label>
-                            <input type="text" class="form-input" id="admin-nombre" name="nombre" placeholder="LUIS ESTEBAN" required autocomplete="given-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-apellidos">Apellidos *</label>
-                            <input type="text" class="form-input" id="admin-apellidos" name="apellidos" placeholder="POTOSI VENTE" required autocomplete="family-name">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-correo">Correo Electrónico *</label>
-                        <input type="email" class="form-input" id="admin-correo" name="correo" placeholder="correo@ejemplo.com" required autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-celular">Celular</label>
-                        <input type="tel" class="form-input" id="admin-celular" name="celular" placeholder="3128813818" autocomplete="tel">
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="form-section-title">
-                        <i class="bx bx-lock"></i> Credenciales
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-usuario">Usuario *</label>
-                        <input type="text" class="form-input" id="admin-usuario" name="usuario" placeholder="admin" required autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-password">Contraseña *</label>
-                        <input type="password" class="form-input" id="admin-password" name="password" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
-                        <div class="password-strength" id="password-strength">
-                            <span class="strength-bar"></span>
-                            <span class="strength-bar"></span>
-                            <span class="strength-bar"></span>
-                            <span class="strength-bar"></span>
-                            <span class="strength-text">Débil</span>
-                        </div>
-                        <small class="form-hint">Mínimo 8 caracteres, incluir mayúsculas, minúsculas y números</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-confirmar-password">Confirmar Contraseña *</label>
-                        <input type="password" class="form-input" id="admin-confirmar-password" name="confirmarPassword" placeholder="Repite la contraseña" required minlength="8" autocomplete="new-password">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit" id="admin-btn-submit">
-                    <i class="bx bx-crown"></i> Crear Administrador Global
-                </button>
-            </form>
-            <div class="resultado" id="admin-resultado"></div>
+            <p class="auth-switch">¿No tienes cuenta? <a href="#" id="show-register">Regístrate</a></p>
+          </form>
         </div>
-    </div>
 
-    <div id="master-code-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="master-code-title">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container" data-aos="zoom-in" data-aos-duration="500">
-            <div class="modal-header" style="background:linear-gradient(135deg,var(--dorado),var(--dorado-oscuro));color:var(--azul-primario);">
-                <h2 id="master-code-title"><i class="bx bx-key"></i> Código Maestro de Recuperación</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar" style="color:var(--azul-primario);">
-                    <i class="bx bx-x"></i>
-                </button>
+        <!-- Registro -->
+        <div id="register-form-container" class="auth-form-container hidden">
+          <form id="register-form" class="auth-form" autocomplete="off">
+            <div class="form-group">
+              <label for="reg-nombre"><i class="bx bx-user"></i> Nombre completo</label>
+              <input type="text" id="reg-nombre" class="form-input" placeholder="Tu nombre" required autocomplete="name" />
             </div>
-            <div class="modal-body">
-                <div style="text-align:center;padding:8px 0 16px;">
-                    <i class="bx bx-shield-quarter" style="font-size:3rem;color:var(--dorado);"></i>
-                    <h3 style="margin-top:8px;">¡Guarda este código!</h3>
-                    <p style="font-size:0.9rem;color:var(--gris-texto);margin-top:8px;">
-                        Lo necesitarás si olvidas tu contraseña o se borran los datos del navegador.
-                        <strong>Guárdalo en un lugar seguro</strong> (papel, gestor de contraseñas, correo).
-                    </p>
-                </div>
-                <div id="master-code-display" style="padding:20px;background:var(--gris-claro);border-radius:var(--borde-radius-sm);text-align:center;font-family:'Courier New',monospace;font-size:1.4rem;font-weight:700;letter-spacing:2px;color:var(--azul-primario);user-select:all;cursor:pointer;border:2px dashed var(--dorado);word-break:break-all;">
-                    LF-2026-XXXX-XXXX
-                </div>
-                <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
-                    <button class="btn-primary" id="btn-copy-master-code" style="flex:1;min-width:140px;">
-                        <i class="bx bx-copy"></i> Copiar
-                    </button>
-                    <button class="btn-secondary" id="btn-download-master-code" style="flex:1;min-width:140px;">
-                        <i class="bx bx-download"></i> Descargar .txt
-                    </button>
-                </div>
-                <div style="margin-top:16px;padding:12px;background:var(--advertencia-claro);border-left:4px solid var(--advertencia);border-radius:var(--borde-radius-sm);font-size:0.85rem;">
-                    <strong><i class="bx bx-error"></i> Importante:</strong>
-                    Este código no se puede recuperar. Si lo pierdes, tendrás que restaurar un respaldo o crear un administrador nuevo.
-                </div>
+            <div class="form-group">
+              <label for="reg-email"><i class="bx bx-envelope"></i> Correo</label>
+              <input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com" required autocomplete="email" />
             </div>
-            <div class="modal-footer">
-                <button class="btn-primary" id="btn-confirm-master-code" style="width:100%;">
-                    <i class="bx bx-check"></i> He guardado el código
-                </button>
+            <div class="form-group">
+              <label for="reg-telefono"><i class="bx bx-phone"></i> Teléfono</label>
+              <input type="tel" id="reg-telefono" class="form-input" placeholder="300 000 0000" autocomplete="tel" />
             </div>
-        </div>
-    </div>
-
-    <div id="report-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
-            <div class="modal-header">
-                <h2 id="report-modal-title"><i class="bx bx-file"></i> Generar Reporte</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar">
-                    <i class="bx bx-x"></i>
-                </button>
+            <div class="form-group">
+              <label for="reg-password"><i class="bx bx-lock"></i> Contraseña</label>
+              <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 10 caracteres" required minlength="10" autocomplete="new-password" />
             </div>
-            <div class="modal-body">
-                <form id="report-form" autocomplete="off">
-                    <div class="form-section">
-                        <div class="form-section-title"><i class="bx bx-list-check"></i> Tipo de Reporte</div>
-                        <div class="report-type-selector">
-                            <label class="report-type-option">
-                                <input type="radio" name="report-type" value="usuario" checked>
-                                <i class="bx bx-user"></i><span>Usuario</span>
-                            </label>
-                            <label class="report-type-option">
-                                <input type="radio" name="report-type" value="contenido">
-                                <i class="bx bx-message-error"></i><span>Contenido</span>
-                            </label>
-                            <label class="report-type-option">
-                                <input type="radio" name="report-type" value="asistencia">
-                                <i class="bx bx-calendar"></i><span>Asistencia</span>
-                            </label>
-                            <label class="report-type-option">
-                                <input type="radio" name="report-type" value="financiero">
-                                <i class="bx bx-money"></i><span>Financiero</span>
-                            </label>
-                            <label class="report-type-option">
-                                <input type="radio" name="report-type" value="ministerio">
-                                <i class="bx bx-building-house"></i><span>Ministerio</span>
-                            </label>
-                            <label class="report-type-option">
-                                <input type="radio" name="report-type" value="abuso">
-                                <i class="bx bx-shield-alt"></i><span>Abuso</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-section-title"><i class="bx bx-detail"></i> Detalles del Reporte</div>
-
-                        <div class="form-group" id="report-user-group">
-                            <label for="report-user">Usuario a Reportar</label>
-                            <div class="input-wrapper">
-                                <i class="bx bx-search"></i>
-                                <input type="text" id="report-user" class="form-input" placeholder="Buscar usuario...">
-                            </div>
-                            <div id="report-user-results" class="search-results-dropdown hidden"></div>
-                        </div>
-
-                        <div class="form-grid" id="report-date-range" style="display:none;">
-                            <div class="form-group">
-                                <label for="report-date-from">Fecha Desde</label>
-                                <input type="date" id="report-date-from" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="report-date-to">Fecha Hasta</label>
-                                <input type="date" id="report-date-to" class="form-input">
-                            </div>
-                        </div>
-
-                        <div class="form-group" id="report-ministerio-group" style="display:none;">
-                            <label for="report-ministerio">Ministerio</label>
-                            <select id="report-ministerio" class="form-input">
-                                <option value="">Seleccionar...</option>
-                                <option value="jovenes">Jóvenes</option>
-                                <option value="ninos">Niños</option>
-                                <option value="alabanza">Alabanza</option>
-                                <option value="misiones">Misiones</option>
-                                <option value="damas">Damas</option>
-                                <option value="caballeros">Caballeros</option>
-                                <option value="intercesion">Intercesión</option>
-                                <option value="predicacion">Predicación</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="report-motivo">Motivo *</label>
-                            <select id="report-motivo" class="form-input" required>
-                                <option value="">Seleccionar motivo...</option>
-                                <option value="comportamiento">Comportamiento Inapropiado</option>
-                                <option value="contenido">Contenido Ofensivo</option>
-                                <option value="spam">Spam</option>
-                                <option value="suplantacion">Suplantación de Identidad</option>
-                                <option value="abuso">Abuso o Acoso</option>
-                                <option value="discriminacion">Discriminación</option>
-                                <option value="otro">Otro</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="report-descripcion">Descripción Detallada *</label>
-                            <textarea id="report-descripcion" class="form-input" rows="4" placeholder="Describe el motivo del reporte..." required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Nivel de Urgencia</label>
-                            <div class="urgency-selector">
-                                <label class="urgency-option">
-                                    <input type="radio" name="report-urgencia" value="baja" checked>
-                                    <span class="urgency-badge baja">Baja</span>
-                                </label>
-                                <label class="urgency-option">
-                                    <input type="radio" name="report-urgencia" value="media">
-                                    <span class="urgency-badge media">Media</span>
-                                </label>
-                                <label class="urgency-option">
-                                    <input type="radio" name="report-urgencia" value="alta">
-                                    <span class="urgency-badge alta">Alta</span>
-                                </label>
-                                <label class="urgency-option">
-                                    <input type="radio" name="report-urgencia" value="critica">
-                                    <span class="urgency-badge critica">Crítica</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="report-attachment">Adjuntar Evidencia</label>
-                            <div class="file-drop-zone" id="file-drop-zone">
-                                <i class="bx bx-cloud-upload"></i>
-                                <p>Arrastra o haz clic para subir archivos</p>
-                                <input type="file" id="report-attachment" class="file-input" accept="image/*,video/*,.pdf,.doc,.docx" multiple>
-                            </div>
-                            <small class="form-hint">Formatos: JPG, PNG, PDF, DOC, MP4 (máx 10MB)</small>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="btn-cancel-report">Cancelar</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="bx bx-send"></i> Enviar Reporte
-                        </button>
-                    </div>
-                </form>
+            <div class="form-group">
+              <label for="reg-password2"><i class="bx bx-lock"></i> Confirmar contraseña</label>
+              <input type="password" id="reg-password2" class="form-input" placeholder="Repite la contraseña" required minlength="10" autocomplete="new-password" />
             </div>
-        </div>
-    </div>
-
-    <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-label="Panel de notificaciones">
-        <div class="notification-header">
-            <h3><i class="bx bx-bell"></i> Notificaciones</h3>
-            <div class="notification-actions">
-                <button class="btn-icon" id="mark-all-read" aria-label="Marcar todas como leídas">
-                    <i class="bx bx-check-double"></i>
-                </button>
-                <button class="btn-icon" id="close-notifications" aria-label="Cerrar">
-                    <i class="bx bx-x"></i>
-                </button>
+            <div class="form-group checkbox-label">
+              <input type="checkbox" id="reg-privacy" required />
+              <span>Acepto la <a href="#/privacidad">política de privacidad</a></span>
             </div>
-        </div>
-        <div class="notification-filters">
-            <button class="filter-btn active" data-filter="all"><i class="bx bx-list-ul"></i> Todas</button>
-            <button class="filter-btn" data-filter="evento"><i class="bx bx-calendar"></i> Eventos</button>
-            <button class="filter-btn" data-filter="oracion"><i class="bx bx-pray"></i> Oraciones</button>
-            <button class="filter-btn" data-filter="sistema"><i class="bx bx-server"></i> Sistema</button>
-        </div>
-        <div id="notification-list">
-            <div class="notification-empty">
-                <i class="bx bx-bell-off"></i>
-                <p>No tienes notificaciones nuevas</p>
+            <div class="form-group checkbox-label">
+              <input type="checkbox" id="reg-image" />
+              <span>Autorizo el uso de mi imagen y voz (opcional)</span>
             </div>
-        </div>
-    </div>
-
-    <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
-            <div class="modal-header">
-                <h2 id="event-modal-title"><i class="bx bx-calendar-plus"></i> Crear Evento</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar">
-                    <i class="bx bx-x"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="event-form" autocomplete="off">
-                    <div class="form-group">
-                        <label for="event-title"><i class="bx bx-text"></i> Título del Evento *</label>
-                        <input type="text" id="event-title" class="form-input" placeholder="Ej: Culto de Adoración" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="event-desc"><i class="bx bx-detail"></i> Descripción</label>
-                        <textarea id="event-desc" class="form-input" rows="3" placeholder="Detalles del evento..."></textarea>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="event-date"><i class="bx bx-calendar"></i> Fecha *</label>
-                            <input type="date" id="event-date" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="event-time"><i class="bx bx-time"></i> Hora *</label>
-                            <input type="time" id="event-time" class="form-input" required>
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="event-location"><i class="bx bx-map"></i> Lugar</label>
-                            <input type="text" id="event-location" class="form-input" placeholder="Dirección del evento">
-                        </div>
-                        <div class="form-group">
-                            <label for="event-type"><i class="bx bx-category"></i> Tipo de Evento</label>
-                            <select id="event-type" class="form-input">
-                                <option value="culto">Culto</option>
-                                <option value="estudio">Estudio Bíblico</option>
-                                <option value="conferencia">Conferencia</option>
-                                <option value="retiro">Retiro</option>
-                                <option value="social">Actividad Social</option>
-                                <option value="misiones">Misiones</option>
-                                <option value="concierto">Concierto</option>
-                                <option value="otros">Otros</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="event-reminder">
-                            <i class="bx bx-bell"></i> Activar recordatorio (24h antes)
-                        </label>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="btn-cancel-event">Cancelar</button>
-                        <button type="submit" class="btn-primary"><i class="bx bx-calendar-check"></i> Crear Evento</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div id="prayer-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container modal-sm" data-aos="fade-up" data-aos-duration="500">
-            <div class="modal-header">
-                <h2><i class="bx bx-pray"></i> Cadena de Oración</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar">
-                    <i class="bx bx-x"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="prayer-form" autocomplete="off">
-                    <div class="form-group">
-                        <label for="prayer-name"><i class="bx bx-user"></i> Tu Nombre</label>
-                        <input type="text" id="prayer-name" class="form-input" placeholder="Anónimo o tu nombre">
-                    </div>
-                    <div class="form-group">
-                        <label for="prayer-category"><i class="bx bx-category"></i> Categoría</label>
-                        <select id="prayer-category" class="form-input">
-                            <option value="salud">Salud</option>
-                            <option value="familia">Familia</option>
-                            <option value="trabajo">Trabajo</option>
-                            <option value="espiritual">Crecimiento Espiritual</option>
-                            <option value="iglesia">Iglesia</option>
-                            <option value="misiones">Misiones</option>
-                            <option value="otros">Otros</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="prayer-request"><i class="bx bx-pray"></i> Petición de Oración *</label>
-                        <textarea id="prayer-request" class="form-input" rows="4" placeholder="Comparte tu petición..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Nivel de Privacidad</label>
-                        <div class="privacy-selector">
-                            <label class="privacy-option">
-                                <input type="radio" name="prayer-privacy" value="public" checked>
-                                <i class="bx bx-globe"></i> Pública
-                            </label>
-                            <label class="privacy-option">
-                                <input type="radio" name="prayer-privacy" value="anonymous">
-                                <i class="bx bx-user-x"></i> Anónima
-                            </label>
-                            <label class="privacy-option">
-                                <input type="radio" name="prayer-privacy" value="private">
-                                <i class="bx bx-lock"></i> Privada
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="btn-cancel-prayer">Cancelar</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="bx bx-send"></i> Enviar Oración
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container modal-sm" data-aos="fade-up" data-aos-duration="400">
-            <div class="modal-body text-center">
-                <div class="confirm-icon"><i class="bx bx-question-mark"></i></div>
-                <h3 id="confirm-title">¿Estás seguro?</h3>
-                <p id="confirm-message"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="confirm-cancel"><i class="bx bx-x"></i> Cancelar</button>
-                <button class="btn-primary" id="confirm-accept"><i class="bx bx-check"></i> Aceptar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="restore-confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container modal-sm" data-aos="zoom-in" data-aos-duration="400">
-            <div class="modal-header" style="background:var(--advertencia);color:white;">
-                <h2><i class="bx bx-error-circle"></i> Confirmar Restauración</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar" style="color:white;">
-                    <i class="bx bx-x"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div style="text-align:center;padding:12px 0;">
-                    <i class="bx bx-cloud-upload" style="font-size:3rem;color:var(--advertencia);"></i>
-                </div>
-                <p style="text-align:center;font-size:1rem;line-height:1.6;">
-                    Vas a <strong>restaurar un respaldo</strong>.<br><br>
-                    Esto <strong style="color:var(--error);">REEMPLAZARÁ todos los datos actuales</strong>
-                    (usuarios, publicaciones, ofrendas, eventos, etc.) con los del archivo.
-                </p>
-                <div style="margin-top:16px;padding:12px;background:var(--error-claro);border-left:4px solid var(--error);border-radius:var(--borde-radius-sm);font-size:0.85rem;">
-                    <strong><i class="bx bx-info-circle"></i> Recomendación:</strong>
-                    Antes de restaurar, descarga un respaldo actual por si acaso.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="btn-cancel-restore">Cancelar</button>
-                <button class="btn-primary" id="btn-confirm-restore" style="background:var(--advertencia);">
-                    <i class="bx bx-check"></i> Sí, restaurar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="game-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
-            <div class="modal-header">
-                <h2 id="game-modal-title"><i class="bx bx-game"></i> Juego Bíblico</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar">
-                    <i class="bx bx-x"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="game-body">
-                <div class="game-container">
-                    <div class="game-score">
-                        <span><i class="bx bx-star"></i> Puntuación: <strong id="game-score">0</strong></span>
-                        <span><i class="bx bx-level-up"></i> Nivel: <strong id="game-level">1</strong></span>
-                    </div>
-                    <div class="game-question" id="game-question">
-                        ¿Quién construyó el arca?
-                    </div>
-                    <div class="game-options" id="game-options">
-                        <button class="game-option" data-answer="a">Moisés</button>
-                        <button class="game-option" data-answer="b">Noé</button>
-                        <button class="game-option" data-answer="c">Abraham</button>
-                        <button class="game-option" data-answer="d">David</button>
-                    </div>
-                    <div class="game-result" id="game-result"></div>
-                    <button class="btn-primary btn-next hidden" id="game-next"><i class="bx bx-right-arrow-alt"></i> Siguiente</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="achievement-modal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-container" data-aos="fade-up" data-aos-duration="500">
-            <div class="modal-header">
-                <h2><i class="bx bx-trophy"></i> Logros Desbloqueados</h2>
-                <button class="modal-close btn-icon" aria-label="Cerrar">
-                    <i class="bx bx-x"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="achievement-body">
-                <div class="achievement-grid">
-                    <div class="achievement-item locked">
-                        <i class="bx bx-lock-alt"></i>
-                        <span>Primera Oración</span>
-                    </div>
-                    <div class="achievement-item locked">
-                        <i class="bx bx-lock-alt"></i>
-                        <span>Leer la Biblia</span>
-                    </div>
-                    <div class="achievement-item locked">
-                        <i class="bx bx-lock-alt"></i>
-                        <span>Compartir Testimonio</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="assistant" class="assistant hidden" role="dialog" aria-label="Asistente virtual">
-        <div class="assistant-header">
-            <div class="assistant-info">
-                <i class="bx bx-bot"></i>
-                <span>Asistente IPUC</span>
-                <span class="assistant-status"><i class="bx bx-circle"></i> En línea</span>
-            </div>
-            <button class="btn-icon" id="close-assistant" aria-label="Cerrar asistente">
-                <i class="bx bx-x"></i>
+            <button type="submit" class="btn-primary btn-lg btn-block">
+              <i class="bx bx-user-plus"></i> Crear cuenta
             </button>
+            <p class="auth-switch">¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión</a></p>
+          </form>
         </div>
-        <div class="assistant-messages" id="assistant-messages">
-            <div class="assistant-msg bot">
-                <i class="bx bx-bot"></i>
-                <div class="msg-content">
-                    <p>¡Hola! Soy tu asistente virtual de IPUC LA FONDA. ¿En qué puedo ayudarte hoy?</p>
-                </div>
-            </div>
+
+        <div class="welcome-actions">
+          <button id="btn-guest" class="btn-outline btn-lg btn-block">
+            <i class="bx bx-user"></i> Explorar como invitado
+          </button>
         </div>
-        <div class="assistant-input">
-            <input type="text" id="assistant-input" placeholder="Escribe tu pregunta..." autocomplete="off">
-            <button class="btn-icon" id="assistant-send"><i class="bx bx-send"></i></button>
+
+        <div class="welcome-footer">
+          <p class="welcome-version">v1.0 &copy; <span id="footer-year">2026</span> IPUC La Fonda</p>
         </div>
-        <div class="assistant-suggestions">
-            <button class="suggestion-btn"><i class="bx bx-book-reader"></i> Versículo del día</button>
-            <button class="suggestion-btn"><i class="bx bx-pray"></i> Oración</button>
-            <button class="suggestion-btn"><i class="bx bx-calendar"></i> Eventos</button>
-            <button class="suggestion-btn"><i class="bx bx-music"></i> Música</button>
-            <button class="suggestion-btn"><i class="bx bx-question-mark"></i> Ayuda</button>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <div id="toast-container" class="toast-container" aria-live="polite"></div>
-
-    <button id="fab-main" class="fab hidden" aria-label="Acciones rápidas">
-        <i class="bx bx-plus"></i>
-    </button>
-    <div id="fab-menu" class="fab-menu hidden" role="menu">
-        <button class="fab-item" data-action="reporte" role="menuitem">
-            <i class="bx bx-file"></i><span>Reporte</span>
-        </button>
-        <button class="fab-item" data-action="oracion" role="menuitem">
-            <i class="bx bx-pray"></i><span>Oración</span>
-        </button>
-        <button class="fab-item" data-action="musica" role="menuitem">
-            <i class="bx bx-music"></i><span>Música</span>
-        </button>
-        <button class="fab-item" data-action="evento" role="menuitem">
-            <i class="bx bx-calendar-plus"></i><span>Evento</span>
-        </button>
-        <button class="fab-item" data-action="donacion" role="menuitem">
-            <i class="bx bx-donate-heart"></i><span>Donar</span>
-        </button>
-        <button class="fab-item" data-action="juego" role="menuitem">
-            <i class="bx bx-game"></i><span>Juego</span>
-        </button>
-        <button class="fab-item" data-action="asistente" role="menuitem">
-            <i class="bx bx-bot"></i><span>Asistente</span>
-        </button>
-        <button class="fab-item" data-action="voluntariado" role="menuitem">
-            <i class="bx bx-hand"></i><span>Voluntariado</span>
-        </button>
-        <button class="fab-item" data-action="desafio" role="menuitem">
-            <i class="bx bx-target-lock"></i><span>Desafío</span>
-        </button>
+  <!-- ================ MODALES ================ -->
+  <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-container modal-sm">
+      <div class="modal-body text-center">
+        <div class="confirm-icon"><i class="bx bx-info-circle"></i></div>
+        <h3 id="confirm-title">¿Estás seguro?</h3>
+        <p id="confirm-message"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="confirm-cancel"><i class="bx bx-x"></i> Cancelar</button>
+        <button class="btn-primary" id="confirm-accept"><i class="bx bx-check"></i> Aceptar</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Librerías externas -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <div id="prayer-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2><i class="bx bx-hands-praying"></i> Petición de oración</h2>
+        <button class="modal-close btn-icon" aria-label="Cerrar"><i class="bx bx-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="prayer-form" autocomplete="off">
+          <div class="form-group">
+            <label for="prayer-name">Tu nombre (opcional)</label>
+            <input type="text" id="prayer-name" class="form-input" placeholder="Anónimo o tu nombre" />
+          </div>
+          <div class="form-group">
+            <label for="prayer-text">Petición</label>
+            <textarea id="prayer-text" class="form-input" rows="4" maxlength="1000" required></textarea>
+          </div>
+          <div class="form-group checkbox-label">
+            <input type="checkbox" id="prayer-private" />
+            <span>Privada (solo líderes la verán)</span>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary modal-close">Cancelar</button>
+            <button type="submit" class="btn-primary"><i class="bx bx-send"></i> Enviar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
-    <!-- Script inline: inicialización de librerías visuales -->
-    <script>
-        if (typeof AOS !== 'undefined') {
-            AOS.init({
-                once: true,
-                offset: 50,
-                duration: 800
-            });
-        }
+  <div id="install-pwa-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2><i class="bx bx-download"></i> Instalar la app</h2>
+        <button class="modal-close btn-icon" aria-label="Cerrar"><i class="bx bx-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p>Instala la aplicación en tu dispositivo para acceder sin conexión.</p>
+        <p><strong>Android / Chrome:</strong> menú ⋮ → "Instalar aplicación".</p>
+        <p><strong>iOS / Safari:</strong> botón Compartir → "Agregar a inicio".</p>
+      </div>
+    </div>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const qrContainer = document.getElementById('qr-code');
-            if (qrContainer && typeof QRCode !== 'undefined') {
-                try {
-                    new QRCode(qrContainer, {
-                        text: 'https://ipuclafonda.netlify.app/',
-                        width: 150,
-                        height: 150,
-                        colorDark: '#1a237e',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                } catch (e) {
-                    console.warn('QR no generado:', e);
-                }
-            }
-        });
-    </script>
+  <div id="notification-panel" class="notification-panel hidden" role="dialog" aria-label="Notificaciones">
+    <div class="notification-header">
+      <h3><i class="bx bx-bell"></i> Notificaciones</h3>
+      <div class="notification-actions">
+        <button class="btn-icon" id="mark-all-read" aria-label="Marcar todas"><i class="bx bx-check"></i></button>
+        <button class="btn-icon" id="close-notifications" aria-label="Cerrar"><i class="bx bx-x"></i></button>
+      </div>
+    </div>
+    <div id="notification-list">
+      <div class="notification-empty">
+        <i class="bx bx-bell"></i>
+        <p>Sin notificaciones nuevas</p>
+      </div>
+    </div>
+  </div>
 
-    <!-- ═══ v22.3: Orden correcto de scripts (con cache-busting) ═══ -->
-    <script src="database.js?v=22.3"></script>
-    <script src="storage.js?v=22.3"></script>
-    <script src="script.js?v=22.3"></script>
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
 
-    <!-- Service Worker y utilidades finales -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(function(reg) {
-                        console.log('✅ Service Worker registrado:', reg.scope);
-                    })
-                    .catch(function(err) {
-                        console.warn('⚠️ SW error:', err);
-                    });
-            });
-        }
+  <button id="fab-main" class="fab hidden" aria-label="Acciones rápidas"><i class="bx bx-plus"></i></button>
+  <div id="fab-menu" class="fab-menu hidden" role="menu">
+    <button class="fab-item" data-action="prayer" role="menuitem"><i class="bx bx-hands-praying"></i><span>Orar</span></button>
+    <button class="fab-item" data-action="install" role="menuitem"><i class="bx bx-download"></i><span>Instalar</span></button>
+    <button class="fab-item" data-action="top" role="menuitem"><i class="bx bx-up-arrow"></i><span>Arriba</span></button>
+  </div>
 
-        if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
-            document.body.classList.add('pwa-mode');
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const dateElement = document.getElementById('header-date');
-            if (dateElement) {
-                try {
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    const today = new Date().toLocaleDateString('es-CO', options);
-                    dateElement.textContent = today.charAt(0).toUpperCase() + today.slice(1);
-                } catch (e) {}
-            }
-
-            const togglePassword = document.getElementById('toggle-password');
-            if (togglePassword) {
-                togglePassword.addEventListener('click', function() {
-                    const passwordInput = document.getElementById('login-password');
-                    if (!passwordInput) return;
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        this.querySelector('i').className = 'bx bx-hide';
-                    } else {
-                        passwordInput.type = 'password';
-                        this.querySelector('i').className = 'bx bx-show';
-                    }
-                });
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const forgotLink = document.getElementById('forgot-password');
-            const recoveryContainer = document.getElementById('recovery-form-container');
-            const loginContainer = document.getElementById('login-form-container');
-            const registerContainer = document.getElementById('register-form-container');
-            const backToLogin = document.getElementById('back-to-login-from-recovery');
-
-            if (forgotLink && recoveryContainer && loginContainer) {
-                forgotLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (registerContainer) registerContainer.classList.add('hidden');
-                    loginContainer.classList.add('hidden');
-                    recoveryContainer.classList.remove('hidden');
-                });
-            }
-
-            if (backToLogin) {
-                backToLogin.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    recoveryContainer.classList.add('hidden');
-                    loginContainer.classList.remove('hidden');
-                });
-            }
-
-            const recoveryForm = document.getElementById('recovery-form');
-            if (recoveryForm) {
-                recoveryForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const codigo = document.getElementById('recovery-code').value.trim();
-                    const pass1 = document.getElementById('recovery-new-password').value;
-                    const pass2 = document.getElementById('recovery-confirm-password').value;
-
-                    if (pass1 !== pass2) {
-                        if (window.showToast) showToast('Las contraseñas no coinciden', 'error');
-                        return;
-                    }
-
-                    if (pass1.length < 8) {
-                        if (window.showToast) showToast('La contraseña debe tener al menos 8 caracteres', 'error');
-                        return;
-                    }
-
-                    if (window.Storage && typeof window.Storage.resetearPasswordConCodigo === 'function') {
-                        const r = window.Storage.resetearPasswordConCodigo(codigo, pass1);
-                        if (r.success) {
-                            if (window.showToast) showToast('✅ Cuenta recuperada. Ya puedes iniciar sesión.', 'success');
-                            recoveryContainer.classList.add('hidden');
-                            loginContainer.classList.remove('hidden');
-                            recoveryForm.reset();
-                        } else {
-                            if (window.showToast) showToast('❌ ' + r.error, 'error');
-                        }
-                    } else {
-                        if (window.showToast) showToast('Módulo de respaldo no disponible', 'error');
-                    }
-                });
-            }
-        });
-    </script>
+  <!-- ================ SCRIPTS LOCALES ================ -->
+  <script src="storage.js"></script>
+  <script src="icons.js"></script>
+  <script src="app.js"></script>
+  <script src="ui-init.js"></script>
 </body>
 </html>
